@@ -4,93 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Editora Graça | Excelência Editorial</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-              serif: ['Cormorant Garamond', 'serif'],
-            },
-            colors: {
-              brand: {
-                50: '#F9F9F9',   // Cinza ultra leve
-                100: '#F2F2F2',  // Cinza elegante (bordas)
-                200: '#E5E5E5',  // Cinza médio para divisores
-                800: '#1A1A1A',  // Preto suave
-                900: '#000000',  // Preto absoluto
-              },
-              accent: {
-                gold: '#C5A059',      // Dourado Sofisticado
-                goldLight: '#D4AF37', // Dourado Vibrante
-                goldDark: '#A68039',
-              }
-            },
-            animation: {
-              'fade-in': 'fadeIn 0.8s ease-out forwards',
-              'slide-up': 'slideUp 0.6s ease-out forwards',
-            },
-            keyframes: {
-              fadeIn: {
-                '0%': { opacity: '0' },
-                '100%': { opacity: '1' },
-              },
-              slideUp: {
-                '0%': { transform: 'translateY(20px)', opacity: '0' },
-                '100%': { transform: 'translateY(0)', opacity: '1' },
-              }
-            }
-          }
-        }
-      }
-    </script>
-    <style>
-      body {
-        background-color: #FFFFFF;
-        color: #111111;
-        -webkit-font-smoothing: antialiased;
-      }
-      .book-shadow {
-        box-shadow: 15px 15px 30px rgba(0,0,0,0.08), -1px 0 4px rgba(0,0,0,0.02);
-      }
-      .paper-texture {
-        background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');
-      }
-      ::selection {
-        background-color: #C5A059;
-        color: white;
-      }
-      ::-webkit-scrollbar {
-        width: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #F9F9F9;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #E5E5E5;
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #C5A059;
-      }
-    </style>
-  <script type="importmap">
-{
-  "imports": {
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.31.0",
-    "react/": "https://aistudiocdn.com/react@^19.2.1/",
-    "react": "https://aistudiocdn.com/react@^19.2.1",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0"
-  }
-}
-</script>
-<link rel="stylesheet" href="/index.css">
-</head>
+  </head>
   <body>
     <div id="root"></div>
-  <script type="module" src="/index.tsx"></script>
-</body>
+    <script type="module" src="/index.tsx"></script>
+  </body>
 </html>
