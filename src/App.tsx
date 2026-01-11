@@ -8,6 +8,7 @@ import CatalogPage from './pages/CatalogPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import CheckoutPage from './pages/CheckoutPage';
+import ServicesPage from './pages/ServicesPage';
 import { subscribeToAuthChanges, logout } from './services/authService';
 import { getBooks } from './services/dataService';
 import { client } from './services/appwrite';
@@ -331,7 +332,8 @@ const App: React.FC = () => {
                         onNavigate={handleNavigate}
                     />
                 )}
-                {currentView !== 'HOME' && currentView !== 'AUTH' && currentView !== 'CATALOG' && currentView !== 'ABOUT' && currentView !== 'CONTACT' && currentView !== 'CHECKOUT' && (
+                {currentView === 'SERVICES' && <ServicesPage onNavigate={handleNavigate} />}
+                {currentView !== 'HOME' && currentView !== 'AUTH' && currentView !== 'CATALOG' && currentView !== 'ABOUT' && currentView !== 'CONTACT' && currentView !== 'CHECKOUT' && currentView !== 'SERVICES' && (
                     <div className="container mx-auto px-8 py-32 text-center h-[60vh] flex flex-col items-center justify-center">
                         <h2 className="text-4xl font-black text-brand-dark mb-4 tracking-tighter">Secção em Construção</h2>
                         <p className="text-gray-500 mb-8 font-medium">Estamos a preparar algo especial para si.</p>
