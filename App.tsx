@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import Navbar from './components/Navbar';
 import AIChat from './components/AIChat';
 import Footer from './components/Footer';
@@ -193,13 +194,23 @@ const App: React.FC = () => {
       case 'AUTH':
         return <AuthPage setUser={setUser} handleNavigate={handleNavigate} />;
       default:
-        return <HomePage onNavigate={handleNavigate} />;
+        return (
+          <HomePage
+            onNavigate={handleNavigate}
+            books={books}
+            addToCart={addToCart}
+            toggleWishlist={toggleWishlist}
+            wishlist={wishlist}
+            setSelectedBook={setSelectedBook}
+          />
+        );
     }
   };
 
   return (
     <div className="min-h-screen flex flex-col font-sans selection:bg-accent-gold selection:text-white">
       <Analytics />
+      <SpeedInsights />
       <Navbar
         cartCount={cart.reduce((a: number, b: CartItem) => a + b.quantity, 0)}
         wishlistCount={wishlist.length}
