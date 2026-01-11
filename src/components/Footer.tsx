@@ -70,7 +70,7 @@ const Footer: React.FC = () => {
             <div className="container mx-auto px-8 flex justify-between items-center text-[10px] text-gray-500 font-bold uppercase tracking-widest">
                 <p>© 2026 Editora Graça (SU), LDA. Todos os direitos reservados.</p>
                 <div className="flex gap-6">
-                    <span>Power by Avançada Agentic Coding</span>
+                    <span>Feito por ibuka47</span>
                 </div>
             </div>
         </footer>
