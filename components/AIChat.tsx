@@ -94,7 +94,12 @@ const AIChat: React.FC = () => {
             </div>
           </div>
         </div>
-        <button onClick={() => setIsOpen(false)} className="text-gray-400 hover:text-white transition-colors">
+        <button
+          onClick={() => setIsOpen(false)}
+          className="text-gray-400 hover:text-white transition-colors"
+          title="Minimizar chat"
+          aria-label="Minimizar chat"
+        >
           <Minimize2 className="h-5 w-5" />
         </button>
       </div>
