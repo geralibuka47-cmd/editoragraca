@@ -22,7 +22,12 @@ const BookDetailModal: React.FC<BookDetailModalProps> = ({
         <div className="fixed inset-0 z-[700] flex items-center justify-center p-0 md:p-4">
             <div className="absolute inset-0 bg-brand-900/95 backdrop-blur-md" onClick={onClose} />
             <div className="relative bg-white w-full max-w-5xl h-full md:h-auto md:max-h-[90vh] overflow-y-auto rounded-none md:rounded-[3rem] shadow-2xl flex flex-col md:flex-row animate-slide-up">
-                <button onClick={onClose} className="absolute top-6 right-6 md:top-10 md:right-10 text-gray-300 hover:text-brand-900 transition-colors z-[100] p-2 bg-brand-900/10 rounded-full backdrop-blur-sm md:bg-transparent">
+                <button
+                    onClick={onClose}
+                    className="absolute top-6 right-6 md:top-10 md:right-10 text-gray-300 hover:text-brand-900 transition-colors z-[100] p-2 bg-brand-900/10 rounded-full backdrop-blur-sm md:bg-transparent"
+                    title="Fechar detalhe do livro"
+                    aria-label="Fechar detalhe do livro"
+                >
                     <X size={24} />
                 </button>
 
@@ -41,7 +46,14 @@ const BookDetailModal: React.FC<BookDetailModalProps> = ({
                     <div className="pt-6 flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-6 md:gap-8">
                         <span className="text-4xl md:text-5xl font-serif font-bold text-brand-900">{book.price.toLocaleString()} Kz</span>
                         <div className="flex gap-4">
-                            <button onClick={() => onToggleWishlist(book)} className={`flex-1 md:flex-none p-5 md:p-6 rounded-2xl md:rounded-[1.5rem] border transition-all ${isInWishlist ? 'bg-accent-gold text-white' : 'border-brand-100 text-brand-900'}`}><Heart className={`mx-auto ${isInWishlist ? "fill-current" : ""}`} size={20} /></button>
+                            <button
+                                onClick={() => onToggleWishlist(book)}
+                                className={`flex-1 md:flex-none p-5 md:p-6 rounded-2xl md:rounded-[1.5rem] border transition-all ${isInWishlist ? 'bg-accent-gold text-white' : 'border-brand-100 text-brand-900'}`}
+                                title={isInWishlist ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+                                aria-label={isInWishlist ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+                            >
+                                <Heart className={`mx-auto ${isInWishlist ? "fill-current" : ""}`} size={20} />
+                            </button>
                             <button onClick={() => { onAddToCart(book); onClose(); }} className="flex-[3] md:flex-none px-8 md:px-12 py-5 md:py-6 bg-brand-900 text-white font-bold uppercase tracking-widest text-[10px] md:text-[11px] rounded-2xl md:rounded-[1.5rem] hover:bg-accent-gold transition-all shadow-2xl">Adicionar ao Carrinho</button>
                         </div>
                     </div>
