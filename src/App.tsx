@@ -7,6 +7,7 @@ import AuthPage from './pages/AuthPage';
 import CatalogPage from './pages/CatalogPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
+import CheckoutPage from './pages/CheckoutPage';
 import { subscribeToAuthChanges, logout } from './services/authService';
 import { getBooks } from './services/dataService';
 import { client } from './services/appwrite';
@@ -72,6 +73,16 @@ const App: React.FC = () => {
 
     const handleToggleWishlist = (book: Book) => {
         console.log('Toggled wishlist for:', book.title);
+    };
+
+    const handleUpdateQuantity = (bookId: string, newQuantity: number) => {
+        setCart(prev => prev.map(item =>
+            item.id === bookId ? { ...item, quantity: newQuantity } : item
+        ));
+    };
+
+    const handleRemoveFromCart = (bookId: string) => {
+        setCart(prev => prev.filter(item => item.id !== bookId));
     };
 
     const handleViewDetails = (book: Book) => {
@@ -312,7 +323,15 @@ const App: React.FC = () => {
                 )}
                 {currentView === 'ABOUT' && <AboutPage onNavigate={handleNavigate} />}
                 {currentView === 'CONTACT' && <ContactPage onNavigate={handleNavigate} />}
-                {currentView !== 'HOME' && currentView !== 'AUTH' && currentView !== 'CATALOG' && currentView !== 'ABOUT' && currentView !== 'CONTACT' && (
+                {currentView === 'CHECKOUT' && (
+                    <CheckoutPage
+                        cart={cart}
+                        onUpdateQuantity={handleUpdateQuantity}
+                        onRemoveItem={handleRemoveFromCart}
+                        onNavigate={handleNavigate}
+                    />
+                )}
+                {currentView !== 'HOME' && currentView !== 'AUTH' && currentView !== 'CATALOG' && currentView !== 'ABOUT' && currentView !== 'CONTACT' && currentView !== 'CHECKOUT' && (
                     <div className="container mx-auto px-8 py-32 text-center h-[60vh] flex flex-col items-center justify-center">
                         <h2 className="text-4xl font-black text-brand-dark mb-4 tracking-tighter">Secção em Construção</h2>
                         <p className="text-gray-500 mb-8 font-medium">Estamos a preparar algo especial para si.</p>
