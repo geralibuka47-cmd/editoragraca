@@ -5,6 +5,7 @@ import BookCard from './components/BookCard';
 import BookDetailModal from './components/BookDetailModal';
 import AuthPage from './pages/AuthPage';
 import CatalogPage from './pages/CatalogPage';
+import AboutPage from './pages/AboutPage';
 import { subscribeToAuthChanges, logout } from './services/authService';
 import { getBooks } from './services/dataService';
 import { client } from './services/appwrite';
@@ -308,7 +309,8 @@ const App: React.FC = () => {
                         onNavigate={handleNavigate}
                     />
                 )}
-                {currentView !== 'HOME' && currentView !== 'AUTH' && currentView !== 'CATALOG' && (
+                {currentView === 'ABOUT' && <AboutPage onNavigate={handleNavigate} />}
+                {currentView !== 'HOME' && currentView !== 'AUTH' && currentView !== 'CATALOG' && currentView !== 'ABOUT' && (
                     <div className="container mx-auto px-8 py-32 text-center h-[60vh] flex flex-col items-center justify-center">
                         <h2 className="text-4xl font-black text-brand-dark mb-4 tracking-tighter">Secção em Construção</h2>
                         <p className="text-gray-500 mb-8 font-medium">Estamos a preparar algo especial para si.</p>
