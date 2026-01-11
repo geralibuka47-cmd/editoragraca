@@ -77,8 +77,8 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) =
                         <button
                             onClick={() => setActiveTab('library')}
                             className={`px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider transition-all ${activeTab === 'library'
-                                    ? 'bg-brand-primary text-white'
-                                    : 'bg-white/10 text-white hover:bg-white/20'
+                                ? 'bg-brand-primary text-white'
+                                : 'bg-white/10 text-white hover:bg-white/20'
                                 }`}
                         >
                             <Book className="w-4 h-4 inline mr-2" />
@@ -87,8 +87,8 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) =
                         <button
                             onClick={() => setActiveTab('wishlist')}
                             className={`px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider transition-all ${activeTab === 'wishlist'
-                                    ? 'bg-brand-primary text-white'
-                                    : 'bg-white/10 text-white hover:bg-white/20'
+                                ? 'bg-brand-primary text-white'
+                                : 'bg-white/10 text-white hover:bg-white/20'
                                 }`}
                         >
                             <Heart className="w-4 h-4 inline mr-2" />
@@ -97,8 +97,8 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) =
                         <button
                             onClick={() => setActiveTab('history')}
                             className={`px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider transition-all ${activeTab === 'history'
-                                    ? 'bg-brand-primary text-white'
-                                    : 'bg-white/10 text-white hover:bg-white/20'
+                                ? 'bg-brand-primary text-white'
+                                : 'bg-white/10 text-white hover:bg-white/20'
                                 }`}
                         >
                             <Clock className="w-4 h-4 inline mr-2" />
@@ -107,8 +107,8 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) =
                         <button
                             onClick={() => setActiveTab('settings')}
                             className={`px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider transition-all ${activeTab === 'settings'
-                                    ? 'bg-brand-primary text-white'
-                                    : 'bg-white/10 text-white hover:bg-white/20'
+                                ? 'bg-brand-primary text-white'
+                                : 'bg-white/10 text-white hover:bg-white/20'
                                 }`}
                         >
                             <Settings className="w-4 h-4 inline mr-2" />
@@ -245,8 +245,9 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) =
                             <div className="bg-white rounded-3xl shadow-lg p-8 max-w-2xl">
                                 <div className="space-y-6">
                                     <div>
-                                        <label className="block text-sm font-bold text-brand-dark mb-2">Nome</label>
+                                        <label htmlFor="user-name" className="block text-sm font-bold text-brand-dark mb-2">Nome</label>
                                         <input
+                                            id="user-name"
                                             type="text"
                                             value={user.name}
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-primary"
@@ -254,8 +255,9 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) =
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-bold text-brand-dark mb-2">Email</label>
+                                        <label htmlFor="user-email" className="block text-sm font-bold text-brand-dark mb-2">Email</label>
                                         <input
+                                            id="user-email"
                                             type="email"
                                             value={user.email}
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-primary"
@@ -263,8 +265,9 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) =
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-bold text-brand-dark mb-2">Tipo de Conta</label>
+                                        <label htmlFor="user-role" className="block text-sm font-bold text-brand-dark mb-2">Tipo de Conta</label>
                                         <input
+                                            id="user-role"
                                             type="text"
                                             value={user.role === 'admin' ? 'Administrador' : user.role === 'author' ? 'Autor' : 'Leitor'}
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50"

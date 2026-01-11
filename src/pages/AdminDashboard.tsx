@@ -160,10 +160,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                                                 <td className="px-6 py-4 text-sm text-gray-600 text-right">{book.stock}</td>
                                                 <td className="px-6 py-4 text-right">
                                                     <div className="flex items-center justify-end gap-2">
-                                                        <button className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-all flex items-center justify-center">
+                                                        <button title="Editar livro" aria-label="Editar livro" className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-all flex items-center justify-center">
                                                             <Edit className="w-4 h-4" />
                                                         </button>
-                                                        <button className="w-8 h-8 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-all flex items-center justify-center">
+                                                        <button title="Eliminar livro" aria-label="Eliminar livro" className="w-8 h-8 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-all flex items-center justify-center">
                                                             <Trash2 className="w-4 h-4" />
                                                         </button>
                                                     </div>
@@ -206,7 +206,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                                                 </td>
                                                 <td className="px-6 py-4 text-sm text-gray-600">{new Date(u.joined).toLocaleDateString('pt-AO')}</td>
                                                 <td className="px-6 py-4 text-right">
-                                                    <button className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-all flex items-center justify-center ml-auto">
+                                                    <button title="Editar utilizador" aria-label="Editar utilizador" className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-all flex items-center justify-center ml-auto">
                                                         <Edit className="w-4 h-4" />
                                                     </button>
                                                 </td>

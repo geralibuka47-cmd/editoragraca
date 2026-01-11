@@ -100,8 +100,8 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                         <button
                             onClick={() => setActiveTab('manuscripts')}
                             className={`px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider transition-all ${activeTab === 'manuscripts'
-                                    ? 'bg-brand-primary text-white'
-                                    : 'bg-white/10 text-white hover:bg-white/20'
+                                ? 'bg-brand-primary text-white'
+                                : 'bg-white/10 text-white hover:bg-white/20'
                                 }`}
                         >
                             <FileText className="w-4 h-4 inline mr-2" />
@@ -110,8 +110,8 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                         <button
                             onClick={() => setActiveTab('submit')}
                             className={`px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider transition-all ${activeTab === 'submit'
-                                    ? 'bg-brand-primary text-white'
-                                    : 'bg-white/10 text-white hover:bg-white/20'
+                                ? 'bg-brand-primary text-white'
+                                : 'bg-white/10 text-white hover:bg-white/20'
                                 }`}
                         >
                             <Upload className="w-4 h-4 inline mr-2" />
@@ -120,8 +120,8 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                         <button
                             onClick={() => setActiveTab('royalties')}
                             className={`px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider transition-all ${activeTab === 'royalties'
-                                    ? 'bg-brand-primary text-white'
-                                    : 'bg-white/10 text-white hover:bg-white/20'
+                                ? 'bg-brand-primary text-white'
+                                : 'bg-white/10 text-white hover:bg-white/20'
                                 }`}
                         >
                             Royalties
@@ -159,7 +159,7 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                                                     {getStatusIcon(manuscript.status)}
                                                     {getStatusText(manuscript.status)}
                                                 </div>
-                                                <button className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all">
+                                                <button title="Ver detalhes" aria-label="Ver detalhes do manuscrito" className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all">
                                                     <Eye className="w-5 h-5" />
                                                 </button>
                                             </div>
@@ -192,7 +192,7 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                                             <label className="block text-sm font-bold text-brand-dark mb-2 uppercase tracking-wider">
                                                 Género Literário *
                                             </label>
-                                            <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-primary">
+                                            <select aria-label="Género Literário" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-primary">
                                                 <option value="">Selecione...</option>
                                                 <option value="romance">Romance</option>
                                                 <option value="ficcao">Ficção</option>
