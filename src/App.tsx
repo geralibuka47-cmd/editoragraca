@@ -3,7 +3,6 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import BookCard from './components/BookCard';
 import BookDetailModal from './components/BookDetailModal';
-import AIChat from './components/AIChat';
 import AuthPage from './pages/AuthPage';
 import { subscribeToAuthChanges, logout } from './services/authService';
 import { getBooks } from './services/dataService';
@@ -316,8 +315,6 @@ const App: React.FC = () => {
                 onClose={() => setIsModalOpen(false)}
                 onAddToCart={handleAddToCart}
             />
-
-            <AIChat />
         </div>
     );
 };
