@@ -78,10 +78,10 @@ const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, onClose
                             </div>
 
                             <div className="flex gap-4">
-                                <button className="p-4 border-2 border-gray-100 rounded-2xl hover:border-brand-primary hover:text-brand-primary transition-all text-gray-400">
+                                <button className="p-4 border-2 border-gray-100 rounded-2xl hover:border-brand-primary hover:text-brand-primary transition-all text-gray-400" title="Favoritos" aria-label="Adicionar aos favoritos">
                                     <Heart className="w-6 h-6" />
                                 </button>
-                                <button className="p-4 border-2 border-gray-100 rounded-2xl hover:border-brand-primary hover:text-brand-primary transition-all text-gray-400">
+                                <button className="p-4 border-2 border-gray-100 rounded-2xl hover:border-brand-primary hover:text-brand-primary transition-all text-gray-400" title="Partilhar" aria-label="Partilhar este livro">
                                     <Share2 className="w-6 h-6" />
                                 </button>
                             </div>

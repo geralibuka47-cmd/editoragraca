@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import BookCard from './components/BookCard';
 import BookDetailModal from './components/BookDetailModal';
+import AIChat from './components/AIChat';
 import AuthPage from './pages/AuthPage';
 import { subscribeToAuthChanges, logout } from './services/authService';
 import { getBooks } from './services/dataService';
@@ -131,7 +132,7 @@ const App: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="relative animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                    <div className="relative animate-fade-in delay-200">
                         <div className="relative z-10 w-full aspect-[4/5] bg-brand-light rounded-3xl shadow-2xl overflow-hidden border-8 border-white group">
                             <div className="absolute inset-0 bg-gradient-to-br from-brand-primary/20 to-brand-dark/20 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                             <div className="flex flex-col items-center justify-center h-full p-20">
@@ -315,6 +316,8 @@ const App: React.FC = () => {
                 onClose={() => setIsModalOpen(false)}
                 onAddToCart={handleAddToCart}
             />
+
+            <AIChat />
         </div>
     );
 };

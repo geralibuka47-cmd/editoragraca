@@ -22,14 +22,14 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, cartCount, user, onLogout }
                     {user ? (
                         <>
                             <span className="text-brand-primary">Olá, {user.name}</span>
-                            <button onClick={onLogout} className="hover:text-brand-primary flex items-center gap-1 uppercase">
+                            <button onClick={onLogout} className="hover:text-brand-primary flex items-center gap-1 uppercase" title="Terminar Sessão">
                                 Sair <LogOut className="w-3 h-3" />
                             </button>
                         </>
                     ) : (
                         <>
-                            <button onClick={() => onNavigate('AUTH')} className="hover:text-brand-primary uppercase">Entrar</button>
-                            <button onClick={() => onNavigate('AUTH')} className="hover:text-brand-primary uppercase">Registar</button>
+                            <button onClick={() => onNavigate('AUTH')} className="hover:text-brand-primary uppercase" title="Entrar na minha conta">Entrar</button>
+                            <button onClick={() => onNavigate('AUTH')} className="hover:text-brand-primary uppercase" title="Criar uma nova conta">Registar</button>
                         </>
                     )}
                 </div>
@@ -38,18 +38,20 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, cartCount, user, onLogout }
             {/* Main Header Area */}
             <div className="bg-white py-6 px-8 flex justify-between items-center border-b border-gray-100">
                 <div className="w-1/3 flex gap-4">
-                    <button className="text-gray-400 hover:text-brand-primary transition-colors">
+                    <button className="text-gray-400 hover:text-brand-primary transition-colors" title="Pesquisar" aria-label="Pesquisar livros">
                         <Search className="w-5 h-5" />
                     </button>
                 </div>
 
-                <div
+                <button
                     className="w-1/3 flex flex-col items-center cursor-pointer hover:scale-105 transition-transform duration-300"
                     onClick={() => onNavigate('HOME')}
+                    title="Editora Graça - Ir para o Início"
+                    aria-label="Voltar à página inicial"
                 >
                     <span className="font-serif text-3xl md:text-4xl font-black tracking-tighter text-brand-dark leading-none">EDITORA</span>
                     <span className="font-sans text-[11px] tracking-[0.4em] font-bold text-brand-primary uppercase -mt-1 ml-1">Graça</span>
-                </div>
+                </button>
 
                 <div className="w-1/3 flex justify-end gap-6 items-center">
                     <button
@@ -62,7 +64,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, cartCount, user, onLogout }
                         </span>
                     </button>
 
-                    <button className="text-brand-dark hover:text-brand-primary transition-colors relative">
+                    <button className="text-brand-dark hover:text-brand-primary transition-colors relative" title="Favoritos" aria-label="Ver favoritos">
                         <Heart className="w-5 h-5" />
                     </button>
 

@@ -14,13 +14,13 @@ const Footer: React.FC = () => {
                         Dedicados à publicação de obras literárias de excelência em Angola. Fomentando a cultura e o conhecimento através das letras.
                     </p>
                     <div className="flex gap-4">
-                        <a href="#" className="p-2 bg-white/5 rounded-full hover:bg-brand-primary transition-colors duration-300">
+                        <a href="#" className="p-2 bg-white/5 rounded-full hover:bg-brand-primary transition-colors duration-300" title="Facebook" aria-label="Seguir no Facebook">
                             <Facebook className="w-4 h-4" />
                         </a>
-                        <a href="#" className="p-2 bg-white/5 rounded-full hover:bg-brand-primary transition-colors duration-300">
+                        <a href="#" className="p-2 bg-white/5 rounded-full hover:bg-brand-primary transition-colors duration-300" title="Instagram" aria-label="Seguir no Instagram">
                             <Instagram className="w-4 h-4" />
                         </a>
-                        <a href="#" className="p-2 bg-white/5 rounded-full hover:bg-brand-primary transition-colors duration-300">
+                        <a href="#" className="p-2 bg-white/5 rounded-full hover:bg-brand-primary transition-colors duration-300" title="Twitter" aria-label="Seguir no Twitter">
                             <Twitter className="w-4 h-4" />
                         </a>
                     </div>
