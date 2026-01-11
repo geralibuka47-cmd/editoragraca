@@ -12,6 +12,9 @@ import ServicesPage from './pages/ServicesPage';
 import TeamPage from './pages/TeamPage';
 import BlogPage from './pages/BlogPage';
 import PodcastPage from './pages/PodcastPage';
+import ReaderDashboard from './pages/ReaderDashboard';
+import AuthorDashboard from './pages/AuthorDashboard';
+import AdminDashboard from './pages/AdminDashboard';
 import { subscribeToAuthChanges, logout } from './services/authService';
 import { getBooks } from './services/dataService';
 import { client } from './services/appwrite';
@@ -339,7 +342,10 @@ const App: React.FC = () => {
                 {currentView === 'TEAM' && <TeamPage onNavigate={handleNavigate} />}
                 {currentView === 'BLOG' && <BlogPage onNavigate={handleNavigate} />}
                 {currentView === 'PODCAST' && <PodcastPage onNavigate={handleNavigate} />}
-                {currentView !== 'HOME' && currentView !== 'AUTH' && currentView !== 'CATALOG' && currentView !== 'ABOUT' && currentView !== 'CONTACT' && currentView !== 'CHECKOUT' && currentView !== 'SERVICES' && currentView !== 'TEAM' && currentView !== 'BLOG' && currentView !== 'PODCAST' && (
+                {currentView === 'READER_DASHBOARD' && <ReaderDashboard user={user} onNavigate={handleNavigate} />}
+                {currentView === 'AUTHOR_DASHBOARD' && <AuthorDashboard user={user} onNavigate={handleNavigate} />}
+                {currentView === 'ADMIN' && <AdminDashboard user={user} onNavigate={handleNavigate} />}
+                {currentView !== 'HOME' && currentView !== 'AUTH' && currentView !== 'CATALOG' && currentView !== 'ABOUT' && currentView !== 'CONTACT' && currentView !== 'CHECKOUT' && currentView !== 'SERVICES' && currentView !== 'TEAM' && currentView !== 'BLOG' && currentView !== 'PODCAST' && currentView !== 'READER_DASHBOARD' && currentView !== 'AUTHOR_DASHBOARD' && currentView !== 'ADMIN' && (
                     <div className="container mx-auto px-8 py-32 text-center h-[60vh] flex flex-col items-center justify-center">
                         <h2 className="text-4xl font-black text-brand-dark mb-4 tracking-tighter">Secção em Construção</h2>
                         <p className="text-gray-500 mb-8 font-medium">Estamos a preparar algo especial para si.</p>
