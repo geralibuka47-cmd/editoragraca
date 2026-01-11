@@ -1,12 +1,15 @@
 import React from 'react';
-import { ShoppingBag, Search, User, Heart } from 'lucide-react';
+import { ShoppingBag, Search, User, Heart, LogOut } from 'lucide-react';
+import { User as UserType } from '../types';
 
 interface NavbarProps {
     onNavigate: (view: any) => void;
     cartCount: number;
+    user: UserType | null;
+    onLogout: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ onNavigate, cartCount }) => {
+const Navbar: React.FC<NavbarProps> = ({ onNavigate, cartCount, user, onLogout }) => {
     return (
         <header className="flex flex-col w-full sticky top-0 z-50 shadow-sm">
             {/* Utility Top Bar */}
@@ -16,8 +19,19 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, cartCount }) => {
                     <span className="text-brand-primary">Ligue: +244 947 472 230</span>
                 </div>
                 <div className="flex gap-4">
-                    <a href="#" className="hover:text-brand-primary">Minha Conta</a>
-                    <a href="#" className="hover:text-brand-primary">Wishlist</a>
+                    {user ? (
+                        <>
+                            <span className="text-brand-primary">Olá, {user.name}</span>
+                            <button onClick={onLogout} className="hover:text-brand-primary flex items-center gap-1 uppercase">
+                                Sair <LogOut className="w-3 h-3" />
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <button onClick={() => onNavigate('AUTH')} className="hover:text-brand-primary uppercase">Entrar</button>
+                            <button onClick={() => onNavigate('AUTH')} className="hover:text-brand-primary uppercase">Registar</button>
+                        </>
+                    )}
                 </div>
             </div>
 
@@ -38,9 +52,14 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, cartCount }) => {
                 </div>
 
                 <div className="w-1/3 flex justify-end gap-6 items-center">
-                    <button className="text-brand-dark hover:text-brand-primary transition-colors flex items-center gap-2 group">
+                    <button
+                        onClick={() => user ? onNavigate('PROFILE') : onNavigate('AUTH')}
+                        className="text-brand-dark hover:text-brand-primary transition-colors flex items-center gap-2 group"
+                    >
                         <User className="w-5 h-5" />
-                        <span className="hidden lg:block text-[10px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-brand-primary transition-colors">Entrar</span>
+                        <span className="hidden lg:block text-[10px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-brand-primary transition-colors">
+                            {user ? 'A minha conta' : 'Entrar'}
+                        </span>
                     </button>
 
                     <button className="text-brand-dark hover:text-brand-primary transition-colors relative">
@@ -61,7 +80,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, cartCount }) => {
             {/* Navigation Menu Area */}
             <nav className="bg-white py-4 px-8 flex justify-center border-b border-gray-50">
                 <ul className="flex gap-12 font-bold text-[11px] uppercase tracking-[0.2em] text-gray-500">
-                    <li><button onClick={() => onNavigate('HOME')} className="hover:text-brand-primary transition-colors text-brand-primary border-b border-brand-primary pb-1">Início</button></li>
+                    <li><button onClick={() => onNavigate('HOME')} className={`hover:text-brand-primary transition-colors border-b pb-1 ${onNavigate.toString().includes('HOME') ? 'text-brand-primary border-brand-primary' : 'border-transparent'}`}>Início</button></li>
                     <li><button onClick={() => onNavigate('CATALOG')} className="hover:text-brand-primary transition-colors">Catálogo</button></li>
                     <li><button onClick={() => onNavigate('ABOUT')} className="hover:text-brand-primary transition-colors">Sobre Nós</button></li>
                     <li><button onClick={() => onNavigate('SERVICES')} className="hover:text-brand-primary transition-colors">Serviços</button></li>

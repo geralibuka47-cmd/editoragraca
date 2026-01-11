@@ -1,34 +1,90 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import BookCard from './components/BookCard';
 import BookDetailModal from './components/BookDetailModal';
-import { BOOKS } from './constants';
-import { Sparkles, BookOpen, ArrowRight, Zap, Star, Trophy, Mail } from 'lucide-react';
+import AuthPage from './pages/AuthPage';
+import { subscribeToAuthChanges, logout } from './services/authService';
+import { getBooks } from './services/dataService';
+import { client } from './services/appwrite';
+import { Book, User, ViewState } from './types';
+import { Sparkles, BookOpen, ArrowRight, Zap, Star, Trophy, Mail, Loader2 } from 'lucide-react';
 
 const App: React.FC = () => {
-    const [currentView, setCurrentView] = useState('HOME');
-    const [cartCount, setCartCount] = useState(0);
-    const [selectedBook, setSelectedBook] = useState<any>(null);
+    const [currentView, setCurrentView] = useState<ViewState>('HOME');
+    const [user, setUser] = useState<User | null>(null);
+    const [books, setBooks] = useState<Book[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [cart, setCart] = useState<any[]>(() => {
+        const saved = localStorage.getItem('cart');
+        return saved ? JSON.parse(saved) : [];
+    });
+    const [selectedBook, setSelectedBook] = useState<Book | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const handleNavigate = (view: string) => {
+    // Sync cart to local storage
+    useEffect(() => {
+        localStorage.setItem('cart', JSON.stringify(cart));
+    }, [cart]);
+
+    // Auth Subscription
+    useEffect(() => {
+        const unsubscribe = subscribeToAuthChanges((u) => {
+            setUser(u);
+        });
+        return () => unsubscribe();
+    }, []);
+
+    // Check Appwrite configuration
+    useEffect(() => {
+        if (!import.meta.env.VITE_APPWRITE_PROJECT_ID) {
+            console.warn("Appwrite Project ID is missing. Backend features will not work.");
+        }
+    }, []);
+
+    // Fetch Data
+    useEffect(() => {
+        const loadData = async () => {
+            setLoading(true);
+            try {
+                const fetchedBooks = await getBooks();
+                setBooks(fetchedBooks);
+            } catch (error) {
+                console.error("Failed to fetch books:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadData();
+    }, []);
+
+    const handleNavigate = (view: ViewState) => {
         setCurrentView(view);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const handleAddToCart = (book: any) => {
-        setCartCount(prev => prev + 1);
-        console.log('Added to cart:', book.title);
+    const handleAddToCart = (book: Book) => {
+        setCart(prev => [...prev, book]);
     };
 
-    const handleToggleWishlist = (book: any) => {
+    const handleToggleWishlist = (book: Book) => {
         console.log('Toggled wishlist for:', book.title);
     };
 
-    const handleViewDetails = (book: any) => {
+    const handleViewDetails = (book: Book) => {
         setSelectedBook(book);
         setIsModalOpen(true);
+    };
+
+    const handleLogout = async () => {
+        await logout();
+        setUser(null);
+        handleNavigate('HOME');
+    };
+
+    const handleAuthSuccess = (u: User) => {
+        setUser(u);
+        handleNavigate('HOME');
     };
 
     const renderHome = () => (
@@ -154,10 +210,13 @@ const App: React.FC = () => {
                                 <span>Novidades</span>
                             </div>
                             <h2 className="text-5xl font-black text-brand-dark tracking-tighter">
-                                Acabados de <span className="text-brand-primary italic font-serif font-normal">Sair do Forno</span>
+                                Acabados de <span className="text-brand-primary italic font-serif font-normal text-[0.9em]">Sair do Forno</span>
                             </h2>
                         </div>
-                        <button className="group flex items-center gap-3 font-bold text-[11px] uppercase tracking-widest text-brand-dark hover:text-brand-primary transition-colors">
+                        <button
+                            onClick={() => handleNavigate('CATALOG')}
+                            className="group flex items-center gap-3 font-bold text-[11px] uppercase tracking-widest text-brand-dark hover:text-brand-primary transition-colors"
+                        >
                             Explorar Todos os Lançamentos
                             <span className="w-10 h-10 border border-brand-dark/10 rounded-full flex items-center justify-center group-hover:bg-brand-primary group-hover:text-white transition-all group-hover:border-brand-primary">
                                 <ArrowRight className="w-4 h-4" />
@@ -166,7 +225,7 @@ const App: React.FC = () => {
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {BOOKS.filter(b => b.isNew || b.isBestseller).slice(0, 4).map(book => (
+                        {books.filter(b => b.isNew || b.isBestseller).slice(0, 4).map(book => (
                             <BookCard
                                 key={book.id}
                                 book={book}
@@ -175,6 +234,11 @@ const App: React.FC = () => {
                                 onViewDetails={handleViewDetails}
                             />
                         ))}
+                        {books.length === 0 && !loading && (
+                            <div className="col-span-full py-20 text-center bg-white rounded-3xl border border-dashed border-gray-200">
+                                <p className="text-gray-400 font-medium">Nenhum livro disponível no momento.</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </section>
@@ -221,16 +285,24 @@ const App: React.FC = () => {
     );
 
     return (
-        <div className="min-h-screen flex flex-col font-sans bg-brand-light">
-            <Navbar onNavigate={handleNavigate} cartCount={cartCount} />
+        <div className="min-h-screen flex flex-col font-sans bg-brand-light relative">
+            <Navbar onNavigate={handleNavigate} cartCount={cart.length} user={user} onLogout={handleLogout} />
 
             <main className="flex-grow">
+                {loading && (
+                    <div className="fixed inset-0 z-[200] bg-white/80 backdrop-blur-md flex flex-col items-center justify-center gap-4">
+                        <Loader2 className="w-12 h-12 text-brand-primary animate-spin" />
+                        <p className="font-serif text-xl font-bold text-brand-dark italic">Abrindo as portas da sabedoria...</p>
+                    </div>
+                )}
+
                 {currentView === 'HOME' && renderHome()}
-                {currentView !== 'HOME' && (
+                {currentView === 'AUTH' && <AuthPage onSuccess={handleAuthSuccess} onBack={() => handleNavigate('HOME')} />}
+                {currentView !== 'HOME' && currentView !== 'AUTH' && (
                     <div className="container mx-auto px-8 py-32 text-center h-[60vh] flex flex-col items-center justify-center">
-                        <h2 className="text-4xl font-black text-brand-dark mb-4">Secção em Construção</h2>
-                        <p className="text-gray-500 mb-8">Estamos a preparar algo especial para si.</p>
-                        <button onClick={() => setCurrentView('HOME')} className="btn-premium">Voltar ao Início</button>
+                        <h2 className="text-4xl font-black text-brand-dark mb-4 tracking-tighter">Secção em Construção</h2>
+                        <p className="text-gray-500 mb-8 font-medium">Estamos a preparar algo especial para si.</p>
+                        <button onClick={() => handleNavigate('HOME')} className="btn-premium">Voltar ao Início</button>
                     </div>
                 )}
             </main>
