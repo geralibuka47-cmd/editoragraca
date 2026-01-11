@@ -16,7 +16,12 @@ const AIChat: React.FC = () => {
 
   useEffect(() => {
     if (isOpen && !chatSession) {
-      setChatSession(createChatSession());
+      const session = createChatSession();
+      if (session) {
+        setChatSession(session);
+      } else {
+        console.warn("Could not create AI chat session.");
+      }
     }
   }, [isOpen, chatSession]);
 
@@ -34,10 +39,10 @@ const AIChat: React.FC = () => {
 
     try {
       const responseStream = await sendMessageStream(chatSession, userMsg.text);
-      
+
       let fullResponse = "";
       const modelMsgId = (Date.now() + 1).toString();
-      
+
       // Add empty model message placeholder
       setMessages(prev => [...prev, { id: modelMsgId, role: 'model', text: '', isLoading: true }]);
 
@@ -45,10 +50,10 @@ const AIChat: React.FC = () => {
         const c = chunk as GenerateContentResponse;
         const text = c.text;
         if (text) {
-            fullResponse += text;
-            setMessages(prev => prev.map(msg => 
-                msg.id === modelMsgId ? { ...msg, text: fullResponse, isLoading: false } : msg
-            ));
+          fullResponse += text;
+          setMessages(prev => prev.map(msg =>
+            msg.id === modelMsgId ? { ...msg, text: fullResponse, isLoading: false } : msg
+          ));
         }
       }
     } catch (error) {
@@ -61,7 +66,7 @@ const AIChat: React.FC = () => {
 
   if (!isOpen) {
     return (
-      <button 
+      <button
         onClick={() => setIsOpen(true)}
         className="fixed bottom-6 right-6 bg-brand-900 text-white p-4 rounded-full shadow-2xl hover:bg-accent-gold hover:scale-105 transition-all duration-300 z-50 flex items-center gap-2 group"
       >
@@ -100,23 +105,23 @@ const AIChat: React.FC = () => {
           <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`
               max-w-[85%] rounded-2xl p-4 text-sm leading-relaxed
-              ${msg.role === 'user' 
-                ? 'bg-brand-900 text-white rounded-br-none shadow-md' 
+              ${msg.role === 'user'
+                ? 'bg-brand-900 text-white rounded-br-none shadow-md'
                 : 'bg-white text-brand-800 border border-brand-100 rounded-bl-none shadow-sm'}
             `}>
               {msg.text}
               {msg.isLoading && (
-                 <span className="inline-block w-2 h-2 ml-1 rounded-full bg-accent-gold animate-bounce" />
+                <span className="inline-block w-2 h-2 ml-1 rounded-full bg-accent-gold animate-bounce" />
               )}
             </div>
           </div>
         ))}
         {isLoading && messages[messages.length - 1].role === 'user' && (
-            <div className="flex justify-start">
-                 <div className="bg-white text-gray-400 border border-brand-100 rounded-2xl rounded-bl-none p-3 shadow-sm">
-                    <Loader2 className="h-4 w-4 animate-spin text-accent-gold" />
-                 </div>
+          <div className="flex justify-start">
+            <div className="bg-white text-gray-400 border border-brand-100 rounded-2xl rounded-bl-none p-3 shadow-sm">
+              <Loader2 className="h-4 w-4 animate-spin text-accent-gold" />
             </div>
+          </div>
         )}
         <div ref={messagesEndRef} />
       </div>
@@ -133,7 +138,7 @@ const AIChat: React.FC = () => {
             className="flex-1 bg-transparent border-none outline-none text-sm text-brand-800 placeholder-gray-400"
             disabled={isLoading}
           />
-          <button 
+          <button
             onClick={handleSend}
             disabled={!inputText.trim() || isLoading}
             className={`p-1.5 rounded-full transition-colors ${inputText.trim() ? 'bg-brand-900 text-white hover:bg-accent-gold' : 'bg-gray-200 text-gray-400'}`}
@@ -142,7 +147,7 @@ const AIChat: React.FC = () => {
           </button>
         </div>
         <div className="text-[9px] text-center text-gray-400 mt-3 uppercase tracking-widest">
-            Editora Graça · Conhecimento & Cultura
+          Editora Graça · Conhecimento & Cultura
         </div>
       </div>
     </div>

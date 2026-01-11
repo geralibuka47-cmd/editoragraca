@@ -1,8 +1,19 @@
 import { GoogleGenAI } from "@google/genai";
 import { BOOKS } from '../constants';
 
-// Initializing the GenAI client using process.env.API_KEY directly as required by guidelines
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Safe initialization of the GenAI client
+let ai: any = null;
+
+const getAIClient = () => {
+   if (ai) return ai;
+   const apiKey = import.meta.env.VITE_GEMINI_API_KEY || '';
+   if (!apiKey) {
+      console.warn("Google Gemini API Key is missing. Chat features will be disabled.");
+      return null;
+   }
+   ai = new GoogleGenAI({ apiKey });
+   return ai;
+};
 
 // Construct a system instruction that knows about the catalog and services
 const CATALOG_CONTEXT = BOOKS.map(b => `- "${b.title}" por ${b.author} (${b.category}): ${b.description}. Preço: ${b.price} Kz`).join('\n');
@@ -75,15 +86,17 @@ Regras:
 `;
 
 export const createChatSession = () => {
-  return ai.chats.create({
-    model: 'gemini-3-flash-preview',
-    config: {
-      systemInstruction: SYSTEM_INSTRUCTION,
-      temperature: 0.7,
-    },
-  });
+   const client = getAIClient();
+   if (!client) return null;
+   return client.chats.create({
+      model: 'gemini-1.5-flash',
+      config: {
+         systemInstruction: SYSTEM_INSTRUCTION,
+         temperature: 0.7,
+      },
+   });
 };
 
 export const sendMessageStream = async (chat: any, message: string) => {
-  return await chat.sendMessageStream({ message });
+   return await chat.sendMessageStream({ message });
 };
