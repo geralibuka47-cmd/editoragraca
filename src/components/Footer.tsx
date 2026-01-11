@@ -1,31 +1,76 @@
-
 import React from 'react';
-import { Facebook, Instagram } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Mail, MapPin, Phone } from 'lucide-react';
 
 const Footer: React.FC = () => {
     return (
-        <footer className="bg-brand-900 text-white py-16 md:py-32 mt-20">
-            <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 md:gap-24">
-                <div className="space-y-6 md:space-y-8">
-                    <h2 className="font-serif font-bold text-3xl">Editora Graça</h2>
-                    <p className="text-gray-500 text-sm leading-relaxed font-serif italic max-w-xs">Eleve o seu potencial literário com a editora líder em Malanje. Qualidade e tradição ao seu serviço.</p>
-                    <div className="flex gap-4">
-                        <div className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-accent-gold transition-all cursor-pointer"><Facebook size={18} /></div>
-                        <div className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-accent-gold transition-all cursor-pointer"><Instagram size={18} /></div>
-                    </div>
-                </div>
+        <footer className="bg-brand-dark text-white pt-20 pb-10">
+            <div className="container mx-auto px-8 grid md:grid-cols-4 gap-12 border-b border-white/5 pb-16 mb-10">
                 <div className="space-y-6">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-accent-gold">Sede Oficial</p>
-                    <div className="space-y-4 text-xs text-gray-400 font-bold uppercase tracking-widest">
-                        <p>geraleditoragraca@gmail.com</p>
-                        <p>+244 973 038 386 | 947 472 230</p>
-                        <p>Malanje, Voanvala, Rua 5, 77</p>
+                    <div className="flex flex-col">
+                        <span className="font-serif text-2xl font-bold tracking-tighter text-white">EDITORA</span>
+                        <span className="font-sans text-[10px] tracking-[0.3em] font-bold text-brand-primary uppercase -mt-1">Graça</span>
+                    </div>
+                    <p className="text-gray-400 text-sm leading-relaxed font-medium">
+                        Dedicados à publicação de obras literárias de excelência em Angola. Fomentando a cultura e o conhecimento através das letras.
+                    </p>
+                    <div className="flex gap-4">
+                        <a href="#" className="p-2 bg-white/5 rounded-full hover:bg-brand-primary transition-colors duration-300">
+                            <Facebook className="w-4 h-4" />
+                        </a>
+                        <a href="#" className="p-2 bg-white/5 rounded-full hover:bg-brand-primary transition-colors duration-300">
+                            <Instagram className="w-4 h-4" />
+                        </a>
+                        <a href="#" className="p-2 bg-white/5 rounded-full hover:bg-brand-primary transition-colors duration-300">
+                            <Twitter className="w-4 h-4" />
+                        </a>
                     </div>
                 </div>
-                <div className="space-y-6 lg:text-right">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-accent-gold">Direcção</p>
-                    <p className="text-sm font-serif italic">António Graça Muondo Mendonça</p>
-                    <p className="text-[8px] text-gray-600 tracking-[0.5em] mt-12 md:mt-24 uppercase">© {new Date().getFullYear()} EDITORA GRAÇA (SU), LDA.</p>
+
+                <div>
+                    <h4 className="font-serif text-xl font-bold mb-8 text-brand-primary italic">Navegação</h4>
+                    <ul className="space-y-4 text-sm text-gray-400 font-medium">
+                        <li><a href="#" className="hover:text-white transition-colors">Início</a></li>
+                        <li><a href="#" className="hover:text-white transition-colors">Todos os Livros</a></li>
+                        <li><a href="#" className="hover:text-white transition-colors">Lançamentos</a></li>
+                        <li><a href="#" className="hover:text-white transition-colors">Promoções</a></li>
+                        <li><a href="#" className="hover:text-white transition-colors">Sobre a Editora</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 className="font-serif text-xl font-bold mb-8 text-brand-primary italic">Informações</h4>
+                    <ul className="space-y-4 text-sm text-gray-400 font-medium">
+                        <li><a href="#" className="hover:text-white transition-colors">Termos e Condições</a></li>
+                        <li><a href="#" className="hover:text-white transition-colors">Política de Privacidade</a></li>
+                        <li><a href="#" className="hover:text-white transition-colors">Envios e Devoluções</a></li>
+                        <li><a href="#" className="hover:text-white transition-colors">Perguntas Frequentes</a></li>
+                        <li><a href="#" className="hover:text-white transition-colors">Trabalhe Connosco</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 className="font-serif text-xl font-bold mb-8 text-brand-primary italic">Atendimento</h4>
+                    <ul className="space-y-6 text-sm text-gray-400 font-medium">
+                        <li className="flex gap-4 items-start">
+                            <MapPin className="w-5 h-5 text-brand-primary shrink-0" />
+                            <span>Malanje, Bairro Voanvala, <br />Rua 5, Casa n.º 77, Angola</span>
+                        </li>
+                        <li className="flex gap-4 items-center">
+                            <Phone className="w-5 h-5 text-brand-primary shrink-0" />
+                            <span>+244 973 038 386</span>
+                        </li>
+                        <li className="flex gap-4 items-center">
+                            <Mail className="w-5 h-5 text-brand-primary shrink-0" />
+                            <span>geraleditoragraca@gmail.com</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div className="container mx-auto px-8 flex justify-between items-center text-[10px] text-gray-500 font-bold uppercase tracking-widest">
+                <p>© 2026 Editora Graça (SU), LDA. Todos os direitos reservados.</p>
+                <div className="flex gap-6">
+                    <span>Power by Avançada Agentic Coding</span>
                 </div>
             </div>
         </footer>

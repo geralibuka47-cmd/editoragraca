@@ -1,253 +1,250 @@
-
-import React, { useState, useEffect } from 'react';
-import { Analytics } from "@vercel/analytics/react";
-import { SpeedInsights } from "@vercel/speed-insights/react";
+import React, { useState } from 'react';
 import Navbar from './components/Navbar';
-import AIChat from './components/AIChat';
 import Footer from './components/Footer';
-import CartDrawer from './components/CartDrawer';
+import BookCard from './components/BookCard';
 import BookDetailModal from './components/BookDetailModal';
-
-// Pages
-import HomePage from './pages/HomePage';
-import CatalogPage from './pages/CatalogPage';
-import AboutPage from './pages/AboutPage';
-import TeamPage from './pages/TeamPage';
-import BlogPage from './pages/BlogPage';
-import AdminDashboard from './pages/AdminDashboard';
-import ReaderDashboard from './pages/ReaderDashboard';
-import AuthPage from './pages/AuthPage';
-import CheckoutPage from './pages/CheckoutPage';
-import ServicesPage from './pages/ServicesPage';
-import PodcastPage from './pages/PodcastPage';
-import ContactPage from './pages/ContactPage';
-
-// Data & Types
-import { Book, CartItem, ViewState, User, Order } from './types';
-
-// Appwrite Services
-import { subscribeToAuthChanges, logout } from './services/authService';
-import { getBooks, getOrders, createOrder } from './services/dataService';
-import { client } from './services/appwrite';
+import { BOOKS } from './constants';
+import { Sparkles, BookOpen, ArrowRight, Zap, Star, Trophy, Mail } from 'lucide-react';
 
 const App: React.FC = () => {
-  const [books, setBooks] = useState<Book[]>([]);
-  const [activeCategory, setActiveCategory] = useState("Todos");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [wishlist, setWishlist] = useState<Book[]>(() => JSON.parse(localStorage.getItem('editora_graca_wishlist') || '[]'));
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isWishlistOpen, setIsWishlistOpen] = useState(false);
-  const [currentView, setCurrentView] = useState<ViewState>('HOME');
-  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [orders, setOrders] = useState<Order[]>([]);
+    const [currentView, setCurrentView] = useState('HOME');
+    const [cartCount, setCartCount] = useState(0);
+    const [selectedBook, setSelectedBook] = useState<any>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Checkout State
-  const [checkoutStep, setCheckoutStep] = useState(1);
-  const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
-
-  // Sync Auth State
-  useEffect(() => {
-    // Ping Appwrite to verify setup
-    client.ping()
-      .then(() => console.log('Appwrite connection verified'))
-      .catch((err) => console.error('Appwrite connection failed:', err));
-
-    const unsubscribe = subscribeToAuthChanges((u: User | null) => {
-      setUser(u);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  // Fetch Initial Data
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [fetchedBooks, fetchedOrders] = await Promise.all([
-          getBooks(),
-          user ? getOrders(user.role === 'adm' ? undefined : user.id) : Promise.resolve([])
-        ]);
-        setBooks(fetchedBooks);
-        setOrders(fetchedOrders);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
+    const handleNavigate = (view: string) => {
+        setCurrentView(view);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
-    fetchData();
-  }, [user]);
 
-  useEffect(() => {
-    localStorage.setItem('editora_graca_wishlist', JSON.stringify(wishlist));
-  }, [wishlist]);
+    const handleAddToCart = (book: any) => {
+        setCartCount(prev => prev + 1);
+        console.log('Added to cart:', book.title);
+    };
 
-  const handleNavigate = (view: ViewState) => {
-    setCurrentView(view);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+    const handleToggleWishlist = (book: any) => {
+        console.log('Toggled wishlist for:', book.title);
+    };
 
-  const addToCart = (book: Book) => {
-    setCart((prev: CartItem[]) => {
-      const existing = prev.find((item: CartItem) => item.id === book.id);
-      if (existing) return prev.map((item: CartItem) => item.id === book.id ? { ...item, quantity: item.quantity + 1 } : item);
-      return [...prev, { ...book, quantity: 1 }];
-    });
-    setIsCartOpen(true);
-  };
+    const handleViewDetails = (book: any) => {
+        setSelectedBook(book);
+        setIsModalOpen(true);
+    };
 
-  const toggleWishlist = (book: Book) => {
-    setWishlist((prev: Book[]) => prev.some((b: Book) => b.id === book.id) ? prev.filter((b: Book) => b.id !== book.id) : [...prev, book]);
-  };
+    const renderHome = () => (
+        <>
+            {/* Hero Section */}
+            <section className="relative min-h-[85vh] flex items-center overflow-hidden bg-white">
+                <div className="absolute top-0 right-0 w-1/3 h-full bg-brand-primary/5 -skew-x-12 transform origin-top translate-x-20"></div>
 
-  const handleCheckout = () => {
-    if (!user) {
-      handleNavigate('AUTH');
-      setIsCartOpen(false);
-      return;
-    }
-    setCurrentView('CHECKOUT');
-    setIsCartOpen(false);
-    setCheckoutStep(1);
-  };
+                <div className="container mx-auto px-8 grid lg:grid-cols-2 items-center gap-20 py-20 relative z-10">
+                    <div className="space-y-10 animate-fade-in">
+                        <div className="inline-flex items-center gap-3 px-4 py-2 bg-brand-primary/10 rounded-full text-brand-primary font-bold tracking-[0.2em] uppercase text-[10px]">
+                            <Sparkles className="w-4 h-4" />
+                            <span>Edições de Colecionador agora disponíveis</span>
+                        </div>
 
-  const finalizeOrder = async () => {
-    if (!user) return;
-    setIsCheckoutLoading(true);
-    try {
-      const orderData: Omit<Order, 'id'> = {
-        customerName: user.name,
-        customerEmail: user.email,
-        customerId: user.id,
-        items: cart.map((i: CartItem) => ({ title: i.title, quantity: i.quantity, price: i.price })),
-        total: cart.reduce((acc: number, i: CartItem) => acc + (i.price * i.quantity), 0),
-        status: 'Pendente',
-        date: new Date().toLocaleDateString('pt-AO')
-      };
+                        <h1 className="text-7xl md:text-[5.5rem] font-black leading-[0.95] text-brand-dark tracking-tighter">
+                            Onde Cada Página <br />
+                            <span className="text-brand-primary italic font-serif font-normal text-[0.9em]">Ganha Vida</span>
+                        </h1>
 
-      const orderId = await createOrder(orderData);
-      const newOrder: Order = { ...orderData, id: orderId };
+                        <p className="text-xl text-gray-500 max-w-xl leading-relaxed font-medium">
+                            Descubra o catálogo da Editora Graça. Uma seleção rigorosa de literatura angolana e internacional, desenhada para leitores exigentes.
+                        </p>
 
-      setOrders((prev: Order[]) => [newOrder, ...prev]);
-      setCart([]);
-      setIsCheckoutLoading(false);
-      setCurrentView('READER_DASHBOARD');
-      alert("Encomenda registada! O seu pedido será validado após verificação do comprovativo.");
-    } catch (error) {
-      console.error("Error creating order:", error);
-      setIsCheckoutLoading(false);
-      alert("Erro ao registar encomenda. Por favor tente novamente.");
-    }
-  };
+                        <div className="flex flex-wrap gap-6 pt-4">
+                            <button className="btn-premium group" onClick={() => handleNavigate('CATALOG')}>
+                                Explorar Catálogo
+                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                            </button>
+                            <button className="px-10 py-4 border-2 border-brand-dark text-brand-dark font-bold hover:bg-brand-dark hover:text-white transition-all uppercase text-[11px] tracking-[0.2em]">
+                                Nossa História
+                            </button>
+                        </div>
 
-  const renderView = () => {
-    switch (currentView) {
-      case 'HOME': return (
-        <HomePage
-          onNavigate={handleNavigate}
-          books={books}
-          addToCart={addToCart}
-          toggleWishlist={toggleWishlist}
-          wishlist={wishlist}
-          setSelectedBook={setSelectedBook}
-        />
-      );
-      case 'CATALOG':
-        return (
-          <CatalogPage
-            books={books}
-            activeCategory={activeCategory}
-            setActiveCategory={setActiveCategory}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            wishlist={wishlist}
-            toggleWishlist={toggleWishlist}
-            addToCart={addToCart}
-            setSelectedBook={setSelectedBook}
-          />
-        );
-      case 'ABOUT':
-        return <AboutPage />;
-      case 'TEAM':
-        return <TeamPage />;
-      case 'BLOG':
-        return <BlogPage />;
-      case 'SERVICES':
-        return <ServicesPage />;
-      case 'PODCAST':
-        return <PodcastPage />;
-      case 'CONTACT':
-        return <ContactPage />;
-      case 'READER_DASHBOARD':
-        return user ? <ReaderDashboard user={user} orders={orders} wishlist={wishlist} /> : <AuthPage setUser={setUser} handleNavigate={handleNavigate} />;
-      case 'ADMIN':
-        return <AdminDashboard orders={orders} setOrders={setOrders} />;
-      case 'CHECKOUT':
-        return (
-          <CheckoutPage
-            cart={cart}
-            checkoutStep={checkoutStep}
-            setCheckoutStep={setCheckoutStep}
-            isCheckoutLoading={isCheckoutLoading}
-            finalizeOrder={finalizeOrder}
-          />
-        );
-      case 'AUTH':
-        return <AuthPage setUser={setUser} handleNavigate={handleNavigate} />;
-      default:
-        return (
-          <HomePage
-            onNavigate={handleNavigate}
-            books={books}
-            addToCart={addToCart}
-            toggleWishlist={toggleWishlist}
-            wishlist={wishlist}
-            setSelectedBook={setSelectedBook}
-          />
-        );
-    }
-  };
+                        <div className="flex items-center gap-10 pt-8 border-t border-gray-100">
+                            <div className="flex flex-col">
+                                <span className="text-3xl font-black text-brand-dark">500+</span>
+                                <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Livros Publicados</span>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-3xl font-black text-brand-dark">10k+</span>
+                                <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Leitores Felizes</span>
+                            </div>
+                        </div>
+                    </div>
 
-  return (
-    <div className="min-h-screen flex flex-col font-sans selection:bg-accent-gold selection:text-white">
-      <Analytics />
-      <SpeedInsights />
-      <Navbar
-        cartCount={cart.reduce((a: number, b: CartItem) => a + b.quantity, 0)}
-        wishlistCount={wishlist.length}
-        onOpenCart={() => setIsCartOpen(true)}
-        onOpenWishlist={() => setIsWishlistOpen(true)}
-        onNavigate={handleNavigate}
-        user={user}
-        onLogout={() => { logout(); handleNavigate('HOME'); }}
-        currentView={currentView}
-      />
+                    <div className="relative animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                        <div className="relative z-10 w-full aspect-[4/5] bg-brand-light rounded-3xl shadow-2xl overflow-hidden border-8 border-white group">
+                            <div className="absolute inset-0 bg-gradient-to-br from-brand-primary/20 to-brand-dark/20 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                            <div className="flex flex-col items-center justify-center h-full p-20">
+                                <div className="w-full h-full border-2 border-brand-primary/30 border-dashed rounded-2xl flex items-center justify-center">
+                                    <BookOpen className="w-32 h-32 text-brand-primary/20" />
+                                </div>
+                            </div>
 
-      <main className="flex-grow">
-        {renderView()}
-      </main>
+                            <div className="absolute -top-10 -left-10 w-40 h-40 bg-brand-primary/10 rounded-full blur-3xl"></div>
+                            <div className="absolute -bottom-10 -right-10 w-60 h-60 bg-brand-dark/5 rounded-full blur-3xl"></div>
+                        </div>
 
-      {selectedBook && (
-        <BookDetailModal
-          book={selectedBook}
-          onClose={() => setSelectedBook(null)}
-          onAddToCart={addToCart}
-          onToggleWishlist={toggleWishlist}
-          isInWishlist={wishlist.some((w: Book) => w.id === (selectedBook as Book).id)}
-        />
-      )}
+                        <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-2xl shadow-2xl flex items-center gap-5 border border-gray-50 z-20">
+                            <div className="w-16 h-16 bg-brand-primary flex items-center justify-center rounded-xl text-white">
+                                <Zap className="w-8 h-8 fill-current" />
+                            </div>
+                            <div>
+                                <h5 className="font-serif font-bold text-xl text-brand-dark italic leading-none">Novidade</h5>
+                                <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold pt-1">Acabado de Chegar</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-      <CartDrawer
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        cart={cart}
-        setCart={setCart}
-        handleCheckout={handleCheckout}
-      />
+            {/* Categories / Promo Banners Section */}
+            <section className="py-24 bg-white">
+                <div className="container mx-auto px-8">
+                    <div className="grid md:grid-cols-3 gap-8">
+                        <div className="group relative h-80 rounded-3xl overflow-hidden bg-brand-dark flex items-end p-10 cursor-pointer">
+                            <div className="absolute inset-0 bg-brand-primary/20 group-hover:bg-brand-primary/40 transition-colors duration-500"></div>
+                            <div className="relative z-10 space-y-3">
+                                <div className="text-brand-primary font-black text-4xl leading-none">Ficção</div>
+                                <p className="text-white/70 text-sm font-medium">As melhores histórias de Angola</p>
+                                <button className="text-white font-bold text-[10px] uppercase tracking-widest flex items-center gap-2 group-hover:gap-4 transition-all">
+                                    Ver Todos <ArrowRight className="w-3 h-3" />
+                                </button>
+                            </div>
+                        </div>
 
-      <Footer />
-      <AIChat />
-    </div>
-  );
+                        <div className="group relative h-80 rounded-3xl overflow-hidden bg-brand-primary flex flex-col justify-center items-center text-center p-10 shadow-xl shadow-brand-primary/20 cursor-pointer transition-transform hover:scale-[1.02]">
+                            <div className="absolute top-0 right-0 p-8">
+                                <Star className="w-12 h-12 text-white/20 fill-current" />
+                            </div>
+                            <div className="relative z-10 space-y-4">
+                                <span className="text-[10px] text-white/80 font-bold uppercase tracking-[0.3em]">Exclusivo</span>
+                                <h3 className="text-4xl font-black text-white leading-none tracking-tighter">OS MAIS <br /> VENDIDOS</h3>
+                                <p className="text-white/80 text-sm font-medium">O que todos estão a ler no momento</p>
+                                <button className="mt-4 px-8 py-3 bg-brand-dark text-white rounded-full font-bold text-[10px] uppercase tracking-widest hover:scale-110 transition-transform">
+                                    Ver Rankings
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="group relative h-80 rounded-3xl overflow-hidden bg-gray-100 flex items-end p-10 cursor-pointer border border-gray-200">
+                            <div className="absolute inset-0 bg-white/50 group-hover:bg-transparent transition-colors duration-500"></div>
+                            <div className="relative z-10 space-y-3">
+                                <div className="text-brand-dark font-black text-4xl leading-none">Apoio</div>
+                                <p className="text-gray-500 text-sm font-medium">Livros escolares e educativos</p>
+                                <button className="text-brand-dark font-bold text-[10px] uppercase tracking-widest flex items-center gap-2 group-hover:gap-4 transition-all">
+                                    Explorar <ArrowRight className="w-3 h-3" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* New Arrivals Section */}
+            <section className="py-24 bg-brand-light">
+                <div className="container mx-auto px-8">
+                    <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2 text-brand-primary font-bold tracking-[0.2em] uppercase text-[10px]">
+                                <div className="w-10 h-0.5 bg-brand-primary"></div>
+                                <span>Novidades</span>
+                            </div>
+                            <h2 className="text-5xl font-black text-brand-dark tracking-tighter">
+                                Acabados de <span className="text-brand-primary italic font-serif font-normal">Sair do Forno</span>
+                            </h2>
+                        </div>
+                        <button className="group flex items-center gap-3 font-bold text-[11px] uppercase tracking-widest text-brand-dark hover:text-brand-primary transition-colors">
+                            Explorar Todos os Lançamentos
+                            <span className="w-10 h-10 border border-brand-dark/10 rounded-full flex items-center justify-center group-hover:bg-brand-primary group-hover:text-white transition-all group-hover:border-brand-primary">
+                                <ArrowRight className="w-4 h-4" />
+                            </span>
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                        {BOOKS.filter(b => b.isNew || b.isBestseller).slice(0, 4).map(book => (
+                            <BookCard
+                                key={book.id}
+                                book={book}
+                                onAddToCart={handleAddToCart}
+                                onToggleWishlist={handleToggleWishlist}
+                                onViewDetails={handleViewDetails}
+                            />
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Feature Highlights Section */}
+            <section className="bg-brand-dark py-24 px-8 overflow-hidden relative">
+                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-brand-primary/10 via-transparent to-transparent"></div>
+
+                <div className="container mx-auto grid md:grid-cols-4 gap-12 relative z-10 text-center md:text-left">
+                    <div className="space-y-4">
+                        <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center text-brand-primary mx-auto md:mx-0 transition-transform hover:scale-110">
+                            <Zap className="w-8 h-8" />
+                        </div>
+                        <h4 className="font-serif text-2xl font-bold text-white italic">Entrega Expresso</h4>
+                        <p className="text-gray-500 text-sm font-medium">Receba as suas encomendas em tempo recorde em qualquer província.</p>
+                    </div>
+
+                    <div className="space-y-4">
+                        <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center text-brand-primary mx-auto md:mx-0 transition-transform hover:scale-110">
+                            <Star className="w-8 h-8" />
+                        </div>
+                        <h4 className="font-serif text-2xl font-bold text-white italic">Qualidade Premium</h4>
+                        <p className="text-gray-500 text-sm font-medium">Garantimos a melhor qualidade de impressão e encadernação de mercado.</p>
+                    </div>
+
+                    <div className="space-y-4">
+                        <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center text-brand-primary mx-auto md:mx-0 transition-transform hover:scale-110">
+                            <Trophy className="w-8 h-8" />
+                        </div>
+                        <h4 className="font-serif text-2xl font-bold text-white italic">Best Sellers</h4>
+                        <p className="text-gray-500 text-sm font-medium">Acesso direto às obras mais premiadas e lidas do ano.</p>
+                    </div>
+
+                    <div className="space-y-4">
+                        <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center text-brand-primary mx-auto md:mx-0 transition-transform hover:scale-110">
+                            <Mail className="w-8 h-8" />
+                        </div>
+                        <h4 className="font-serif text-2xl font-bold text-white italic">Newsletter</h4>
+                        <p className="text-gray-500 text-sm font-medium">Subscreva e receba 10% de desconto imediato na sua primeira compra.</p>
+                    </div>
+                </div>
+            </section>
+        </>
+    );
+
+    return (
+        <div className="min-h-screen flex flex-col font-sans bg-brand-light">
+            <Navbar onNavigate={handleNavigate} cartCount={cartCount} />
+
+            <main className="flex-grow">
+                {currentView === 'HOME' && renderHome()}
+                {currentView !== 'HOME' && (
+                    <div className="container mx-auto px-8 py-32 text-center h-[60vh] flex flex-col items-center justify-center">
+                        <h2 className="text-4xl font-black text-brand-dark mb-4">Secção em Construção</h2>
+                        <p className="text-gray-500 mb-8">Estamos a preparar algo especial para si.</p>
+                        <button onClick={() => setCurrentView('HOME')} className="btn-premium">Voltar ao Início</button>
+                    </div>
+                )}
+            </main>
+
+            <Footer />
+
+            <BookDetailModal
+                book={selectedBook}
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onAddToCart={handleAddToCart}
+            />
+        </div>
+    );
 };
 
 export default App;

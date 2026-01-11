@@ -1,60 +1,103 @@
-
 import React from 'react';
-import { X, Heart } from 'lucide-react';
-import { Book } from '../types';
+import { X, ShoppingCart, Heart, Share2, Check } from 'lucide-react';
 
 interface BookDetailModalProps {
-    book: Book;
+    book: any;
+    isOpen: boolean;
     onClose: () => void;
-    onAddToCart: (book: Book) => void;
-    onToggleWishlist: (book: Book) => void;
-    isInWishlist: boolean;
+    onAddToCart: (book: any) => void;
 }
 
-const BookDetailModal: React.FC<BookDetailModalProps> = ({
-    book,
-    onClose,
-    onAddToCart,
-    onToggleWishlist,
-    isInWishlist
-}) => {
+const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, onClose, onAddToCart }) => {
+    if (!isOpen || !book) return null;
+
     return (
-        <div className="fixed inset-0 z-[700] flex items-center justify-center p-0 md:p-4">
-            <div className="absolute inset-0 bg-brand-900/95 backdrop-blur-md" onClick={onClose} />
-            <div className="relative bg-white w-full max-w-5xl h-full md:h-auto md:max-h-[90vh] overflow-y-auto rounded-none md:rounded-[3rem] shadow-2xl flex flex-col md:flex-row animate-slide-up">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+            {/* Backdrop */}
+            <div
+                className="absolute inset-0 bg-brand-dark/60 backdrop-blur-sm animate-fade-in"
+                onClick={onClose}
+            />
+
+            {/* Modal Content */}
+            <div className="relative bg-white w-full max-w-5xl rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row animate-fade-in group">
                 <button
                     onClick={onClose}
-                    className="absolute top-6 right-6 md:top-10 md:right-10 text-gray-300 hover:text-brand-900 transition-colors z-[100] p-2 bg-brand-900/10 rounded-full backdrop-blur-sm md:bg-transparent"
-                    title="Fechar detalhe do livro"
-                    aria-label="Fechar detalhe do livro"
+                    className="absolute top-6 right-6 z-20 p-2 bg-gray-100 rounded-full hover:bg-brand-primary hover:text-white transition-all text-gray-500"
+                    title="Fechar"
                 >
-                    <X size={24} />
+                    <X className="w-6 h-6" />
                 </button>
 
-                <div className="w-full md:w-1/2 bg-brand-50 p-10 md:p-16 flex items-center justify-center relative min-h-[400px]">
-                    <img src={book.coverUrl} loading="lazy" className="w-full max-w-[240px] md:max-w-[340px] aspect-[2/3] object-cover book-shadow rounded-sm relative z-10" alt={book.title} />
+                {/* Left: Image Section */}
+                <div className="md:w-5/12 bg-brand-light p-12 flex items-center justify-center relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-brand-primary/10 to-transparent"></div>
+                    <div className="relative z-10 w-full aspect-[3/4] bg-white rounded-lg shadow-2xl flex items-center justify-center p-12 border-4 border-white group-hover:scale-105 transition-transform duration-700">
+                        <div className="text-center">
+                            <h4 className="font-serif text-2xl font-black text-brand-dark mb-4">{book.title}</h4>
+                            <div className="w-12 h-1 bg-brand-primary mx-auto"></div>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="w-full md:w-1/2 p-8 md:p-24 flex flex-col justify-center space-y-6 md:space-y-10">
-                    <div className="space-y-3 md:space-y-4">
-                        <span className="text-accent-gold font-bold uppercase tracking-[0.5em] text-[9px] md:text-[10px]">{book.category}</span>
-                        <h2 className="text-4xl md:text-6xl font-serif font-bold text-brand-900 leading-none">{book.title}</h2>
-                        <p className="text-xl md:text-2xl font-serif italic text-gray-400">Obra de {book.author}</p>
-                        {book.isbn && <p className="text-[9px] font-bold text-accent-gold uppercase tracking-[0.2em]">ISBN: {book.isbn}</p>}
-                    </div>
-                    <p className="text-gray-500 leading-relaxed md:leading-loose text-base md:text-lg font-light">{book.description}</p>
-                    <div className="pt-6 flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-6 md:gap-8">
-                        <span className="text-4xl md:text-5xl font-serif font-bold text-brand-900">{book.price.toLocaleString()} Kz</span>
-                        <div className="flex gap-4">
+                {/* Right: Info Section */}
+                <div className="md:w-7/12 p-10 md:p-16 flex flex-col justify-center">
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-3">
+                            <span className="px-3 py-1 bg-brand-primary/10 text-brand-primary font-black text-[10px] uppercase tracking-widest rounded-full">
+                                {book.category}
+                            </span>
+                            {book.isBestseller && (
+                                <span className="flex items-center gap-1 text-orange-500 font-bold text-[10px] uppercase tracking-widest">
+                                    <Star className="w-3 h-3 fill-current" /> Best Seller
+                                </span>
+                            )}
+                        </div>
+
+                        <h2 className="text-4xl md:text-5xl font-black text-brand-dark tracking-tighter leading-none">
+                            {book.title}
+                        </h2>
+
+                        <p className="text-xl font-serif font-bold text-gray-500 italic">
+                            {book.author}
+                        </p>
+
+                        <div className="flex items-center gap-2 text-green-600 font-bold text-xs uppercase tracking-widest">
+                            <Check className="w-4 h-4" />
+                            <span>Disponível em Stock</span>
+                        </div>
+
+                        <p className="text-gray-500 text-lg leading-relaxed font-normal py-4 border-y border-gray-100">
+                            {book.description || "Uma obra literária excepcional que promete envolver o leitor do início ao fim, explorando temas universais com uma voz única."}
+                        </p>
+
+                        <div className="flex items-end justify-between pt-4">
+                            <div className="flex flex-col">
+                                <span className="text-xs text-gray-400 font-bold uppercase tracking-widest">Preço Online</span>
+                                <span className="text-4xl font-black text-brand-dark">{book.price?.toLocaleString()} Kz</span>
+                            </div>
+
+                            <div className="flex gap-4">
+                                <button className="p-4 border-2 border-gray-100 rounded-2xl hover:border-brand-primary hover:text-brand-primary transition-all text-gray-400">
+                                    <Heart className="w-6 h-6" />
+                                </button>
+                                <button className="p-4 border-2 border-gray-100 rounded-2xl hover:border-brand-primary hover:text-brand-primary transition-all text-gray-400">
+                                    <Share2 className="w-6 h-6" />
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="pt-6">
                             <button
-                                onClick={() => onToggleWishlist(book)}
-                                className={`flex-1 md:flex-none p-5 md:p-6 rounded-2xl md:rounded-[1.5rem] border transition-all ${isInWishlist ? 'bg-accent-gold text-white' : 'border-brand-100 text-brand-900'}`}
-                                title={isInWishlist ? "Remover dos favoritos" : "Adicionar aos favoritos"}
-                                aria-label={isInWishlist ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+                                onClick={() => {
+                                    onAddToCart(book);
+                                    onClose();
+                                }}
+                                className="w-full btn-premium py-5 justify-center text-lg rounded-2xl shadow-xl shadow-brand-primary/30"
                             >
-                                <Heart className={`mx-auto ${isInWishlist ? "fill-current" : ""}`} size={20} />
+                                <ShoppingCart className="w-6 h-6" />
+                                Adicionar ao Meu Carrinho
                             </button>
-                            <button onClick={() => { onAddToCart(book); onClose(); }} className="flex-[3] md:flex-none px-8 md:px-12 py-5 md:py-6 bg-brand-900 text-white font-bold uppercase tracking-widest text-[10px] md:text-[11px] rounded-2xl md:rounded-[1.5rem] hover:bg-accent-gold transition-all shadow-2xl">Adicionar ao Carrinho</button>
                         </div>
                     </div>
                 </div>
@@ -62,5 +105,7 @@ const BookDetailModal: React.FC<BookDetailModalProps> = ({
         </div>
     );
 };
+
+import { Star } from 'lucide-react';
 
 export default BookDetailModal;

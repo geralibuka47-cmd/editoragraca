@@ -1,42 +1,54 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+    --color-brand-primary: #DA9631;
+    --color-brand-dark: #0B1C24;
+    --color-brand-light: #F5F5F5;
+    --color-brand-accent: #E8A845;
+
+    --font-serif: "Cormorant Garamond", serif;
+    --font-sans: "Montserrat", sans-serif;
+}
 
 @layer base {
-  body {
-    background-color: #FFFFFF;
-    color: #111111;
-    -webkit-font-smoothing: antialiased;
-    font-family: 'Inter', sans-serif;
-  }
+    body {
+        @apply font-sans bg-brand-light text-brand-dark;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        @apply font-serif;
+    }
 }
 
-.book-shadow {
-  box-shadow: 15px 15px 30px rgba(0,0,0,0.08), -1px 0 4px rgba(0,0,0,0.02);
+/* Custom Utilities Inspired by Booksell */
+@layer components {
+    .btn-premium {
+        @apply px-8 py-3 bg-brand-primary text-white font-semibold transition-all duration-300 hover:bg-brand-dark hover:scale-105 shadow-md flex items-center gap-2;
+    }
+
+    .section-bg-dark {
+        @apply bg-brand-dark text-white py-16;
+    }
 }
 
-.paper-texture {
-  background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-::selection {
-  background-color: #C5A059;
-  color: white;
-}
-
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #F9F9F9;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #E5E5E5;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #C5A059;
+.animate-fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
 }
