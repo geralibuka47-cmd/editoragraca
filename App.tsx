@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { Analytics } from "@vercel/analytics/react";
 import Navbar from './components/Navbar';
 import AIChat from './components/AIChat';
 import Footer from './components/Footer';
@@ -52,7 +53,7 @@ const App: React.FC = () => {
       .then(() => console.log('Appwrite connection verified'))
       .catch((err) => console.error('Appwrite connection failed:', err));
 
-    const unsubscribe = subscribeToAuthChanges((u) => {
+    const unsubscribe = subscribeToAuthChanges((u: User | null) => {
       setUser(u);
     });
     return () => unsubscribe();
@@ -85,16 +86,16 @@ const App: React.FC = () => {
   };
 
   const addToCart = (book: Book) => {
-    setCart(prev => {
-      const existing = prev.find(item => item.id === book.id);
-      if (existing) return prev.map(item => item.id === book.id ? { ...item, quantity: item.quantity + 1 } : item);
+    setCart((prev: CartItem[]) => {
+      const existing = prev.find((item: CartItem) => item.id === book.id);
+      if (existing) return prev.map((item: CartItem) => item.id === book.id ? { ...item, quantity: item.quantity + 1 } : item);
       return [...prev, { ...book, quantity: 1 }];
     });
     setIsCartOpen(true);
   };
 
   const toggleWishlist = (book: Book) => {
-    setWishlist(prev => prev.some(b => b.id === book.id) ? prev.filter(b => b.id !== book.id) : [...prev, book]);
+    setWishlist((prev: Book[]) => prev.some((b: Book) => b.id === book.id) ? prev.filter((b: Book) => b.id !== book.id) : [...prev, book]);
   };
 
   const handleCheckout = () => {
@@ -116,8 +117,8 @@ const App: React.FC = () => {
         customerName: user.name,
         customerEmail: user.email,
         customerId: user.id,
-        items: cart.map(i => ({ title: i.title, quantity: i.quantity, price: i.price })),
-        total: cart.reduce((acc, i) => acc + (i.price * i.quantity), 0),
+        items: cart.map((i: CartItem) => ({ title: i.title, quantity: i.quantity, price: i.price })),
+        total: cart.reduce((acc: number, i: CartItem) => acc + (i.price * i.quantity), 0),
         status: 'Pendente',
         date: new Date().toLocaleDateString('pt-AO')
       };
@@ -125,7 +126,7 @@ const App: React.FC = () => {
       const orderId = await createOrder(orderData);
       const newOrder: Order = { ...orderData, id: orderId };
 
-      setOrders(prev => [newOrder, ...prev]);
+      setOrders((prev: Order[]) => [newOrder, ...prev]);
       setCart([]);
       setIsCheckoutLoading(false);
       setCurrentView('READER_DASHBOARD');
@@ -198,8 +199,9 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col font-sans selection:bg-accent-gold selection:text-white">
+      <Analytics />
       <Navbar
-        cartCount={cart.reduce((a, b) => a + b.quantity, 0)}
+        cartCount={cart.reduce((a: number, b: CartItem) => a + b.quantity, 0)}
         wishlistCount={wishlist.length}
         onOpenCart={() => setIsCartOpen(true)}
         onOpenWishlist={() => setIsWishlistOpen(true)}
@@ -219,7 +221,7 @@ const App: React.FC = () => {
           onClose={() => setSelectedBook(null)}
           onAddToCart={addToCart}
           onToggleWishlist={toggleWishlist}
-          isInWishlist={wishlist.some(w => w.id === selectedBook.id)}
+          isInWishlist={wishlist.some((w: Book) => w.id === (selectedBook as Book).id)}
         />
       )}
 
