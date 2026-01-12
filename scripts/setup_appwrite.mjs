@@ -78,7 +78,9 @@ async function setup() {
             { id: 'whatsappNumber', type: 'string', size: 32, required: false },
             { id: 'name', type: 'string', size: 255, required: true },
             { id: 'email', type: 'string', size: 255, required: true },
-            { id: 'role', type: 'string', size: 32, required: true, default: 'leitor' }
+            { id: 'role', type: 'string', size: 32, required: true, default: 'leitor' },
+            { id: 'bio', type: 'string', size: 2000, required: false },
+            { id: 'avatarUrl', type: 'string', size: 1024, required: false }
         ];
 
         for (const attr of userAttrs) {
@@ -156,6 +158,37 @@ async function setup() {
                     await databases.createStringAttribute(dbId, VITE_APPWRITE_PAYMENT_PROOFS_COLLECTION, attr.id, attr.size, attr.required);
                 } else if (attr.type === 'datetime') {
                     await databases.createDatetimeAttribute(dbId, VITE_APPWRITE_PAYMENT_PROOFS_COLLECTION, attr.id, attr.required);
+                }
+                console.log(`✅ Atributo "${attr.id}" criado.`);
+            } catch (e) { console.log(`⚠️ Atributo "${attr.id}" erro:`, e.message); }
+        }
+
+        // 3.1 Create Orders Collection
+        console.log(`\n📝 Criando coleção ${VITE_APPWRITE_ORDERS_COLLECTION}...`);
+        try {
+            await databases.createCollection(dbId, VITE_APPWRITE_ORDERS_COLLECTION, VITE_APPWRITE_ORDERS_COLLECTION, ['read("any")', 'create("users")', 'update("users")', 'delete("users")']);
+            console.log('✅ Coleção de pedidos criada.');
+        } catch (e) { console.log('⚠️ Coleção já existe ou erro:', e.message); }
+
+        const orderAttrs = [
+            { id: 'customerName', type: 'string', size: 255, required: true },
+            { id: 'customerEmail', type: 'string', size: 255, required: true },
+            { id: 'customerId', type: 'string', size: 36, required: false },
+            { id: 'items', type: 'string', size: 8192, required: true }, // Store as stringified JSON
+            { id: 'total', type: 'integer', required: true },
+            { id: 'status', type: 'string', size: 32, required: true, default: 'Pendente' },
+            { id: 'date', type: 'datetime', required: true },
+            { id: 'paymentNotificationId', type: 'string', size: 36, required: false }
+        ];
+
+        for (const attr of orderAttrs) {
+            try {
+                if (attr.type === 'string') {
+                    await databases.createStringAttribute(dbId, VITE_APPWRITE_ORDERS_COLLECTION, attr.id, attr.size, attr.required, attr.default);
+                } else if (attr.type === 'integer') {
+                    await databases.createIntegerAttribute(dbId, VITE_APPWRITE_ORDERS_COLLECTION, attr.id, attr.required);
+                } else if (attr.type === 'datetime') {
+                    await databases.createDatetimeAttribute(dbId, VITE_APPWRITE_ORDERS_COLLECTION, attr.id, attr.required);
                 }
                 console.log(`✅ Atributo "${attr.id}" criado.`);
             } catch (e) { console.log(`⚠️ Atributo "${attr.id}" erro:`, e.message); }

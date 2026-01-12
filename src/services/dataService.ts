@@ -9,15 +9,84 @@ const BOOKS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_BOOKS_COLLECTION || 'b
 const ORDERS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_ORDERS_COLLECTION || 'orders';
 const USERS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_USERS_COLLECTION || 'users';
 
-// Helper to clean data for Appwrite (removes system fields and custom id)
 const cleanData = (data: any) => {
     const clean: any = {};
+    const mapping: Record<string, string> = {
+        'paymentMethods': 'bankAccounts'
+    };
+
+    // Numeric fields that must be converted to number for Appwrite
+    const numericFields = ['price', 'stock', 'order', 'pages', 'total', 'totalAmount'];
+    // Fields that should be stringified as a single JSON string (not an array)
+    const JSONFields = ['items'];
+
     Object.keys(data).forEach(key => {
         if (!key.startsWith('$') && key !== 'id') {
-            clean[key] = data[key];
+            const dbKey = mapping[key] || key;
+            const value = data[key];
+
+            // Skip undefined or null values
+            if (value === undefined || value === null) return;
+
+            // Handle objects and arrays of objects
+            if (typeof value === 'object' && !Array.isArray(value)) {
+                clean[dbKey] = JSON.stringify(value);
+            } else if (Array.isArray(value)) {
+                if (JSONFields.includes(dbKey)) {
+                    clean[dbKey] = JSON.stringify(value);
+                } else if (value.length > 0 && typeof value[0] === 'object') {
+                    clean[dbKey] = value.map(item => JSON.stringify(item));
+                } else {
+                    clean[dbKey] = value;
+                }
+            } else if (numericFields.includes(dbKey)) {
+                clean[dbKey] = typeof value === 'string' ? (parseInt(value) || 0) : value;
+            } else {
+                clean[dbKey] = value;
+            }
         }
     });
     return clean;
+};
+
+// Helper to parse data from Appwrite (parses stringified JSON and maps back)
+const parseData = (doc: any) => {
+    const parsed: any = { id: doc.$id, ...doc };
+
+    // Reverse mapping
+    if (doc.bankAccounts) {
+        parsed.paymentMethods = Array.isArray(doc.bankAccounts)
+            ? doc.bankAccounts.map((item: string) => {
+                try { return JSON.parse(item); } catch (e) { return item; }
+            })
+            : doc.bankAccounts;
+    }
+
+    // Parse items if they are strings (Order.items or PaymentNotification.items)
+    if (doc.items) {
+        if (typeof doc.items === 'string') {
+            try { parsed.items = JSON.parse(doc.items); } catch (e) { /* ignore */ }
+        } else if (Array.isArray(doc.items)) {
+            parsed.items = doc.items.map((item: any) => {
+                if (typeof item === 'string') {
+                    try { return JSON.parse(item); } catch (e) { return item; }
+                }
+                return item;
+            });
+        }
+    }
+
+    // Parse details (EditorialService)
+    if (doc.details && Array.isArray(doc.details)) {
+        parsed.details = doc.details.map((item: any) => {
+            if (typeof item === 'string' && (item.startsWith('{') || item.startsWith('['))) {
+                try { return JSON.parse(item); } catch (e) { return item; }
+            }
+            return item;
+        });
+    }
+
+    return parsed;
 };
 
 // Books Collection
@@ -38,12 +107,6 @@ export const saveBook = async (book: Book) => {
     try {
         const { id } = book;
         const bookData = cleanData(book);
-
-        // Ensure numeric fields are valid
-        if (typeof bookData.price === 'string') bookData.price = parseInt(bookData.price) || 0;
-        if (typeof bookData.stock === 'string') bookData.stock = parseInt(bookData.stock) || 0;
-        if (isNaN(bookData.price)) bookData.price = 0;
-        if (isNaN(bookData.stock)) bookData.stock = 0;
 
         // Validation
         if (!bookData.title || !bookData.author) {
@@ -85,7 +148,7 @@ export const getOrders = async (userId?: string): Promise<Order[]> => {
             ORDERS_COLLECTION_ID,
             queries
         );
-        return response.documents.map(doc => ({ id: doc.$id, ...doc } as unknown as Order));
+        return response.documents.map(doc => parseData(doc) as Order);
     } catch (error) {
         console.error("Erro ao procurar pedidos:", error);
         return [];
@@ -94,13 +157,14 @@ export const getOrders = async (userId?: string): Promise<Order[]> => {
 
 export const createOrder = async (order: Omit<Order, 'id'>): Promise<string> => {
     const orderData = cleanData(order);
+
     const response = await databases.createDocument(
         DATABASE_ID,
         ORDERS_COLLECTION_ID,
         ID.unique(),
         {
             ...orderData,
-            createdAt: new Date().toISOString()
+            date: new Date().toISOString()
         }
     );
     return response.$id;
@@ -114,7 +178,7 @@ export const updateOrderStatus = async (orderId: string, status: Order['status']
 export const getUserProfile = async (uid: string): Promise<User | null> => {
     try {
         const response = await databases.getDocument(DATABASE_ID, USERS_COLLECTION_ID, uid);
-        return { id: response.$id, ...response } as unknown as User;
+        return parseData(response) as User;
     } catch (error) {
         return null;
     }
@@ -136,7 +200,7 @@ export const saveUserProfile = async (user: User) => {
 export const getAllUsers = async (): Promise<User[]> => {
     try {
         const response = await databases.listDocuments(DATABASE_ID, USERS_COLLECTION_ID);
-        return response.documents.map(doc => ({ id: doc.$id, ...doc } as unknown as User));
+        return response.documents.map(doc => parseData(doc) as User);
     } catch (error) {
         console.error("Erro ao buscar utilizadores:", error);
         return [];
@@ -169,7 +233,7 @@ export const getPaymentNotificationsByReader = async (readerId: string): Promise
             PAYMENT_NOTIFICATIONS_COLLECTION_ID,
             [Query.equal('readerId', readerId), Query.orderDesc('createdAt')]
         );
-        return response.documents.map(doc => ({ id: doc.$id, ...doc } as unknown as import('../types').PaymentNotification));
+        return response.documents.map(doc => parseData(doc) as import('../types').PaymentNotification);
     } catch (error) {
         console.error("Erro ao buscar notificações de pagamento:", error);
         return [];
@@ -183,7 +247,7 @@ export const getAllPaymentNotifications = async (): Promise<import('../types').P
             PAYMENT_NOTIFICATIONS_COLLECTION_ID,
             [Query.orderDesc('createdAt')]
         );
-        return response.documents.map(doc => ({ id: doc.$id, ...doc } as unknown as import('../types').PaymentNotification));
+        return response.documents.map(doc => parseData(doc) as import('../types').PaymentNotification);
     } catch (error) {
         console.error("Erro ao buscar notificações de pagamento:", error);
         return [];
@@ -433,7 +497,7 @@ const SERVICES_COLLECTION_ID = import.meta.env.VITE_APPWRITE_SERVICES_COLLECTION
 export const getBlogPosts = async (): Promise<import('../types').BlogPost[]> => {
     try {
         const response = await databases.listDocuments(DATABASE_ID, BLOG_COLLECTION_ID, [Query.orderDesc('date')]);
-        return response.documents.map(doc => ({ id: doc.$id, ...doc } as unknown as import('../types').BlogPost));
+        return response.documents.map(doc => parseData(doc) as import('../types').BlogPost);
     } catch (error) {
         console.error("Erro ao buscar blog posts:", error);
         return [];
@@ -457,7 +521,7 @@ export const deleteBlogPost = async (id: string) => {
 export const getTeamMembers = async (): Promise<any[]> => {
     try {
         const response = await databases.listDocuments(DATABASE_ID, TEAM_COLLECTION_ID, [Query.orderAsc('order')]);
-        return response.documents.map(doc => ({ id: doc.$id, ...doc }));
+        return response.documents.map(doc => parseData(doc));
     } catch (error) {
         console.error("Erro ao buscar equipa:", error);
         return [];
@@ -466,6 +530,7 @@ export const getTeamMembers = async (): Promise<any[]> => {
 
 export const saveTeamMember = async (member: any) => {
     const data = cleanData(member);
+
     if (member.id && !member.id.startsWith('temp_')) {
         await databases.updateDocument(DATABASE_ID, TEAM_COLLECTION_ID, member.id, data);
     } else {
@@ -481,7 +546,7 @@ export const deleteTeamMember = async (id: string) => {
 export const getEditorialServices = async (): Promise<import('../types').EditorialService[]> => {
     try {
         const response = await databases.listDocuments(DATABASE_ID, SERVICES_COLLECTION_ID, [Query.orderAsc('order')]);
-        return response.documents.map(doc => ({ id: doc.$id, ...doc } as unknown as import('../types').EditorialService));
+        return response.documents.map(doc => parseData(doc) as import('../types').EditorialService);
     } catch (error) {
         console.error("Erro ao buscar serviços:", error);
         return [];
@@ -490,6 +555,7 @@ export const getEditorialServices = async (): Promise<import('../types').Editori
 
 export const saveEditorialService = async (service: import('../types').EditorialService) => {
     const data = cleanData(service);
+
     if (service.id && !service.id.startsWith('temp_')) {
         await databases.updateDocument(DATABASE_ID, SERVICES_COLLECTION_ID, service.id, data);
     } else {

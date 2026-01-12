@@ -264,10 +264,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
         try {
             const { saveBlogPost } = await import('../services/dataService');
             await saveBlogPost(blogForm);
+            alert('Post guardado com sucesso!');
             setShowBlogModal(false);
             fetchBlogPosts();
         } catch (error) {
             console.error('Erro ao salvar post:', error);
+            alert('Erro ao salvar post. Verifique os dados.');
         } finally {
             setIsSavingBlog(false);
         }
@@ -278,9 +280,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
         try {
             const { deleteBlogPost } = await import('../services/dataService');
             await deleteBlogPost(id);
+            alert('Post eliminado.');
             fetchBlogPosts();
         } catch (error) {
             console.error('Erro ao eliminar post:', error);
+            alert('Erro ao eliminar post.');
         }
     };
 
@@ -290,10 +294,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
         try {
             const { saveTeamMember } = await import('../services/dataService');
             await saveTeamMember(teamForm);
+            alert('Membro guardado com sucesso!');
             setShowTeamModal(false);
             fetchTeamMembers();
         } catch (error) {
             console.error('Erro ao salvar membro:', error);
+            alert('Erro ao salvar membro.');
         } finally {
             setIsSavingTeam(false);
         }
@@ -304,9 +310,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
         try {
             const { deleteTeamMember } = await import('../services/dataService');
             await deleteTeamMember(id);
+            alert('Membro eliminado.');
             fetchTeamMembers();
         } catch (error) {
             console.error('Erro ao eliminar membro:', error);
+            alert('Erro ao eliminar membro.');
         }
     };
 
@@ -316,10 +324,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
         try {
             const { saveEditorialService } = await import('../services/dataService');
             await saveEditorialService(serviceForm);
+            alert('Serviço guardado com sucesso!');
             setShowServiceModal(false);
             fetchServices();
         } catch (error) {
             console.error('Erro ao salvar serviço:', error);
+            alert('Erro ao salvar serviço. Verifique se os dados estão corretos.');
         } finally {
             setIsSavingService(false);
         }
@@ -330,9 +340,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
         try {
             const { deleteEditorialService } = await import('../services/dataService');
             await deleteEditorialService(id);
+            alert('Serviço eliminado.');
             fetchServices();
         } catch (error) {
             console.error('Erro ao eliminar serviço:', error);
+            alert('Erro ao eliminar serviço.');
         }
     };
 

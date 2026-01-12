@@ -43,14 +43,38 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
         setStep('details');
     };
 
-    const handleConfirmOrder = () => {
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [orderError, setOrderError] = useState('');
+
+    const handleConfirmOrder = async () => {
         if (!validateCustomerInfo()) return;
+        setIsSubmitting(true);
+        setOrderError('');
 
-        // Simulate order creation
-        console.log('Order placed:', { customer: customerInfo, items: cart, total });
+        try {
+            const { createOrder } = await import('../services/dataService');
 
-        // Clear cart (would be handled by parent component in real app)
-        setStep('success');
+            await createOrder({
+                customerName: customerInfo.name,
+                customerEmail: customerInfo.email,
+                items: cart.map(item => ({
+                    title: item.title,
+                    quantity: item.quantity,
+                    price: item.price,
+                    authorId: item.authorId
+                })),
+                total: total,
+                status: 'Pendente',
+                date: new Date().toISOString()
+            });
+
+            setStep('success');
+        } catch (error) {
+            console.error('Erro ao criar pedido:', error);
+            setOrderError('Ocorreu um erro ao processar o seu pedido. Por favor, tente novamente.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -195,6 +219,12 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
                         <div className="md:col-span-2 bg-white rounded-3xl shadow-xl p-8">
                             <h2 className="text-2xl font-black text-brand-dark mb-6">Dados do Cliente</h2>
 
+                            {orderError && (
+                                <div className="p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm font-bold mb-6 animate-pulse">
+                                    {orderError}
+                                </div>
+                            )}
+
                             <form onSubmit={(e) => { e.preventDefault(); handleConfirmOrder(); }} className="space-y-6">
                                 <div>
                                     <label htmlFor="name" className="block text-sm font-bold text-brand-dark mb-2 uppercase tracking-wider">
@@ -301,8 +331,12 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
                                     </div>
                                 </div>
 
-                                <button type="submit" className="w-full btn-premium justify-center text-lg">
-                                    Confirmar Pedido
+                                <button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className="w-full btn-premium justify-center text-lg disabled:opacity-50"
+                                >
+                                    {isSubmitting ? 'A processar pedido...' : 'Confirmar Pedido'}
                                 </button>
                             </form>
                         </div>
