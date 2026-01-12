@@ -102,3 +102,174 @@ export const saveUserProfile = async (user: User) => {
         }
     }
 };
+
+// Payment Notifications Collection
+const PAYMENT_NOTIFICATIONS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_PAYMENT_NOTIFICATIONS_COLLECTION || 'payment_notifications';
+const PAYMENT_PROOFS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_PAYMENT_PROOFS_COLLECTION || 'payment_proofs';
+
+export const createPaymentNotification = async (notification: Omit<import('../types').PaymentNotification, 'id'>): Promise<string> => {
+    const response = await databases.createDocument(
+        DATABASE_ID,
+        PAYMENT_NOTIFICATIONS_COLLECTION_ID,
+        ID.unique(),
+        {
+            ...notification,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        }
+    );
+    return response.$id;
+};
+
+export const getPaymentNotificationsByReader = async (readerId: string): Promise<import('../types').PaymentNotification[]> => {
+    try {
+        const response = await databases.listDocuments(
+            DATABASE_ID,
+            PAYMENT_NOTIFICATIONS_COLLECTION_ID,
+            [Query.equal('readerId', readerId), Query.orderDesc('createdAt')]
+        );
+        return response.documents.map(doc => ({ id: doc.$id, ...doc } as unknown as import('../types').PaymentNotification));
+    } catch (error) {
+        console.error("Erro ao buscar notificações de pagamento:", error);
+        return [];
+    }
+};
+
+export const getAllPaymentNotifications = async (): Promise<import('../types').PaymentNotification[]> => {
+    try {
+        const response = await databases.listDocuments(
+            DATABASE_ID,
+            PAYMENT_NOTIFICATIONS_COLLECTION_ID,
+            [Query.orderDesc('createdAt')]
+        );
+        return response.documents.map(doc => ({ id: doc.$id, ...doc } as unknown as import('../types').PaymentNotification));
+    } catch (error) {
+        console.error("Erro ao buscar notificações de pagamento:", error);
+        return [];
+    }
+};
+
+export const updatePaymentNotificationStatus = async (
+    notificationId: string,
+    status: import('../types').PaymentNotification['status']
+): Promise<void> => {
+    await databases.updateDocument(
+        DATABASE_ID,
+        PAYMENT_NOTIFICATIONS_COLLECTION_ID,
+        notificationId,
+        {
+            status,
+            updatedAt: new Date().toISOString()
+        }
+    );
+};
+
+// Payment Proofs Collection
+export const createPaymentProof = async (proof: Omit<import('../types').PaymentProof, 'id'>): Promise<string> => {
+    const response = await databases.createDocument(
+        DATABASE_ID,
+        PAYMENT_PROOFS_COLLECTION_ID,
+        ID.unique(),
+        {
+            ...proof,
+            uploadedAt: new Date().toISOString()
+        }
+    );
+    return response.$id;
+};
+
+export const getPaymentProofByNotification = async (notificationId: string): Promise<import('../types').PaymentProof | null> => {
+    try {
+        const response = await databases.listDocuments(
+            DATABASE_ID,
+            PAYMENT_PROOFS_COLLECTION_ID,
+            [Query.equal('paymentNotificationId', notificationId)]
+        );
+        if (response.documents.length > 0) {
+            return { id: response.documents[0].$id, ...response.documents[0] } as unknown as import('../types').PaymentProof;
+        }
+        return null;
+    } catch (error) {
+        console.error("Erro ao buscar comprovante:", error);
+        return null;
+    }
+};
+
+export const confirmPaymentProof = async (
+    proofId: string,
+    adminId: string,
+    notes?: string
+): Promise<void> => {
+    await databases.updateDocument(
+        DATABASE_ID,
+        PAYMENT_PROOFS_COLLECTION_ID,
+        proofId,
+        {
+            confirmedBy: adminId,
+            confirmedAt: new Date().toISOString(),
+            notes: notes || ''
+        }
+    );
+};
+
+// Manuscripts Collection
+const MANUSCRIPTS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_MANUSCRIPTS_COLLECTION || 'manuscripts';
+
+export const createManuscript = async (manuscript: Omit<import('../types').Manuscript, 'id'>): Promise<string> => {
+    const response = await databases.createDocument(
+        DATABASE_ID,
+        MANUSCRIPTS_COLLECTION_ID,
+        ID.unique(),
+        {
+            ...manuscript,
+            submittedDate: new Date().toISOString()
+        }
+    );
+    return response.$id;
+};
+
+export const getManuscriptsByAuthor = async (authorId: string): Promise<import('../types').Manuscript[]> => {
+    try {
+        const response = await databases.listDocuments(
+            DATABASE_ID,
+            MANUSCRIPTS_COLLECTION_ID,
+            [Query.equal('authorId', authorId), Query.orderDesc('submittedDate')]
+        );
+        return response.documents.map(doc => ({ id: doc.$id, ...doc } as unknown as import('../types').Manuscript));
+    } catch (error) {
+        console.error("Erro ao buscar manuscritos:", error);
+        return [];
+    }
+};
+
+export const getAllManuscripts = async (): Promise<import('../types').Manuscript[]> => {
+    try {
+        const response = await databases.listDocuments(
+            DATABASE_ID,
+            MANUSCRIPTS_COLLECTION_ID,
+            [Query.orderDesc('submittedDate')]
+        );
+        return response.documents.map(doc => ({ id: doc.$id, ...doc } as unknown as import('../types').Manuscript));
+    } catch (error) {
+        console.error("Erro ao buscar todos os manuscritos:", error);
+        return [];
+    }
+};
+
+export const updateManuscriptStatus = async (
+    manuscriptId: string,
+    status: 'approved' | 'rejected',
+    feedback?: string
+): Promise<void> => {
+    await databases.updateDocument(
+        DATABASE_ID,
+        MANUSCRIPTS_COLLECTION_ID,
+        manuscriptId,
+        {
+            status,
+            feedback: feedback || '',
+            reviewedDate: new Date().toISOString()
+        }
+    );
+};
+

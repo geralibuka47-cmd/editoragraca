@@ -103,7 +103,8 @@ export const BOOKS: Book[] = [
     isbn: "978-972-21-1721-0",
     coverUrl: "https://picsum.photos/seed/agualusa/300/450",
     isBestseller: true,
-    description: "Uma sátira brilhante sobre a construção da memória e identidade na Angola pós-guerra."
+    description: "Uma sátira brilhante sobre a construção da memória e identidade na Angola pós-guerra.",
+    authorId: "author_agualusa"
   },
   {
     id: "2",
@@ -114,7 +115,8 @@ export const BOOKS: Book[] = [
     isbn: "978-972-21-0210-0",
     coverUrl: "https://picsum.photos/seed/miacouto/300/450",
     isBestseller: true,
-    description: "Um clássico moderno que entrelaça a dura realidade da guerra com o realismo mágico."
+    description: "Um clássico moderno que entrelaça a dura realidade da guerra com o realismo mágico.",
+    authorId: "author_miacouto"
   },
   {
     id: "3",
@@ -125,7 +127,8 @@ export const BOOKS: Book[] = [
     isbn: "978-972-21-1000-0",
     coverUrl: "https://picsum.photos/seed/pepetela/300/450",
     isNew: true,
-    description: "Uma reflexão profunda sobre os sonhos e desilusões da geração que lutou pela independência."
+    description: "Uma reflexão profunda sobre os sonhos e desilusões da geração que lutou pela independência.",
+    authorId: "author_pepetela"
   },
   {
     id: "4",
@@ -135,7 +138,8 @@ export const BOOKS: Book[] = [
     category: "Ficção Literária",
     isbn: "978-972-21-0500-0",
     coverUrl: "https://picsum.photos/seed/ondjaki/300/450",
-    description: "A vida em Luanda vista através dos olhos de uma criança, com humor e ternura."
+    description: "A vida em Luanda vista através dos olhos de uma criança, com humor e ternura.",
+    authorId: "author_ondjaki"
   },
   {
     id: "5",
@@ -145,7 +149,8 @@ export const BOOKS: Book[] = [
     category: "História e Biografia",
     isbn: "978-972-21-0100-0",
     coverUrl: "https://picsum.photos/seed/mayombe/300/450",
-    description: "Uma narrativa crua sobre a guerrilha e as complexidades tribais e ideológicas."
+    description: "Uma narrativa crua sobre a guerrilha e as complexidades tribais e ideológicas.",
+    authorId: "author_pepetela"
   },
   {
     id: "6",
@@ -156,7 +161,8 @@ export const BOOKS: Book[] = [
     isbn: "978-972-21-0001-0",
     coverUrl: "https://picsum.photos/seed/neto/300/450",
     isBestseller: true,
-    description: "Coletânea de poemas que se tornaram hinos da resistência e da esperança angolana."
+    description: "Coletânea de poemas que se tornaram hinos da resistência e da esperança angolana.",
+    authorId: "author_neto"
   },
   {
     id: "7",
@@ -167,6 +173,8 @@ export const BOOKS: Book[] = [
     isbn: "978-972-21-0002-0",
     coverUrl: "https://picsum.photos/seed/lueji/300/450",
     isNew: true,
-    description: "O nascimento do império Lunda contado através de uma narrativa fascinante."
+    description: "O nascimento do império Lunda contado através de uma narrativa fascinante.",
+    authorId: "author_pepetela"
   }
 ];
+

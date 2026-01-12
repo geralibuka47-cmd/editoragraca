@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Book, Heart, Clock, Settings, Download, User as UserIcon } from 'lucide-react';
+import { Book, Heart, Clock, Settings, Download, User as UserIcon, CheckCircle, CreditCard } from 'lucide-react';
 import { ViewState, User } from '../types';
 
 interface ReaderDashboardProps {
@@ -8,7 +8,58 @@ interface ReaderDashboardProps {
 }
 
 const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) => {
-    const [activeTab, setActiveTab] = useState<'library' | 'wishlist' | 'history' | 'settings'>('library');
+    const [activeTab, setActiveTab] = useState<'library' | 'wishlist' | 'history' | 'settings' | 'payments'>('library');
+    const [notifications, setNotifications] = useState<import('../types').PaymentNotification[]>([]);
+    const [isUploading, setIsUploading] = useState<string | null>(null);
+
+    React.useEffect(() => {
+        const fetchNotifications = async () => {
+            if (!user) return;
+            try {
+                const { getPaymentNotificationsByReader } = await import('../services/dataService');
+                const data = await getPaymentNotificationsByReader(user.id);
+                setNotifications(data);
+            } catch (error) {
+                console.error('Erro ao buscar pagamentos:', error);
+            }
+        };
+
+        if (activeTab === 'payments') {
+            fetchNotifications();
+        }
+    }, [activeTab, user]);
+
+    const handleUploadProof = async (notificationId: string, file: File) => {
+        setIsUploading(notificationId);
+        try {
+            const { uploadPaymentProof } = await import('../services/storageService');
+            const { createPaymentProof, updatePaymentNotificationStatus } = await import('../services/dataService');
+
+            const { fileId, fileUrl } = await uploadPaymentProof(file);
+
+            await createPaymentProof({
+                paymentNotificationId: notificationId,
+                readerId: user?.id || 'temp',
+                fileUrl,
+                fileName: file.name,
+                uploadedAt: new Date().toISOString()
+            });
+
+            await updatePaymentNotificationStatus(notificationId, 'proof_uploaded');
+
+            // Refresh notifications
+            const { getPaymentNotificationsByReader } = await import('../services/dataService');
+            const data = await getPaymentNotificationsByReader(user?.id || 'temp');
+            setNotifications(data);
+
+            alert('Comprovante enviado com sucesso!');
+        } catch (error) {
+            console.error('Erro no upload:', error);
+            alert('Erro ao enviar comprovante.');
+        } finally {
+            setIsUploading(null);
+        }
+    };
 
     // Mock data - in real app would come from database
     const purchasedBooks = [
@@ -281,9 +332,93 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) =
                             </div>
                         </div>
                     )}
+
+                    {/* Payments Tab */}
+                    {activeTab === 'payments' && (
+                        <div>
+                            <h2 className="text-3xl font-black text-brand-dark mb-8">Meus Pagamentos</h2>
+
+                            <div className="grid gap-6">
+                                {notifications.length > 0 ? notifications.map((notif) => (
+                                    <div key={notif.id} className="bg-white rounded-2xl shadow-lg p-6 border-l-8 border-brand-primary">
+                                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-3 mb-2">
+                                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Pedido #{notif.orderId}</span>
+                                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${notif.status === 'confirmed' ? 'bg-green-100 text-green-600' :
+                                                        notif.status === 'proof_uploaded' ? 'bg-blue-100 text-blue-600' :
+                                                            'bg-yellow-100 text-yellow-600'
+                                                        }`}>
+                                                        {notif.status === 'confirmed' ? 'Confirmado' :
+                                                            notif.status === 'proof_uploaded' ? 'Comprovante em Análise' :
+                                                                'Aguardando Pagamento'}
+                                                    </span>
+                                                </div>
+                                                <div className="space-y-1">
+                                                    {notif.items.map((item, idx) => (
+                                                        <div key={idx} className="text-sm">
+                                                            <span className="font-bold text-brand-dark">{item.bookTitle}</span>
+                                                            <span className="text-gray-500 mx-2">por</span>
+                                                            <span className="text-brand-primary font-medium">{item.authorName}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <div className="lg:text-right">
+                                                <div className="text-2xl font-black text-brand-dark mb-1">{notif.totalAmount.toLocaleString()} Kz</div>
+                                                <p className="text-xs text-gray-500 mb-4 italic">Solicitado em {new Date(notif.createdAt).toLocaleDateString('pt-AO')}</p>
+
+                                                {notif.status === 'pending' && (
+                                                    <div className="relative inline-block">
+                                                        <input
+                                                            type="file"
+                                                            title="Anexar comprovante de pagamento"
+                                                            aria-label="Selecionar ficheiro de comprovante"
+                                                            className="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                                            onChange={(e) => e.target.files && handleUploadProof(notif.id, e.target.files[0])}
+                                                            disabled={isUploading === notif.id}
+                                                        />
+                                                        <button className="btn-premium py-2 px-4 text-xs">
+                                                            {isUploading === notif.id ? 'A enviar...' : 'Anexar Comprovante'}
+                                                        </button>
+                                                    </div>
+                                                )}
+
+
+                                                {notif.status === 'proof_uploaded' && (
+                                                    <div className="flex items-center gap-2 text-blue-600 font-bold text-sm">
+                                                        <Clock className="w-4 h-4" />
+                                                        Em verificação
+                                                    </div>
+                                                )}
+
+                                                {notif.status === 'confirmed' && (
+                                                    <div className="flex items-center gap-2 text-green-600 font-bold text-sm">
+                                                        <CheckCircle className="w-4 h-4" />
+                                                        Confirmado
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )) : (
+                                    <div className="bg-white rounded-3xl shadow-lg p-16 text-center">
+                                        <CreditCard className="w-20 h-20 text-gray-300 mx-auto mb-6" />
+                                        <h3 className="text-2xl font-bold text-brand-dark mb-4">Sem Pagamentos Pendentes</h3>
+                                        <p className="text-gray-600 mb-8">As suas compras aparecerão aqui para acompanhamento.</p>
+                                        <button onClick={() => onNavigate('CATALOG')} className="btn-premium">
+                                            Ir às Compras
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
-            </section>
-        </div>
+            </section >
+        </div >
+
     );
 };
 

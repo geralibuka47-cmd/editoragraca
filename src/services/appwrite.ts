@@ -1,4 +1,4 @@
-import { Client, Account, Databases } from "appwrite";
+import { Client, Account, Databases, Storage, Messaging, ID } from "appwrite";
 
 const endpoint = import.meta.env.VITE_APPWRITE_ENDPOINT || 'https://cloud.appwrite.io/v1';
 const projectId = import.meta.env.VITE_APPWRITE_PROJECT_ID;
@@ -17,5 +17,8 @@ if (projectId) {
 
 const account = new Account(client);
 const databases = new Databases(client);
+const storage = new Storage(client);
+const messaging = new Messaging(client);
 
-export { client, account, databases };
+export { client, account, databases, storage, messaging, ID };
+

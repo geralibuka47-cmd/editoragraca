@@ -16,6 +16,7 @@ export interface User {
   email: string;
   role: UserRole;
   paymentMethods?: BankInfo[];
+  whatsappNumber?: string; // WhatsApp for notifications
   preferredContact?: {
     whatsapp?: string;
     email?: string;
@@ -75,6 +76,42 @@ export interface Order {
   total: number;
   status: 'Pendente' | 'Validado' | 'Cancelado';
   date: string;
+  paymentNotificationId?: string;
+}
+
+export interface PaymentNotificationItem {
+  bookId: string;
+  bookTitle: string;
+  authorId: string;
+  authorName: string;
+  bankingDetails: BankInfo;
+  quantity: number;
+  price: number;
+}
+
+export interface PaymentNotification {
+  id: string;
+  orderId: string;
+  readerId: string;
+  readerName: string;
+  readerEmail: string;
+  items: PaymentNotificationItem[];
+  totalAmount: number;
+  status: 'pending' | 'proof_uploaded' | 'confirmed' | 'cancelled';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PaymentProof {
+  id: string;
+  paymentNotificationId: string;
+  readerId: string;
+  fileUrl: string;
+  fileName: string;
+  uploadedAt: string;
+  confirmedBy?: string;
+  confirmedAt?: string;
+  notes?: string;
 }
 
 export interface BlogPost {
@@ -84,6 +121,22 @@ export interface BlogPost {
   imageUrl: string;
   date: string;
   author: string;
+}
+
+export interface Manuscript {
+  id: string;
+  authorId: string;
+  authorName: string;
+  title: string;
+  genre: string;
+  pages?: number;
+  synopsis: string;
+  fileUrl: string;
+  fileName: string;
+  status: 'pending' | 'approved' | 'rejected';
+  submittedDate: string;
+  reviewedDate?: string | null;
+  feedback?: string;
 }
 
 export type ViewState = 'HOME' | 'CATALOG' | 'DETAILS' | 'ABOUT' | 'TEAM' | 'SERVICES' | 'CHECKOUT' | 'PODCAST' | 'CONTACT' | 'ADMIN' | 'AUTH' | 'AUTHOR_DASHBOARD' | 'READER_DASHBOARD' | 'BLOG';
