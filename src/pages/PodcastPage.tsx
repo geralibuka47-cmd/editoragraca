@@ -117,8 +117,7 @@ const PodcastPage: React.FC<PodcastPageProps> = ({ onNavigate }) => {
                     <div className="mt-6">
                         <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                             <div
-                                className="h-full bg-brand-primary rounded-full transition-all duration-300"
-                                style={{ width: isPlaying ? '30%' : '0%' }}
+                                className={`h-full bg-brand-primary rounded-full transition-all duration-300 ${isPlaying ? 'progress-bar-playing' : 'progress-bar-stopped'}`}
                             />
                         </div>
                         <div className="flex justify-between text-xs text-gray-600 mt-2">

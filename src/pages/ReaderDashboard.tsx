@@ -269,7 +269,7 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) =
                                         <input
                                             id="user-role"
                                             type="text"
-                                            value={user.role === 'admin' ? 'Administrador' : user.role === 'author' ? 'Autor' : 'Leitor'}
+                                            value={user.role === 'adm' ? 'Administrador' : user.role === 'autor' ? 'Autor' : 'Leitor'}
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50"
                                             readOnly
                                         />

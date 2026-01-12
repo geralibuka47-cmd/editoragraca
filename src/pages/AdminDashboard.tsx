@@ -36,7 +36,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
         { id: '3', customer: 'Sofia Almeida', items: 3, total: 22500, status: 'shipped', date: '2026-01-08' }
     ];
 
-    if (!user || user.role !== 'admin') {
+    if (!user || user.role !== 'adm') {
         return (
             <div className="min-h-screen bg-brand-light flex items-center justify-center p-8">
                 <div className="bg-white rounded-3xl shadow-xl p-12 text-center max-w-md">

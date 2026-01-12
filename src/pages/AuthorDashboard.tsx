@@ -63,7 +63,7 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
         }
     };
 
-    if (!user || user.role !== 'author') {
+    if (!user || user.role !== 'autor') {
         return (
             <div className="min-h-screen bg-brand-light flex items-center justify-center p-8">
                 <div className="bg-white rounded-3xl shadow-xl p-12 text-center max-w-md">
