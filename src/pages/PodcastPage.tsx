@@ -13,39 +13,48 @@ const PodcastPage: React.FC<PodcastPageProps> = ({ onNavigate }) => {
     const episodes: PodcastEpisode[] = [
         {
             id: '1',
-            title: 'O Futuro da Literatura Angolana',
-            description: 'Conversamos com jovens autores sobre suas expectativas e desafios no cenário literário angolano.',
+            title: 'Entre o Sagrado e o Profano - DUS',
+            description: 'O autor revela sua paixão pelas mulheres, explorando amor, sensualidade e espiritualidade. Eva pura ou filha pecadora? Uma reflexão sobre a força e fragilidade do feminino.',
             date: '2026-01-10',
-            duration: '45:30',
-            audioUrl: '#',
-            imageUrl: 'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=400&h=400&fit=crop'
+            duration: '28:45',
+            audioUrl: 'https://anchor.fm/s/10838fbcc/podcast/rss',
+            imageUrl: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=400&fit=crop'
         },
         {
             id: '2',
-            title: 'Histórias Por Trás das Capas',
-            description: 'Um designer gráfico partilha os bastidores da criação de capas icónicas de livros angolanos.',
+            title: 'Transformar Fracassos em Oportunidades',
+            description: 'Histórias pessoais, reflexões profundas e exercícios práticos que mostram como transformar fracassos em oportunidades e fortalecer a identidade interior.',
             date: '2026-01-03',
-            duration: '38:15',
-            audioUrl: '#',
+            duration: '35:20',
+            audioUrl: 'https://anchor.fm/s/10838fbcc/podcast/rss',
             imageUrl: 'https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=400&h=400&fit=crop'
         },
         {
             id: '3',
-            title: 'Marketing para Autores Independentes',
-            description: 'Estratégias práticas para promover seu livro e alcançar mais leitores sem grande orçamento.',
+            title: 'Saúde Mental e Autocuidado',
+            description: 'Reflexões e caminhos de autocuidado para reencontrar serenidade e equilíbrio em meio ao caos cotidiano. Um episódio sobre compreender as próprias emoções.',
             date: '2025-12-27',
-            duration: '52:00',
-            audioUrl: '#',
+            duration: '32:15',
+            audioUrl: 'https://anchor.fm/s/10838fbcc/podcast/rss',
             imageUrl: 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400&h=400&fit=crop'
         },
         {
             id: '4',
-            title: 'A Arte da Revisão',
-            description: 'Revisores profissionais explicam como transformam manuscritos em obras polidas e prontas para publicação.',
+            title: 'Poesia: Palavra como Confissão',
+            description: 'Versos íntimos e reflexivos sobre silêncios guardados, dores que nos atravessam e afetos que sustentam nossa existência. Palavras para sentir com a alma.',
             date: '2025-12-20',
-            duration: '41:45',
-            audioUrl: '#',
+            duration: '25:30',
+            audioUrl: 'https://anchor.fm/s/10838fbcc/podcast/rss',
             imageUrl: 'https://images.unsplash.com/photo-1590935216814-f162c873e678?w=400&h=400&fit=crop'
+        },
+        {
+            id: '5',
+            title: 'Amores Por Esquecer',
+            description: 'Um convite para sentir, refletir e redescobrir os próprios amores. Poesia que ecoa além das palavras, revelando metamorfoses que nos formam e deformam.',
+            date: '2025-12-13',
+            duration: '29:10',
+            audioUrl: 'https://anchor.fm/s/10838fbcc/podcast/rss',
+            imageUrl: 'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=400&h=400&fit=crop'
         }
     ];
 
