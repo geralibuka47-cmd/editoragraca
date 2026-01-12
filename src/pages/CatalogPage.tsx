@@ -104,28 +104,27 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
     return (
         <div className="min-h-screen bg-brand-light">
             {/* Hero Header */}
-            <section className="bg-brand-dark text-white py-16">
-                <div className="container mx-auto px-8">
-                    <div className="max-w-3xl">
-                        <div className="flex items-center gap-2 text-sm text-brand-primary uppercase tracking-widest font-bold mb-4">
+            <section className="bg-brand-dark text-white py-12 md:py-16">
+                <div className="container mx-auto px-4 md:px-8">
+                    <div className="max-w-3xl text-center md:text-left">
+                        <div className="flex items-center justify-center md:justify-start gap-2 text-[10px] md:text-sm text-brand-primary uppercase tracking-widest font-bold mb-4">
                             <button onClick={() => onNavigate('HOME')} className="hover:underline">Início</button>
                             <span>/</span>
                             <span>Catálogo</span>
                         </div>
-                        <h1 className="text-5xl md:text-6xl font-black tracking-tighter mb-6">
+                        <h1 className="text-4xl md:text-6xl font-black tracking-tighter mb-4 md:mb-6 leading-[1.1]">
                             Explore o Nosso <span className="text-brand-primary italic font-serif">Catálogo</span>
                         </h1>
-                        <p className="text-xl text-gray-400 font-medium">
-                            Descubra uma seleção rigorosa de literatura angolana e internacional,
-                            desenhada para leitores exigentes.
+                        <p className="text-lg md:text-xl text-gray-400 font-medium leading-relaxed">
+                            Descubra uma seleção rigorosa de literatura angolana e internacional.
                         </p>
                     </div>
                 </div>
             </section>
 
             {/* Search and Filters Bar */}
-            <section className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
-                <div className="container mx-auto px-8 py-6">
+            <section className="bg-white border-b border-gray-200 sticky top-0 md:top-[154px] lg:top-[160px] z-40 shadow-sm">
+                <div className="container mx-auto px-4 md:px-8 py-4 md:py-6">
                     <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
                         {/* Search */}
                         <div className="flex-1 w-full md:max-w-md relative">

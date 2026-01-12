@@ -79,19 +79,19 @@ const TeamPage: React.FC<TeamPageProps> = ({ onNavigate }) => {
     return (
         <div className="min-h-screen bg-brand-light">
             {/* Hero */}
-            <section className="bg-brand-dark text-white py-20">
-                <div className="container mx-auto px-8">
-                    <div className="flex items-center gap-2 text-sm text-brand-primary uppercase tracking-widest font-bold mb-6">
+            <section className="bg-brand-dark text-white py-12 md:py-20">
+                <div className="container mx-auto px-4 md:px-8">
+                    <div className="flex items-center justify-center md:justify-start gap-2 text-[10px] md:text-sm text-brand-primary uppercase tracking-widest font-bold mb-6">
                         <button onClick={() => onNavigate('HOME')} className="hover:underline">Início</button>
                         <span>/</span>
                         <span>Equipa</span>
                     </div>
 
-                    <div className="max-w-4xl">
-                        <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-6">
+                    <div className="max-w-4xl text-center md:text-left">
+                        <h1 className="text-4xl md:text-7xl font-black tracking-tighter mb-4 md:mb-6 leading-tight">
                             Conheça Nossa <span className="text-brand-primary italic font-serif font-normal">Equipa</span>
                         </h1>
-                        <p className="text-xl md:text-2xl text-gray-300 leading-relaxed font-medium">
+                        <p className="text-lg md:text-2xl text-gray-300 leading-relaxed font-medium">
                             Profissionais apaixonados pela literatura e dedicados a transformar
                             manuscritos em obras de excelência.
                         </p>
@@ -100,16 +100,16 @@ const TeamPage: React.FC<TeamPageProps> = ({ onNavigate }) => {
             </section>
 
             {/* Department Filter */}
-            <section className="py-12 bg-white border-b border-gray-200">
-                <div className="container mx-auto px-8">
-                    <div className="flex flex-wrap gap-3 justify-center">
+            <section className="py-8 md:py-12 bg-white border-b border-gray-200">
+                <div className="container mx-auto px-4 md:px-8">
+                    <div className="flex flex-wrap gap-2 md:gap-3 justify-center">
                         {departments.map(dept => (
                             <button
                                 key={dept}
                                 onClick={() => setSelectedDepartment(dept)}
-                                className={`px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider transition-all ${selectedDepartment === dept
-                                        ? 'bg-brand-primary text-white'
-                                        : 'bg-gray-100 text-brand-dark hover:bg-gray-200'
+                                className={`px-4 md:px-6 py-2 md:py-3 rounded-lg font-bold text-[10px] md:text-sm uppercase tracking-wider transition-all ${selectedDepartment === dept
+                                    ? 'bg-brand-primary text-white'
+                                    : 'bg-gray-100 text-brand-dark hover:bg-gray-200'
                                     }`}
                             >
                                 {dept}
@@ -120,13 +120,13 @@ const TeamPage: React.FC<TeamPageProps> = ({ onNavigate }) => {
             </section>
 
             {/* Team Grid */}
-            <section className="py-24">
-                <div className="container mx-auto px-8">
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <section className="py-12 md:py-24">
+                <div className="container mx-auto px-4 md:px-8">
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                         {filteredMembers.map((member) => (
                             <div
                                 key={member.id}
-                                className="bg-white rounded-3xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 group cursor-pointer"
+                                className="bg-white rounded-2xl md:rounded-3xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 group cursor-pointer"
                                 onClick={() => setSelectedMember(member)}
                             >
                                 <div className="aspect-square overflow-hidden bg-gray-200">
@@ -136,11 +136,11 @@ const TeamPage: React.FC<TeamPageProps> = ({ onNavigate }) => {
                                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                     />
                                 </div>
-                                <div className="p-6">
-                                    <h3 className="text-2xl font-black text-brand-dark mb-1">{member.name}</h3>
-                                    <p className="text-brand-primary font-bold mb-2">{member.role}</p>
-                                    <p className="text-sm text-gray-600 mb-4">{member.department}</p>
-                                    <p className="text-sm text-gray-700 line-clamp-3">{member.bio}</p>
+                                <div className="p-4 md:p-6">
+                                    <h3 className="text-xl md:text-2xl font-black text-brand-dark mb-1">{member.name}</h3>
+                                    <p className="text-brand-primary font-bold mb-2 text-sm md:text-base">{member.role}</p>
+                                    <p className="text-[11px] md:text-sm text-gray-600 mb-4">{member.department}</p>
+                                    <p className="text-sm text-gray-700 line-clamp-3 leading-relaxed">{member.bio}</p>
                                     <button className="mt-4 text-brand-primary font-bold text-sm hover:underline">
                                         Ler mais →
                                     </button>
@@ -154,24 +154,24 @@ const TeamPage: React.FC<TeamPageProps> = ({ onNavigate }) => {
             {/* Modal */}
             {selectedMember && (
                 <div
-                    className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 animate-fade-in"
+                    className="fixed inset-0 bg-black/70 z-[100] flex items-center justify-center p-4 animate-fade-in backdrop-blur-sm"
                     onClick={() => setSelectedMember(null)}
                 >
                     <div
-                        className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-auto"
+                        className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="relative">
                             <button
                                 onClick={() => setSelectedMember(null)}
-                                className="absolute top-4 right-4 w-12 h-12 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 transition-all z-10 shadow-lg"
+                                className="absolute top-4 right-4 w-10 h-10 md:w-12 md:h-12 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all z-20 shadow-lg text-brand-dark"
                                 title="Fechar"
                                 aria-label="Fechar modal"
                             >
-                                <X className="w-6 h-6 text-brand-dark" />
+                                <X className="w-5 h-5 md:w-6 md:h-6" />
                             </button>
 
-                            <div className="aspect-[16/9] overflow-hidden bg-gray-200">
+                            <div className="aspect-[16/10] sm:aspect-[16/9] overflow-hidden bg-gray-200">
                                 <img
                                     src={selectedMember.photoUrl}
                                     alt={selectedMember.name}
@@ -179,17 +179,17 @@ const TeamPage: React.FC<TeamPageProps> = ({ onNavigate }) => {
                                 />
                             </div>
 
-                            <div className="p-8">
-                                <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-primary/10 rounded-full mb-4">
-                                    <Users className="w-4 h-4 text-brand-primary" />
-                                    <span className="text-brand-primary font-bold text-xs uppercase tracking-wider">
+                            <div className="p-6 md:p-12">
+                                <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-primary/10 rounded-full mb-4 md:mb-6">
+                                    <Users className="w-3.5 h-3.5 md:w-4 md:h-4 text-brand-primary" />
+                                    <span className="text-brand-primary font-bold text-[10px] md:text-xs uppercase tracking-wider">
                                         {selectedMember.department}
                                     </span>
                                 </div>
 
-                                <h2 className="text-4xl font-black text-brand-dark mb-2">{selectedMember.name}</h2>
-                                <p className="text-xl text-brand-primary font-bold mb-6">{selectedMember.role}</p>
-                                <p className="text-gray-700 leading-relaxed text-lg">{selectedMember.bio}</p>
+                                <h2 className="text-3xl md:text-5xl font-black text-brand-dark mb-2 tracking-tighter">{selectedMember.name}</h2>
+                                <p className="text-lg md:text-2xl text-brand-primary font-serif font-bold italic mb-6 md:mb-8">{selectedMember.role}</p>
+                                <p className="text-gray-600 leading-relaxed text-sm md:text-xl font-medium">{selectedMember.bio}</p>
                             </div>
                         </div>
                     </div>

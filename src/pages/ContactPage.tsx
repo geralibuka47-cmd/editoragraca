@@ -97,37 +97,37 @@ const ContactPage: React.FC<ContactPageProps> = ({ onNavigate }) => {
     return (
         <div className="min-h-screen bg-brand-light">
             {/* Hero */}
-            <section className="bg-brand-dark text-white py-16">
-                <div className="container mx-auto px-8">
-                    <div className="flex items-center gap-2 text-sm text-brand-primary uppercase tracking-widest font-bold mb-6">
+            <section className="bg-brand-dark text-white py-12 md:py-16">
+                <div className="container mx-auto px-4 md:px-8">
+                    <div className="flex items-center justify-center md:justify-start gap-2 text-[10px] md:text-sm text-brand-primary uppercase tracking-widest font-bold mb-6">
                         <button onClick={() => onNavigate('HOME')} className="hover:underline">Início</button>
                         <span>/</span>
                         <span>Contacto</span>
                     </div>
 
-                    <div className="max-w-3xl">
-                        <h1 className="text-5xl md:text-6xl font-black tracking-tighter mb-6">
+                    <div className="max-w-3xl text-center md:text-left">
+                        <h1 className="text-4xl md:text-6xl font-black tracking-tighter mb-4 md:mb-6 leading-tight">
                             Entre em <span className="text-brand-primary italic font-serif font-normal">Contacto</span>
                         </h1>
-                        <p className="text-xl text-gray-300 font-medium">
-                            Estamos prontos para atender suas dúvidas, receber seu manuscrito ou discutir nossos serviços editoriais.
+                        <p className="text-lg md:text-xl text-gray-300 font-medium">
+                            Estamos prontos para atender suas dúvidas e receber seu manuscrito.
                         </p>
                     </div>
                 </div>
             </section>
 
             {/* Main Content */}
-            <section className="py-24">
-                <div className="container mx-auto px-8">
-                    <div className="grid lg:grid-cols-5 gap-12">
+            <section className="py-12 md:py-24">
+                <div className="container mx-auto px-4 md:px-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
                         {/* Contact Form */}
                         <div className="lg:col-span-3">
-                            <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12">
+                            <div className="bg-white rounded-3xl shadow-xl p-6 md:p-12">
                                 <div className="mb-8">
-                                    <h2 className="text-3xl font-black text-brand-dark tracking-tighter mb-4">
+                                    <h2 className="text-2xl md:text-3xl font-black text-brand-dark tracking-tighter mb-4">
                                         Envie-nos uma Mensagem
                                     </h2>
-                                    <p className="text-gray-600">
+                                    <p className="text-sm md:text-base text-gray-600">
                                         Preencha o formulário abaixo e responderemos o mais breve possível.
                                     </p>
                                 </div>
@@ -154,8 +154,8 @@ const ContactPage: React.FC<ContactPageProps> = ({ onNavigate }) => {
                                             value={formData.name}
                                             onChange={handleChange}
                                             className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all ${errors.name
-                                                    ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                                                    : 'border-gray-300 focus:border-brand-primary focus:ring-brand-primary/10'
+                                                ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
+                                                : 'border-gray-300 focus:border-brand-primary focus:ring-brand-primary/10'
                                                 }`}
                                             placeholder="Seu nome completo"
                                         />
@@ -173,8 +173,8 @@ const ContactPage: React.FC<ContactPageProps> = ({ onNavigate }) => {
                                             value={formData.email}
                                             onChange={handleChange}
                                             className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all ${errors.email
-                                                    ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                                                    : 'border-gray-300 focus:border-brand-primary focus:ring-brand-primary/10'
+                                                ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
+                                                : 'border-gray-300 focus:border-brand-primary focus:ring-brand-primary/10'
                                                 }`}
                                             placeholder="seu.email@exemplo.com"
                                         />
@@ -191,8 +191,8 @@ const ContactPage: React.FC<ContactPageProps> = ({ onNavigate }) => {
                                             value={formData.subject}
                                             onChange={handleChange}
                                             className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all ${errors.subject
-                                                    ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                                                    : 'border-gray-300 focus:border-brand-primary focus:ring-brand-primary/10'
+                                                ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
+                                                : 'border-gray-300 focus:border-brand-primary focus:ring-brand-primary/10'
                                                 }`}
                                         >
                                             <option value="">Selecione um assunto</option>
@@ -216,8 +216,8 @@ const ContactPage: React.FC<ContactPageProps> = ({ onNavigate }) => {
                                             onChange={handleChange}
                                             rows={6}
                                             className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all resize-none ${errors.message
-                                                    ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                                                    : 'border-gray-300 focus:border-brand-primary focus:ring-brand-primary/10'
+                                                ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
+                                                : 'border-gray-300 focus:border-brand-primary focus:ring-brand-primary/10'
                                                 }`}
                                             placeholder="Escreva sua mensagem aqui..."
                                         />
@@ -241,15 +241,15 @@ const ContactPage: React.FC<ContactPageProps> = ({ onNavigate }) => {
                             {contactInfo.map((info, index) => {
                                 const Icon = info.icon;
                                 return (
-                                    <div key={index} className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all">
+                                    <div key={index} className="bg-white rounded-2xl shadow-lg p-5 md:p-6 hover:shadow-xl transition-all">
                                         <div className="flex items-start gap-4">
-                                            <div className="w-12 h-12 bg-brand-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                                                <Icon className="w-6 h-6 text-brand-primary" />
+                                            <div className="w-10 h-10 md:w-12 md:h-12 bg-brand-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                                                <Icon className="w-5 h-5 md:w-6 md:h-6 text-brand-primary" />
                                             </div>
                                             <div>
-                                                <h3 className="font-bold text-brand-dark mb-2">{info.title}</h3>
+                                                <h3 className="font-bold text-brand-dark mb-2 text-sm md:text-base">{info.title}</h3>
                                                 {info.lines.map((line, lineIndex) => (
-                                                    <p key={lineIndex} className="text-gray-600 text-sm leading-relaxed">
+                                                    <p key={lineIndex} className="text-gray-600 text-[13px] md:text-sm leading-relaxed">
                                                         {line}
                                                     </p>
                                                 ))}
@@ -295,16 +295,16 @@ const ContactPage: React.FC<ContactPageProps> = ({ onNavigate }) => {
             </section>
 
             {/* Map */}
-            <section className="pb-24">
-                <div className="container mx-auto px-8">
+            <section className="pb-16 md:pb-24">
+                <div className="container mx-auto px-4 md:px-8">
                     <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
-                        <div className="aspect-video bg-gray-200 flex items-center justify-center">
+                        <div className="aspect-video bg-gray-200 flex items-center justify-center p-6">
                             <div className="text-center space-y-4">
-                                <MapPin className="w-16 h-16 text-brand-primary mx-auto" />
+                                <MapPin className="w-12 h-12 md:w-16 md:h-16 text-brand-primary mx-auto" />
                                 <div>
-                                    <h3 className="text-xl font-bold text-brand-dark mb-2">Nossa Localização</h3>
-                                    <p className="text-gray-600">Malanje, Bairro Voanvala, Rua 5, Casa n.º 77</p>
-                                    <p className="text-sm text-gray-500 mt-4">
+                                    <h3 className="text-lg md:text-xl font-bold text-brand-dark mb-2">Nossa Localização</h3>
+                                    <p className="text-sm md:text-base text-gray-600 text-balance">Malanje, Bairro Voanvala, Rua 5, Casa n.º 77</p>
+                                    <p className="text-[10px] md:text-sm text-gray-500 mt-4">
                                         (Mapa do Google Maps será integrado em breve)
                                     </p>
                                 </div>

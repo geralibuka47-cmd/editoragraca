@@ -38,8 +38,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
         category: 'Ficção',
         description: '',
         stock: '0',
-        isbn: ''
+        isbn: '',
+        format: 'físico',
+        coverUrl: '',
+        digitalFileUrl: ''
     });
+    const [coverType, setCoverType] = useState<'file' | 'link'>('file');
+    const [digitalFileType, setDigitalFileType] = useState<'file' | 'link'>('file');
     const [coverFile, setCoverFile] = useState<File | null>(null);
     const [digitalFile, setDigitalFile] = useState<File | null>(null);
     const [isSavingBook, setIsSavingBook] = useState(false);
@@ -118,15 +123,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
             const { saveBook } = await import('../services/dataService');
             const { uploadFile } = await import('../services/storageService');
 
-            let finalCoverUrl = editingBook?.coverUrl || '';
-            let finalDigitalUrl = editingBook?.digitalFileUrl || '';
+            let finalCoverUrl = coverType === 'link' ? bookForm.coverUrl : (editingBook?.coverUrl || '');
+            let finalDigitalUrl = digitalFileType === 'link' ? bookForm.digitalFileUrl : (editingBook?.digitalFileUrl || '');
 
-            if (coverFile) {
+            if (coverType === 'file' && coverFile) {
                 const { fileUrl } = await uploadFile(coverFile);
                 finalCoverUrl = fileUrl;
             }
 
-            if (digitalFile) {
+            if (digitalFileType === 'file' && digitalFile) {
                 const { fileUrl } = await uploadFile(digitalFile);
                 finalDigitalUrl = fileUrl;
             }
@@ -140,6 +145,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                 description: bookForm.description,
                 stock: parseInt(bookForm.stock),
                 isbn: bookForm.isbn,
+                format: bookForm.format as 'físico' | 'digital',
                 coverUrl: finalCoverUrl,
                 digitalFileUrl: finalDigitalUrl
             });
@@ -182,8 +188,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
             category: 'Ficção',
             description: '',
             stock: '0',
-            isbn: ''
+            isbn: '',
+            format: 'físico',
+            coverUrl: '',
+            digitalFileUrl: ''
         });
+        setCoverType('file');
+        setDigitalFileType('file');
         setCoverFile(null);
         setDigitalFile(null);
         setIsBookModalOpen(true);
@@ -198,8 +209,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
             category: book.category,
             description: book.description,
             stock: (book.stock || 0).toString(),
-            isbn: book.isbn || ''
+            isbn: book.isbn || '',
+            format: book.format || 'físico',
+            coverUrl: book.coverUrl,
+            digitalFileUrl: book.digitalFileUrl || ''
         });
+        setCoverType(book.coverUrl.startsWith('http') && !book.coverUrl.includes('appwrite') ? 'link' : 'file');
+        setDigitalFileType(book.digitalFileUrl?.startsWith('http') && !book.digitalFileUrl.includes('appwrite') ? 'link' : 'file');
         setCoverFile(null);
         setDigitalFile(null);
         setIsBookModalOpen(true);
@@ -333,30 +349,31 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
             </section>
 
             {/* Content */}
-            <section className="py-12">
-                <div className="container mx-auto px-8">
+            <section className="py-6 md:py-12">
+                <div className="container mx-auto px-4 md:px-8">
                     {/* Books Tab */}
                     {activeTab === 'books' && (
                         <div>
-                            <div className="flex items-center justify-between mb-8">
-                                <h2 className="text-3xl font-black text-brand-dark">Gestão de Livros</h2>
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+                                <h2 className="text-2xl md:text-3xl font-black text-brand-dark">Gestão de Livros</h2>
                                 <button
                                     onClick={openAddModal}
                                     title="Registar novo livro"
                                     aria-label="Registar novo livro"
-                                    className="btn-premium"
+                                    className="btn-premium w-full sm:w-auto justify-center"
                                 >
                                     <Plus className="w-5 h-5" />
                                     Adicionar Livro
                                 </button>
                             </div>
-                            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-                                <table className="w-full">
+                            <div className="bg-white rounded-2xl shadow-lg overflow-hidden overflow-x-auto">
+                                <table className="w-full min-w-[800px]">
                                     <thead className="bg-gray-50">
                                         <tr>
                                             <th className="px-6 py-4 text-left text-xs font-bold text-brand-dark uppercase tracking-wider">Título</th>
                                             <th className="px-6 py-4 text-left text-xs font-bold text-brand-dark uppercase tracking-wider">Autor</th>
                                             <th className="px-6 py-4 text-left text-xs font-bold text-brand-dark uppercase tracking-wider">Categoria</th>
+                                            <th className="px-6 py-4 text-left text-xs font-bold text-brand-dark uppercase tracking-wider">Formato</th>
                                             <th className="px-6 py-4 text-right text-xs font-bold text-brand-dark uppercase tracking-wider">Preço</th>
                                             <th className="px-6 py-4 text-right text-xs font-bold text-brand-dark uppercase tracking-wider">Stock</th>
                                             <th className="px-6 py-4 text-right text-xs font-bold text-brand-dark uppercase tracking-wider">Ações</th>
@@ -365,7 +382,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                                     <tbody className="divide-y divide-gray-200">
                                         {isLoadingBooks ? (
                                             <tr>
-                                                <td colSpan={6} className="px-6 py-12 text-center text-gray-500 italic">Carregando livros...</td>
+                                                <td colSpan={7} className="px-6 py-12 text-center text-gray-500 italic">Carregando livros...</td>
                                             </tr>
                                         ) : books.length > 0 ? (
                                             books.map((book) => (
@@ -373,6 +390,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                                                     <td className="px-6 py-4 font-bold text-brand-dark">{book.title}</td>
                                                     <td className="px-6 py-4 text-sm text-gray-600">{book.author}</td>
                                                     <td className="px-6 py-4 text-sm text-gray-600">{book.category}</td>
+                                                    <td className="px-6 py-4">
+                                                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest ${book.format === 'digital' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'}`}>
+                                                            {book.format || 'físico'}
+                                                        </span>
+                                                    </td>
                                                     <td className="px-6 py-4 text-sm font-bold text-brand-primary text-right">{book.price.toLocaleString()} Kz</td>
                                                     <td className="px-6 py-4 text-sm text-gray-600 text-right">{book.stock}</td>
                                                     <td className="px-6 py-4 text-right">
@@ -411,9 +433,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                     {/* Users Tab */}
                     {activeTab === 'users' && (
                         <div>
-                            <h2 className="text-3xl font-black text-brand-dark mb-8">Gestão de Utilizadores</h2>
-                            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-                                <table className="w-full">
+                            <h2 className="text-2xl md:text-3xl font-black text-brand-dark mb-8">Gestão de Utilizadores</h2>
+                            <div className="bg-white rounded-2xl shadow-lg overflow-hidden overflow-x-auto">
+                                <table className="w-full min-w-[700px]">
                                     <thead className="bg-gray-50">
                                         <tr>
                                             <th className="px-6 py-4 text-left text-xs font-bold text-brand-dark uppercase tracking-wider">Nome</th>
@@ -468,9 +490,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                     {/* Manuscripts Tab */}
                     {activeTab === 'manuscripts' && (
                         <div>
-                            <h2 className="text-3xl font-black text-brand-dark mb-8">Revisão de Manuscritos</h2>
-                            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-                                <table className="w-full">
+                            <h2 className="text-2xl md:text-3xl font-black text-brand-dark mb-8">Revisão de Manuscritos</h2>
+                            <div className="bg-white rounded-2xl shadow-lg overflow-hidden overflow-x-auto">
+                                <table className="w-full min-w-[800px]">
                                     <thead className="bg-gray-50">
                                         <tr>
                                             <th className="px-6 py-4 text-left text-xs font-bold text-brand-dark uppercase tracking-wider">Título</th>
@@ -641,6 +663,25 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-4">
                                         <div>
+                                            <label className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Formato da Obra</label>
+                                            <div className="flex gap-4">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setBookForm({ ...bookForm, format: 'físico' })}
+                                                    className={`flex-1 py-3 rounded-xl font-bold text-xs uppercase transition-all ${bookForm.format === 'físico' ? 'bg-brand-primary text-white' : 'bg-gray-100 text-gray-500'}`}
+                                                >
+                                                    Físico
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setBookForm({ ...bookForm, format: 'digital' })}
+                                                    className={`flex-1 py-3 rounded-xl font-bold text-xs uppercase transition-all ${bookForm.format === 'digital' ? 'bg-brand-primary text-white' : 'bg-gray-100 text-gray-500'}`}
+                                                >
+                                                    Digital (e-book)
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div>
                                             <label htmlFor="book-title" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Título</label>
                                             <input
                                                 id="book-title"
@@ -740,38 +781,99 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                                             />
                                         </div>
 
-                                        <div className="grid grid-cols-2 gap-4 pt-2">
-                                            <div className="relative">
-                                                <label className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Capa</label>
-                                                <input
-                                                    type="file"
-                                                    accept="image/*"
-                                                    onChange={(e) => setCoverFile(e.target.files?.[0] || null)}
-                                                    className="hidden"
-                                                    id="cover-upload"
-                                                />
-                                                <label htmlFor="cover-upload" className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-all aspect-video">
-                                                    <Image className="w-6 h-6 text-gray-400 mb-1" />
-                                                    <span className="text-[10px] text-gray-500 font-bold uppercase truncate w-full text-center">
-                                                        {coverFile ? coverFile.name : (editingBook ? 'Alterar Capa' : 'Upload Capa')}
-                                                    </span>
-                                                </label>
+                                        <div className="grid grid-cols-1 gap-4 pt-2">
+                                            <div>
+                                                <div className="flex justify-between items-center mb-2">
+                                                    <label className="block text-xs font-black text-brand-dark uppercase tracking-wider">Capa</label>
+                                                    <div className="flex bg-gray-100 rounded-lg p-1">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setCoverType('file')}
+                                                            className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${coverType === 'file' ? 'bg-white text-brand-primary shadow-sm' : 'text-gray-400'}`}
+                                                        >
+                                                            Upload
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setCoverType('link')}
+                                                            className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${coverType === 'link' ? 'bg-white text-brand-primary shadow-sm' : 'text-gray-400'}`}
+                                                        >
+                                                            Link
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                {coverType === 'file' ? (
+                                                    <div className="relative">
+                                                        <input
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={(e) => setCoverFile(e.target.files?.[0] || null)}
+                                                            className="hidden"
+                                                            id="cover-upload"
+                                                        />
+                                                        <label htmlFor="cover-upload" className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-all min-h-[100px]">
+                                                            <Image className="w-6 h-6 text-gray-400 mb-1" />
+                                                            <span className="text-[10px] text-gray-500 font-bold uppercase truncate w-full text-center">
+                                                                {coverFile ? coverFile.name : (editingBook ? 'Alterar Capa' : 'Clique para Carregar')}
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                ) : (
+                                                    <input
+                                                        type="text"
+                                                        placeholder="https://exemplo.com/capa.jpg"
+                                                        value={bookForm.coverUrl}
+                                                        onChange={(e) => setBookForm({ ...bookForm, coverUrl: e.target.value })}
+                                                        className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                                    />
+                                                )}
                                             </div>
-                                            <div className="relative">
-                                                <label className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Ficheiro Digital</label>
-                                                <input
-                                                    type="file"
-                                                    accept=".pdf,.epub"
-                                                    onChange={(e) => setDigitalFile(e.target.files?.[0] || null)}
-                                                    className="hidden"
-                                                    id="digital-upload"
-                                                />
-                                                <label htmlFor="digital-upload" className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-all aspect-video">
-                                                    <File className="w-6 h-6 text-gray-400 mb-1" />
-                                                    <span className="text-[10px] text-gray-500 font-bold uppercase truncate w-full text-center">
-                                                        {digitalFile ? digitalFile.name : (editingBook?.digitalFileUrl ? 'Alterar Digital' : 'Upload Digital')}
-                                                    </span>
-                                                </label>
+
+                                            <div>
+                                                <div className="flex justify-between items-center mb-2">
+                                                    <label className="block text-xs font-black text-brand-dark uppercase tracking-wider">Ficheiro Digital (Opcional)</label>
+                                                    <div className="flex bg-gray-100 rounded-lg p-1">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setDigitalFileType('file')}
+                                                            className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${digitalFileType === 'file' ? 'bg-white text-brand-primary shadow-sm' : 'text-gray-400'}`}
+                                                        >
+                                                            Upload
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setDigitalFileType('link')}
+                                                            className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${digitalFileType === 'link' ? 'bg-white text-brand-primary shadow-sm' : 'text-gray-400'}`}
+                                                        >
+                                                            Link
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                {digitalFileType === 'file' ? (
+                                                    <div className="relative">
+                                                        <input
+                                                            type="file"
+                                                            accept=".pdf,.epub"
+                                                            onChange={(e) => setDigitalFile(e.target.files?.[0] || null)}
+                                                            className="hidden"
+                                                            id="digital-upload"
+                                                        />
+                                                        <label htmlFor="digital-upload" className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-all min-h-[100px]">
+                                                            <File className="w-6 h-6 text-gray-400 mb-1" />
+                                                            <span className="text-[10px] text-gray-500 font-bold uppercase truncate w-full text-center">
+                                                                {digitalFile ? digitalFile.name : (editingBook?.digitalFileUrl ? 'Alterar Digital' : 'Clique para Carregar')}
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                ) : (
+                                                    <input
+                                                        type="text"
+                                                        placeholder="https://exemplo.com/livro.pdf"
+                                                        value={bookForm.digitalFileUrl}
+                                                        onChange={(e) => setBookForm({ ...bookForm, digitalFileUrl: e.target.value })}
+                                                        className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                                    />
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -863,9 +965,9 @@ const AdminOrdersTab: React.FC<{ user: User }> = ({ user }) => {
 
     return (
         <div>
-            <h2 className="text-3xl font-black text-brand-dark mb-8">Gestão de Pagamentos</h2>
-            <div className="bg-white rounded-[32px] shadow-xl overflow-hidden border border-gray-100">
-                <table className="w-full">
+            <h2 className="text-2xl md:text-3xl font-black text-brand-dark mb-8">Gestão de Pagamentos</h2>
+            <div className="bg-white rounded-[32px] shadow-xl overflow-hidden border border-gray-100 overflow-x-auto">
+                <table className="w-full min-w-[900px]">
                     <thead className="bg-gray-50 border-b border-gray-100">
                         <tr>
                             <th className="px-6 py-6 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">ID / Data</th>

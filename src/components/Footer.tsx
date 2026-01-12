@@ -36,9 +36,9 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                     <ul className="space-y-4 text-sm text-gray-400 font-medium">
                         <li><button onClick={() => onNavigate('HOME')} className="hover:text-white transition-colors">Início</button></li>
                         <li><button onClick={() => onNavigate('CATALOG')} className="hover:text-white transition-colors">Todos os Livros</button></li>
-                        <li><button onClick={() => onNavigate('CATALOG')} className="hover:text-white transition-colors">Lançamentos</button></li>
-                        <li><button onClick={() => onNavigate('CATALOG')} className="hover:text-white transition-colors">Promoções</button></li>
                         <li><button onClick={() => onNavigate('ABOUT')} className="hover:text-white transition-colors">Sobre a Editora</button></li>
+                        <li><button onClick={() => onNavigate('PODCAST')} className="hover:text-white transition-colors">Podcast</button></li>
+                        <li><button onClick={() => onNavigate('BLOG')} className="hover:text-white transition-colors">Blog & Novidades</button></li>
                     </ul>
                 </div>
 
@@ -72,8 +72,8 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                 </div>
             </div>
 
-            <div className="container mx-auto px-8 flex justify-between items-center text-[10px] text-gray-500 font-bold uppercase tracking-widest">
-                <p>© 2026 Editora Graça (SU), LDA. Todos os direitos reservados.</p>
+            <div className="container mx-auto px-4 md:px-8 flex flex-col md:flex-row justify-between items-center text-[10px] text-gray-500 font-bold uppercase tracking-widest gap-4 md:gap-0 mt-8">
+                <p className="text-center md:text-left leading-relaxed">© 2026 Editora Graça (SU), LDA. Todos os direitos reservados.</p>
                 <div className="flex gap-6">
                     <span>Feito por ibuka47</span>
                 </div>

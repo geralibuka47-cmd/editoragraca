@@ -177,7 +177,8 @@ async function setup() {
             { id: 'description', type: 'string', size: 5000, required: true },
             { id: 'authorId', type: 'string', size: 36, required: false },
             { id: 'stock', type: 'integer', required: false, default: 0 },
-            { id: 'digitalFileUrl', type: 'string', size: 1024, required: false }
+            { id: 'digitalFileUrl', type: 'string', size: 1024, required: false },
+            { id: 'format', type: 'string', size: 20, required: false, default: 'físico' }
         ];
 
         for (const attr of bookAttrs) {

@@ -45,49 +45,43 @@ const AuthPage: React.FC<AuthPageProps> = ({ onSuccess, onBack }) => {
                 </div>
 
                 {/* Left Side: Visual/Message */}
-                <div className="md:w-1/2 bg-brand-dark p-16 flex flex-col justify-center relative overflow-hidden text-white">
+                <div className="md:w-1/2 bg-brand-dark p-8 md:p-16 flex flex-col justify-center relative overflow-hidden text-white">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-brand-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-brand-primary/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
 
-                    <div className="relative z-10 space-y-8">
-                        <div className="w-16 h-16 bg-brand-primary/20 backdrop-blur-sm rounded-2xl flex items-center justify-center text-brand-primary">
-                            <BookOpen className="w-8 h-8" />
+                    <div className="relative z-10 space-y-6 md:space-y-8">
+                        <div className="w-12 h-12 md:w-16 md:h-16 bg-brand-primary/20 backdrop-blur-sm rounded-2xl flex items-center justify-center text-brand-primary">
+                            <BookOpen className="w-6 h-6 md:w-8 md:h-8" />
                         </div>
 
-                        <h1 className="text-5xl font-black tracking-tighter leading-none">
+                        <h1 className="text-3xl md:text-5xl font-black tracking-tighter leading-tight md:leading-none">
                             Seja Bem-vindo à <span className="text-brand-primary italic font-serif font-normal">Nossa Família</span>
                         </h1>
 
-                        <p className="text-gray-400 text-lg font-medium leading-relaxed">
-                            Crie uma conta para gerir os seus pedidos, guardar os seus livros favoritos e ter acesso a edições exclusivas da Editora Graça.
+                        <p className="text-gray-400 text-base md:text-lg font-medium leading-relaxed">
+                            Crie uma conta para gerir os seus pedidos, guardar favoritos e ter acesso a edições exclusivas.
                         </p>
 
-                        <ul className="space-y-4 pt-4">
-                            <li className="flex items-center gap-3 text-sm font-bold text-white/80">
-                                <div className="w-5 h-5 bg-brand-primary rounded-full flex items-center justify-center">
-                                    <Check className="w-3 h-3 text-white" />
+                        <ul className="space-y-3 md:space-y-4 pt-2 md:pt-4">
+                            <li className="flex items-center gap-3 text-xs md:text-sm font-bold text-white/80">
+                                <div className="w-4 h-4 md:w-5 md:h-5 bg-brand-primary rounded-full flex items-center justify-center shrink-0">
+                                    <Check className="w-2 h-2 md:w-3 md:h-3 text-white" />
                                 </div>
-                                Acompanhamento de pedidos em tempo real
+                                Acompanhamento de pedidos
                             </li>
-                            <li className="flex items-center gap-3 text-sm font-bold text-white/80">
-                                <div className="w-5 h-5 bg-brand-primary rounded-full flex items-center justify-center">
-                                    <Check className="w-3 h-3 text-white" />
+                            <li className="flex items-center gap-3 text-xs md:text-sm font-bold text-white/80">
+                                <div className="w-4 h-4 md:w-5 md:h-5 bg-brand-primary rounded-full flex items-center justify-center shrink-0">
+                                    <Check className="w-2 h-2 md:w-3 md:h-3 text-white" />
                                 </div>
                                 Lista de desejos personalizada
-                            </li>
-                            <li className="flex items-center gap-3 text-sm font-bold text-white/80">
-                                <div className="w-5 h-5 bg-brand-primary rounded-full flex items-center justify-center">
-                                    <Check className="w-3 h-3 text-white" />
-                                </div>
-                                Ofertas exclusivas para membros
                             </li>
                         </ul>
                     </div>
                 </div>
 
                 {/* Right Side: Form */}
-                <div className="md:w-1/2 p-12 md:p-20 flex flex-col justify-center">
-                    <div className="max-w-md mx-auto w-full space-y-10">
+                <div className="md:w-1/2 p-8 md:p-20 flex flex-col justify-center">
+                    <div className="max-w-md mx-auto w-full space-y-8 md:space-y-10">
                         <div className="text-center md:text-left">
                             <h2 className="text-4xl font-black text-brand-dark tracking-tighter">
                                 {isLogin ? 'Iniciar Sessão' : 'Criar Nova Conta'}

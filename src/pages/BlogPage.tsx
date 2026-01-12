@@ -108,19 +108,19 @@ const BlogPage: React.FC<BlogPageProps> = ({ onNavigate }) => {
     return (
         <div className="min-h-screen bg-brand-light">
             {/* Hero */}
-            <section className="bg-brand-dark text-white py-20">
-                <div className="container mx-auto px-8">
-                    <div className="flex items-center gap-2 text-sm text-brand-primary uppercase tracking-widest font-bold mb-6">
+            <section className="bg-brand-dark text-white py-12 md:py-20">
+                <div className="container mx-auto px-4 md:px-8">
+                    <div className="flex items-center justify-center md:justify-start gap-2 text-[10px] md:text-sm text-brand-primary uppercase tracking-widest font-bold mb-6">
                         <button onClick={() => onNavigate('HOME')} className="hover:underline">Início</button>
                         <span>/</span>
                         <span>Blog</span>
                     </div>
 
-                    <div className="max-w-4xl">
-                        <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-6">
+                    <div className="max-w-4xl text-center md:text-left">
+                        <h1 className="text-4xl md:text-7xl font-black tracking-tighter mb-4 md:mb-6 leading-tight">
                             Nosso <span className="text-brand-primary italic font-serif font-normal">Blog</span>
                         </h1>
-                        <p className="text-xl md:text-2xl text-gray-300 leading-relaxed font-medium">
+                        <p className="text-lg md:text-2xl text-gray-300 leading-relaxed font-medium">
                             Insights, dicas e notícias sobre o mundo editorial e a literatura angolana.
                         </p>
                     </div>
@@ -128,16 +128,16 @@ const BlogPage: React.FC<BlogPageProps> = ({ onNavigate }) => {
             </section>
 
             {/* Search */}
-            <section className="py-12 bg-white border-b border-gray-200">
-                <div className="container mx-auto px-8">
+            <section className="py-8 md:py-12 bg-white border-b border-gray-200">
+                <div className="container mx-auto px-4 md:px-8">
                     <div className="max-w-2xl mx-auto relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400" />
                         <input
                             type="text"
                             placeholder="Pesquisar artigos..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10"
+                            className="w-full pl-10 md:pl-12 pr-4 py-3 md:py-4 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10 transition-all"
                         />
                     </div>
                 </div>

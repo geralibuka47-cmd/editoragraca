@@ -9,6 +9,8 @@ interface BookCardProps {
         price: number;
         category: string;
         description: string;
+        coverUrl: string;
+        format?: string;
         isBestseller?: boolean;
         isNew?: boolean;
     };
@@ -21,7 +23,7 @@ const BookCard: React.FC<BookCardProps> = ({ book, onAddToCart, onToggleWishlist
     return (
         <div className="group relative bg-white rounded-2xl overflow-hidden border border-gray-100 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2">
             {/* Badges */}
-            <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
+            <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
                 {book.isBestseller && (
                     <span className="bg-brand-primary text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">
                         Best Seller
@@ -32,17 +34,31 @@ const BookCard: React.FC<BookCardProps> = ({ book, onAddToCart, onToggleWishlist
                         Novidade
                     </span>
                 )}
+                {book.format === 'digital' && (
+                    <span className="bg-blue-600 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">
+                        Digital
+                    </span>
+                )}
             </div>
 
             {/* Image Area */}
-            <div className="relative aspect-[3/4] bg-brand-light flex items-center justify-center overflow-hidden p-8">
-                <div className="w-full h-full bg-white/40 border border-brand-primary/10 rounded shadow-md transform group-hover:rotate-3 transition-transform duration-500 flex items-center justify-center">
-                    {/* Fallback pattern for book cover */}
-                    <div className="text-center p-4">
-                        <p className="font-serif font-bold text-brand-dark group-hover:text-brand-primary transition-colors leading-tight">{book.title}</p>
-                        <div className="w-8 h-0.5 bg-brand-primary mx-auto mt-2"></div>
+            <div className="relative aspect-[3/4] bg-brand-light flex items-center justify-center overflow-hidden">
+                {book.coverUrl ? (
+                    <img
+                        src={book.coverUrl}
+                        alt={book.title}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                ) : (
+                    <div className="w-full h-full p-8 flex items-center justify-center">
+                        <div className="w-full h-full bg-white/40 border border-brand-primary/10 rounded shadow-md transform group-hover:rotate-3 transition-transform duration-500 flex items-center justify-center">
+                            <div className="text-center p-4">
+                                <p className="font-serif font-bold text-brand-dark group-hover:text-brand-primary transition-colors leading-tight">{book.title}</p>
+                                <div className="w-8 h-0.5 bg-brand-primary mx-auto mt-2"></div>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {/* Action Overlay */}
                 <div className="absolute inset-0 bg-brand-dark/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">

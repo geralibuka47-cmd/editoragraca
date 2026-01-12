@@ -63,19 +63,19 @@ const PodcastPage: React.FC<PodcastPageProps> = ({ onNavigate }) => {
     return (
         <div className="min-h-screen bg-brand-light">
             {/* Hero */}
-            <section className="bg-brand-dark text-white py-20">
-                <div className="container mx-auto px-8">
-                    <div className="flex items-center gap-2 text-sm text-brand-primary uppercase tracking-widest font-bold mb-6">
+            <section className="bg-brand-dark text-white py-12 md:py-20">
+                <div className="container mx-auto px-4 md:px-8">
+                    <div className="flex items-center justify-center md:justify-start gap-2 text-[10px] md:text-sm text-brand-primary uppercase tracking-widest font-bold mb-6">
                         <button onClick={() => onNavigate('HOME')} className="hover:underline">Início</button>
                         <span>/</span>
                         <span>Podcast</span>
                     </div>
 
-                    <div className="max-w-4xl">
-                        <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-6">
+                    <div className="max-w-4xl text-center md:text-left">
+                        <h1 className="text-4xl md:text-7xl font-black tracking-tighter mb-4 md:mb-6 leading-tight">
                             Vozes da <span className="text-brand-primary italic font-serif font-normal">Literatura</span>
                         </h1>
-                        <p className="text-xl md:text-2xl text-gray-300 leading-relaxed font-medium">
+                        <p className="text-lg md:text-2xl text-gray-300 leading-relaxed font-medium">
                             Conversas inspiradoras sobre literatura, publicação e o mundo editorial angolano.
                         </p>
                     </div>
@@ -83,10 +83,10 @@ const PodcastPage: React.FC<PodcastPageProps> = ({ onNavigate }) => {
             </section>
 
             {/* Player */}
-            <section className="py-12 bg-white border-b border-gray-200 sticky top-0 z-40 shadow-md">
-                <div className="container mx-auto px-8">
+            <section className="py-8 md:py-12 bg-white border-b border-gray-200 sticky top-0 z-40 shadow-md">
+                <div className="container mx-auto px-4 md:px-8">
                     <div className="flex flex-col md:flex-row items-center gap-6">
-                        <div className="w-24 h-24 rounded-2xl overflow-hidden bg-gray-200 flex-shrink-0">
+                        <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden bg-gray-200 flex-shrink-0 shadow-inner">
                             <img
                                 src={currentEpisode.imageUrl}
                                 alt={currentEpisode.title}
@@ -94,30 +94,30 @@ const PodcastPage: React.FC<PodcastPageProps> = ({ onNavigate }) => {
                             />
                         </div>
 
-                        <div className="flex-1 text-center md:text-left">
-                            <h3 className="text-xl font-bold text-brand-dark mb-1">{currentEpisode.title}</h3>
-                            <p className="text-sm text-gray-600">{currentEpisode.duration}</p>
+                        <div className="flex-1 text-center md:text-left min-w-0">
+                            <h3 className="text-lg md:text-xl font-bold text-brand-dark mb-1 truncate">{currentEpisode.title}</h3>
+                            <p className="text-xs md:text-sm text-gray-600">{currentEpisode.duration}</p>
                         </div>
 
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={() => setIsPlaying(!isPlaying)}
-                                className="w-16 h-16 bg-brand-primary rounded-full flex items-center justify-center hover:bg-brand-dark transition-all shadow-lg"
+                                className="w-14 h-14 md:w-16 md:h-16 bg-brand-primary rounded-full flex items-center justify-center hover:bg-brand-dark transition-all shadow-lg"
                                 title={isPlaying ? 'Pausar' : 'Reproduzir'}
                                 aria-label={isPlaying ? 'Pausar episódio' : 'Reproduzir episódio'}
                             >
                                 {isPlaying ? (
-                                    <Pause className="w-8 h-8 text-white" />
+                                    <Pause className="w-6 h-6 md:w-8 md:h-8 text-white" />
                                 ) : (
-                                    <Play className="w-8 h-8 text-white ml-1" />
+                                    <Play className="w-6 h-6 md:w-8 md:h-8 text-white ml-1" />
                                 )}
                             </button>
                             <button
-                                className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all"
+                                className="w-10 h-10 md:w-12 md:h-12 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all text-brand-dark"
                                 title="Volume"
                                 aria-label="Controle de volume"
                             >
-                                <Volume2 className="w-5 h-5 text-brand-dark" />
+                                <Volume2 className="w-4 h-4 md:w-5 md:h-5" />
                             </button>
                         </div>
                     </div>
@@ -149,16 +149,16 @@ const PodcastPage: React.FC<PodcastPageProps> = ({ onNavigate }) => {
                         </p>
                     </div>
 
-                    <div className="max-w-4xl mx-auto space-y-6">
+                    <div className="max-w-4xl mx-auto space-y-4 md:space-y-6">
                         {episodes.map((episode) => (
                             <div
                                 key={episode.id}
-                                className={`bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all cursor-pointer ${selectedEpisode?.id === episode.id ? 'ring-2 ring-brand-primary' : ''
+                                className={`bg-white rounded-2xl shadow-lg p-4 md:p-6 hover:shadow-xl transition-all cursor-pointer ${selectedEpisode?.id === episode.id ? 'ring-2 ring-brand-primary' : ''
                                     }`}
                                 onClick={() => setSelectedEpisode(episode)}
                             >
-                                <div className="flex gap-6">
-                                    <div className="w-32 h-32 rounded-xl overflow-hidden bg-gray-200 flex-shrink-0">
+                                <div className="flex flex-col sm:flex-row gap-4 md:gap-6 relative">
+                                    <div className="w-full sm:w-32 h-48 sm:h-32 rounded-xl overflow-hidden bg-gray-200 flex-shrink-0">
                                         <img
                                             src={episode.imageUrl}
                                             alt={episode.title}
@@ -166,20 +166,20 @@ const PodcastPage: React.FC<PodcastPageProps> = ({ onNavigate }) => {
                                         />
                                     </div>
 
-                                    <div className="flex-1">
-                                        <h3 className="text-2xl font-black text-brand-dark mb-2 hover:text-brand-primary transition-colors">
+                                    <div className="flex-1 min-w-0 pr-14 sm:pr-0">
+                                        <h3 className="text-xl md:text-2xl font-black text-brand-dark mb-2 hover:text-brand-primary transition-colors leading-tight">
                                             {episode.title}
                                         </h3>
-                                        <p className="text-gray-700 mb-4 leading-relaxed">
+                                        <p className="text-sm md:text-base text-gray-700 mb-4 leading-relaxed line-clamp-2 md:line-clamp-none">
                                             {episode.description}
                                         </p>
-                                        <div className="flex items-center gap-6 text-sm text-gray-600">
+                                        <div className="flex flex-wrap items-center gap-4 md:gap-6 text-[11px] md:text-sm text-gray-600">
                                             <div className="flex items-center gap-2">
-                                                <Calendar className="w-4 h-4" />
+                                                <Calendar className="w-3.5 h-3.5 md:w-4 md:h-4" />
                                                 <span>{new Date(episode.date).toLocaleDateString('pt-AO', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <Clock className="w-4 h-4" />
+                                                <Clock className="w-3.5 h-3.5 md:w-4 md:h-4" />
                                                 <span>{episode.duration}</span>
                                             </div>
                                         </div>
@@ -191,11 +191,11 @@ const PodcastPage: React.FC<PodcastPageProps> = ({ onNavigate }) => {
                                             setSelectedEpisode(episode);
                                             setIsPlaying(!isPlaying);
                                         }}
-                                        className="w-12 h-12 bg-brand-primary rounded-full flex items-center justify-center hover:bg-brand-dark transition-all flex-shrink-0"
+                                        className="absolute top-0 right-0 sm:relative w-12 h-12 bg-brand-primary rounded-full flex items-center justify-center hover:bg-brand-dark transition-all flex-shrink-0"
                                         title="Reproduzir"
                                         aria-label="Reproduzir episódio"
                                     >
-                                        <Play className="w-6 h-6 text-white ml-1" />
+                                        <Play className="w-5 h-5 text-white ml-0.5" />
                                     </button>
                                 </div>
                             </div>

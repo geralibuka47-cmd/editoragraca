@@ -39,6 +39,7 @@ export interface Book {
   authorId?: string;
   stock?: number;
   digitalFileUrl?: string;
+  format?: 'físico' | 'digital';
 }
 
 export interface CartItem extends Book {
