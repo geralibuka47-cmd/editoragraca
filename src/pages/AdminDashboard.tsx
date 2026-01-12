@@ -62,7 +62,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
         coverUrl: '',
         digitalFileUrl: '',
         paymentInfo: '',
-        paymentInfo: '',
         paymentInfoNotes: '',
         launchDate: ''
     });
@@ -211,9 +210,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                 coverUrl: finalCoverUrl,
                 digitalFileUrl: finalDigitalUrl,
                 paymentInfo: bookForm.paymentInfo,
-                paymentInfo: bookForm.paymentInfo,
                 paymentInfoNotes: bookForm.paymentInfoNotes,
-                launchDate: bookForm.launchDate
+                launchDate: bookForm.launchDate || undefined
             });
 
             alert('Livro guardado com sucesso!');
@@ -258,7 +256,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
             format: 'físico',
             coverUrl: '',
             digitalFileUrl: '',
-            paymentInfo: '',
             paymentInfo: '',
             paymentInfoNotes: '',
             launchDate: ''
@@ -373,7 +370,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
             format: book.format || 'físico',
             coverUrl: book.coverUrl,
             digitalFileUrl: book.digitalFileUrl || '',
-            paymentInfo: book.paymentInfo || '',
             paymentInfo: book.paymentInfo || '',
             paymentInfoNotes: book.paymentInfoNotes || '',
             launchDate: book.launchDate || ''
