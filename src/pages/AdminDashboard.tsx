@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { BookOpen, Users, ShoppingCart, Plus, Edit, Trash2, User as UserIcon, CheckCircle, FileText, XCircle, Download, X, Upload, Image, File } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { BookOpen, Users, ShoppingCart, Plus, Edit, Trash2, User as UserIcon, CheckCircle, FileText, XCircle, Download, X, Upload, Image, File, Layout, Calendar } from 'lucide-react';
 import { ViewState, User } from '../types';
 
 interface AdminDashboardProps {
@@ -8,7 +8,7 @@ interface AdminDashboardProps {
 }
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => {
-    const [activeTab, setActiveTab] = useState<'books' | 'users' | 'orders' | 'manuscripts'>('books');
+    const [activeTab, setActiveTab] = useState<'stats' | 'books' | 'users' | 'manuscripts' | 'orders' | 'blog' | 'team' | 'services'>('stats');
     const [stats, setStats] = useState({
         totalBooks: 0,
         totalUsers: 0,
@@ -18,13 +18,32 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
     const [isLoadingStats, setIsLoadingStats] = useState(true);
 
     const [books, setBooks] = useState<import('../types').Book[]>([]);
-    const [isLoadingBooks, setIsLoadingBooks] = useState(false);
+    const [isLoadingBooks, setIsLoadingBooks] = useState(true);
 
     const [users, setUsers] = useState<any[]>([]);
-    const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+    const [isLoadingUsers, setIsLoadingUsers] = useState(true);
 
     const [manuscripts, setManuscripts] = useState<import('../types').Manuscript[]>([]);
-    const [isLoadingManuscripts, setIsLoadingManuscripts] = useState(false);
+    const [isLoadingManuscripts, setIsLoadingManuscripts] = useState(true);
+    const [blogPosts, setBlogPosts] = useState<any[]>([]);
+    const [teamMembers, setTeamMembers] = useState<any[]>([]);
+    const [editorialServices, setEditorialServices] = useState<any[]>([]);
+    const [isLoadingBlog, setIsLoadingBlog] = useState(true);
+    const [isLoadingTeam, setIsLoadingTeam] = useState(true);
+    const [isLoadingServices, setIsLoadingServices] = useState(true);
+
+    // Modal state for additional entities
+    const [showBlogModal, setShowBlogModal] = useState(false);
+    const [blogForm, setBlogForm] = useState<any>({ title: '', content: '', imageUrl: '', author: '', date: new Date().toISOString().split('T')[0] });
+    const [isSavingBlog, setIsSavingBlog] = useState(false);
+
+    const [showTeamModal, setShowTeamModal] = useState(false);
+    const [teamForm, setTeamForm] = useState<any>({ name: '', role: '', department: '', bio: '', photoUrl: '', order: 0 });
+    const [isSavingTeam, setIsSavingTeam] = useState(false);
+
+    const [showServiceModal, setShowServiceModal] = useState(false);
+    const [serviceForm, setServiceForm] = useState<any>({ title: '', price: '', details: [], order: 0 });
+    const [isSavingService, setIsSavingService] = useState(false);
     const [selectedManuscript, setSelectedManuscript] = useState<import('../types').Manuscript | null>(null);
     const [feedback, setFeedback] = useState('');
 
@@ -98,6 +117,45 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
             console.error('Erro ao buscar manuscritos:', error);
         } finally {
             setIsLoadingManuscripts(false);
+        }
+    };
+
+    const fetchBlogPosts = async () => {
+        setIsLoadingBlog(true);
+        try {
+            const { getBlogPosts } = await import('../services/dataService');
+            const data = await getBlogPosts();
+            setBlogPosts(data);
+        } catch (error) {
+            console.error('Erro ao buscar posts do blog:', error);
+        } finally {
+            setIsLoadingBlog(false);
+        }
+    };
+
+    const fetchTeamMembers = async () => {
+        setIsLoadingTeam(true);
+        try {
+            const { getTeamMembers } = await import('../services/dataService');
+            const data = await getTeamMembers();
+            setTeamMembers(data);
+        } catch (error) {
+            console.error('Erro ao buscar membros da equipa:', error);
+        } finally {
+            setIsLoadingTeam(false);
+        }
+    };
+
+    const fetchServices = async () => {
+        setIsLoadingServices(true);
+        try {
+            const { getEditorialServices } = await import('../services/dataService');
+            const data = await getEditorialServices();
+            setEditorialServices(data);
+        } catch (error) {
+            console.error('Erro ao buscar serviços editoriais:', error);
+        } finally {
+            setIsLoadingServices(false);
         }
     };
 
@@ -200,6 +258,84 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
         setIsBookModalOpen(true);
     };
 
+    const handleSaveBlog = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSavingBlog(true);
+        try {
+            const { saveBlogPost } = await import('../services/dataService');
+            await saveBlogPost(blogForm);
+            setShowBlogModal(false);
+            fetchBlogPosts();
+        } catch (error) {
+            console.error('Erro ao salvar post:', error);
+        } finally {
+            setIsSavingBlog(false);
+        }
+    };
+
+    const handleDeleteBlog = async (id: string) => {
+        if (!confirm('Eliminar este post?')) return;
+        try {
+            const { deleteBlogPost } = await import('../services/dataService');
+            await deleteBlogPost(id);
+            fetchBlogPosts();
+        } catch (error) {
+            console.error('Erro ao eliminar post:', error);
+        }
+    };
+
+    const handleSaveTeam = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSavingTeam(true);
+        try {
+            const { saveTeamMember } = await import('../services/dataService');
+            await saveTeamMember(teamForm);
+            setShowTeamModal(false);
+            fetchTeamMembers();
+        } catch (error) {
+            console.error('Erro ao salvar membro:', error);
+        } finally {
+            setIsSavingTeam(false);
+        }
+    };
+
+    const handleDeleteTeam = async (id: string) => {
+        if (!confirm('Eliminar este membro?')) return;
+        try {
+            const { deleteTeamMember } = await import('../services/dataService');
+            await deleteTeamMember(id);
+            fetchTeamMembers();
+        } catch (error) {
+            console.error('Erro ao eliminar membro:', error);
+        }
+    };
+
+    const handleSaveService = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSavingService(true);
+        try {
+            const { saveEditorialService } = await import('../services/dataService');
+            await saveEditorialService(serviceForm);
+            setShowServiceModal(false);
+            fetchServices();
+        } catch (error) {
+            console.error('Erro ao salvar serviço:', error);
+        } finally {
+            setIsSavingService(false);
+        }
+    };
+
+    const handleDeleteService = async (id: string) => {
+        if (!confirm('Eliminar este serviço?')) return;
+        try {
+            const { deleteEditorialService } = await import('../services/dataService');
+            await deleteEditorialService(id);
+            fetchServices();
+        } catch (error) {
+            console.error('Erro ao eliminar serviço:', error);
+        }
+    };
+
     const openEditModal = (book: import('../types').Book) => {
         setEditingBook(book);
         setBookForm({
@@ -221,18 +357,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
         setIsBookModalOpen(true);
     };
 
-    React.useEffect(() => {
-        fetchStats();
-    }, []);
-
-    React.useEffect(() => {
-        if (activeTab === 'books') {
-            fetchBooks();
-        } else if (activeTab === 'users') {
-            fetchUsers();
-        } else if (activeTab === 'manuscripts') {
-            fetchManuscripts();
-        }
+    useEffect(() => {
+        if (activeTab === 'stats') fetchStats();
+        if (activeTab === 'books') fetchBooks();
+        if (activeTab === 'users') fetchUsers();
+        if (activeTab === 'manuscripts') fetchManuscripts();
+        if (activeTab === 'blog') fetchBlogPosts();
+        if (activeTab === 'team') fetchTeamMembers();
+        if (activeTab === 'services') fetchServices();
     }, [activeTab]);
 
     if (!user || user.role !== 'adm') {
@@ -343,6 +475,42 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                         >
                             <FileText className="w-4 h-4 inline mr-2" />
                             Manuscritos
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('blog')}
+                            title="Gerir blog"
+                            aria-label="Gerir blog"
+                            className={`px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider transition-all ${activeTab === 'blog'
+                                ? 'bg-brand-primary text-white'
+                                : 'bg-white/10 text-white hover:bg-white/20'
+                                }`}
+                        >
+                            <FileText className="w-4 h-4 inline mr-2" />
+                            Blog
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('team')}
+                            title="Gerir equipa"
+                            aria-label="Gerir equipa"
+                            className={`px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider transition-all ${activeTab === 'team'
+                                ? 'bg-brand-primary text-white'
+                                : 'bg-white/10 text-white hover:bg-white/20'
+                                }`}
+                        >
+                            <Users className="w-4 h-4 inline mr-2" />
+                            Equipa
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('services')}
+                            title="Gerir serviços"
+                            aria-label="Gerir serviços"
+                            className={`px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider transition-all ${activeTab === 'services'
+                                ? 'bg-brand-primary text-white'
+                                : 'bg-white/10 text-white hover:bg-white/20'
+                                }`}
+                        >
+                            <Layout className="w-4 h-4 inline mr-2" />
+                            Serviços
                         </button>
                     </div>
                 </div>
@@ -547,6 +715,233 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                             </div>
                         </div>
                     )}
+
+                    {/* Blog Tab */}
+                    {activeTab === 'blog' && (
+                        <div>
+                            <div className="flex justify-between items-center mb-8">
+                                <h2 className="text-2xl md:text-3xl font-black text-brand-dark">Gestão do Blog</h2>
+                                <button
+                                    onClick={() => {
+                                        setBlogForm({ title: '', content: '', imageUrl: '', author: '', date: new Date().toISOString().split('T')[0] });
+                                        setShowBlogModal(true);
+                                    }}
+                                    title="Criar novo post"
+                                    aria-label="Criar novo post"
+                                    className="btn-premium py-3 px-6 text-sm"
+                                >
+                                    <Plus className="w-4 h-4 mr-2" />
+                                    Novo Post
+                                </button>
+                            </div>
+                            <div className="bg-white rounded-2xl shadow-lg overflow-hidden overflow-x-auto">
+                                <table className="w-full min-w-[800px]">
+                                    <thead className="bg-gray-50">
+                                        <tr>
+                                            <th className="px-6 py-4 text-left text-xs font-bold text-brand-dark uppercase tracking-wider">Título</th>
+                                            <th className="px-6 py-4 text-left text-xs font-bold text-brand-dark uppercase tracking-wider">Autor</th>
+                                            <th className="px-6 py-4 text-left text-xs font-bold text-brand-dark uppercase tracking-wider">Data</th>
+                                            <th className="px-6 py-4 text-right text-xs font-bold text-brand-dark uppercase tracking-wider">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-200">
+                                        {isLoadingBlog ? (
+                                            <tr>
+                                                <td colSpan={4} className="px-6 py-12 text-center text-gray-500 italic">Carregando posts...</td>
+                                            </tr>
+                                        ) : blogPosts.length > 0 ? (
+                                            blogPosts.map((post) => (
+                                                <tr key={post.id} className="hover:bg-gray-50">
+                                                    <td className="px-6 py-4 font-bold text-brand-dark">{post.title}</td>
+                                                    <td className="px-6 py-4 text-sm text-gray-600">{post.author}</td>
+                                                    <td className="px-6 py-4 text-sm text-gray-600">{new Date(post.date).toLocaleDateString('pt-AO')}</td>
+                                                    <td className="px-6 py-4 text-right">
+                                                        <div className="flex items-center justify-end gap-2">
+                                                            <button
+                                                                onClick={() => {
+                                                                    setBlogForm(post);
+                                                                    setShowBlogModal(true);
+                                                                }}
+                                                                title="Editar post"
+                                                                aria-label="Editar post"
+                                                                className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 flex items-center justify-center transition-all"
+                                                            >
+                                                                <Edit className="w-4 h-4" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDeleteBlog(post.id)}
+                                                                title="Eliminar post"
+                                                                aria-label="Eliminar post"
+                                                                className="w-8 h-8 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 flex items-center justify-center transition-all"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan={4} className="px-6 py-12 text-center text-gray-500 italic">Nenhum post encontrado.</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Team Tab */}
+                    {activeTab === 'team' && (
+                        <div>
+                            <div className="flex justify-between items-center mb-8">
+                                <h2 className="text-2xl md:text-3xl font-black text-brand-dark">Gestão da Equipa</h2>
+                                <button
+                                    onClick={() => {
+                                        setTeamForm({ name: '', role: '', department: '', bio: '', photoUrl: '', order: 0 });
+                                        setShowTeamModal(true);
+                                    }}
+                                    title="Adicionar novo membro"
+                                    aria-label="Adicionar novo membro"
+                                    className="btn-premium py-3 px-6 text-sm"
+                                >
+                                    <Plus className="w-4 h-4 mr-2" />
+                                    Novo Membro
+                                </button>
+                            </div>
+                            <div className="bg-white rounded-2xl shadow-lg overflow-hidden overflow-x-auto">
+                                <table className="w-full min-w-[800px]">
+                                    <thead className="bg-gray-50">
+                                        <tr>
+                                            <th className="px-6 py-4 text-left text-xs font-bold text-brand-dark uppercase tracking-wider">Nome</th>
+                                            <th className="px-6 py-4 text-left text-xs font-bold text-brand-dark uppercase tracking-wider">Cargo</th>
+                                            <th className="px-6 py-4 text-left text-xs font-bold text-brand-dark uppercase tracking-wider">Departamento</th>
+                                            <th className="px-6 py-4 text-right text-xs font-bold text-brand-dark uppercase tracking-wider">Ordem</th>
+                                            <th className="px-6 py-4 text-right text-xs font-bold text-brand-dark uppercase tracking-wider">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-200">
+                                        {isLoadingTeam ? (
+                                            <tr>
+                                                <td colSpan={5} className="px-6 py-12 text-center text-gray-500 italic">Carregando equipa...</td>
+                                            </tr>
+                                        ) : teamMembers.length > 0 ? (
+                                            teamMembers.map((member) => (
+                                                <tr key={member.id} className="hover:bg-gray-50">
+                                                    <td className="px-6 py-4 font-bold text-brand-dark">{member.name}</td>
+                                                    <td className="px-6 py-4 text-sm text-gray-600">{member.role}</td>
+                                                    <td className="px-6 py-4 text-sm text-gray-600">{member.department}</td>
+                                                    <td className="px-6 py-4 text-sm text-gray-600 text-right">{member.order}</td>
+                                                    <td className="px-6 py-4 text-right">
+                                                        <div className="flex items-center justify-end gap-2">
+                                                            <button
+                                                                onClick={() => {
+                                                                    setTeamForm(member);
+                                                                    setShowTeamModal(true);
+                                                                }}
+                                                                title="Editar membro"
+                                                                aria-label="Editar membro"
+                                                                className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 flex items-center justify-center transition-all"
+                                                            >
+                                                                <Edit className="w-4 h-4" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDeleteTeam(member.id)}
+                                                                title="Eliminar membro"
+                                                                aria-label="Eliminar membro"
+                                                                className="w-8 h-8 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 flex items-center justify-center transition-all"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan={5} className="px-6 py-12 text-center text-gray-500 italic">Nenhum membro encontrado.</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Services Tab */}
+                    {activeTab === 'services' && (
+                        <div>
+                            <div className="flex justify-between items-center mb-8">
+                                <h2 className="text-2xl md:text-3xl font-black text-brand-dark">Gestão de Serviços</h2>
+                                <button
+                                    onClick={() => {
+                                        setServiceForm({ title: '', price: '', details: [], order: 0 });
+                                        setShowServiceModal(true);
+                                    }}
+                                    title="Criar novo serviço"
+                                    aria-label="Criar novo serviço"
+                                    className="btn-premium py-3 px-6 text-sm"
+                                >
+                                    <Plus className="w-4 h-4 mr-2" />
+                                    Novo Serviço
+                                </button>
+                            </div>
+                            <div className="bg-white rounded-2xl shadow-lg overflow-hidden overflow-x-auto">
+                                <table className="w-full min-w-[800px]">
+                                    <thead className="bg-gray-50">
+                                        <tr>
+                                            <th className="px-6 py-4 text-left text-xs font-bold text-brand-dark uppercase tracking-wider">Serviço</th>
+                                            <th className="px-6 py-4 text-left text-xs font-bold text-brand-dark uppercase tracking-wider">Preço</th>
+                                            <th className="px-6 py-4 text-right text-xs font-bold text-brand-dark uppercase tracking-wider">Ordem</th>
+                                            <th className="px-6 py-4 text-right text-xs font-bold text-brand-dark uppercase tracking-wider">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-200">
+                                        {isLoadingServices ? (
+                                            <tr>
+                                                <td colSpan={4} className="px-6 py-12 text-center text-gray-500 italic">Carregando serviços...</td>
+                                            </tr>
+                                        ) : editorialServices.length > 0 ? (
+                                            editorialServices.map((service) => (
+                                                <tr key={service.id} className="hover:bg-gray-50">
+                                                    <td className="px-6 py-4 font-bold text-brand-dark">{service.title}</td>
+                                                    <td className="px-6 py-4 text-sm text-brand-primary font-black">{service.price}</td>
+                                                    <td className="px-6 py-4 text-sm text-gray-600 text-right">{service.order}</td>
+                                                    <td className="px-6 py-4 text-right">
+                                                        <div className="flex items-center justify-end gap-2">
+                                                            <button
+                                                                onClick={() => {
+                                                                    setServiceForm(service);
+                                                                    setShowServiceModal(true);
+                                                                }}
+                                                                title="Editar serviço"
+                                                                aria-label="Editar serviço"
+                                                                className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 flex items-center justify-center transition-all"
+                                                            >
+                                                                <Edit className="w-4 h-4" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDeleteService(service.id)}
+                                                                title="Eliminar serviço"
+                                                                aria-label="Eliminar serviço"
+                                                                className="w-8 h-8 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 flex items-center justify-center transition-all"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan={4} className="px-6 py-12 text-center text-gray-500 italic">Nenhum serviço encontrado.</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </section>
 
@@ -607,6 +1002,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                                         href={selectedManuscript.fileUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
+                                        title="Descarregar e ler o manuscrito"
+                                        aria-label="Descarregar e ler o manuscrito"
                                         className="flex-1 py-4 border-2 border-brand-dark rounded-full font-black text-xs uppercase tracking-widest text-brand-dark text-center hover:bg-brand-dark hover:text-white transition-all flex items-center justify-center gap-2"
                                     >
                                         <Download className="w-4 h-4" />
@@ -668,6 +1065,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                                                 <button
                                                     type="button"
                                                     onClick={() => setBookForm({ ...bookForm, format: 'físico' })}
+                                                    title="Selecionar formato físico"
+                                                    aria-label="Selecionar formato físico"
                                                     className={`flex-1 py-3 rounded-xl font-bold text-xs uppercase transition-all ${bookForm.format === 'físico' ? 'bg-brand-primary text-white' : 'bg-gray-100 text-gray-500'}`}
                                                 >
                                                     Físico
@@ -675,6 +1074,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                                                 <button
                                                     type="button"
                                                     onClick={() => setBookForm({ ...bookForm, format: 'digital' })}
+                                                    title="Selecionar formato digital"
+                                                    aria-label="Selecionar formato digital"
                                                     className={`flex-1 py-3 rounded-xl font-bold text-xs uppercase transition-all ${bookForm.format === 'digital' ? 'bg-brand-primary text-white' : 'bg-gray-100 text-gray-500'}`}
                                                 >
                                                     Digital (e-book)
@@ -789,6 +1190,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                                                         <button
                                                             type="button"
                                                             onClick={() => setCoverType('file')}
+                                                            title="Carregar ficheiro de imagem"
+                                                            aria-label="Carregar ficheiro de imagem"
                                                             className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${coverType === 'file' ? 'bg-white text-brand-primary shadow-sm' : 'text-gray-400'}`}
                                                         >
                                                             Upload
@@ -796,6 +1199,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                                                         <button
                                                             type="button"
                                                             onClick={() => setCoverType('link')}
+                                                            title="Introduzir link da imagem"
+                                                            aria-label="Introduzir link da imagem"
                                                             className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${coverType === 'link' ? 'bg-white text-brand-primary shadow-sm' : 'text-gray-400'}`}
                                                         >
                                                             Link
@@ -810,6 +1215,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                                                             onChange={(e) => setCoverFile(e.target.files?.[0] || null)}
                                                             className="hidden"
                                                             id="cover-upload"
+                                                            title="Carregar capa"
                                                         />
                                                         <label htmlFor="cover-upload" className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-all min-h-[100px]">
                                                             <Image className="w-6 h-6 text-gray-400 mb-1" />
@@ -820,8 +1226,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                                                     </div>
                                                 ) : (
                                                     <input
+                                                        id="cover-link"
                                                         type="text"
                                                         placeholder="https://exemplo.com/capa.jpg"
+                                                        title="Link direto da imagem da capa"
                                                         value={bookForm.coverUrl}
                                                         onChange={(e) => setBookForm({ ...bookForm, coverUrl: e.target.value })}
                                                         className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
@@ -836,6 +1244,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                                                         <button
                                                             type="button"
                                                             onClick={() => setDigitalFileType('file')}
+                                                            title="Carregar ficheiro (PDF/EPUB)"
+                                                            aria-label="Carregar ficheiro (PDF/EPUB)"
                                                             className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${digitalFileType === 'file' ? 'bg-white text-brand-primary shadow-sm' : 'text-gray-400'}`}
                                                         >
                                                             Upload
@@ -843,6 +1253,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                                                         <button
                                                             type="button"
                                                             onClick={() => setDigitalFileType('link')}
+                                                            title="Introduzir link do ficheiro"
+                                                            aria-label="Introduzir link do ficheiro"
                                                             className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${digitalFileType === 'link' ? 'bg-white text-brand-primary shadow-sm' : 'text-gray-400'}`}
                                                         >
                                                             Link
@@ -857,6 +1269,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                                                             onChange={(e) => setDigitalFile(e.target.files?.[0] || null)}
                                                             className="hidden"
                                                             id="digital-upload"
+                                                            title="Carregar ficheiro digital"
                                                         />
                                                         <label htmlFor="digital-upload" className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-all min-h-[100px]">
                                                             <File className="w-6 h-6 text-gray-400 mb-1" />
@@ -867,8 +1280,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                                                     </div>
                                                 ) : (
                                                     <input
+                                                        id="digital-link"
                                                         type="text"
                                                         placeholder="https://exemplo.com/livro.pdf"
+                                                        title="Link direto do ficheiro digital"
                                                         value={bookForm.digitalFileUrl}
                                                         onChange={(e) => setBookForm({ ...bookForm, digitalFileUrl: e.target.value })}
                                                         className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
@@ -904,6 +1319,356 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                                                 {editingBook ? 'Guardar Alterações' : 'Criar Livro'}
                                             </>
                                         )}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Blog Modal */}
+            {showBlogModal && (
+                <div className="fixed inset-0 bg-brand-dark/90 backdrop-blur-sm z-50 flex items-center justify-center p-8">
+                    <div className="bg-white rounded-[40px] w-full max-w-2xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300">
+                        <div className="p-8 md:p-12 overflow-y-auto max-h-[90vh]">
+                            <div className="flex justify-between items-start mb-8">
+                                <div>
+                                    <span className="text-brand-primary font-black uppercase tracking-widest text-xs mb-2 block italic">
+                                        Post do Blog
+                                    </span>
+                                    <h3 className="text-4xl font-black text-brand-dark tracking-tighter leading-none">
+                                        {blogForm.id ? 'Editar Post' : 'Novo Post'}
+                                    </h3>
+                                </div>
+                                <button
+                                    onClick={() => setShowBlogModal(false)}
+                                    title="Fechar modal"
+                                    aria-label="Fechar modal"
+                                    className="w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                                >
+                                    <X className="w-5 h-5 text-gray-400" />
+                                </button>
+                            </div>
+
+                            <form onSubmit={handleSaveBlog} className="space-y-6">
+                                <div className="space-y-4">
+                                    <div>
+                                        <label htmlFor="blog-title" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Título</label>
+                                        <input
+                                            id="blog-title"
+                                            required
+                                            type="text"
+                                            title="Título do post"
+                                            placeholder="Introduza o título"
+                                            value={blogForm.title}
+                                            onChange={(e) => setBlogForm({ ...blogForm, title: e.target.value })}
+                                            className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label htmlFor="blog-author" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Autor</label>
+                                            <input
+                                                id="blog-author"
+                                                required
+                                                type="text"
+                                                title="Autor do post"
+                                                placeholder="Nome do autor"
+                                                value={blogForm.author}
+                                                onChange={(e) => setBlogForm({ ...blogForm, author: e.target.value })}
+                                                className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label htmlFor="blog-date" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Data</label>
+                                            <input
+                                                id="blog-date"
+                                                required
+                                                type="date"
+                                                title="Data do post"
+                                                value={blogForm.date}
+                                                onChange={(e) => setBlogForm({ ...blogForm, date: e.target.value })}
+                                                className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="blog-image" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Imagem (URL)</label>
+                                        <input
+                                            id="blog-image"
+                                            type="text"
+                                            title="URL da imagem do post"
+                                            value={blogForm.imageUrl}
+                                            onChange={(e) => setBlogForm({ ...blogForm, imageUrl: e.target.value })}
+                                            placeholder="https://..."
+                                            className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="blog-content" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Conteúdo</label>
+                                        <textarea
+                                            id="blog-content"
+                                            required
+                                            title="Conteúdo do post"
+                                            placeholder="Escreva o conteúdo do post..."
+                                            value={blogForm.content}
+                                            onChange={(e) => setBlogForm({ ...blogForm, content: e.target.value })}
+                                            className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary h-48 resize-none"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="pt-6 border-t border-gray-100 flex gap-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowBlogModal(false)}
+                                        className="flex-1 py-4 border-2 border-brand-dark rounded-full font-black text-xs uppercase tracking-widest text-brand-dark hover:bg-brand-dark hover:text-white transition-all"
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={isSavingBlog}
+                                        className="flex-1 py-4 bg-brand-primary text-white rounded-full font-black text-xs uppercase tracking-widest shadow-lg shadow-brand-primary/20 hover:brightness-110 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                                    >
+                                        {isSavingBlog ? 'Salvando...' : 'Salvar Post'}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Team Modal */}
+            {showTeamModal && (
+                <div className="fixed inset-0 bg-brand-dark/90 backdrop-blur-sm z-50 flex items-center justify-center p-8">
+                    <div className="bg-white rounded-[40px] w-full max-w-2xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300">
+                        <div className="p-8 md:p-12 overflow-y-auto max-h-[90vh]">
+                            <div className="flex justify-between items-start mb-8">
+                                <div>
+                                    <span className="text-brand-primary font-black uppercase tracking-widest text-xs mb-2 block italic">
+                                        Membro da Equipa
+                                    </span>
+                                    <h3 className="text-4xl font-black text-brand-dark tracking-tighter leading-none">
+                                        {teamForm.id ? 'Editar Membro' : 'Novo Membro'}
+                                    </h3>
+                                </div>
+                                <button
+                                    onClick={() => setShowTeamModal(false)}
+                                    title="Fechar modal"
+                                    aria-label="Fechar modal"
+                                    className="w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                                >
+                                    <X className="w-5 h-5 text-gray-400" />
+                                </button>
+                            </div>
+
+                            <form onSubmit={handleSaveTeam} className="space-y-6">
+                                <div className="space-y-4">
+                                    <div>
+                                        <label htmlFor="team-name" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Nome</label>
+                                        <input
+                                            id="team-name"
+                                            required
+                                            type="text"
+                                            title="Nome do membro"
+                                            placeholder="Nome completo"
+                                            value={teamForm.name}
+                                            onChange={(e) => setTeamForm({ ...teamForm, name: e.target.value })}
+                                            className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label htmlFor="team-role" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Cargo</label>
+                                            <input
+                                                id="team-role"
+                                                required
+                                                type="text"
+                                                title="Cargo do membro"
+                                                placeholder="Ex: Editor Chefe"
+                                                value={teamForm.role}
+                                                onChange={(e) => setTeamForm({ ...teamForm, role: e.target.value })}
+                                                className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label htmlFor="team-department" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Departamento</label>
+                                            <select
+                                                id="team-department"
+                                                required
+                                                title="Departamento"
+                                                value={teamForm.department}
+                                                onChange={(e) => setTeamForm({ ...teamForm, department: e.target.value })}
+                                                className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                            >
+                                                <option value="">Selecionar...</option>
+                                                <option value="Editorial">Editorial</option>
+                                                <option value="Administrativo">Administrativo</option>
+                                                <option value="Logística">Logística</option>
+                                                <option value="Comercial">Comercial</option>
+                                                <option value="Marketing">Marketing</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label htmlFor="team-photo" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Foto (URL)</label>
+                                            <input
+                                                id="team-photo"
+                                                type="text"
+                                                title="URL da foto"
+                                                placeholder="https://..."
+                                                value={teamForm.photoUrl}
+                                                onChange={(e) => setTeamForm({ ...teamForm, photoUrl: e.target.value })}
+                                                className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label htmlFor="team-order" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Ordem de Exibição</label>
+                                            <input
+                                                id="team-order"
+                                                type="number"
+                                                title="Ordem de exibição"
+                                                placeholder="0"
+                                                value={teamForm.order}
+                                                onChange={(e) => setTeamForm({ ...teamForm, order: parseInt(e.target.value) })}
+                                                className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="team-bio" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Bio</label>
+                                        <textarea
+                                            id="team-bio"
+                                            required
+                                            title="Bio do membro"
+                                            placeholder="Escreva uma breve biografia..."
+                                            value={teamForm.bio}
+                                            onChange={(e) => setTeamForm({ ...teamForm, bio: e.target.value })}
+                                            className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary h-32 resize-none"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="pt-6 border-t border-gray-100 flex gap-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowTeamModal(false)}
+                                        className="flex-1 py-4 border-2 border-brand-dark rounded-full font-black text-xs uppercase tracking-widest text-brand-dark hover:bg-brand-dark hover:text-white transition-all"
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={isSavingTeam}
+                                        className="flex-1 py-4 bg-brand-primary text-white rounded-full font-black text-xs uppercase tracking-widest shadow-lg shadow-brand-primary/20 hover:brightness-110 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                                    >
+                                        {isSavingTeam ? 'Salvando...' : 'Salvar Membro'}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Service Modal */}
+            {showServiceModal && (
+                <div className="fixed inset-0 bg-brand-dark/90 backdrop-blur-sm z-50 flex items-center justify-center p-8">
+                    <div className="bg-white rounded-[40px] w-full max-w-2xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300">
+                        <div className="p-8 md:p-12 overflow-y-auto max-h-[90vh]">
+                            <div className="flex justify-between items-start mb-8">
+                                <div>
+                                    <span className="text-brand-primary font-black uppercase tracking-widest text-xs mb-2 block italic">
+                                        Serviço Editorial
+                                    </span>
+                                    <h3 className="text-4xl font-black text-brand-dark tracking-tighter leading-none">
+                                        {serviceForm.id ? 'Editar Serviço' : 'Novo Serviço'}
+                                    </h3>
+                                </div>
+                                <button
+                                    onClick={() => setShowServiceModal(false)}
+                                    title="Fechar modal"
+                                    aria-label="Fechar modal"
+                                    className="w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                                >
+                                    <X className="w-5 h-5 text-gray-400" />
+                                </button>
+                            </div>
+
+                            <form onSubmit={handleSaveService} className="space-y-6">
+                                <div className="space-y-4">
+                                    <div>
+                                        <label htmlFor="service-title" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Título do Serviço</label>
+                                        <input
+                                            id="service-title"
+                                            required
+                                            type="text"
+                                            title="Título do serviço"
+                                            placeholder="Ex: Revisão Linguística"
+                                            value={serviceForm.title}
+                                            onChange={(e) => setServiceForm({ ...serviceForm, title: e.target.value })}
+                                            className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label htmlFor="service-price" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Preço (ou Sob Consulta)</label>
+                                            <input
+                                                id="service-price"
+                                                required
+                                                type="text"
+                                                title="Preço do serviço"
+                                                value={serviceForm.price}
+                                                onChange={(e) => setServiceForm({ ...serviceForm, price: e.target.value })}
+                                                placeholder="Ex: 50.000 Kz"
+                                                className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label htmlFor="service-order" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Ordem</label>
+                                            <input
+                                                id="service-order"
+                                                type="number"
+                                                title="Ordem de exibição"
+                                                placeholder="0"
+                                                value={serviceForm.order}
+                                                onChange={(e) => setServiceForm({ ...serviceForm, order: parseInt(e.target.value) })}
+                                                className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="service-details" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Detalhes (um por linha)</label>
+                                        <textarea
+                                            id="service-details"
+                                            required
+                                            title="Detalhes do serviço"
+                                            value={serviceForm.details.join('\n')}
+                                            onChange={(e) => setServiceForm({ ...serviceForm, details: e.target.value.split('\n') })}
+                                            placeholder="Detalhe 1&#10;Detalhe 2..."
+                                            className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary h-32 resize-none"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="pt-6 border-t border-gray-100 flex gap-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowServiceModal(false)}
+                                        className="flex-1 py-4 border-2 border-brand-dark rounded-full font-black text-xs uppercase tracking-widest text-brand-dark hover:bg-brand-dark hover:text-white transition-all"
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={isSavingService}
+                                        className="flex-1 py-4 bg-brand-primary text-white rounded-full font-black text-xs uppercase tracking-widest shadow-lg shadow-brand-primary/20 hover:brightness-110 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                                    >
+                                        {isSavingService ? 'Salvando...' : 'Salvar Serviço'}
                                     </button>
                                 </div>
                             </form>

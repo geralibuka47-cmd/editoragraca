@@ -19,6 +19,9 @@ const {
     VITE_APPWRITE_PAYMENT_NOTIFICATIONS_COLLECTION = 'payment_notifications',
     VITE_APPWRITE_PAYMENT_PROOFS_COLLECTION = 'payment_proofs',
     VITE_APPWRITE_MANUSCRIPTS_COLLECTION = 'manuscripts',
+    VITE_APPWRITE_BLOG_COLLECTION = 'blog_posts',
+    VITE_APPWRITE_TEAM_COLLECTION = 'team_members',
+    VITE_APPWRITE_SERVICES_COLLECTION = 'editorial_services',
     VITE_APPWRITE_BUCKET_ID = 'uploads'
 } = process.env;
 
@@ -239,7 +242,81 @@ async function setup() {
             }
         }
 
-        // 5. Create Storage Buckets
+        // 6. Create Blog Posts Collection
+        console.log(`\n📝 Criando coleção ${VITE_APPWRITE_BLOG_COLLECTION}...`);
+        try {
+            await databases.createCollection(dbId, VITE_APPWRITE_BLOG_COLLECTION, VITE_APPWRITE_BLOG_COLLECTION, ['read("any")', 'create("users")', 'update("users")']);
+            console.log('✅ Coleção de blog criada.');
+        } catch (e) { console.log('⚠️ Coleção já existe ou erro:', e.message); }
+
+        const blogAttrs = [
+            { id: 'title', type: 'string', size: 255, required: true },
+            { id: 'content', type: 'string', size: 10000, required: true },
+            { id: 'imageUrl', type: 'string', size: 1024, required: true },
+            { id: 'date', type: 'string', size: 32, required: true },
+            { id: 'author', type: 'string', size: 255, required: true }
+        ];
+
+        for (const attr of blogAttrs) {
+            try {
+                await databases.createStringAttribute(dbId, VITE_APPWRITE_BLOG_COLLECTION, attr.id, attr.size, attr.required);
+                console.log(`✅ Atributo "${attr.id}" criado.`);
+            } catch (e) { console.log(`⚠️ Atributo "${attr.id}" erro:`, e.message); }
+        }
+
+        // 7. Create Team Members Collection
+        console.log(`\n📝 Criando coleção ${VITE_APPWRITE_TEAM_COLLECTION}...`);
+        try {
+            await databases.createCollection(dbId, VITE_APPWRITE_TEAM_COLLECTION, VITE_APPWRITE_TEAM_COLLECTION, ['read("any")', 'create("users")', 'update("users")']);
+            console.log('✅ Coleção de equipa criada.');
+        } catch (e) { console.log('⚠️ Coleção já existe ou erro:', e.message); }
+
+        const teamAttrs = [
+            { id: 'name', type: 'string', size: 255, required: true },
+            { id: 'role', type: 'string', size: 255, required: true },
+            { id: 'department', type: 'string', size: 255, required: true },
+            { id: 'bio', type: 'string', size: 2000, required: true },
+            { id: 'photoUrl', type: 'string', size: 1024, required: true },
+            { id: 'order', type: 'integer', required: false, default: 0 }
+        ];
+
+        for (const attr of teamAttrs) {
+            try {
+                if (attr.type === 'string') {
+                    await databases.createStringAttribute(dbId, VITE_APPWRITE_TEAM_COLLECTION, attr.id, attr.size, attr.required);
+                } else if (attr.type === 'integer') {
+                    await databases.createIntegerAttribute(dbId, VITE_APPWRITE_TEAM_COLLECTION, attr.id, attr.required, attr.default);
+                }
+                console.log(`✅ Atributo "${attr.id}" criado.`);
+            } catch (e) { console.log(`⚠️ Atributo "${attr.id}" erro:`, e.message); }
+        }
+
+        // 8. Create Editorial Services Collection
+        console.log(`\n📝 Criando coleção ${VITE_APPWRITE_SERVICES_COLLECTION}...`);
+        try {
+            await databases.createCollection(dbId, VITE_APPWRITE_SERVICES_COLLECTION, VITE_APPWRITE_SERVICES_COLLECTION, ['read("any")', 'create("users")', 'update("users")']);
+            console.log('✅ Coleção de serviços criada.');
+        } catch (e) { console.log('⚠️ Coleção já existe ou erro:', e.message); }
+
+        const serviceAttrs = [
+            { id: 'title', type: 'string', size: 255, required: true },
+            { id: 'price', type: 'string', size: 255, required: true },
+            { id: 'details', type: 'string', size: 2000, required: true, array: true },
+            { id: 'order', type: 'integer', required: false, default: 0 }
+        ];
+
+        for (const attr of serviceAttrs) {
+            try {
+                if (attr.type === 'string') {
+                    await databases.createStringAttribute(dbId, VITE_APPWRITE_SERVICES_COLLECTION, attr.id, attr.size, attr.required, undefined, attr.array);
+                } else if (attr.type === 'integer') {
+                    await databases.createIntegerAttribute(dbId, VITE_APPWRITE_SERVICES_COLLECTION, attr.id, attr.required, attr.default);
+                }
+                console.log(`✅ Atributo "${attr.id}" criado.`);
+            } catch (e) { console.log(`⚠️ Atributo "${attr.id}" erro:`, e.message); }
+        }
+
+        // 9. Create Storage Buckets
         console.log(`\n📦 Criando bucket unificado...`);
         try {
             await storage.createBucket(VITE_APPWRITE_BUCKET_ID, 'General Uploads', ['read("any")', 'create("users")', 'update("users")', 'write("users")'], false, true, 50000000, ['jpg', 'png', 'pdf', 'jpeg', 'docx', 'doc']);

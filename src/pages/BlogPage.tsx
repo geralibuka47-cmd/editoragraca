@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { Calendar, User, ArrowRight, Search } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Calendar, User, ArrowRight, Search, Loader2 } from 'lucide-react';
 import { ViewState, BlogPost } from '../types';
+import { getBlogPosts } from '../services/dataService';
 
 interface BlogPageProps {
     onNavigate: (view: ViewState) => void;
@@ -9,10 +10,12 @@ interface BlogPageProps {
 const BlogPage: React.FC<BlogPageProps> = ({ onNavigate }) => {
     const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
+    const [posts, setPosts] = useState<BlogPost[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-    const blogPosts: BlogPost[] = [
+    const FALLBACK_POSTS: BlogPost[] = [
         {
-            id: '1',
+            id: 'f-1',
             title: 'O Renascimento da Literatura Angolana',
             content: 'Nos últimos anos, temos assistido a um verdadeiro renascimento da literatura angolana. Novos autores emergem com histórias autênticas que capturam a essência da nossa cultura e identidade. Esta nova geração de escritores não só preserva as tradições literárias, mas também as reinventa para os tempos modernos...',
             imageUrl: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=800&h=500&fit=crop',
@@ -20,7 +23,7 @@ const BlogPage: React.FC<BlogPageProps> = ({ onNavigate }) => {
             author: 'Maria Santos'
         },
         {
-            id: '2',
+            id: 'f-2',
             title: 'Como Publicar Seu Primeiro Livro',
             content: 'Publicar um livro pode parecer intimidante, mas com a orientação certa, o processo torna-se muito mais acessível. Desde a finalização do manuscrito até a distribuição, cada etapa requer atenção aos detalhes. Neste artigo, partilhamos um guia completo para autores de primeira viagem...',
             imageUrl: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&h=500&fit=crop',
@@ -28,76 +31,96 @@ const BlogPage: React.FC<BlogPageProps> = ({ onNavigate }) => {
             author: 'Geral Ibuka'
         },
         {
-            id: '3',
+            id: 'f-3',
             title: 'A Importância da Revisão Editorial',
             content: 'Um manuscrito bem escrito pode ser transformado numa obra-prima através de uma revisão editorial profissional. A revisão não se limita à correção de erros; ela aprimora a narrativa, fortalece a voz do autor e garante que a mensagem chegue clara aos leitores...',
             imageUrl: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&h=500&fit=crop',
             date: '2025-12-15',
             author: 'Carlos Mendes'
-        },
-        {
-            id: '4',
-            title: 'Tendências Editoriais para 2026',
-            content: 'O mercado editorial está em constante evolução, e 2026 promete ser um ano de transformações significativas. Desde o crescimento dos audiolivros até novas estratégias de marketing digital, exploramos as principais tendências que moldarão o futuro da publicação em Angola...',
-            imageUrl: 'https://images.unsplash.com/photo-1471107340929-a87cd0f5b5f3?w=800&h=500&fit=crop',
-            date: '2025-12-01',
-            author: 'Ana Costa'
         }
     ];
 
+    useEffect(() => {
+        const loadPosts = async () => {
+            setIsLoading(true);
+            try {
+                const data = await getBlogPosts();
+                setPosts(data.length > 0 ? data : FALLBACK_POSTS);
+            } catch (error) {
+                console.error("Erro ao carregar posts:", error);
+                setPosts(FALLBACK_POSTS);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        loadPosts();
+    }, []);
+
     const filteredPosts = searchQuery.trim()
-        ? blogPosts.filter(post =>
+        ? posts.filter(post =>
             post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             post.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
             post.author.toLowerCase().includes(searchQuery.toLowerCase())
         )
-        : blogPosts;
+        : posts;
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-brand-light flex items-center justify-center">
+                <div className="text-center">
+                    <Loader2 className="w-12 h-12 text-brand-primary animate-spin mx-auto mb-4" />
+                    <p className="font-serif text-xl font-bold text-brand-dark italic">Folheando as novidades...</p>
+                </div>
+            </div>
+        );
+    }
 
     if (selectedPost) {
         return (
             <div className="min-h-screen bg-brand-light">
                 <article className="bg-white">
-                    <div className="aspect-[21/9] overflow-hidden bg-gray-200">
+                    <div className="aspect-[21/9] overflow-hidden bg-gray-200 relative">
                         <img
                             src={selectedPost.imageUrl}
                             alt={selectedPost.title}
                             className="w-full h-full object-cover"
                         />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                     </div>
 
-                    <div className="container mx-auto px-8 py-16 max-w-4xl">
+                    <div className="container mx-auto px-4 md:px-8 py-12 md:py-16 max-w-4xl">
                         <button
                             onClick={() => setSelectedPost(null)}
-                            className="flex items-center gap-2 text-brand-primary hover:underline font-bold mb-8"
+                            className="flex items-center gap-2 text-brand-primary hover:underline font-bold mb-8 group"
                         >
-                            ← Voltar aos Artigos
+                            <span className="group-hover:-translate-x-1 transition-transform">←</span> Voltar aos Artigos
                         </button>
 
-                        <div className="flex items-center gap-6 text-sm text-gray-600 mb-6">
-                            <div className="flex items-center gap-2">
-                                <Calendar className="w-4 h-4" />
+                        <div className="flex flex-wrap items-center gap-4 md:gap-8 text-sm text-gray-600 mb-8 border-b border-gray-100 pb-8">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-brand-primary/10 rounded-lg">
+                                    <Calendar className="w-4 h-4 text-brand-primary" />
+                                </div>
                                 <span>{new Date(selectedPost.date).toLocaleDateString('pt-AO', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <User className="w-4 h-4" />
-                                <span>{selectedPost.author}</span>
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-brand-primary/10 rounded-lg">
+                                    <User className="w-4 h-4 text-brand-primary" />
+                                </div>
+                                <span className="font-bold text-brand-dark">{selectedPost.author}</span>
                             </div>
                         </div>
 
-                        <h1 className="text-5xl font-black text-brand-dark tracking-tighter mb-8">
+                        <h1 className="text-4xl md:text-6xl font-black text-brand-dark tracking-tighter mb-10 leading-[1.1]">
                             {selectedPost.title}
                         </h1>
 
-                        <div className="prose prose-lg max-w-none">
-                            <p className="text-gray-700 leading-relaxed text-lg">
-                                {selectedPost.content}
-                            </p>
-                            <p className="text-gray-700 leading-relaxed text-lg mt-6">
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
-                            </p>
-                            <p className="text-gray-700 leading-relaxed text-lg mt-6">
-                                Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                            </p>
+                        <div className="prose prose-xl max-w-none">
+                            <div className="text-gray-700 leading-relaxed space-y-6">
+                                {selectedPost.content.split('\n').map((para, i) => (
+                                    <p key={i}>{para}</p>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </article>
@@ -108,7 +131,7 @@ const BlogPage: React.FC<BlogPageProps> = ({ onNavigate }) => {
     return (
         <div className="min-h-screen bg-brand-light">
             {/* Hero */}
-            <section className="bg-brand-dark text-white py-12 md:py-20">
+            <section className="bg-brand-dark text-white py-12 md:py-24">
                 <div className="container mx-auto px-4 md:px-8">
                     <div className="flex items-center justify-center md:justify-start gap-2 text-[10px] md:text-sm text-brand-primary uppercase tracking-widest font-bold mb-6">
                         <button onClick={() => onNavigate('HOME')} className="hover:underline">Início</button>
@@ -128,67 +151,84 @@ const BlogPage: React.FC<BlogPageProps> = ({ onNavigate }) => {
             </section>
 
             {/* Search */}
-            <section className="py-8 md:py-12 bg-white border-b border-gray-200">
+            <section className="py-8 md:py-12 bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
                 <div className="container mx-auto px-4 md:px-8">
                     <div className="max-w-2xl mx-auto relative">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400" />
                         <input
                             type="text"
-                            placeholder="Pesquisar artigos..."
+                            placeholder="Pesquisar artigos por título, autor ou conteúdo..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-10 md:pl-12 pr-4 py-3 md:py-4 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10 transition-all"
+                            className="w-full pl-10 md:pl-12 pr-4 py-3 md:py-4 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10 transition-all font-medium"
                         />
                     </div>
                 </div>
             </section>
 
             {/* Blog Posts */}
-            <section className="py-24">
-                <div className="container mx-auto px-8">
+            <section className="py-16 md:py-24">
+                <div className="container mx-auto px-4 md:px-8">
                     {filteredPosts.length > 0 ? (
-                        <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                        <div className="grid md:grid-cols-2 gap-8 lg:gap-12 max-w-6xl mx-auto">
                             {filteredPosts.map((post) => (
                                 <article
                                     key={post.id}
-                                    className="bg-white rounded-3xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 group cursor-pointer"
+                                    className="bg-white rounded-3xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 group cursor-pointer flex flex-col h-full"
                                     onClick={() => setSelectedPost(post)}
                                 >
-                                    <div className="aspect-video overflow-hidden bg-gray-200">
+                                    <div className="aspect-video overflow-hidden bg-gray-200 relative">
                                         <img
                                             src={post.imageUrl}
                                             alt={post.title}
-                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                         />
+                                        <div className="absolute top-4 left-4">
+                                            <span className="px-4 py-1.5 bg-brand-primary text-white text-[10px] font-bold uppercase tracking-widest rounded-full shadow-lg">
+                                                Artigo
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div className="p-8">
-                                        <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
+                                    <div className="p-6 md:p-10 flex flex-col flex-1">
+                                        <div className="flex items-center gap-4 text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">
                                             <div className="flex items-center gap-2">
-                                                <Calendar className="w-4 h-4" />
+                                                <Calendar className="w-3.5 h-3.5 text-brand-primary" />
                                                 <span>{new Date(post.date).toLocaleDateString('pt-AO', { day: 'numeric', month: 'short' })}</span>
                                             </div>
+                                            <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
                                             <div className="flex items-center gap-2">
-                                                <User className="w-4 h-4" />
-                                                <span>{post.author}</span>
+                                                <User className="w-3.5 h-3.5 text-brand-primary" />
+                                                <span className="text-gray-600">{post.author}</span>
                                             </div>
                                         </div>
-                                        <h2 className="text-2xl font-black text-brand-dark mb-4 group-hover:text-brand-primary transition-colors">
+                                        <h2 className="text-2xl md:text-3xl font-black text-brand-dark mb-4 group-hover:text-brand-primary transition-colors leading-tight">
                                             {post.title}
                                         </h2>
-                                        <p className="text-gray-700 leading-relaxed mb-6 line-clamp-3">
+                                        <p className="text-gray-600 leading-relaxed mb-8 line-clamp-3 font-medium">
                                             {post.content}
                                         </p>
-                                        <button className="flex items-center gap-2 text-brand-primary font-bold hover:gap-4 transition-all">
-                                            Ler Mais <ArrowRight className="w-4 h-4" />
-                                        </button>
+                                        <div className="mt-auto">
+                                            <button className="flex items-center gap-2 text-brand-primary font-bold hover:gap-4 transition-all uppercase text-xs tracking-widest">
+                                                Ler Artigo Completo <ArrowRight className="w-4 h-4" />
+                                            </button>
+                                        </div>
                                     </div>
                                 </article>
                             ))}
                         </div>
                     ) : (
-                        <div className="text-center py-20">
-                            <h3 className="text-2xl font-bold text-brand-dark mb-4">Nenhum artigo encontrado</h3>
-                            <p className="text-gray-600">Tente pesquisar com outros termos.</p>
+                        <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-200 max-w-2xl mx-auto">
+                            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <Search className="w-10 h-10 text-gray-300" />
+                            </div>
+                            <h3 className="text-2xl font-black text-brand-dark mb-4 tracking-tighter">Nenhum artigo encontrado</h3>
+                            <p className="text-gray-500 font-medium px-8">Nenhum resultado para "{searchQuery}". Tente pesquisar com outros termos.</p>
+                            <button
+                                onClick={() => setSearchQuery('')}
+                                className="mt-8 btn-premium"
+                            >
+                                Limpar Pesquisa
+                            </button>
                         </div>
                     )}
                 </div>

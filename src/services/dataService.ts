@@ -9,6 +9,17 @@ const BOOKS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_BOOKS_COLLECTION || 'b
 const ORDERS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_ORDERS_COLLECTION || 'orders';
 const USERS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_USERS_COLLECTION || 'users';
 
+// Helper to clean data for Appwrite (removes system fields and custom id)
+const cleanData = (data: any) => {
+    const clean: any = {};
+    Object.keys(data).forEach(key => {
+        if (!key.startsWith('$') && key !== 'id') {
+            clean[key] = data[key];
+        }
+    });
+    return clean;
+};
+
 // Books Collection
 export const getBooks = async (): Promise<Book[]> => {
     try {
@@ -25,19 +36,36 @@ export const getBooks = async (): Promise<Book[]> => {
 
 export const saveBook = async (book: Book) => {
     try {
-        // Appwrite uses updateDocument if it exists, or createDocument if new
-        // Check if book.id is a timestamp or a real ID
-        if (book.id.length > 10 && !book.id.startsWith('ID')) {
+        const { id } = book;
+        const bookData = cleanData(book);
+
+        // Ensure numeric fields are valid
+        if (typeof bookData.price === 'string') bookData.price = parseInt(bookData.price) || 0;
+        if (typeof bookData.stock === 'string') bookData.stock = parseInt(bookData.stock) || 0;
+        if (isNaN(bookData.price)) bookData.price = 0;
+        if (isNaN(bookData.stock)) bookData.stock = 0;
+
+        // Validation
+        if (!bookData.title || !bookData.author) {
+            throw new Error("Título e Autor são obrigatórios.");
+        }
+
+        // If it's an existing book
+        if (id && id.length > 5 && !id.startsWith('temp_')) {
             try {
-                await databases.updateDocument(DATABASE_ID, BOOKS_COLLECTION_ID, book.id, book);
+                await databases.updateDocument(DATABASE_ID, BOOKS_COLLECTION_ID, id, bookData);
+                console.log("Livro atualizado com sucesso:", id);
                 return;
-            } catch (e) {
-                // If not found, create it
+            } catch (e: any) {
+                console.warn("Falha ao atualizar, tentando criar novo:", e.message);
             }
         }
-        await databases.createDocument(DATABASE_ID, BOOKS_COLLECTION_ID, ID.unique(), book);
-    } catch (error) {
-        console.error("Erro ao salvar livro:", error);
+
+        await databases.createDocument(DATABASE_ID, BOOKS_COLLECTION_ID, ID.unique(), bookData);
+        console.log("Novo livro criado com sucesso");
+    } catch (error: any) {
+        console.error("Erro total ao salvar livro:", error);
+        throw error;
     }
 };
 
@@ -65,12 +93,13 @@ export const getOrders = async (userId?: string): Promise<Order[]> => {
 };
 
 export const createOrder = async (order: Omit<Order, 'id'>): Promise<string> => {
+    const orderData = cleanData(order);
     const response = await databases.createDocument(
         DATABASE_ID,
         ORDERS_COLLECTION_ID,
         ID.unique(),
         {
-            ...order,
+            ...orderData,
             createdAt: new Date().toISOString()
         }
     );
@@ -92,11 +121,12 @@ export const getUserProfile = async (uid: string): Promise<User | null> => {
 };
 
 export const saveUserProfile = async (user: User) => {
+    const userData = cleanData(user);
     try {
-        await databases.updateDocument(DATABASE_ID, USERS_COLLECTION_ID, user.id, user);
+        await databases.updateDocument(DATABASE_ID, USERS_COLLECTION_ID, user.id, userData);
     } catch (error) {
         try {
-            await databases.createDocument(DATABASE_ID, USERS_COLLECTION_ID, user.id, user);
+            await databases.createDocument(DATABASE_ID, USERS_COLLECTION_ID, user.id, userData);
         } catch (e) {
             console.error("Erro ao salvar perfil:", e);
         }
@@ -118,12 +148,13 @@ const PAYMENT_NOTIFICATIONS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_PAYMEN
 const PAYMENT_PROOFS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_PAYMENT_PROOFS_COLLECTION || 'payment_proofs';
 
 export const createPaymentNotification = async (notification: Omit<import('../types').PaymentNotification, 'id'>): Promise<string> => {
+    const data = cleanData(notification);
     const response = await databases.createDocument(
         DATABASE_ID,
         PAYMENT_NOTIFICATIONS_COLLECTION_ID,
         ID.unique(),
         {
-            ...notification,
+            ...data,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
         }
@@ -176,12 +207,13 @@ export const updatePaymentNotificationStatus = async (
 
 // Payment Proofs Collection
 export const createPaymentProof = async (proof: Omit<import('../types').PaymentProof, 'id'>): Promise<string> => {
+    const data = cleanData(proof);
     const response = await databases.createDocument(
         DATABASE_ID,
         PAYMENT_PROOFS_COLLECTION_ID,
         ID.unique(),
         {
-            ...proof,
+            ...data,
             uploadedAt: new Date().toISOString()
         }
     );
@@ -226,12 +258,13 @@ export const confirmPaymentProof = async (
 const MANUSCRIPTS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_MANUSCRIPTS_COLLECTION || 'manuscripts';
 
 export const createManuscript = async (manuscript: Omit<import('../types').Manuscript, 'id'>): Promise<string> => {
+    const data = cleanData(manuscript);
     const response = await databases.createDocument(
         DATABASE_ID,
         MANUSCRIPTS_COLLECTION_ID,
         ID.unique(),
         {
-            ...manuscript,
+            ...data,
             submittedDate: new Date().toISOString()
         }
     );
@@ -392,3 +425,78 @@ export const getUserBooks = async (readerId: string): Promise<Book[]> => {
     }
 };
 
+const BLOG_COLLECTION_ID = import.meta.env.VITE_APPWRITE_BLOG_COLLECTION || 'blog_posts';
+const TEAM_COLLECTION_ID = import.meta.env.VITE_APPWRITE_TEAM_COLLECTION || 'team_members';
+const SERVICES_COLLECTION_ID = import.meta.env.VITE_APPWRITE_SERVICES_COLLECTION || 'editorial_services';
+
+// Blog Posts
+export const getBlogPosts = async (): Promise<import('../types').BlogPost[]> => {
+    try {
+        const response = await databases.listDocuments(DATABASE_ID, BLOG_COLLECTION_ID, [Query.orderDesc('date')]);
+        return response.documents.map(doc => ({ id: doc.$id, ...doc } as unknown as import('../types').BlogPost));
+    } catch (error) {
+        console.error("Erro ao buscar blog posts:", error);
+        return [];
+    }
+};
+
+export const saveBlogPost = async (post: import('../types').BlogPost) => {
+    const data = cleanData(post);
+    if (post.id && !post.id.startsWith('temp_')) {
+        await databases.updateDocument(DATABASE_ID, BLOG_COLLECTION_ID, post.id, data);
+    } else {
+        await databases.createDocument(DATABASE_ID, BLOG_COLLECTION_ID, ID.unique(), data);
+    }
+};
+
+export const deleteBlogPost = async (id: string) => {
+    await databases.deleteDocument(DATABASE_ID, BLOG_COLLECTION_ID, id);
+};
+
+// Team Members
+export const getTeamMembers = async (): Promise<any[]> => {
+    try {
+        const response = await databases.listDocuments(DATABASE_ID, TEAM_COLLECTION_ID, [Query.orderAsc('order')]);
+        return response.documents.map(doc => ({ id: doc.$id, ...doc }));
+    } catch (error) {
+        console.error("Erro ao buscar equipa:", error);
+        return [];
+    }
+};
+
+export const saveTeamMember = async (member: any) => {
+    const data = cleanData(member);
+    if (member.id && !member.id.startsWith('temp_')) {
+        await databases.updateDocument(DATABASE_ID, TEAM_COLLECTION_ID, member.id, data);
+    } else {
+        await databases.createDocument(DATABASE_ID, TEAM_COLLECTION_ID, ID.unique(), data);
+    }
+};
+
+export const deleteTeamMember = async (id: string) => {
+    await databases.deleteDocument(DATABASE_ID, TEAM_COLLECTION_ID, id);
+};
+
+// Editorial Services
+export const getEditorialServices = async (): Promise<import('../types').EditorialService[]> => {
+    try {
+        const response = await databases.listDocuments(DATABASE_ID, SERVICES_COLLECTION_ID, [Query.orderAsc('order')]);
+        return response.documents.map(doc => ({ id: doc.$id, ...doc } as unknown as import('../types').EditorialService));
+    } catch (error) {
+        console.error("Erro ao buscar serviços:", error);
+        return [];
+    }
+};
+
+export const saveEditorialService = async (service: import('../types').EditorialService) => {
+    const data = cleanData(service);
+    if (service.id && !service.id.startsWith('temp_')) {
+        await databases.updateDocument(DATABASE_ID, SERVICES_COLLECTION_ID, service.id, data);
+    } else {
+        await databases.createDocument(DATABASE_ID, SERVICES_COLLECTION_ID, ID.unique(), data);
+    }
+};
+
+export const deleteEditorialService = async (id: string) => {
+    await databases.deleteDocument(DATABASE_ID, SERVICES_COLLECTION_ID, id);
+};
