@@ -60,7 +60,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
         isbn: '',
         format: 'físico',
         coverUrl: '',
-        digitalFileUrl: ''
+        digitalFileUrl: '',
+        paymentInfo: '',
+        paymentInfo: '',
+        paymentInfoNotes: '',
+        launchDate: ''
     });
     const [coverType, setCoverType] = useState<'file' | 'link'>('file');
     const [digitalFileType, setDigitalFileType] = useState<'file' | 'link'>('file');
@@ -205,7 +209,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                 isbn: bookForm.isbn,
                 format: bookForm.format as 'físico' | 'digital',
                 coverUrl: finalCoverUrl,
-                digitalFileUrl: finalDigitalUrl
+                digitalFileUrl: finalDigitalUrl,
+                paymentInfo: bookForm.paymentInfo,
+                paymentInfo: bookForm.paymentInfo,
+                paymentInfoNotes: bookForm.paymentInfoNotes,
+                launchDate: bookForm.launchDate
             });
 
             alert('Livro guardado com sucesso!');
@@ -249,7 +257,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
             isbn: '',
             format: 'físico',
             coverUrl: '',
-            digitalFileUrl: ''
+            digitalFileUrl: '',
+            paymentInfo: '',
+            paymentInfo: '',
+            paymentInfoNotes: '',
+            launchDate: ''
         });
         setCoverType('file');
         setDigitalFileType('file');
@@ -360,7 +372,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
             isbn: book.isbn || '',
             format: book.format || 'físico',
             coverUrl: book.coverUrl,
-            digitalFileUrl: book.digitalFileUrl || ''
+            digitalFileUrl: book.digitalFileUrl || '',
+            paymentInfo: book.paymentInfo || '',
+            paymentInfo: book.paymentInfo || '',
+            paymentInfoNotes: book.paymentInfoNotes || '',
+            launchDate: book.launchDate || ''
         });
         setCoverType(book.coverUrl.startsWith('http') && !book.coverUrl.includes('appwrite') ? 'link' : 'file');
         setDigitalFileType(book.digitalFileUrl?.startsWith('http') && !book.digitalFileUrl.includes('appwrite') ? 'link' : 'file');
@@ -1165,6 +1181,43 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                                                 <option value="Técnico">Técnico</option>
                                                 <option value="Religião">Religião</option>
                                             </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="border-t border-gray-100 pt-6">
+                                        <h4 className="font-bold text-brand-dark mb-4 text-sm uppercase tracking-wide">Dados de Pagamento (Opcional)</h4>
+                                        <div className="grid md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Informações de Pagamento (IBAN/Conta)</label>
+                                                <input
+                                                    type="text"
+                                                    value={bookForm.paymentInfo}
+                                                    onChange={e => setBookForm({ ...bookForm, paymentInfo: e.target.value })}
+                                                    className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                                    placeholder="Ex: IBAN AO06..."
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Notas de Pagamento</label>
+                                                <input
+                                                    type="text"
+                                                    value={bookForm.paymentInfoNotes}
+                                                    onChange={e => setBookForm({ ...bookForm, paymentInfoNotes: e.target.value })}
+                                                    className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                                    placeholder="Ex: Enviar comprovativo para..."
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="mt-4">
+                                            <label htmlFor="book-launch-date" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Data de Lançamento (Opcional)</label>
+                                            <input
+                                                id="book-launch-date"
+                                                type="datetime-local"
+                                                title="Data de Lançamento"
+                                                value={bookForm.launchDate || ''}
+                                                onChange={(e) => setBookForm({ ...bookForm, launchDate: e.target.value })}
+                                                className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                            />
                                         </div>
                                     </div>
 

@@ -214,7 +214,10 @@ async function setup() {
             { id: 'authorId', type: 'string', size: 36, required: false },
             { id: 'stock', type: 'integer', required: false, default: 0 },
             { id: 'digitalFileUrl', type: 'string', size: 1024, required: false },
-            { id: 'format', type: 'string', size: 20, required: false, default: 'físico' }
+            { id: 'format', type: 'string', size: 20, required: false, default: 'físico' },
+            { id: 'paymentInfo', type: 'string', size: 1024, required: false },
+            { id: 'paymentInfoNotes', type: 'string', size: 1024, required: false },
+            { id: 'launchDate', type: 'datetime', required: false }
         ];
 
         for (const attr of bookAttrs) {

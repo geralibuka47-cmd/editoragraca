@@ -40,6 +40,9 @@ export interface Book {
   stock?: number;
   digitalFileUrl?: string;
   format?: 'físico' | 'digital';
+  paymentInfo?: string; // ID of the bank account to use
+  paymentInfoNotes?: string; // Custom notes for payment
+  launchDate?: string; // ISO date string for upcoming book launch
 }
 
 export interface CartItem extends Book {
