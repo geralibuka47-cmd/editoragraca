@@ -5,6 +5,9 @@ const projectId = import.meta.env.VITE_APPWRITE_PROJECT_ID;
 
 const client = new Client();
 
+console.log("Appwrite Endpoint:", endpoint);
+console.log("Appwrite Project ID:", projectId ? "Configurado" : "Faltando");
+
 if (endpoint) {
     client.setEndpoint(endpoint);
 }
@@ -12,7 +15,7 @@ if (endpoint) {
 if (projectId) {
     client.setProject(projectId);
 } else {
-    console.warn("Appwrite Project ID is missing. Please check your environment variables.");
+    console.error("Appwrite Project ID is missing. Please check your .env file.");
 }
 
 const account = new Account(client);

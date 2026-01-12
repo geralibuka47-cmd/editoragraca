@@ -48,13 +48,29 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
         }
     };
 
-    // Mock data
-    const stats = {
-        totalBooks: 156,
-        totalUsers: 1243,
-        pendingOrders: 23,
-        revenue: 4567800
+    const [stats, setStats] = useState({
+        totalBooks: 0,
+        totalUsers: 0,
+        pendingOrders: 0,
+        revenue: 0
+    });
+    const [isLoadingStats, setIsLoadingStats] = useState(true);
+
+    const fetchStats = async () => {
+        try {
+            const { getAdminStats } = await import('../services/dataService');
+            const data = await getAdminStats();
+            setStats(data);
+        } catch (error) {
+            console.error('Erro ao buscar estatísticas:', error);
+        } finally {
+            setIsLoadingStats(false);
+        }
     };
+
+    React.useEffect(() => {
+        fetchStats();
+    }, []);
 
     const books = [
         { id: '1', title: 'A Gloriosa Família', author: 'Pepetela', price: 8500, stock: 45, category: 'Romance' },
@@ -108,21 +124,25 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                         <div className="bg-white/10 rounded-2xl p-6">
                             <BookOpen className="w-8 h-8 text-brand-primary mb-2" />
-                            <p className="text-3xl font-black mb-1">{stats.totalBooks}</p>
+                            <p className="text-3xl font-black mb-1">{isLoadingStats ? '...' : stats.totalBooks}</p>
                             <p className="text-sm text-gray-300">Livros</p>
                         </div>
                         <div className="bg-white/10 rounded-2xl p-6">
                             <Users className="w-8 h-8 text-brand-primary mb-2" />
-                            <p className="text-3xl font-black mb-1">{stats.totalUsers}</p>
+                            <p className="text-3xl font-black mb-1">{isLoadingStats ? '...' : stats.totalUsers}</p>
                             <p className="text-sm text-gray-300">Utilizadores</p>
                         </div>
                         <div className="bg-white/10 rounded-2xl p-6">
                             <ShoppingCart className="w-8 h-8 text-brand-primary mb-2" />
-                            <p className="text-3xl font-black mb-1">{stats.pendingOrders}</p>
+                            <p className="text-3xl font-black mb-1">{isLoadingStats ? '...' : stats.pendingOrders}</p>
                             <p className="text-sm text-gray-300">Pedidos Pendentes</p>
                         </div>
                         <div className="bg-white/10 rounded-2xl p-6">
-                            <p className="text-3xl font-black mb-1">{(stats.revenue / 1000000).toFixed(1)}M</p>
+                            <p className="text-3xl font-black mb-1">
+                                {isLoadingStats ? '...' : (stats.revenue >= 1000000
+                                    ? `${(stats.revenue / 1000000).toFixed(1)}M`
+                                    : stats.revenue.toLocaleString())}
+                            </p>
                             <p className="text-sm text-gray-300">Receita (Kz)</p>
                         </div>
                     </div>

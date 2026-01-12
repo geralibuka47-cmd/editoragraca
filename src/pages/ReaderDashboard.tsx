@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Book, Heart, Clock, Settings, Download, User as UserIcon, CheckCircle, CreditCard } from 'lucide-react';
-import { ViewState, User } from '../types';
+import { Book as BookIcon, Heart, Clock, Settings, Download, User as UserIcon, CheckCircle, CreditCard } from 'lucide-react';
+import { ViewState, User, Book } from '../types';
 
 interface ReaderDashboardProps {
     user: User | null;
@@ -11,6 +11,22 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) =
     const [activeTab, setActiveTab] = useState<'library' | 'wishlist' | 'history' | 'settings' | 'payments'>('library');
     const [notifications, setNotifications] = useState<import('../types').PaymentNotification[]>([]);
     const [isUploading, setIsUploading] = useState<string | null>(null);
+    const [purchasedBooks, setPurchasedBooks] = useState<Book[]>([]);
+    const [isLoadingLibrary, setIsLoadingLibrary] = useState(false);
+
+    const fetchLibrary = async () => {
+        if (!user) return;
+        setIsLoadingLibrary(true);
+        try {
+            const { getUserBooks } = await import('../services/dataService');
+            const data = await getUserBooks(user.id);
+            setPurchasedBooks(data);
+        } catch (error) {
+            console.error('Erro ao buscar biblioteca:', error);
+        } finally {
+            setIsLoadingLibrary(false);
+        }
+    };
 
     React.useEffect(() => {
         const fetchNotifications = async () => {
@@ -26,6 +42,8 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) =
 
         if (activeTab === 'payments') {
             fetchNotifications();
+        } else if (activeTab === 'library' || activeTab === 'history') {
+            fetchLibrary();
         }
     }, [activeTab, user]);
 
@@ -62,24 +80,6 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) =
     };
 
     // Mock data - in real app would come from database
-    const purchasedBooks = [
-        {
-            id: '1',
-            title: 'A Gloriosa Família',
-            author: 'Pepetela',
-            coverUrl: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400&fit=crop',
-            purchaseDate: '2026-01-05',
-            format: 'PDF'
-        },
-        {
-            id: '2',
-            title: 'O Desejo de Kianda',
-            author: 'Pepetela',
-            coverUrl: 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=300&h=400&fit=crop',
-            purchaseDate: '2025-12-28',
-            format: 'EPUB'
-        }
-    ];
 
     const wishlistBooks = [
         {
@@ -132,7 +132,7 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) =
                                 : 'bg-white/10 text-white hover:bg-white/20'
                                 }`}
                         >
-                            <Book className="w-4 h-4 inline mr-2" />
+                            <BookIcon className="w-4 h-4 inline mr-2" />
                             Minha Biblioteca
                         </button>
                         <button
@@ -176,7 +176,9 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) =
                     {activeTab === 'library' && (
                         <div>
                             <h2 className="text-3xl font-black text-brand-dark mb-8">Minha Biblioteca</h2>
-                            {purchasedBooks.length > 0 ? (
+                            {isLoadingLibrary ? (
+                                <div className="text-center py-12 text-gray-500 italic">A carregar a sua biblioteca...</div>
+                            ) : purchasedBooks.length > 0 ? (
                                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                                     {purchasedBooks.map((book) => (
                                         <div key={book.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all group">
@@ -191,8 +193,8 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) =
                                                 <h3 className="font-bold text-brand-dark mb-1 line-clamp-1">{book.title}</h3>
                                                 <p className="text-sm text-gray-600 mb-3">{book.author}</p>
                                                 <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
-                                                    <span>{book.format}</span>
-                                                    <span>{new Date(book.purchaseDate).toLocaleDateString('pt-AO')}</span>
+                                                    <span>Digital</span>
+                                                    <span>Disponível</span>
                                                 </div>
                                                 <button className="w-full btn-premium justify-center text-sm">
                                                     <Download className="w-4 h-4" />
@@ -204,7 +206,7 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) =
                                 </div>
                             ) : (
                                 <div className="bg-white rounded-3xl shadow-lg p-16 text-center">
-                                    <Book className="w-20 h-20 text-gray-300 mx-auto mb-6" />
+                                    <BookIcon className="w-20 h-20 text-gray-300 mx-auto mb-6" />
                                     <h3 className="text-2xl font-bold text-brand-dark mb-4">Biblioteca Vazia</h3>
                                     <p className="text-gray-600 mb-8">Comece a explorar nosso catálogo!</p>
                                     <button onClick={() => onNavigate('CATALOG')} className="btn-premium">
@@ -271,18 +273,28 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) =
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200">
-                                        {purchasedBooks.map((book) => (
-                                            <tr key={book.id} className="hover:bg-gray-50">
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                    {new Date(book.purchaseDate).toLocaleDateString('pt-AO')}
-                                                </td>
-                                                <td className="px-6 py-4 text-sm font-bold text-brand-dark">{book.title}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{book.format}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-brand-primary text-right">
-                                                    8.500 Kz
-                                                </td>
+                                        {isLoadingLibrary ? (
+                                            <tr>
+                                                <td colSpan={4} className="px-6 py-8 text-center text-gray-500 italic">Carregando histórico...</td>
                                             </tr>
-                                        ))}
+                                        ) : purchasedBooks.length > 0 ? (
+                                            purchasedBooks.map((book) => (
+                                                <tr key={book.id} className="hover:bg-gray-50">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                        Confirmado
+                                                    </td>
+                                                    <td className="px-6 py-4 text-sm font-bold text-brand-dark">{book.title}</td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Digital</td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-brand-primary text-right">
+                                                        {book.price.toLocaleString()} Kz
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan={4} className="px-6 py-12 text-center text-gray-500 italic">Nenhuma compra confirmada encontrada.</td>
+                                            </tr>
+                                        )}
                                     </tbody>
                                 </table>
                             </div>

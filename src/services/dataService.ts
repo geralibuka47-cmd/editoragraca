@@ -273,3 +273,112 @@ export const updateManuscriptStatus = async (
     );
 };
 
+// Statistics & Royalties
+export const getAdminStats = async (): Promise<{ totalBooks: number; totalUsers: number; pendingOrders: number; revenue: number }> => {
+    try {
+        const books = await databases.listDocuments(DATABASE_ID, BOOKS_COLLECTION_ID, [Query.limit(1)]);
+        const users = await databases.listDocuments(DATABASE_ID, USERS_COLLECTION_ID, [Query.limit(1)]);
+        const confirmedPayments = await databases.listDocuments(DATABASE_ID, PAYMENT_NOTIFICATIONS_COLLECTION_ID, [Query.equal('status', 'confirmed')]);
+        const pendingPayments = await databases.listDocuments(DATABASE_ID, PAYMENT_NOTIFICATIONS_COLLECTION_ID, [Query.equal('status', 'proof_uploaded')]);
+
+        const totalRevenue = confirmedPayments.documents.reduce((acc, curr) => acc + (curr.totalAmount || 0), 0);
+
+        return {
+            totalBooks: books.total,
+            totalUsers: users.total,
+            pendingOrders: pendingPayments.total,
+            revenue: totalRevenue
+        };
+    } catch (error) {
+        console.error("Erro ao buscar estatísticas administrativas:", error);
+        return { totalBooks: 0, totalUsers: 0, pendingOrders: 0, revenue: 0 };
+    }
+};
+
+export const getAuthorStats = async (authorId: string): Promise<{ publishedBooks: number; totalSales: number; totalRoyalties: number }> => {
+    try {
+        // 1. Published books
+        const books = await databases.listDocuments(DATABASE_ID, BOOKS_COLLECTION_ID, [Query.equal('authorId', authorId)]);
+
+        // 2. Sales (from confirmed payments)
+        const confirmedPayments = await databases.listDocuments(DATABASE_ID, PAYMENT_NOTIFICATIONS_COLLECTION_ID, [Query.equal('status', 'confirmed')]);
+
+        let totalSales = 0;
+        let authorRevenue = 0;
+
+        confirmedPayments.documents.forEach(doc => {
+            const items = doc.items as any[];
+            items.forEach(item => {
+                if (item.authorId === authorId) {
+                    totalSales += item.quantity;
+                    authorRevenue += (item.price * item.quantity);
+                }
+            });
+        });
+
+        return {
+            publishedBooks: books.total,
+            totalSales: totalSales,
+            totalRoyalties: authorRevenue * 0.7 // 70% Royalty
+        };
+    } catch (error) {
+        console.error("Erro ao buscar estatísticas do autor:", error);
+        return { publishedBooks: 0, totalSales: 0, totalRoyalties: 0 };
+    }
+};
+
+export const getAuthorConfirmedSales = async (authorId: string): Promise<any[]> => {
+    try {
+        const confirmedPayments = await databases.listDocuments(DATABASE_ID, PAYMENT_NOTIFICATIONS_COLLECTION_ID, [Query.equal('status', 'confirmed'), Query.orderDesc('createdAt')]);
+
+        const authorSales: any[] = [];
+        confirmedPayments.documents.forEach(doc => {
+            const items = doc.items as any[];
+            items.forEach(item => {
+                if (item.authorId === authorId) {
+                    authorSales.push({
+                        id: doc.$id,
+                        orderId: doc.orderId,
+                        bookTitle: item.bookTitle,
+                        quantity: item.quantity,
+                        price: item.price,
+                        total: item.price * item.quantity,
+                        royalty: (item.price * item.quantity) * 0.7,
+                        date: doc.createdAt,
+                        readerName: doc.readerName
+                    });
+                }
+            });
+        });
+
+        return authorSales;
+    } catch (error) {
+        console.error("Erro ao buscar vendas do autor:", error);
+        return [];
+    }
+};
+
+export const getUserBooks = async (readerId: string): Promise<Book[]> => {
+    try {
+        const confirmedPayments = await databases.listDocuments(
+            DATABASE_ID,
+            PAYMENT_NOTIFICATIONS_COLLECTION_ID,
+            [Query.equal('readerId', readerId), Query.equal('status', 'confirmed')]
+        );
+
+        const bookIds = new Set<string>();
+        confirmedPayments.documents.forEach(doc => {
+            const items = doc.items as any[];
+            items.forEach(item => bookIds.add(item.bookId));
+        });
+
+        if (bookIds.size === 0) return [];
+
+        const allBooks = await getBooks();
+        return allBooks.filter(book => bookIds.has(book.id));
+    } catch (error) {
+        console.error("Erro ao buscar livros do utilizador:", error);
+        return [];
+    }
+};
+

@@ -14,6 +14,9 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
     const [isSaving, setIsSaving] = useState(false);
     const [manuscripts, setManuscripts] = useState<import('../types').Manuscript[]>([]);
     const [isLoadingManuscripts, setIsLoadingManuscripts] = useState(false);
+    const [authorStats, setAuthorStats] = useState({ publishedBooks: 0, totalSales: 0, totalRoyalties: 0 });
+    const [confirmedSales, setConfirmedSales] = useState<any[]>([]);
+    const [isLoadingStats, setIsLoadingStats] = useState(false);
 
     // Submit form state
     const [submitLoading, setSubmitLoading] = useState(false);
@@ -39,9 +42,29 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
         }
     };
 
+    const fetchAuthorData = async () => {
+        if (!user) return;
+        setIsLoadingStats(true);
+        try {
+            const { getAuthorStats, getAuthorConfirmedSales } = await import('../services/dataService');
+            const [stats, sales] = await Promise.all([
+                getAuthorStats(user.id),
+                getAuthorConfirmedSales(user.id)
+            ]);
+            setAuthorStats(stats);
+            setConfirmedSales(sales);
+        } catch (error) {
+            console.error('Erro ao buscar dados do autor:', error);
+        } finally {
+            setIsLoadingStats(false);
+        }
+    };
+
     React.useEffect(() => {
         if (activeTab === 'manuscripts') {
             fetchManuscripts();
+        } else if (activeTab === 'royalties') {
+            fetchAuthorData();
         }
     }, [activeTab, user?.id]);
 
@@ -373,16 +396,15 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                             <div className="grid md:grid-cols-3 gap-6 mb-8">
                                 <div className="bg-white rounded-2xl shadow-lg p-6">
                                     <p className="text-gray-600 mb-2">Total de Vendas</p>
-                                    <p className="text-4xl font-black text-brand-dark">127</p>
+                                    <p className="text-4xl font-black text-brand-dark">{isLoadingStats ? '...' : authorStats.totalSales}</p>
                                 </div>
                                 <div className="bg-white rounded-2xl shadow-lg p-6">
                                     <p className="text-gray-600 mb-2">Royalties Acumulados</p>
-                                    <p className="text-4xl font-black text-brand-primary">45.600 Kz</p>
+                                    <p className="text-4xl font-black text-brand-primary">{isLoadingStats ? '...' : authorStats.totalRoyalties.toLocaleString()} Kz</p>
                                 </div>
                                 <div className="bg-white rounded-2xl shadow-lg p-6">
-                                    <p className="text-gray-600 mb-2">Último Pagamento</p>
-                                    <p className="text-4xl font-black text-brand-dark">15.000 Kz</p>
-                                    <p className="text-xs text-gray-500 mt-1">Dezembro 2025</p>
+                                    <p className="text-gray-600 mb-2">Livros Publicados</p>
+                                    <p className="text-4xl font-black text-brand-dark">{isLoadingStats ? '...' : authorStats.publishedBooks}</p>
                                 </div>
                             </div>
 
@@ -398,18 +420,26 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200">
-                                        <tr className="hover:bg-gray-50">
-                                            <td className="px-4 py-4 text-sm text-gray-600">Dez 2025</td>
-                                            <td className="px-4 py-4 text-sm font-bold text-brand-dark">Memórias do Futuro</td>
-                                            <td className="px-4 py-4 text-sm text-gray-600 text-right">45</td>
-                                            <td className="px-4 py-4 text-sm font-bold text-brand-primary text-right">15.000 Kz</td>
-                                        </tr>
-                                        <tr className="hover:bg-gray-50">
-                                            <td className="px-4 py-4 text-sm text-gray-600">Nov 2025</td>
-                                            <td className="px-4 py-4 text-sm font-bold text-brand-dark">Memórias do Futuro</td>
-                                            <td className="px-4 py-4 text-sm text-gray-600 text-right">52</td>
-                                            <td className="px-4 py-4 text-sm font-bold text-brand-primary text-right">17.400 Kz</td>
-                                        </tr>
+                                        {isLoadingStats ? (
+                                            <tr>
+                                                <td colSpan={4} className="px-4 py-8 text-center text-gray-500 italic">Carregando histórico...</td>
+                                            </tr>
+                                        ) : confirmedSales.length > 0 ? (
+                                            confirmedSales.map((sale) => (
+                                                <tr key={sale.id} className="hover:bg-gray-50">
+                                                    <td className="px-4 py-4 text-sm text-gray-600">
+                                                        {new Date(sale.date).toLocaleDateString('pt-AO', { month: 'short', year: 'numeric' })}
+                                                    </td>
+                                                    <td className="px-4 py-4 text-sm font-bold text-brand-dark">{sale.bookTitle}</td>
+                                                    <td className="px-4 py-4 text-sm text-gray-600 text-right">{sale.quantity}</td>
+                                                    <td className="px-4 py-4 text-sm font-bold text-brand-primary text-right">{sale.royalty.toLocaleString()} Kz</td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan={4} className="px-4 py-8 text-center text-gray-500 italic">Nenhuma venda registada até ao momento.</td>
+                                            </tr>
+                                        )}
                                     </tbody>
                                 </table>
                             </div>
