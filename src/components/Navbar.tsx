@@ -4,12 +4,13 @@ import { User as UserType } from '../types';
 
 interface NavbarProps {
     onNavigate: (view: any) => void;
+    currentView: string;
     cartCount: number;
     user: UserType | null;
     onLogout: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ onNavigate, cartCount, user, onLogout }) => {
+const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, user, onLogout }) => {
     return (
         <header className="flex flex-col w-full sticky top-0 z-50 shadow-sm">
             {/* Utility Top Bar */}
@@ -55,8 +56,17 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, cartCount, user, onLogout }
 
                 <div className="w-1/3 flex justify-end gap-6 items-center">
                     <button
-                        onClick={() => user ? onNavigate('PROFILE') : onNavigate('AUTH')}
+                        onClick={() => {
+                            if (!user) {
+                                onNavigate('AUTH');
+                            } else {
+                                const dashboardView = user.role === 'adm' ? 'ADMIN' :
+                                    (user.role === 'autor' ? 'AUTHOR_DASHBOARD' : 'READER_DASHBOARD');
+                                onNavigate(dashboardView);
+                            }
+                        }}
                         className="text-brand-dark hover:text-brand-primary transition-colors flex items-center gap-2 group"
+                        title="Ver o meu painel"
                     >
                         <User className="w-5 h-5" />
                         <span className="hidden lg:block text-[10px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-brand-primary transition-colors">
@@ -82,11 +92,11 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, cartCount, user, onLogout }
             {/* Navigation Menu Area */}
             <nav className="bg-white py-4 px-8 flex justify-center border-b border-gray-50">
                 <ul className="flex gap-12 font-bold text-[11px] uppercase tracking-[0.2em] text-gray-500">
-                    <li><button onClick={() => onNavigate('HOME')} className={`hover:text-brand-primary transition-colors border-b pb-1 ${onNavigate.toString().includes('HOME') ? 'text-brand-primary border-brand-primary' : 'border-transparent'}`}>Início</button></li>
-                    <li><button onClick={() => onNavigate('CATALOG')} className="hover:text-brand-primary transition-colors">Catálogo</button></li>
-                    <li><button onClick={() => onNavigate('ABOUT')} className="hover:text-brand-primary transition-colors">Sobre Nós</button></li>
-                    <li><button onClick={() => onNavigate('SERVICES')} className="hover:text-brand-primary transition-colors">Serviços</button></li>
-                    <li><button onClick={() => onNavigate('CONTACT')} className="hover:text-brand-primary transition-colors">Contacto</button></li>
+                    <li><button onClick={() => onNavigate('HOME')} className={`hover:text-brand-primary transition-colors border-b pb-1 ${currentView === 'HOME' ? 'text-brand-primary border-brand-primary' : 'border-transparent'}`}>Início</button></li>
+                    <li><button onClick={() => onNavigate('CATALOG')} className={`hover:text-brand-primary transition-colors border-b pb-1 ${currentView === 'CATALOG' ? 'text-brand-primary border-brand-primary' : 'border-transparent'}`}>Catálogo</button></li>
+                    <li><button onClick={() => onNavigate('ABOUT')} className={`hover:text-brand-primary transition-colors border-b pb-1 ${currentView === 'ABOUT' ? 'text-brand-primary border-brand-primary' : 'border-transparent'}`}>Sobre Nós</button></li>
+                    <li><button onClick={() => onNavigate('SERVICES')} className={`hover:text-brand-primary transition-colors border-b pb-1 ${currentView === 'SERVICES' ? 'text-brand-primary border-brand-primary' : 'border-transparent'}`}>Serviços</button></li>
+                    <li><button onClick={() => onNavigate('CONTACT')} className={`hover:text-brand-primary transition-colors border-b pb-1 ${currentView === 'CONTACT' ? 'text-brand-primary border-brand-primary' : 'border-transparent'}`}>Contacto</button></li>
                 </ul>
             </nav>
         </header>

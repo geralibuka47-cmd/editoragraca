@@ -305,9 +305,69 @@ const App: React.FC = () => {
         </>
     );
 
+    const renderContent = () => {
+        switch (currentView) {
+            case 'HOME':
+                return renderHome();
+            case 'AUTH':
+                return <AuthPage onSuccess={handleAuthSuccess} onBack={() => handleNavigate('HOME')} />;
+            case 'CATALOG':
+                return (
+                    <CatalogPage
+                        books={books}
+                        onAddToCart={handleAddToCart}
+                        onToggleWishlist={handleToggleWishlist}
+                        onViewDetails={handleViewDetails}
+                        onNavigate={handleNavigate}
+                    />
+                );
+            case 'ABOUT':
+                return <AboutPage onNavigate={handleNavigate} />;
+            case 'CONTACT':
+                return <ContactPage onNavigate={handleNavigate} />;
+            case 'CHECKOUT':
+                return (
+                    <CheckoutPage
+                        cart={cart}
+                        onUpdateQuantity={handleUpdateQuantity}
+                        onRemoveItem={handleRemoveFromCart}
+                        onNavigate={handleNavigate}
+                    />
+                );
+            case 'SERVICES':
+                return <ServicesPage onNavigate={handleNavigate} />;
+            case 'TEAM':
+                return <TeamPage onNavigate={handleNavigate} />;
+            case 'BLOG':
+                return <BlogPage onNavigate={handleNavigate} />;
+            case 'PODCAST':
+                return <PodcastPage onNavigate={handleNavigate} />;
+            case 'READER_DASHBOARD':
+                return <ReaderDashboard user={user} onNavigate={handleNavigate} />;
+            case 'AUTHOR_DASHBOARD':
+                return <AuthorDashboard user={user} onNavigate={handleNavigate} />;
+            case 'ADMIN':
+                return <AdminDashboard user={user} onNavigate={handleNavigate} />;
+            default:
+                return (
+                    <div className="container mx-auto px-8 py-32 text-center h-[60vh] flex flex-col items-center justify-center">
+                        <h2 className="text-4xl font-black text-brand-dark mb-4 tracking-tighter">Secção em Construção</h2>
+                        <p className="text-gray-500 mb-8 font-medium">Estamos a preparar algo especial para si.</p>
+                        <button onClick={() => handleNavigate('HOME')} className="btn-premium">Voltar ao Início</button>
+                    </div>
+                );
+        }
+    };
+
     return (
         <div className="min-h-screen flex flex-col font-sans bg-brand-light relative">
-            <Navbar onNavigate={handleNavigate} cartCount={cart.length} user={user} onLogout={handleLogout} />
+            <Navbar
+                onNavigate={handleNavigate}
+                currentView={currentView}
+                cartCount={cart.length}
+                user={user}
+                onLogout={handleLogout}
+            />
 
             <main className="flex-grow">
                 {loading && (
@@ -317,44 +377,10 @@ const App: React.FC = () => {
                     </div>
                 )}
 
-                {currentView === 'HOME' && renderHome()}
-                {currentView === 'AUTH' && <AuthPage onSuccess={handleAuthSuccess} onBack={() => handleNavigate('HOME')} />}
-                {currentView === 'CATALOG' && (
-                    <CatalogPage
-                        books={books}
-                        onAddToCart={handleAddToCart}
-                        onToggleWishlist={handleToggleWishlist}
-                        onViewDetails={handleViewDetails}
-                        onNavigate={handleNavigate}
-                    />
-                )}
-                {currentView === 'ABOUT' && <AboutPage onNavigate={handleNavigate} />}
-                {currentView === 'CONTACT' && <ContactPage onNavigate={handleNavigate} />}
-                {currentView === 'CHECKOUT' && (
-                    <CheckoutPage
-                        cart={cart}
-                        onUpdateQuantity={handleUpdateQuantity}
-                        onRemoveItem={handleRemoveFromCart}
-                        onNavigate={handleNavigate}
-                    />
-                )}
-                {currentView === 'SERVICES' && <ServicesPage onNavigate={handleNavigate} />}
-                {currentView === 'TEAM' && <TeamPage onNavigate={handleNavigate} />}
-                {currentView === 'BLOG' && <BlogPage onNavigate={handleNavigate} />}
-                {currentView === 'PODCAST' && <PodcastPage onNavigate={handleNavigate} />}
-                {currentView === 'READER_DASHBOARD' && <ReaderDashboard user={user} onNavigate={handleNavigate} />}
-                {currentView === 'AUTHOR_DASHBOARD' && <AuthorDashboard user={user} onNavigate={handleNavigate} />}
-                {currentView === 'ADMIN' && <AdminDashboard user={user} onNavigate={handleNavigate} />}
-                {currentView !== 'HOME' && currentView !== 'AUTH' && currentView !== 'CATALOG' && currentView !== 'ABOUT' && currentView !== 'CONTACT' && currentView !== 'CHECKOUT' && currentView !== 'SERVICES' && currentView !== 'TEAM' && currentView !== 'BLOG' && currentView !== 'PODCAST' && currentView !== 'READER_DASHBOARD' && currentView !== 'AUTHOR_DASHBOARD' && currentView !== 'ADMIN' && (
-                    <div className="container mx-auto px-8 py-32 text-center h-[60vh] flex flex-col items-center justify-center">
-                        <h2 className="text-4xl font-black text-brand-dark mb-4 tracking-tighter">Secção em Construção</h2>
-                        <p className="text-gray-500 mb-8 font-medium">Estamos a preparar algo especial para si.</p>
-                        <button onClick={() => handleNavigate('HOME')} className="btn-premium">Voltar ao Início</button>
-                    </div>
-                )}
+                {renderContent()}
             </main>
 
-            <Footer />
+            <Footer onNavigate={handleNavigate} />
 
             <BookDetailModal
                 book={selectedBook}
