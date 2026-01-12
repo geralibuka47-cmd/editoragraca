@@ -47,6 +47,14 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) =
         }
     }, [activeTab, user]);
 
+    const handleDownload = (book: Book) => {
+        if (!book.digitalFileUrl) {
+            alert('Ficheiro digital não disponível para este livro.');
+            return;
+        }
+        window.open(book.digitalFileUrl, '_blank');
+    };
+
     const handleUploadProof = async (notificationId: string, file: File) => {
         setIsUploading(notificationId);
         try {
@@ -196,7 +204,10 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) =
                                                     <span>Digital</span>
                                                     <span>Disponível</span>
                                                 </div>
-                                                <button className="w-full btn-premium justify-center text-sm">
+                                                <button
+                                                    onClick={() => handleDownload(book)}
+                                                    className="w-full btn-premium justify-center text-sm"
+                                                >
                                                     <Download className="w-4 h-4" />
                                                     Download
                                                 </button>

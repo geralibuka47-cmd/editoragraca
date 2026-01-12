@@ -14,6 +14,8 @@ const {
     APPWRITE_API_KEY, // Needs to be added to .env
     VITE_APPWRITE_DATABASE_ID = 'main',
     VITE_APPWRITE_USERS_COLLECTION = 'users',
+    VITE_APPWRITE_BOOKS_COLLECTION = 'books',
+    VITE_APPWRITE_ORDERS_COLLECTION = 'orders',
     VITE_APPWRITE_PAYMENT_NOTIFICATIONS_COLLECTION = 'payment_notifications',
     VITE_APPWRITE_PAYMENT_PROOFS_COLLECTION = 'payment_proofs',
     VITE_APPWRITE_MANUSCRIPTS_COLLECTION = 'manuscripts',
@@ -156,7 +158,42 @@ async function setup() {
             } catch (e) { console.log(`⚠️ Atributo "${attr.id}" erro:`, e.message); }
         }
 
-        // 4. Create Manuscripts Collection
+        // 4. Create Books Collection
+        console.log(`\n📝 Criando coleção ${VITE_APPWRITE_BOOKS_COLLECTION}...`);
+        try {
+            await databases.createCollection(dbId, VITE_APPWRITE_BOOKS_COLLECTION, VITE_APPWRITE_BOOKS_COLLECTION, ['read("any")', 'create("users")', 'update("users")']);
+            console.log('✅ Coleção de livros criada.');
+        } catch (e) { console.log('⚠️ Coleção já existe ou erro:', e.message); }
+
+        const bookAttrs = [
+            { id: 'title', type: 'string', size: 255, required: true },
+            { id: 'author', type: 'string', size: 255, required: true },
+            { id: 'price', type: 'integer', required: true },
+            { id: 'coverUrl', type: 'string', size: 1024, required: true },
+            { id: 'category', type: 'string', size: 100, required: true },
+            { id: 'isbn', type: 'string', size: 20, required: false },
+            { id: 'isNew', type: 'boolean', required: false, default: true },
+            { id: 'isBestseller', type: 'boolean', required: false, default: false },
+            { id: 'description', type: 'string', size: 5000, required: true },
+            { id: 'authorId', type: 'string', size: 36, required: false },
+            { id: 'stock', type: 'integer', required: false, default: 0 },
+            { id: 'digitalFileUrl', type: 'string', size: 1024, required: false }
+        ];
+
+        for (const attr of bookAttrs) {
+            try {
+                if (attr.type === 'string') {
+                    await databases.createStringAttribute(dbId, VITE_APPWRITE_BOOKS_COLLECTION, attr.id, attr.size, attr.required, attr.default);
+                } else if (attr.type === 'integer') {
+                    await databases.createIntegerAttribute(dbId, VITE_APPWRITE_BOOKS_COLLECTION, attr.id, attr.required, 0);
+                } else if (attr.type === 'boolean') {
+                    await databases.createBooleanAttribute(dbId, VITE_APPWRITE_BOOKS_COLLECTION, attr.id, attr.required, attr.default);
+                }
+                console.log(`✅ Atributo "${attr.id}" criado.`);
+            } catch (e) { console.log(`⚠️ Atributo "${attr.id}" erro:`, e.message); }
+        }
+
+        // 5. Create Manuscripts Collection
         console.log(`\n📝 Criando coleção ${VITE_APPWRITE_MANUSCRIPTS_COLLECTION}...`);
         try {
             await databases.createCollection(dbId, VITE_APPWRITE_MANUSCRIPTS_COLLECTION, VITE_APPWRITE_MANUSCRIPTS_COLLECTION, ['read("any")', 'create("users")', 'update("users")']);

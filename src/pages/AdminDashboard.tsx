@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookOpen, Users, ShoppingCart, Plus, Edit, Trash2, User as UserIcon, CheckCircle, FileText, XCircle, Download } from 'lucide-react';
+import { BookOpen, Users, ShoppingCart, Plus, Edit, Trash2, User as UserIcon, CheckCircle, FileText, XCircle, Download, X, Upload, Image, File } from 'lucide-react';
 import { ViewState, User } from '../types';
 
 interface AdminDashboardProps {
@@ -9,10 +9,79 @@ interface AdminDashboardProps {
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => {
     const [activeTab, setActiveTab] = useState<'books' | 'users' | 'orders' | 'manuscripts'>('books');
+    const [stats, setStats] = useState({
+        totalBooks: 0,
+        totalUsers: 0,
+        pendingOrders: 0,
+        revenue: 0
+    });
+    const [isLoadingStats, setIsLoadingStats] = useState(true);
+
+    const [books, setBooks] = useState<import('../types').Book[]>([]);
+    const [isLoadingBooks, setIsLoadingBooks] = useState(false);
+
+    const [users, setUsers] = useState<any[]>([]);
+    const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+
     const [manuscripts, setManuscripts] = useState<import('../types').Manuscript[]>([]);
     const [isLoadingManuscripts, setIsLoadingManuscripts] = useState(false);
     const [selectedManuscript, setSelectedManuscript] = useState<import('../types').Manuscript | null>(null);
     const [feedback, setFeedback] = useState('');
+
+    // Book Modal State
+    const [isBookModalOpen, setIsBookModalOpen] = useState(false);
+    const [editingBook, setEditingBook] = useState<import('../types').Book | null>(null);
+    const [bookForm, setBookForm] = useState({
+        title: '',
+        author: '',
+        price: '',
+        category: 'Ficção',
+        description: '',
+        stock: '0',
+        isbn: ''
+    });
+    const [coverFile, setCoverFile] = useState<File | null>(null);
+    const [digitalFile, setDigitalFile] = useState<File | null>(null);
+    const [isSavingBook, setIsSavingBook] = useState(false);
+
+    const fetchStats = async () => {
+        setIsLoadingStats(true);
+        try {
+            const { getAdminStats } = await import('../services/dataService');
+            const data = await getAdminStats();
+            setStats(data);
+        } catch (error) {
+            console.error('Erro ao buscar estatísticas:', error);
+        } finally {
+            setIsLoadingStats(false);
+        }
+    };
+
+    const fetchBooks = async () => {
+        setIsLoadingBooks(true);
+        try {
+            const { getBooks } = await import('../services/dataService');
+            const data = await getBooks();
+            setBooks(data);
+        } catch (error) {
+            console.error('Erro ao buscar livros:', error);
+        } finally {
+            setIsLoadingBooks(false);
+        }
+    };
+
+    const fetchUsers = async () => {
+        setIsLoadingUsers(true);
+        try {
+            const { getAllUsers } = await import('../services/dataService');
+            const data = await getAllUsers();
+            setUsers(data);
+        } catch (error) {
+            console.error('Erro ao buscar utilizadores:', error);
+        } finally {
+            setIsLoadingUsers(false);
+        }
+    };
 
     const fetchManuscripts = async () => {
         setIsLoadingManuscripts(true);
@@ -26,12 +95,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
             setIsLoadingManuscripts(false);
         }
     };
-
-    React.useEffect(() => {
-        if (activeTab === 'manuscripts') {
-            fetchManuscripts();
-        }
-    }, [activeTab]);
 
     const handleReviewManuscript = async (status: 'approved' | 'rejected') => {
         if (!selectedManuscript) return;
@@ -48,47 +111,113 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
         }
     };
 
-    const [stats, setStats] = useState({
-        totalBooks: 0,
-        totalUsers: 0,
-        pendingOrders: 0,
-        revenue: 0
-    });
-    const [isLoadingStats, setIsLoadingStats] = useState(true);
-
-    const fetchStats = async () => {
+    const handleSaveBook = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSavingBook(true);
         try {
-            const { getAdminStats } = await import('../services/dataService');
-            const data = await getAdminStats();
-            setStats(data);
+            const { saveBook } = await import('../services/dataService');
+            const { uploadFile } = await import('../services/storageService');
+
+            let finalCoverUrl = editingBook?.coverUrl || '';
+            let finalDigitalUrl = editingBook?.digitalFileUrl || '';
+
+            if (coverFile) {
+                const { fileUrl } = await uploadFile(coverFile);
+                finalCoverUrl = fileUrl;
+            }
+
+            if (digitalFile) {
+                const { fileUrl } = await uploadFile(digitalFile);
+                finalDigitalUrl = fileUrl;
+            }
+
+            await saveBook({
+                id: editingBook?.id || '',
+                title: bookForm.title,
+                author: bookForm.author,
+                price: parseInt(bookForm.price),
+                category: bookForm.category,
+                description: bookForm.description,
+                stock: parseInt(bookForm.stock),
+                isbn: bookForm.isbn,
+                coverUrl: finalCoverUrl,
+                digitalFileUrl: finalDigitalUrl
+            });
+
+            alert('Livro guardado com sucesso!');
+            setIsBookModalOpen(false);
+            setEditingBook(null);
+            setCoverFile(null);
+            setDigitalFile(null);
+            fetchBooks();
+            fetchStats();
         } catch (error) {
-            console.error('Erro ao buscar estatísticas:', error);
+            console.error('Erro ao salvar livro:', error);
+            alert('Erro ao salvar livro. Verifique os dados e tente novamente.');
         } finally {
-            setIsLoadingStats(false);
+            setIsSavingBook(false);
         }
+    };
+
+    const handleDeleteBook = async (id: string) => {
+        if (!confirm('Tem a certeza que deseja eliminar este livro?')) return;
+        try {
+            const { deleteBook } = await import('../services/dataService');
+            await deleteBook(id);
+            alert('Livro eliminado com sucesso.');
+            fetchBooks();
+            fetchStats();
+        } catch (error) {
+            console.error('Erro ao eliminar livro:', error);
+            alert('Erro ao eliminar livro.');
+        }
+    };
+
+    const openAddModal = () => {
+        setEditingBook(null);
+        setBookForm({
+            title: '',
+            author: '',
+            price: '',
+            category: 'Ficção',
+            description: '',
+            stock: '0',
+            isbn: ''
+        });
+        setCoverFile(null);
+        setDigitalFile(null);
+        setIsBookModalOpen(true);
+    };
+
+    const openEditModal = (book: import('../types').Book) => {
+        setEditingBook(book);
+        setBookForm({
+            title: book.title,
+            author: book.author,
+            price: book.price.toString(),
+            category: book.category,
+            description: book.description,
+            stock: (book.stock || 0).toString(),
+            isbn: book.isbn || ''
+        });
+        setCoverFile(null);
+        setDigitalFile(null);
+        setIsBookModalOpen(true);
     };
 
     React.useEffect(() => {
         fetchStats();
     }, []);
 
-    const books = [
-        { id: '1', title: 'A Gloriosa Família', author: 'Pepetela', price: 8500, stock: 45, category: 'Romance' },
-        { id: '2', title: 'Mayombe', author: 'Pepetela', price: 7500, stock: 32, category: 'Ficção' },
-        { id: '3', title: 'O Desejo de Kianda', author: 'Pepetela', price: 6500, stock: 28, category: 'Ficção' }
-    ];
-
-    const users = [
-        { id: '1', name: 'João Silva', email: 'joao@example.com', role: 'reader', joined: '2025-11-15' },
-        { id: '2', name: 'Maria Costa', email: 'maria@example.com', role: 'author', joined: '2025-10-20' },
-        { id: '3', name: 'Carlos Mendes', email: 'carlos@example.com', role: 'reader', joined: '2025-12-05' }
-    ];
-
-    const orders = [
-        { id: '1', customer: 'Ana Ferreira', items: 2, total: 17000, status: 'pending', date: '2026-01-10' },
-        { id: '2', customer: 'Pedro Santos', items: 1, total: 8500, status: 'completed', date: '2026-01-09' },
-        { id: '3', customer: 'Sofia Almeida', items: 3, total: 22500, status: 'shipped', date: '2026-01-08' }
-    ];
+    React.useEffect(() => {
+        if (activeTab === 'books') {
+            fetchBooks();
+        } else if (activeTab === 'users') {
+            fetchUsers();
+        } else if (activeTab === 'manuscripts') {
+            fetchManuscripts();
+        }
+    }, [activeTab]);
 
     if (!user || user.role !== 'adm') {
         return (
@@ -99,6 +228,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                     <p className="text-gray-600 mb-8">Esta área é exclusiva para administradores.</p>
                     <button
                         onClick={() => onNavigate('HOME')}
+                        title="Voltar para a página inicial"
+                        aria-label="Voltar para a página inicial"
                         className="btn-premium w-full justify-center"
                     >
                         Voltar ao Início
@@ -151,6 +282,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                     <div className="flex flex-wrap gap-3">
                         <button
                             onClick={() => setActiveTab('books')}
+                            title="Ver listagem de livros"
+                            aria-label="Ver listagem de livros"
                             className={`px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider transition-all ${activeTab === 'books'
                                 ? 'bg-brand-primary text-white'
                                 : 'bg-white/10 text-white hover:bg-white/20'
@@ -161,6 +294,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                         </button>
                         <button
                             onClick={() => setActiveTab('users')}
+                            title="Gerir utilizadores"
+                            aria-label="Gerir utilizadores"
                             className={`px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider transition-all ${activeTab === 'users'
                                 ? 'bg-brand-primary text-white'
                                 : 'bg-white/10 text-white hover:bg-white/20'
@@ -171,6 +306,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                         </button>
                         <button
                             onClick={() => setActiveTab('orders')}
+                            title="Ver encomendas"
+                            aria-label="Ver encomendas"
                             className={`px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider transition-all ${activeTab === 'orders'
                                 ? 'bg-brand-primary text-white'
                                 : 'bg-white/10 text-white hover:bg-white/20'
@@ -181,6 +318,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                         </button>
                         <button
                             onClick={() => setActiveTab('manuscripts')}
+                            title="Rever manuscritos"
+                            aria-label="Rever manuscritos"
                             className={`px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider transition-all ${activeTab === 'manuscripts'
                                 ? 'bg-brand-primary text-white'
                                 : 'bg-white/10 text-white hover:bg-white/20'
@@ -201,7 +340,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                         <div>
                             <div className="flex items-center justify-between mb-8">
                                 <h2 className="text-3xl font-black text-brand-dark">Gestão de Livros</h2>
-                                <button className="btn-premium">
+                                <button
+                                    onClick={openAddModal}
+                                    title="Registar novo livro"
+                                    aria-label="Registar novo livro"
+                                    className="btn-premium"
+                                >
                                     <Plus className="w-5 h-5" />
                                     Adicionar Livro
                                 </button>
@@ -219,25 +363,45 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200">
-                                        {books.map((book) => (
-                                            <tr key={book.id} className="hover:bg-gray-50">
-                                                <td className="px-6 py-4 font-bold text-brand-dark">{book.title}</td>
-                                                <td className="px-6 py-4 text-sm text-gray-600">{book.author}</td>
-                                                <td className="px-6 py-4 text-sm text-gray-600">{book.category}</td>
-                                                <td className="px-6 py-4 text-sm font-bold text-brand-primary text-right">{book.price.toLocaleString()} Kz</td>
-                                                <td className="px-6 py-4 text-sm text-gray-600 text-right">{book.stock}</td>
-                                                <td className="px-6 py-4 text-right">
-                                                    <div className="flex items-center justify-end gap-2">
-                                                        <button title="Editar livro" aria-label="Editar livro" className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-all flex items-center justify-center">
-                                                            <Edit className="w-4 h-4" />
-                                                        </button>
-                                                        <button title="Eliminar livro" aria-label="Eliminar livro" className="w-8 h-8 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-all flex items-center justify-center">
-                                                            <Trash2 className="w-4 h-4" />
-                                                        </button>
-                                                    </div>
-                                                </td>
+                                        {isLoadingBooks ? (
+                                            <tr>
+                                                <td colSpan={6} className="px-6 py-12 text-center text-gray-500 italic">Carregando livros...</td>
                                             </tr>
-                                        ))}
+                                        ) : books.length > 0 ? (
+                                            books.map((book) => (
+                                                <tr key={book.id} className="hover:bg-gray-50">
+                                                    <td className="px-6 py-4 font-bold text-brand-dark">{book.title}</td>
+                                                    <td className="px-6 py-4 text-sm text-gray-600">{book.author}</td>
+                                                    <td className="px-6 py-4 text-sm text-gray-600">{book.category}</td>
+                                                    <td className="px-6 py-4 text-sm font-bold text-brand-primary text-right">{book.price.toLocaleString()} Kz</td>
+                                                    <td className="px-6 py-4 text-sm text-gray-600 text-right">{book.stock}</td>
+                                                    <td className="px-6 py-4 text-right">
+                                                        <div className="flex items-center justify-end gap-2">
+                                                            <button
+                                                                onClick={() => openEditModal(book)}
+                                                                title="Editar livro"
+                                                                aria-label="Editar livro"
+                                                                className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-all flex items-center justify-center"
+                                                            >
+                                                                <Edit className="w-4 h-4" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDeleteBook(book.id)}
+                                                                title="Eliminar livro"
+                                                                aria-label="Eliminar livro"
+                                                                className="w-8 h-8 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-all flex items-center justify-center"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan={6} className="px-6 py-12 text-center text-gray-500 italic">Nenhum livro cadastrado.</td>
+                                            </tr>
+                                        )}
                                     </tbody>
                                 </table>
                             </div>
@@ -260,26 +424,36 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200">
-                                        {users.map((u) => (
-                                            <tr key={u.id} className="hover:bg-gray-50">
-                                                <td className="px-6 py-4 font-bold text-brand-dark">{u.name}</td>
-                                                <td className="px-6 py-4 text-sm text-gray-600">{u.email}</td>
-                                                <td className="px-6 py-4">
-                                                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${u.role === 'admin' ? 'bg-purple-100 text-purple-600' :
-                                                        u.role === 'author' ? 'bg-blue-100 text-blue-600' :
-                                                            'bg-gray-100 text-gray-600'
-                                                        }`}>
-                                                        {u.role === 'admin' ? 'Admin' : u.role === 'author' ? 'Autor' : 'Leitor'}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4 text-sm text-gray-600">{new Date(u.joined).toLocaleDateString('pt-AO')}</td>
-                                                <td className="px-6 py-4 text-right">
-                                                    <button title="Editar utilizador" aria-label="Editar utilizador" className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-all flex items-center justify-center ml-auto">
-                                                        <Edit className="w-4 h-4" />
-                                                    </button>
-                                                </td>
+                                        {isLoadingUsers ? (
+                                            <tr>
+                                                <td colSpan={5} className="px-6 py-12 text-center text-gray-500 italic">Carregando utilizadores...</td>
                                             </tr>
-                                        ))}
+                                        ) : users.length > 0 ? (
+                                            users.map((u) => (
+                                                <tr key={u.id} className="hover:bg-gray-50">
+                                                    <td className="px-6 py-4 font-bold text-brand-dark">{u.name}</td>
+                                                    <td className="px-6 py-4 text-sm text-gray-600">{u.email}</td>
+                                                    <td className="px-6 py-4">
+                                                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${u.role === 'admin' || u.role === 'adm' ? 'bg-purple-100 text-purple-600' :
+                                                            u.role === 'author' ? 'bg-blue-100 text-blue-600' :
+                                                                'bg-gray-100 text-gray-600'
+                                                            }`}>
+                                                            {u.role === 'admin' || u.role === 'adm' ? 'Admin' : u.role === 'author' ? 'Autor' : 'Leitor'}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-sm text-gray-600">{new Date(u.joined || Date.now()).toLocaleDateString('pt-AO')}</td>
+                                                    <td className="px-6 py-4 text-right">
+                                                        <button title="Editar utilizador" aria-label="Editar utilizador" className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-all flex items-center justify-center ml-auto">
+                                                            <Edit className="w-4 h-4" />
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan={5} className="px-6 py-12 text-center text-gray-500 italic">Nenhum utilizador encontrado.</td>
+                                            </tr>
+                                        )}
                                     </tbody>
                                 </table>
                             </div>
@@ -332,6 +506,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                                                     <td className="px-6 py-4 text-right">
                                                         <button
                                                             onClick={() => setSelectedManuscript(m)}
+                                                            title="Analisar este manuscrito"
+                                                            aria-label="Analisar este manuscrito"
                                                             className="px-4 py-2 bg-brand-primary text-white text-xs font-bold rounded-lg hover:brightness-110 transition-all uppercase tracking-wider"
                                                         >
                                                             Analisar
@@ -393,10 +569,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-3">Feedback ao Autor</label>
+                                    <label htmlFor="manuscript-feedback" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-3">Feedback ao Autor</label>
                                     <textarea
+                                        id="manuscript-feedback"
                                         value={feedback}
                                         onChange={(e) => setFeedback(e.target.value)}
+                                        title="Caixa de feedback para o autor"
                                         placeholder="Escreva a sua análise ou motivo da rejeição..."
                                         className="w-full bg-gray-50 border-none rounded-2xl p-6 text-sm text-gray-600 focus:ring-2 focus:ring-brand-primary h-32 resize-none"
                                     />
@@ -414,18 +592,219 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                                     </a>
                                     <button
                                         onClick={() => handleReviewManuscript('rejected')}
+                                        title="Rejeitar manuscrito"
+                                        aria-label="Rejeitar manuscrito"
                                         className="flex-1 py-4 bg-red-50 text-red-600 rounded-full font-black text-xs uppercase tracking-widest hover:bg-red-100 transition-all"
                                     >
                                         Rejeitar
                                     </button>
                                     <button
                                         onClick={() => handleReviewManuscript('approved')}
+                                        title="Aprovar manuscrito"
+                                        aria-label="Aprovar manuscrito"
                                         className="flex-1 py-4 bg-brand-primary text-white rounded-full font-black text-xs uppercase tracking-widest shadow-lg shadow-brand-primary/20 hover:brightness-110 transition-all"
                                     >
                                         Aprovar
                                     </button>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Book Modal */}
+            {isBookModalOpen && (
+                <div className="fixed inset-0 bg-brand-dark/90 backdrop-blur-sm z-50 flex items-center justify-center p-8">
+                    <div className="bg-white rounded-[40px] w-full max-w-4xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300">
+                        <div className="p-8 md:p-12 overflow-y-auto max-h-[90vh]">
+                            <div className="flex justify-between items-start mb-8">
+                                <div>
+                                    <span className="text-brand-primary font-black uppercase tracking-widest text-xs mb-2 block italic">
+                                        {editingBook ? 'Editar Livro' : 'Adicionar Novo Livro'}
+                                    </span>
+                                    <h3 className="text-4xl font-black text-brand-dark tracking-tighter leading-none">
+                                        {editingBook ? editingBook.title : 'Detalhes do Livro'}
+                                    </h3>
+                                </div>
+                                <button
+                                    onClick={() => setIsBookModalOpen(false)}
+                                    title="Fechar modal"
+                                    aria-label="Fechar modal"
+                                    className="w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                                >
+                                    <X className="w-5 h-5 text-gray-400" />
+                                </button>
+                            </div>
+
+                            <form onSubmit={handleSaveBook} className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label htmlFor="book-title" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Título</label>
+                                            <input
+                                                id="book-title"
+                                                type="text"
+                                                required
+                                                placeholder="Digite o título do livro"
+                                                title="Título do livro"
+                                                value={bookForm.title}
+                                                onChange={(e) => setBookForm({ ...bookForm, title: e.target.value })}
+                                                className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label htmlFor="book-author" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Autor</label>
+                                            <input
+                                                id="book-author"
+                                                type="text"
+                                                required
+                                                placeholder="Nome do autor"
+                                                title="Autor do livro"
+                                                value={bookForm.author}
+                                                onChange={(e) => setBookForm({ ...bookForm, author: e.target.value })}
+                                                className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                            />
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label htmlFor="book-price" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Preço (Kz)</label>
+                                                <input
+                                                    id="book-price"
+                                                    type="number"
+                                                    required
+                                                    placeholder="0"
+                                                    title="Preço do livro"
+                                                    value={bookForm.price}
+                                                    onChange={(e) => setBookForm({ ...bookForm, price: e.target.value })}
+                                                    className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label htmlFor="book-stock" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Stock</label>
+                                                <input
+                                                    id="book-stock"
+                                                    type="number"
+                                                    required
+                                                    placeholder="0"
+                                                    title="Stock disponível"
+                                                    value={bookForm.stock}
+                                                    onChange={(e) => setBookForm({ ...bookForm, stock: e.target.value })}
+                                                    className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label htmlFor="book-category" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Categoria</label>
+                                            <select
+                                                id="book-category"
+                                                required
+                                                title="Selecione a categoria"
+                                                value={bookForm.category}
+                                                onChange={(e) => setBookForm({ ...bookForm, category: e.target.value })}
+                                                className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                            >
+                                                <option value="Ficção">Ficção</option>
+                                                <option value="Romance">Romance</option>
+                                                <option value="História">História</option>
+                                                <option value="Poesia">Poesia</option>
+                                                <option value="Técnico">Técnico</option>
+                                                <option value="Religião">Religião</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label htmlFor="book-description" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Descrição</label>
+                                            <textarea
+                                                id="book-description"
+                                                required
+                                                placeholder="Resumo do livro..."
+                                                title="Descrição do livro"
+                                                value={bookForm.description}
+                                                onChange={(e) => setBookForm({ ...bookForm, description: e.target.value })}
+                                                className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary h-32 resize-none"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label htmlFor="book-isbn" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">ISBN (Opcional)</label>
+                                            <input
+                                                id="book-isbn"
+                                                type="text"
+                                                placeholder="Ex: 978-3-16-148410-0"
+                                                title="Código ISBN"
+                                                value={bookForm.isbn}
+                                                onChange={(e) => setBookForm({ ...bookForm, isbn: e.target.value })}
+                                                className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                            />
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4 pt-2">
+                                            <div className="relative">
+                                                <label className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Capa</label>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={(e) => setCoverFile(e.target.files?.[0] || null)}
+                                                    className="hidden"
+                                                    id="cover-upload"
+                                                />
+                                                <label htmlFor="cover-upload" className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-all aspect-video">
+                                                    <Image className="w-6 h-6 text-gray-400 mb-1" />
+                                                    <span className="text-[10px] text-gray-500 font-bold uppercase truncate w-full text-center">
+                                                        {coverFile ? coverFile.name : (editingBook ? 'Alterar Capa' : 'Upload Capa')}
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <div className="relative">
+                                                <label className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Ficheiro Digital</label>
+                                                <input
+                                                    type="file"
+                                                    accept=".pdf,.epub"
+                                                    onChange={(e) => setDigitalFile(e.target.files?.[0] || null)}
+                                                    className="hidden"
+                                                    id="digital-upload"
+                                                />
+                                                <label htmlFor="digital-upload" className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-all aspect-video">
+                                                    <File className="w-6 h-6 text-gray-400 mb-1" />
+                                                    <span className="text-[10px] text-gray-500 font-bold uppercase truncate w-full text-center">
+                                                        {digitalFile ? digitalFile.name : (editingBook?.digitalFileUrl ? 'Alterar Digital' : 'Upload Digital')}
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="pt-6 border-t border-gray-100 flex gap-4">
+                                    <button
+                                        type="button"
+                                        disabled={isSavingBook}
+                                        onClick={() => setIsBookModalOpen(false)}
+                                        className="flex-1 py-4 border-2 border-brand-dark rounded-full font-black text-xs uppercase tracking-widest text-brand-dark hover:bg-brand-dark hover:text-white transition-all disabled:opacity-50"
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={isSavingBook}
+                                        className="flex-1 py-4 bg-brand-primary text-white rounded-full font-black text-xs uppercase tracking-widest shadow-lg shadow-brand-primary/20 hover:brightness-110 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                                    >
+                                        {isSavingBook ? (
+                                            <>
+                                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                                Salvando...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <CheckCircle className="w-4 h-4" />
+                                                {editingBook ? 'Guardar Alterações' : 'Criar Livro'}
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -480,44 +859,45 @@ const AdminOrdersTab: React.FC<{ user: User }> = ({ user }) => {
         }
     };
 
-    if (isLoading) return <div className="text-center py-12">Carregando pagamentos...</div>;
+    if (isLoading) return <div className="text-center py-12 text-brand-dark/50 font-bold uppercase tracking-widest text-xs">Carregando pagamentos...</div>;
 
     return (
         <div>
             <h2 className="text-3xl font-black text-brand-dark mb-8">Gestão de Pagamentos</h2>
-            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div className="bg-white rounded-[32px] shadow-xl overflow-hidden border border-gray-100">
                 <table className="w-full">
-                    <thead className="bg-gray-50">
+                    <thead className="bg-gray-50 border-b border-gray-100">
                         <tr>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-brand-dark uppercase tracking-wider">ID / Data</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-brand-dark uppercase tracking-wider">Leitor</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-brand-dark uppercase tracking-wider">Itens / Autores</th>
-                            <th className="px-6 py-4 text-right text-xs font-bold text-brand-dark uppercase tracking-wider">Total</th>
-                            <th className="px-6 py-4 text-center text-xs font-bold text-brand-dark uppercase tracking-wider">Acções</th>
+                            <th className="px-6 py-6 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">ID / Data</th>
+                            <th className="px-6 py-6 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Leitor</th>
+                            <th className="px-6 py-6 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Itens / Autores</th>
+                            <th className="px-6 py-6 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">Total</th>
+                            <th className="px-6 py-6 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Ações</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200">
+                    <tbody className="divide-y divide-gray-100">
                         {notifications.map((n) => (
-                            <tr key={n.id} className="hover:bg-gray-50">
-                                <td className="px-6 py-4">
-                                    <div className="text-sm font-mono font-bold text-brand-dark">#{n.orderId}</div>
-                                    <div className="text-xs text-gray-500">{new Date(n.createdAt).toLocaleDateString()}</div>
+                            <tr key={n.id} className="hover:bg-gray-50/50 transition-colors">
+                                <td className="px-6 py-6">
+                                    <div className="text-xs font-mono font-bold text-brand-dark">#{n.orderId?.substring(0, 8)}</div>
+                                    <div className="text-[10px] text-gray-400 font-bold uppercase mt-1">{new Date(n.createdAt).toLocaleDateString()}</div>
                                 </td>
-                                <td className="px-6 py-4">
-                                    <div className="font-bold text-brand-dark">{n.readerName}</div>
-                                    <div className="text-xs text-gray-500">{n.readerEmail}</div>
+                                <td className="px-6 py-6">
+                                    <div className="font-bold text-brand-dark text-sm">{n.readerName}</div>
+                                    <div className="text-[10px] text-gray-400 font-medium">{n.readerEmail}</div>
                                 </td>
-                                <td className="px-6 py-4">
+                                <td className="px-6 py-6 font-medium">
                                     {n.items.map((item, i) => (
-                                        <div key={i} className="text-xs mb-1">
-                                            <span className="font-bold">{item.bookTitle}</span> ({item.authorName})
+                                        <div key={i} className="text-[11px] mb-1 text-gray-600">
+                                            <span className="font-bold text-brand-dark">{item.bookTitle}</span>
+                                            <span className="text-gray-400 ml-1 italic">({item.authorName})</span>
                                         </div>
                                     ))}
                                 </td>
-                                <td className="px-6 py-4 text-right font-black text-brand-primary">
+                                <td className="px-6 py-6 text-right font-black text-brand-primary">
                                     {n.totalAmount.toLocaleString()} Kz
                                 </td>
-                                <td className="px-6 py-4 text-center">
+                                <td className="px-6 py-6">
                                     <div className="flex items-center justify-center gap-2">
                                         {n.status === 'proof_uploaded' && (
                                             <button
@@ -526,20 +906,24 @@ const AdminOrdersTab: React.FC<{ user: User }> = ({ user }) => {
                                                     const proof = await getPaymentProofByNotification(n.id);
                                                     if (proof) window.open(proof.fileUrl, '_blank');
                                                 }}
-                                                className="px-3 py-1 bg-blue-100 text-blue-600 rounded text-[10px] font-bold uppercase hover:bg-blue-200"
+                                                title="Visualizar comprovativo de pagamento"
+                                                aria-label="Visualizar comprovativo de pagamento"
+                                                className="px-4 py-2 bg-blue-50 text-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-100 transition-all"
                                             >
-                                                Ver Talão
+                                                Ver Comprovativo
                                             </button>
                                         )}
                                         {n.status !== 'confirmed' ? (
                                             <button
                                                 onClick={() => handleConfirm(n)}
-                                                className="px-3 py-1 bg-green-600 text-white rounded text-[10px] font-bold uppercase hover:bg-brand-dark"
+                                                title="Confirmar este pagamento"
+                                                aria-label="Confirmar este pagamento"
+                                                className="px-4 py-2 bg-brand-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:brightness-110 shadow-lg shadow-brand-primary/20 transition-all"
                                             >
                                                 Confirmar
                                             </button>
                                         ) : (
-                                            <span className="flex items-center gap-1 text-green-600 text-[10px] font-bold uppercase">
+                                            <span className="flex items-center gap-2 text-green-600 text-[10px] font-black uppercase tracking-widest bg-green-50 px-4 py-2 rounded-xl">
                                                 <CheckCircle className="w-3 h-3" /> Pago
                                             </span>
                                         )}
@@ -549,8 +933,8 @@ const AdminOrdersTab: React.FC<{ user: User }> = ({ user }) => {
                         ))}
                         {notifications.length === 0 && (
                             <tr>
-                                <td colSpan={5} className="px-6 py-12 text-center text-gray-500 italic">
-                                    Nenhum registo de pagamento encontrado.
+                                <td colSpan={5} className="px-6 py-20 text-center text-gray-400 font-bold uppercase tracking-widest text-[10px]">
+                                    Nenhuma notificação de pagamento pendente.
                                 </td>
                             </tr>
                         )}

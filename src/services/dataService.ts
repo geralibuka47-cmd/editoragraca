@@ -103,6 +103,16 @@ export const saveUserProfile = async (user: User) => {
     }
 };
 
+export const getAllUsers = async (): Promise<User[]> => {
+    try {
+        const response = await databases.listDocuments(DATABASE_ID, USERS_COLLECTION_ID);
+        return response.documents.map(doc => ({ id: doc.$id, ...doc } as unknown as User));
+    } catch (error) {
+        console.error("Erro ao buscar utilizadores:", error);
+        return [];
+    }
+};
+
 // Payment Notifications Collection
 const PAYMENT_NOTIFICATIONS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_PAYMENT_NOTIFICATIONS_COLLECTION || 'payment_notifications';
 const PAYMENT_PROOFS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_PAYMENT_PROOFS_COLLECTION || 'payment_proofs';

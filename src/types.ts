@@ -37,6 +37,8 @@ export interface Book {
   isBestseller?: boolean;
   description: string;
   authorId?: string;
+  stock?: number;
+  digitalFileUrl?: string;
 }
 
 export interface CartItem extends Book {

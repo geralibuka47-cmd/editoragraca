@@ -265,6 +265,13 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                                                     </a>
                                                 </div>
                                             </div>
+
+                                            {manuscript.feedback && (
+                                                <div className="mt-4 p-4 bg-brand-light rounded-xl border border-brand-primary/20">
+                                                    <p className="text-[10px] font-black text-brand-primary uppercase tracking-widest mb-1">Feedback do Editor</p>
+                                                    <p className="text-sm text-gray-700 italic">"{manuscript.feedback}"</p>
+                                                </div>
+                                            )}
                                         </div>
                                     ))
                                 ) : (
