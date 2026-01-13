@@ -143,6 +143,7 @@ export interface Manuscript {
   submittedDate: string;
   reviewedDate?: string | null;
   feedback?: string;
+  email?: string;
 }
 
 export type ViewState = 'HOME' | 'CATALOG' | 'DETAILS' | 'ABOUT' | 'TEAM' | 'SERVICES' | 'CHECKOUT' | 'PODCAST' | 'CONTACT' | 'ADMIN' | 'AUTH' | 'AUTHOR_DASHBOARD' | 'READER_DASHBOARD' | 'BLOG';

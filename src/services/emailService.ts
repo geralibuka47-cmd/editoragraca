@@ -13,11 +13,12 @@ const sendEmail = async ({ to, subject, html }: EmailData): Promise<void> => {
     try {
         // Appwrite Messaging API
         // Note: Você precisará configurar um provider de email no Appwrite Console
-        await messaging.createEmail(
-            to,
-            subject,
-            html
-        );
+        // await messaging.createEmail(
+        //     to,
+        //     subject,
+        //     html
+        // );
+        console.warn('Envio de email direto pelo cliente não é suportado pelo SDK Web do Appwrite. Use Cloud Functions.');
     } catch (error) {
         console.error('Erro ao enviar email:', error);
         // Em desenvolvimento, apenas log o erro mas não falhar

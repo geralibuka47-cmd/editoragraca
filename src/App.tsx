@@ -3,18 +3,18 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import BookCard from './components/BookCard';
 import BookDetailModal from './components/BookDetailModal';
-import AuthPage from './pages/AuthPage';
-import CatalogPage from './pages/CatalogPage';
-import AboutPage from './pages/AboutPage';
-import ContactPage from './pages/ContactPage';
-import CheckoutPage from './pages/CheckoutPage';
-import ServicesPage from './pages/ServicesPage';
-import TeamPage from './pages/TeamPage';
-import BlogPage from './pages/BlogPage';
-import PodcastPage from './pages/PodcastPage';
-import ReaderDashboard from './pages/ReaderDashboard';
-import AuthorDashboard from './pages/AuthorDashboard';
-import AdminDashboard from './pages/AdminDashboard';
+const AuthPage = React.lazy(() => import('./pages/AuthPage'));
+const CatalogPage = React.lazy(() => import('./pages/CatalogPage'));
+const AboutPage = React.lazy(() => import('./pages/AboutPage'));
+const ContactPage = React.lazy(() => import('./pages/ContactPage'));
+const CheckoutPage = React.lazy(() => import('./pages/CheckoutPage'));
+const ServicesPage = React.lazy(() => import('./pages/ServicesPage'));
+const TeamPage = React.lazy(() => import('./pages/TeamPage'));
+const BlogPage = React.lazy(() => import('./pages/BlogPage'));
+const PodcastPage = React.lazy(() => import('./pages/PodcastPage'));
+const ReaderDashboard = React.lazy(() => import('./pages/ReaderDashboard'));
+const AuthorDashboard = React.lazy(() => import('./pages/AuthorDashboard'));
+const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard'));
 import { subscribeToAuthChanges, logout } from './services/authService';
 import { getBooks } from './services/dataService';
 import { client } from './services/appwrite';
@@ -423,7 +423,14 @@ const App: React.FC = () => {
                     </div>
                 )}
 
-                {renderContent()}
+                <React.Suspense fallback={
+                    <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
+                        <Loader2 className="w-8 h-8 text-brand-primary animate-spin" />
+                        <p className="text-gray-400 font-serif italic text-sm">Carregando...</p>
+                    </div>
+                }>
+                    {renderContent()}
+                </React.Suspense>
             </main>
 
             <Footer onNavigate={handleNavigate} />

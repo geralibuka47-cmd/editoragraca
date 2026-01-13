@@ -48,6 +48,7 @@ const BookCard: React.FC<BookCardProps> = ({ book, onAddToCart, onToggleWishlist
                         src={book.coverUrl}
                         alt={book.title}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        loading="lazy"
                     />
                 ) : (
                     <div className="w-full h-full p-8 flex items-center justify-center">

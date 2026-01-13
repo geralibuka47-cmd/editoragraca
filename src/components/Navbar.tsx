@@ -1,4 +1,5 @@
 import React from 'react';
+import logo from '../assets/imagens/logo.png';
 import { ShoppingBag, Search, User, Heart, LogOut, Menu, X } from 'lucide-react';
 import { User as UserType } from '../types';
 
@@ -68,8 +69,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                     title="Editora Graça - Ir para o Início"
                     aria-label="Voltar à página inicial"
                 >
-                    <span className="font-serif text-2xl md:text-4xl font-black tracking-tighter text-brand-dark leading-none uppercase">EDITORA</span>
-                    <span className="font-sans text-[9px] md:text-[11px] tracking-[0.3em] md:tracking-[0.4em] font-bold text-brand-primary uppercase -mt-0.5 md:-mt-1 ml-1">Graça</span>
+                    <img src={logo} alt="Editora Graça" className="h-12 md:h-16 w-auto object-contain" />
                 </button>
 
                 <div className="w-1/4 md:w-1/3 flex justify-end gap-3 md:gap-6 items-center">
@@ -114,7 +114,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                         <li key={link.view}>
                             <button
                                 onClick={() => onNavigate(link.view as any)}
-                                className={`hover:text-brand-primary transition-colors border-b pb-1 ${currentView === link.view ? 'text-brand-primary border-brand-primary' : 'border-transparent'}`}
+                                className={`hover: text - brand - primary transition - colors border - b pb - 1 ${currentView === link.view ? 'text-brand-primary border-brand-primary' : 'border-transparent'} `}
                             >
                                 {link.name}
                             </button>
@@ -134,7 +134,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                                         onNavigate(link.view as any);
                                         setIsMenuOpen(false);
                                     }}
-                                    className={`w-full text-left px-8 py-3 text-[11px] font-bold uppercase tracking-[0.2em] ${currentView === link.view ? 'text-brand-primary bg-brand-light' : 'text-gray-500 hover:bg-gray-50'}`}
+                                    className={`w - full text - left px - 8 py - 3 text - [11px] font - bold uppercase tracking - [0.2em] ${currentView === link.view ? 'text-brand-primary bg-brand-light' : 'text-gray-500 hover:bg-gray-50'} `}
                                 >
                                     {link.name}
                                 </button>

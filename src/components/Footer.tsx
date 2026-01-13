@@ -1,4 +1,5 @@
 import React from 'react';
+import logo from '../assets/imagens/logo.png';
 import { Facebook, Instagram, Twitter, Mail, MapPin, Phone } from 'lucide-react';
 import { ViewState } from '../types';
 
@@ -12,8 +13,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             <div className="container mx-auto px-8 grid md:grid-cols-4 gap-12 border-b border-white/5 pb-16 mb-10">
                 <div className="space-y-6">
                     <div className="flex flex-col">
-                        <span className="font-serif text-2xl font-bold tracking-tighter text-white">EDITORA</span>
-                        <span className="font-sans text-[10px] tracking-[0.3em] font-bold text-brand-primary uppercase -mt-1">Graça</span>
+                        <img src={logo} alt="Editora Graça" className="h-12 w-auto object-contain brightness-0 invert" />
                     </div>
                     <p className="text-gray-400 text-sm leading-relaxed font-medium">
                         Dedicados à publicação de obras literárias de excelência em Angola. Fomentando a cultura e o conhecimento através das letras.
