@@ -17,9 +17,11 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
     const navLinks = [
         { name: 'Início', view: 'HOME' },
         { name: 'Catálogo', view: 'CATALOG' },
-        { name: 'Sobre Nós', view: 'ABOUT' },
-        { name: 'Serviços', view: 'SERVICES' },
+        { name: 'Blog', view: 'BLOG' },
         { name: 'Podcast', view: 'PODCAST' },
+        { name: 'Serviços', view: 'SERVICES' },
+        { name: 'Equipa', view: 'TEAM' },
+        { name: 'Sobre Nós', view: 'ABOUT' },
         { name: 'Contacto', view: 'CONTACT' },
     ];
 

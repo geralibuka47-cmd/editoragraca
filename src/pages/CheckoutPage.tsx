@@ -20,7 +20,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
 
-    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const total = cart.reduce((sum, item) => sum + ((Number(item.price) || 0) * item.quantity), 0);
 
     const validateCustomerInfo = () => {
         const newErrors: Record<string, string> = {};
@@ -145,7 +145,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
                                                         <Plus className="w-3 h-3" />
                                                     </button>
                                                 </div>
-                                                <span className="font-bold text-brand-primary text-sm md:text-base">{(item.price * item.quantity).toLocaleString()} Kz</span>
+                                                <span className="font-bold text-brand-primary text-sm md:text-base">{((Number(item.price) || 0) * item.quantity).toLocaleString()} Kz</span>
                                             </div>
                                         </div>
                                         <button
@@ -349,7 +349,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
                                     {cart.map(item => (
                                         <div key={item.id} className="flex justify-between text-gray-600 gap-4">
                                             <span className="truncate">{item.title} × {item.quantity}</span>
-                                            <span className="shrink-0">{(item.price * item.quantity).toLocaleString()} Kz</span>
+                                            <span className="shrink-0">{((Number(item.price) || 0) * item.quantity).toLocaleString()} Kz</span>
                                         </div>
                                     ))}
                                     <div className="border-t pt-3 flex justify-between font-black text-brand-dark text-base">

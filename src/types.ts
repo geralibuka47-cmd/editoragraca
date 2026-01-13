@@ -43,6 +43,26 @@ export interface Book {
   paymentInfo?: string; // ID of the bank account to use
   paymentInfoNotes?: string; // Custom notes for payment
   launchDate?: string; // ISO date string for upcoming book launch
+  stats?: BookStats;
+  reviews?: Review[];
+}
+
+export interface BookStats {
+  views: number;
+  downloads?: number; // For digital books
+  copiesSold?: number; // For physical/paid books
+  averageRating: number;
+  totalReviews: number;
+}
+
+export interface Review {
+  id: string;
+  bookId: string;
+  userId: string;
+  userName: string;
+  rating: number; // 1-5
+  comment: string;
+  date: string;
 }
 
 export interface CartItem extends Book {

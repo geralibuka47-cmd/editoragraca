@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Sparkles, BookOpen, ArrowRight, Zap, Star, Trophy, Mail, Clock } from 'lucide-react';
-import { Book, ViewState } from '../types';
+import { Sparkles, BookOpen, ArrowRight, Zap, Star, Trophy, Mail, Clock, Mic, PenTool } from 'lucide-react';
+import { Book, ViewState, PodcastEpisode, BlogPost } from '../types';
 import BookCard from '../components/BookCard';
 import Countdown from '../components/Countdown';
-import { getPublicStats, getCategories } from '../services/dataService';
+import { getPublicStats, getCategories, getBlogPosts } from '../services/dataService';
+import { fetchPodcastEpisodes } from '../services/podcastService';
 
 interface HomePageProps {
     books: Book[];
@@ -17,13 +18,20 @@ interface HomePageProps {
 const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewDetails, onAddToCart, onToggleWishlist }) => {
     const [stats, setStats] = useState({ booksCount: 0, authorsCount: 0, readersCount: 0 });
     const [categories, setCategories] = useState<{ name: string; count: number; image?: string }[]>([]);
+    const [latestEpisode, setLatestEpisode] = useState<PodcastEpisode | null>(null);
+    const [recentPosts, setRecentPosts] = useState<BlogPost[]>([]);
 
     useEffect(() => {
         const loadDynamicData = async () => {
             const s = await getPublicStats();
             const c = await getCategories();
+            const p = await fetchPodcastEpisodes();
+            const b = await getBlogPosts();
+
             setStats(s);
             setCategories(c);
+            if (p.length > 0) setLatestEpisode(p[0]);
+            setRecentPosts(b.slice(0, 3));
         };
         loadDynamicData();
     }, [books]); // Reload if books change
@@ -227,10 +235,99 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
                             </div>
                         )}
                     </div>
+                    {/* Categories / Promo Banners Section */}
+                    {/* ... (Existing code) ... */}
+                    {/* The previous replace_file_content will handle the categories section content, 
+                so I will assume this insertion point is AFTER the categories section closing tag.
+                However, to be safe and precise with replace_file_content, I should target the space between Categories and Newsletter.
+            */}
+                    {/* Note: I'll target the end of the Categories section and start of Newsletter to insert in between. */}
+
                 </div>
             </section>
 
-            {/* Newsletter Section */}
+            {/* Podcast & Blog Preview Section */}
+            <section className="py-16 bg-gray-50">
+                <div className="container mx-auto px-4 md:px-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                        {/* Podcast Feature */}
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="p-3 bg-brand-primary/10 rounded-full text-brand-primary">
+                                    <Mic className="w-6 h-6" />
+                                </div>
+                                <h3 className="text-2xl font-black text-brand-dark">Cultura em Áudio</h3>
+                            </div>
+
+                            {latestEpisode ? (
+                                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-6 items-center">
+                                    <img src={latestEpisode.imageUrl} alt={latestEpisode.title} className="w-24 h-24 rounded-xl object-cover shadow-md" />
+                                    <div className="flex-1 space-y-2 text-center md:text-left">
+                                        <span className="text-xs font-bold text-brand-primary uppercase tracking-wider">Último Episódio</span>
+                                        <h4 className="font-bold text-brand-dark text-lg line-clamp-2">{latestEpisode.title}</h4>
+                                        <button onClick={() => onNavigate('PODCAST')} className="text-sm font-medium text-gray-500 hover:text-brand-primary flex items-center justify-center md:justify-start gap-1 transition-colors">
+                                            Ouvir Agora <ArrowRight className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center py-10">
+                                    <p className="text-gray-400">Carregando podcast...</p>
+                                </div>
+                            )}
+
+                            {/* Call to Authors */}
+                            <div className="bg-brand-dark p-8 rounded-2xl text-white relative overflow-hidden mt-8">
+                                <div className="absolute top-0 right-0 p-8 opacity-10">
+                                    <PenTool className="w-32 h-32" />
+                                </div>
+                                <div className="relative z-10 space-y-4">
+                                    <h3 className="text-2xl font-black">És um Autor?</h3>
+                                    <p className="text-white/80 text-sm max-w-xs">Transforme o seu manuscrito em obra publicada. Conheça os nossos serviços editoriais.</p>
+                                    <button onClick={() => onNavigate('SERVICES')} className="px-6 py-3 bg-brand-primary text-white rounded-xl font-bold text-sm hover:scale-105 transition-transform">
+                                        Publicar Conosco
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Recent Blog Posts */}
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="p-3 bg-brand-primary/10 rounded-full text-brand-primary">
+                                    <BookOpen className="w-6 h-6" />
+                                </div>
+                                <h3 className="text-2xl font-black text-brand-dark">Do Nosso Blog</h3>
+                            </div>
+
+                            <div className="space-y-4">
+                                {recentPosts.length > 0 ? (
+                                    recentPosts.map(post => (
+                                        <div key={post.id} onClick={() => onNavigate('BLOG')} className="group flex gap-4 items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100 cursor-pointer hover:shadow-md transition-all">
+                                            <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0">
+                                                <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                                            </div>
+                                            <div className="flex-1">
+                                                <h4 className="font-bold text-brand-dark line-clamp-2 group-hover:text-brand-primary transition-colors">{post.title}</h4>
+                                                <span className="text-xs text-gray-400">{new Date(post.date).toLocaleDateString()}</span>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-center py-10">
+                                        <p className="text-gray-400">Buscando novidades...</p>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="text-right">
+                                <button onClick={() => onNavigate('BLOG')} className="text-sm font-bold text-brand-primary hover:text-brand-dark transition-colors inline-flex items-center gap-1">
+                                    Ver todos os artigos <ArrowRight className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
             <section className="bg-brand-dark py-24 px-8 overflow-hidden relative">
                 <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-brand-primary/10 via-transparent to-transparent"></div>
 
