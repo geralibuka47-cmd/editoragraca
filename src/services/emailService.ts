@@ -1,4 +1,4 @@
-import { messaging } from './appwrite';
+// Email Service implementation
 
 const EDITORA_EMAIL = 'geral@editoragraca.com'; // Email da editora
 

@@ -1,22 +1,25 @@
-
-import { ID } from "appwrite";
-import { account } from "./appwrite";
+import { supabase } from "./supabase";
 import { User } from "../types";
 import { getUserProfile, saveUserProfile } from "./dataService";
 
 export const login = async (email: string, password: string): Promise<User | null> => {
     try {
-        await account.createEmailPasswordSession(email, password);
-        const appwriteUser = await account.get();
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+        });
+
+        if (error) throw error;
+        if (!data.user) return null;
 
         // Get extra profile info from Database
-        const profile = await getUserProfile(appwriteUser.$id);
+        const profile = await getUserProfile(data.user.id);
         if (profile) return profile;
 
         return {
-            id: appwriteUser.$id,
-            name: appwriteUser.name || 'Utilizador',
-            email: appwriteUser.email,
+            id: data.user.id,
+            name: data.user.user_metadata?.name || 'Utilizador',
+            email: data.user.email || email,
             role: 'leitor'
         };
     } catch (error) {
@@ -27,12 +30,21 @@ export const login = async (email: string, password: string): Promise<User | nul
 
 export const signUp = async (email: string, password: string, name: string): Promise<User> => {
     try {
-        const appwriteUser = await account.create(ID.unique(), email, password, name);
-        // Login immediately after signup
-        await account.createEmailPasswordSession(email, password);
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    name: name,
+                }
+            }
+        });
+
+        if (error) throw error;
+        if (!data.user) throw new Error("Erro ao criar utilizador.");
 
         const newUser: User = {
-            id: appwriteUser.$id,
+            id: data.user.id,
             name: name,
             email: email,
             role: 'leitor'
@@ -48,35 +60,47 @@ export const signUp = async (email: string, password: string, name: string): Pro
 
 export const logout = async () => {
     try {
-        await account.deleteSession('current');
+        await supabase.auth.signOut();
     } catch (error) {
         console.error("Erro ao fazer logout:", error);
     }
 };
 
 export const subscribeToAuthChanges = (callback: (user: User | null) => void) => {
-    // Appwrite doesn't have a listener like Firebase, so we check on mount
-    const checkSession = async () => {
-        try {
-            const appwriteUser = await account.get();
-            const profile = await getUserProfile(appwriteUser.$id);
-            if (profile) {
-                callback(profile);
-            } else {
-                callback({
-                    id: appwriteUser.$id,
-                    name: appwriteUser.name || 'Utilizador',
-                    email: appwriteUser.email,
-                    role: 'leitor'
-                });
-            }
-        } catch (error) {
+    // Check initial session
+    const checkInitialSession = async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+            const profile = await getUserProfile(session.user.id);
+            callback(profile || {
+                id: session.user.id,
+                name: session.user.user_metadata?.name || 'Utilizador',
+                email: session.user.email || '',
+                role: 'leitor'
+            });
+        } else {
             callback(null);
         }
     };
 
-    checkSession();
+    checkInitialSession();
 
-    // Return a dummy unsubscribe
-    return () => { };
+    // Listen for changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        if (session?.user) {
+            const profile = await getUserProfile(session.user.id);
+            callback(profile || {
+                id: session.user.id,
+                name: session.user.user_metadata?.name || 'Utilizador',
+                email: session.user.email || '',
+                role: 'leitor'
+            });
+        } else {
+            callback(null);
+        }
+    });
+
+    return () => {
+        subscription.unsubscribe();
+    };
 };

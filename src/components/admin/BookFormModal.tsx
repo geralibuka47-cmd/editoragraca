@@ -57,11 +57,11 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                     launchDate: book.launchDate || ''
                 });
 
-                const isCoverLink = book.coverUrl.startsWith('http') && !book.coverUrl.includes('appwrite');
+                const isCoverLink = book.coverUrl.startsWith('http');
                 setCoverType(isCoverLink ? 'link' : 'file');
                 setCoverPreview(book.coverUrl); // Show existing cover
 
-                const isDigitalLink = book.digitalFileUrl?.startsWith('http') && !book.digitalFileUrl.includes('appwrite');
+                const isDigitalLink = book.digitalFileUrl?.startsWith('http') || false;
                 setDigitalFileType(isDigitalLink ? 'link' : 'file');
             } else {
                 // Reset for new book
