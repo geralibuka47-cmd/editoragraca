@@ -104,7 +104,7 @@ const parseDataFromSupabase = (item: any) => {
         'user_name': 'userName',
         'book_id': 'bookId',
         'user_id': 'userId',
-        'display_order': 'order', // Frontend uses 'order' for sorting
+        'display_order': 'displayOrder', // Correcting to match frontend usage
         'image_url': 'imageUrl'
     };
 
