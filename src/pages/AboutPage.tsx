@@ -31,32 +31,32 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
     ];
 
     const stats = [
-        { number: '500+', label: 'Livros Publicados' },
-        { number: '150+', label: 'Autores Angolanos' },
-        { number: '10k+', label: 'Leitores Satisfeitos' },
-        { number: '15', label: 'Anos de Experiência' }
+        { number: '26+', label: 'Obras Publicadas' },
+        { number: '100%', label: 'Autores Angolanos' },
+        { number: '5+', label: 'Anos de Actividade' },
+        { number: '18', label: 'Províncias Alcançadas' }
     ];
 
     const timeline = [
         {
-            year: '2010',
-            title: 'Fundação',
-            description: 'Nascimento da Editora Graça em Malanje, com a missão de descentralizar o acesso à cultura.'
-        },
-        {
-            year: '2015',
-            title: 'Expansão',
-            description: 'Abertura de novos canais de distribuição e parcerias com autores de todo o país.'
-        },
-        {
             year: '2020',
-            title: 'Modernização',
-            description: 'Investimento em tecnologia e plataformas digitais para alcançar mais leitores.'
+            title: 'Fundação',
+            description: 'Fundada pelo designer literário Nilton Graça, com o propósito de fortalecer o setor editorial e promover a literautra lusófona.'
+        },
+        {
+            year: '2021',
+            title: 'Início Editorial',
+            description: 'Início das operações de edição, diagramação e design, servindo autores independentes e parceiros.'
+        },
+        {
+            year: '2023',
+            title: 'Crescimento',
+            description: 'Marca de 26+ obras publicadas sob selo próprio e através de colaborações institucionais.'
         },
         {
             year: '2026',
-            title: 'Liderança',
-            description: 'Consolidação como uma das principais editoras de Angola, com projecção internacional.'
+            title: 'Reestruturação',
+            description: 'Reorganização estratégica, consolidação da comunidade e expansão para formatos digitais.'
         }
     ];
 
@@ -105,15 +105,29 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
 
                         <div className="space-y-4 md:space-y-6">
                             <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-primary/10 rounded-full">
-                                <BookOpen className="w-5 h-5 text-brand-primary" />
-                                <span className="text-brand-primary font-bold tracking-widest uppercase text-xs">Visão</span>
+                                <TrendingUp className="w-5 h-5 text-brand-primary" />
+                                <span className="text-brand-primary font-bold tracking-widest uppercase text-xs">Propósito</span>
                             </div>
                             <h2 className="text-3xl md:text-4xl font-black text-brand-dark tracking-tighter">
-                                Referência em Excelência Editorial
+                                Fortalecer o Setor Editorial
                             </h2>
                             <p className="text-base md:text-lg text-gray-600 leading-relaxed">
-                                Ser a editora de referência em Angola e nos países lusófonos, reconhecida pela excelência
-                                editorial, inovação e compromisso com a cultura angolana.
+                                A Editora Graça participa ativamente na dinamização cultural, valorizando a produção literária
+                                no espaço lusófono como instrumento de preservação da memória e transformação social.
+                            </p>
+                        </div>
+
+                        <div className="space-y-4 md:space-y-6">
+                            <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-primary/10 rounded-full">
+                                <BookOpen className="w-5 h-5 text-brand-primary" />
+                                <span className="text-brand-primary font-bold tracking-widest uppercase text-xs">Atuação</span>
+                            </div>
+                            <h2 className="text-3xl md:text-4xl font-black text-brand-dark tracking-tighter">
+                                Serviços Completos
+                            </h2>
+                            <p className="text-base md:text-lg text-gray-600 leading-relaxed">
+                                Prestamos serviços de edição, diagramação, design e acompanhamento editorial, pautados pelo rigor
+                                técnico, qualidade estética e respeito à identidade de cada obra e autor.
                             </p>
                         </div>
                     </div>

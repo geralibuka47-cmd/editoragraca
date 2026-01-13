@@ -136,6 +136,64 @@ export const deleteBook = async (id: string) => {
     await databases.deleteDocument(DATABASE_ID, BOOKS_COLLECTION_ID, id);
 };
 
+// Public Statistics
+export const getPublicStats = async (): Promise<{ booksCount: number; authorsCount: number; readersCount: number }> => {
+    try {
+        const books = await databases.listDocuments(DATABASE_ID, BOOKS_COLLECTION_ID, [Query.limit(1)]);
+        // Note: Counting users might be restricted. If so, this will fail or return 0. 
+        // We catch the error and return 0 for users if restricted.
+        let usersCount = 0;
+        try {
+            // Try to fetch users count (might need specific permissions)
+            const users = await databases.listDocuments(DATABASE_ID, USERS_COLLECTION_ID, [Query.limit(1)]);
+            usersCount = users.total;
+        } catch (e) {
+            console.warn("Could not fetch user count (likely permission restricted).");
+        }
+
+        // For authors, we could count unique authors in books if we don't have a separate collection,
+        // or just return a placeholder if we want to be strictly correct about "Authors" vs "Users".
+        // Let's assume we want to count unique author names from books for now as a proxy if we don't have specific author profiles linked.
+        // Actually, let's just use the books count and maybe estimated readers.
+
+        return {
+            booksCount: books.total,
+            authorsCount: 0, // Placeholder or need logic to count unique authors
+            readersCount: usersCount
+        };
+    } catch (error) {
+        console.error("Error fetching public stats:", error);
+        return { booksCount: 0, authorsCount: 0, readersCount: 0 };
+    }
+};
+
+// Public Categories
+export const getCategories = async (): Promise<{ name: string; count: number; image?: string }[]> => {
+    try {
+        // Fetch all books to aggregate categories. 
+        // Optimization: In a large DB, we should use a proper aggregation or separate collection. 
+        // For now, fetching all is acceptable for small-medium catalogues.
+        const books = await getBooks();
+
+        const categoryMap = new Map<string, { count: number; image?: string }>();
+
+        books.forEach(book => {
+            const cat = book.category || 'Outros';
+            const current = categoryMap.get(cat) || { count: 0, image: book.coverUrl };
+            categoryMap.set(cat, { count: current.count + 1, image: current.image }); // Keep first image found
+        });
+
+        return Array.from(categoryMap.entries()).map(([name, data]) => ({
+            name,
+            count: data.count,
+            image: data.image
+        }));
+    } catch (error) {
+        console.error("Error fetching categories:", error);
+        return [];
+    }
+};
+
 // Orders Collection
 export const getOrders = async (userId?: string): Promise<Order[]> => {
     try {
