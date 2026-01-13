@@ -1,4 +1,3 @@
-
 import { ID, Query } from "appwrite";
 import { databases } from "./appwrite";
 import { Book, Order, User } from "../types";
@@ -8,6 +7,13 @@ const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID || 'main';
 const BOOKS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_BOOKS_COLLECTION || 'books';
 const ORDERS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_ORDERS_COLLECTION || 'orders';
 const USERS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_USERS_COLLECTION || 'users';
+const BLOG_COLLECTION_ID = import.meta.env.VITE_APPWRITE_BLOG_COLLECTION || 'blog_posts';
+const TEAM_COLLECTION_ID = import.meta.env.VITE_APPWRITE_TEAM_COLLECTION || 'team_members';
+const SERVICES_COLLECTION_ID = import.meta.env.VITE_APPWRITE_SERVICES_COLLECTION || 'editorial_services';
+const REVIEWS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_REVIEWS_COLLECTION || 'reviews';
+const PAYMENT_NOTIFICATIONS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_PAYMENT_NOTIFICATIONS_COLLECTION || 'payment_notifications';
+const PAYMENT_PROOFS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_PAYMENT_PROOFS_COLLECTION || 'payment_proofs';
+const MANUSCRIPTS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_MANUSCRIPTS_COLLECTION || 'manuscripts';
 
 const cleanData = (data: any) => {
     const clean: any = {};
@@ -15,9 +21,7 @@ const cleanData = (data: any) => {
         'paymentMethods': 'bankAccounts'
     };
 
-    // Numeric fields that must be converted to number for Appwrite
     const numericFields = ['price', 'stock', 'order', 'pages', 'total', 'totalAmount'];
-    // Fields that should be stringified as a single JSON string (not an array)
     const JSONFields = ['items'];
 
     Object.keys(data).forEach(key => {
@@ -25,10 +29,8 @@ const cleanData = (data: any) => {
             const dbKey = mapping[key] || key;
             const value = data[key];
 
-            // Skip undefined or null values
             if (value === undefined || value === null) return;
 
-            // Handle objects and arrays of objects
             if (typeof value === 'object' && !Array.isArray(value)) {
                 clean[dbKey] = JSON.stringify(value);
             } else if (Array.isArray(value)) {
@@ -49,22 +51,18 @@ const cleanData = (data: any) => {
     return clean;
 };
 
-// Helper to separate data parsing logic
 const ensureNumber = (val: any): number => {
     if (typeof val === 'number') return val;
     if (typeof val === 'string') {
-        // Remove known currency symbols or excessive whitespace if any (though usually just digits)
         const clean = val.replace(/[^\d.-]/g, '');
         return parseFloat(clean) || 0;
     }
     return 0;
 };
 
-// Helper to parse data from Appwrite (parses stringified JSON and maps back)
 const parseData = (doc: any) => {
     const parsed: any = { id: doc.$id, ...doc };
 
-    // Reverse mapping
     if (doc.bankAccounts) {
         parsed.paymentMethods = Array.isArray(doc.bankAccounts)
             ? doc.bankAccounts.map((item: string) => {
@@ -73,14 +71,12 @@ const parseData = (doc: any) => {
             : doc.bankAccounts;
     }
 
-    // Ensure numeric fields are numbers
     ['price', 'stock', 'pages', 'total', 'totalAmount'].forEach(field => {
         if (parsed[field] !== undefined) {
             parsed[field] = ensureNumber(parsed[field]);
         }
     });
 
-    // Parse items if they are strings (Order.items or PaymentNotification.items)
     if (doc.items) {
         if (typeof doc.items === 'string') {
             try { parsed.items = JSON.parse(doc.items); } catch (e) { /* ignore */ }
@@ -94,7 +90,6 @@ const parseData = (doc: any) => {
         }
     }
 
-    // Parse details (EditorialService)
     if (doc.details && Array.isArray(doc.details)) {
         parsed.details = doc.details.map((item: any) => {
             if (typeof item === 'string' && (item.startsWith('{') || item.startsWith('['))) {
@@ -110,14 +105,13 @@ const parseData = (doc: any) => {
 // Books Collection
 export const getBooks = async (): Promise<Book[]> => {
     try {
-        databases.client.headers['X-Appwrite-Response-Format'] = '0.15.0'; // Implicitly handled by SDK but good to know
+        databases.client.headers['X-Appwrite-Response-Format'] = '0.15.0';
         const response = await databases.listDocuments(
             DATABASE_ID,
             BOOKS_COLLECTION_ID,
-            [Query.limit(100)] // Increase limit to fetch more books
+            [Query.limit(100)]
         );
         return response.documents.map(doc => {
-            // Use parseData or manual normalization
             const book = { id: doc.$id, ...doc } as any;
             book.price = ensureNumber(book.price);
             book.stock = ensureNumber(book.stock);
@@ -135,12 +129,10 @@ export const saveBook = async (book: Book) => {
         const { id } = book;
         const bookData = cleanData(book);
 
-        // Validation
         if (!bookData.title || !bookData.author) {
             throw new Error("Título e Autor são obrigatórios.");
         }
 
-        // If it's an existing book
         if (id && id.length > 5 && !id.startsWith('temp_')) {
             try {
                 await databases.updateDocument(DATABASE_ID, BOOKS_COLLECTION_ID, id, bookData);
@@ -167,25 +159,17 @@ export const deleteBook = async (id: string) => {
 export const getPublicStats = async (): Promise<{ booksCount: number; authorsCount: number; readersCount: number }> => {
     try {
         const books = await databases.listDocuments(DATABASE_ID, BOOKS_COLLECTION_ID, [Query.limit(1)]);
-        // Note: Counting users might be restricted. If so, this will fail or return 0. 
-        // We catch the error and return 0 for users if restricted.
         let usersCount = 0;
         try {
-            // Try to fetch users count (might need specific permissions)
             const users = await databases.listDocuments(DATABASE_ID, USERS_COLLECTION_ID, [Query.limit(1)]);
             usersCount = users.total;
         } catch (e) {
-            console.warn("Could not fetch user count (likely permission restricted).");
+            console.warn("Could not fetch user count.");
         }
-
-        // For authors, we could count unique authors in books if we don't have a separate collection,
-        // or just return a placeholder if we want to be strictly correct about "Authors" vs "Users".
-        // Let's assume we want to count unique author names from books for now as a proxy if we don't have specific author profiles linked.
-        // Actually, let's just use the books count and maybe estimated readers.
 
         return {
             booksCount: books.total,
-            authorsCount: 0, // Placeholder or need logic to count unique authors
+            authorsCount: 0,
             readersCount: usersCount
         };
     } catch (error) {
@@ -197,17 +181,13 @@ export const getPublicStats = async (): Promise<{ booksCount: number; authorsCou
 // Public Categories
 export const getCategories = async (): Promise<{ name: string; count: number; image?: string }[]> => {
     try {
-        // Fetch all books to aggregate categories. 
-        // Optimization: In a large DB, we should use a proper aggregation or separate collection. 
-        // For now, fetching all is acceptable for small-medium catalogues.
         const books = await getBooks();
-
         const categoryMap = new Map<string, { count: number; image?: string }>();
 
         books.forEach(book => {
             const cat = book.category || 'Outros';
             const current = categoryMap.get(cat) || { count: 0, image: book.coverUrl };
-            categoryMap.set(cat, { count: current.count + 1, image: current.image }); // Keep first image found
+            categoryMap.set(cat, { count: current.count + 1, image: current.image });
         });
 
         return Array.from(categoryMap.entries()).map(([name, data]) => ({
@@ -242,15 +222,11 @@ export const getOrders = async (userId?: string): Promise<Order[]> => {
 
 export const createOrder = async (order: Omit<Order, 'id'>): Promise<string> => {
     const orderData = cleanData(order);
-
     const response = await databases.createDocument(
         DATABASE_ID,
         ORDERS_COLLECTION_ID,
         ID.unique(),
-        {
-            ...orderData,
-            date: new Date().toISOString()
-        }
+        { ...orderData, date: new Date().toISOString() }
     );
     return response.$id;
 };
@@ -292,21 +268,14 @@ export const getAllUsers = async (): Promise<User[]> => {
     }
 };
 
-// Payment Notifications Collection
-const PAYMENT_NOTIFICATIONS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_PAYMENT_NOTIFICATIONS_COLLECTION || 'payment_notifications';
-const PAYMENT_PROOFS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_PAYMENT_PROOFS_COLLECTION || 'payment_proofs';
-
+// Payment Notifications
 export const createPaymentNotification = async (notification: Omit<import('../types').PaymentNotification, 'id'>): Promise<string> => {
     const data = cleanData(notification);
     const response = await databases.createDocument(
         DATABASE_ID,
         PAYMENT_NOTIFICATIONS_COLLECTION_ID,
         ID.unique(),
-        {
-            ...data,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-        }
+        { ...data, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
     );
     return response.$id;
 };
@@ -347,24 +316,18 @@ export const updatePaymentNotificationStatus = async (
         DATABASE_ID,
         PAYMENT_NOTIFICATIONS_COLLECTION_ID,
         notificationId,
-        {
-            status,
-            updatedAt: new Date().toISOString()
-        }
+        { status, updatedAt: new Date().toISOString() }
     );
 };
 
-// Payment Proofs Collection
+// Payment Proofs
 export const createPaymentProof = async (proof: Omit<import('../types').PaymentProof, 'id'>): Promise<string> => {
     const data = cleanData(proof);
     const response = await databases.createDocument(
         DATABASE_ID,
         PAYMENT_PROOFS_COLLECTION_ID,
         ID.unique(),
-        {
-            ...data,
-            uploadedAt: new Date().toISOString()
-        }
+        { ...data, uploadedAt: new Date().toISOString() }
     );
     return response.$id;
 };
@@ -386,36 +349,23 @@ export const getPaymentProofByNotification = async (notificationId: string): Pro
     }
 };
 
-export const confirmPaymentProof = async (
-    proofId: string,
-    adminId: string,
-    notes?: string
-): Promise<void> => {
+export const confirmPaymentProof = async (proofId: string, adminId: string, notes?: string): Promise<void> => {
     await databases.updateDocument(
         DATABASE_ID,
         PAYMENT_PROOFS_COLLECTION_ID,
         proofId,
-        {
-            confirmedBy: adminId,
-            confirmedAt: new Date().toISOString(),
-            notes: notes || ''
-        }
+        { confirmedBy: adminId, confirmedAt: new Date().toISOString(), notes: notes || '' }
     );
 };
 
-// Manuscripts Collection
-const MANUSCRIPTS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_MANUSCRIPTS_COLLECTION || 'manuscripts';
-
+// Manuscripts
 export const createManuscript = async (manuscript: Omit<import('../types').Manuscript, 'id'>): Promise<string> => {
     const data = cleanData(manuscript);
     const response = await databases.createDocument(
         DATABASE_ID,
         MANUSCRIPTS_COLLECTION_ID,
         ID.unique(),
-        {
-            ...data,
-            submittedDate: new Date().toISOString()
-        }
+        { ...data, submittedDate: new Date().toISOString() }
     );
     return response.$id;
 };
@@ -457,76 +407,46 @@ export const updateManuscriptStatus = async (
         DATABASE_ID,
         MANUSCRIPTS_COLLECTION_ID,
         manuscriptId,
-        {
-            status,
-            feedback: feedback || '',
-            reviewedDate: new Date().toISOString()
-        }
+        { status, feedback: feedback || '', reviewedDate: new Date().toISOString() }
     );
 };
 
-// Statistics & Royalties
+// Admin Stats
 export const getAdminStats = async (): Promise<{ totalBooks: number; totalUsers: number; pendingOrders: number; revenue: number }> => {
     let totalBooks = 0;
     let totalUsers = 0;
     let pendingOrders = 0;
     let revenue = 0;
 
-    // 1. Books
     try {
         const books = await databases.listDocuments(DATABASE_ID, BOOKS_COLLECTION_ID, [Query.limit(1)]);
         totalBooks = books.total;
-    } catch (e) {
-        console.error("Failed to fetch books stat:", e);
-    }
+    } catch (e) { }
 
-    // 2. Users (Often fails due to permissions)
     try {
         const users = await databases.listDocuments(DATABASE_ID, USERS_COLLECTION_ID, [Query.limit(1)]);
         totalUsers = users.total;
-    } catch (e) {
-        console.warn("Failed to fetch users stat (permission restricted?):", e);
-    }
+    } catch (e) { }
 
-    // 3. Pending Orders (Payment Notifications with status 'proof_uploaded')
     try {
         const pendingPayments = await databases.listDocuments(DATABASE_ID, PAYMENT_NOTIFICATIONS_COLLECTION_ID, [Query.equal('status', 'proof_uploaded')]);
         pendingOrders = pendingPayments.total;
-    } catch (e) {
-        console.error("Failed to fetch pending orders stat:", e);
-    }
+    } catch (e) { }
 
-    // 4. Revenue (Confirmed Payments)
     try {
-        // Limitation: This only sums the page returned. ideally we need aggregation. 
-        // For now, fetching a larger limit or assuming we don't have thousands yet.
-        // Or better, just count total for now if aggregation isn't available.
-        // Actually, to get revenue we need to sum values. 
-        // We'll fetch all confirmed payments (up to limit, typically 25 or 100 by default). 
-        // To be accurate we'd need pagination loop, but for 'stats' quick view let's keep it simple or increase limit.
         const confirmedPayments = await databases.listDocuments(DATABASE_ID, PAYMENT_NOTIFICATIONS_COLLECTION_ID, [
             Query.equal('status', 'confirmed'),
             Query.limit(100)
         ]);
         revenue = confirmedPayments.documents.reduce((acc, curr) => acc + (curr.totalAmount || 0), 0);
-    } catch (e) {
-        console.error("Failed to fetch revenue stat:", e);
-    }
+    } catch (e) { }
 
-    return {
-        totalBooks,
-        totalUsers,
-        pendingOrders,
-        revenue
-    };
+    return { totalBooks, totalUsers, pendingOrders, revenue };
 };
 
 export const getAuthorStats = async (authorId: string): Promise<{ publishedBooks: number; totalSales: number; totalRoyalties: number }> => {
     try {
-        // 1. Published books
         const books = await databases.listDocuments(DATABASE_ID, BOOKS_COLLECTION_ID, [Query.equal('authorId', authorId)]);
-
-        // 2. Sales (from confirmed payments)
         const confirmedPayments = await databases.listDocuments(DATABASE_ID, PAYMENT_NOTIFICATIONS_COLLECTION_ID, [Query.equal('status', 'confirmed')]);
 
         let totalSales = 0;
@@ -545,10 +465,9 @@ export const getAuthorStats = async (authorId: string): Promise<{ publishedBooks
         return {
             publishedBooks: books.total,
             totalSales: totalSales,
-            totalRoyalties: authorRevenue * 0.7 // 70% Royalty
+            totalRoyalties: authorRevenue * 0.7
         };
     } catch (error) {
-        console.error("Erro ao buscar estatísticas do autor:", error);
         return { publishedBooks: 0, totalSales: 0, totalRoyalties: 0 };
     }
 };
@@ -579,7 +498,6 @@ export const getAuthorConfirmedSales = async (authorId: string): Promise<any[]> 
 
         return authorSales;
     } catch (error) {
-        console.error("Erro ao buscar vendas do autor:", error);
         return [];
     }
 };
@@ -603,16 +521,11 @@ export const getUserBooks = async (readerId: string): Promise<Book[]> => {
         const allBooks = await getBooks();
         return allBooks.filter(book => bookIds.has(book.id));
     } catch (error) {
-        console.error("Erro ao buscar livros do utilizador:", error);
         return [];
     }
 };
 
-const BLOG_COLLECTION_ID = import.meta.env.VITE_APPWRITE_BLOG_COLLECTION || 'blog_posts';
-const TEAM_COLLECTION_ID = import.meta.env.VITE_APPWRITE_TEAM_COLLECTION || 'team_members';
-const SERVICES_COLLECTION_ID = import.meta.env.VITE_APPWRITE_SERVICES_COLLECTION || 'editorial_services';
-
-// Blog Posts
+// Blog
 export const getBlogPosts = async (): Promise<import('../types').BlogPost[]> => {
     try {
         const response = await databases.listDocuments(DATABASE_ID, BLOG_COLLECTION_ID, [Query.orderDesc('date')]);
@@ -636,7 +549,7 @@ export const deleteBlogPost = async (id: string) => {
     await databases.deleteDocument(DATABASE_ID, BLOG_COLLECTION_ID, id);
 };
 
-// Team Members
+// Team
 export const getTeamMembers = async (): Promise<any[]> => {
     try {
         const response = await databases.listDocuments(DATABASE_ID, TEAM_COLLECTION_ID, [Query.orderAsc('order')]);
@@ -661,7 +574,7 @@ export const deleteTeamMember = async (id: string) => {
     await databases.deleteDocument(DATABASE_ID, TEAM_COLLECTION_ID, id);
 };
 
-// Editorial Services
+// Services
 export const getEditorialServices = async (): Promise<import('../types').EditorialService[]> => {
     try {
         const response = await databases.listDocuments(DATABASE_ID, SERVICES_COLLECTION_ID, [Query.orderAsc('order')]);
@@ -686,22 +599,15 @@ export const deleteEditorialService = async (id: string) => {
     await databases.deleteDocument(DATABASE_ID, SERVICES_COLLECTION_ID, id);
 };
 
-// Reviews & Stats (Simulated or Hybrid)
-// Note: In a real scenario, we would have a 'reviews' collection. 
-// For now, we'll simulate fetching/saving to a sub-attribute if possible, or just return dummy data for UI demo if collection doesn't exist.
-
-const REVIEWS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_REVIEWS_COLLECTION || 'reviews';
-
+// Reviews
 export const getBookReviews = async (bookId: string): Promise<import('../types').Review[]> => {
     try {
-        // Attempt to fetch from real collection
         const response = await databases.listDocuments(DATABASE_ID, REVIEWS_COLLECTION_ID, [
             Query.equal('bookId', bookId),
             Query.orderDesc('date')
         ]);
         return response.documents.map(doc => parseData(doc) as import('../types').Review);
     } catch (error) {
-        // Fallback: Return empty or mock array for UI testing if collection not found
         console.warn("Could not fetch reviews (Collection might not exist yet).");
         return [
             { id: '1', bookId, userId: 'mock1', userName: 'Maria Silva', rating: 5, comment: 'Uma obra prima! Adorei cada página.', date: new Date().toISOString() },
@@ -723,6 +629,5 @@ export const addBookReview = async (review: Omit<import('../types').Review, 'id'
 };
 
 export const incrementBookView = async (bookId: string) => {
-    // In a real app, calls a Function or increments a counter in DB
     console.log(`View incremented for book ${bookId}`);
 };
