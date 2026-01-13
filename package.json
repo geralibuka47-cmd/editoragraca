@@ -6,7 +6,9 @@
     "scripts": {
         "dev": "vite",
         "build": "vite build",
-        "preview": "vite preview"
+        "preview": "vite preview",
+        "setup:db": "node scripts/setup_database.mjs",
+        "create:admin": "node scripts/create_admin.mjs"
     },
     "dependencies": {
         "@tailwindcss/vite": "^4.1.18",
