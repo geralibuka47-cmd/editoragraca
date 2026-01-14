@@ -146,7 +146,7 @@ const App: React.FC = () => {
             case 'TEAM':
                 return <TeamPage onNavigate={handleNavigate} />;
             case 'BLOG':
-                return <BlogPage onNavigate={handleNavigate} />;
+                return <BlogPage />;
             case 'PODCAST':
                 return <PodcastPage onNavigate={handleNavigate} />;
             case 'READER_DASHBOARD':
