@@ -101,7 +101,14 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
     const handleSubmitManuscript = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!user) return;
-        if (!validateManuscript()) return;
+
+        setSubmitErrors({});
+
+        if (!validateManuscript()) {
+            // Scroll to the top of the form or first error if needed
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+        }
 
         setSubmitLoading(true);
         try {
@@ -128,10 +135,13 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
             alert('Manuscrito submetido com sucesso! A nossa equipa irá analisar e entrará em contacto brevemente.');
             setSubmitData({ title: '', genre: '', pages: '', description: '' });
             setSelectedFile(null);
+            setSubmitErrors({});
             setActiveTab('manuscripts');
-        } catch (error) {
+        } catch (error: any) {
             console.error('Erro ao submeter:', error);
-            alert('Ocorreu um erro ao submeter o manuscrito. Por favor, tente novamente.');
+            setSubmitErrors({
+                form: error.message || 'Ocorreu um erro ao submeter o manuscrito. Por favor, verifique os dados e tente novamente.'
+            });
         } finally {
             setSubmitLoading(false);
         }
@@ -300,6 +310,14 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                             <h2 className="text-3xl font-black text-brand-dark mb-8">Submeter Novo Manuscrito</h2>
                             <div className="bg-white rounded-3xl shadow-lg p-8 max-w-3xl">
                                 <form onSubmit={handleSubmitManuscript} className="space-y-6">
+                                    {submitErrors.form && (
+                                        <div className="p-4 bg-red-50 border border-red-200 rounded-xl mb-6">
+                                            <p className="text-red-600 text-sm font-bold flex items-center gap-2">
+                                                <XCircle className="w-5 h-5" />
+                                                {submitErrors.form}
+                                            </p>
+                                        </div>
+                                    )}
                                     <div className="form-group-premium">
                                         <label className="label-premium">
                                             Título da Obra *
@@ -334,11 +352,12 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                                                 className={`input-premium ${submitErrors.genre ? 'border-red-500 bg-red-50' : ''}`}
                                             >
                                                 <option value="">Selecione...</option>
-                                                <option value="romance">Romance</option>
-                                                <option value="ficcao">Ficção</option>
-                                                <option value="poesia">Poesia</option>
-                                                <option value="nao-ficcao">Não-Ficção</option>
-                                                <option value="infantil">Infantil</option>
+                                                <option value="Ficção">Ficção</option>
+                                                <option value="Não-Ficção">Não-Ficção</option>
+                                                <option value="Técnico">Técnico</option>
+                                                <option value="Infantil">Infantil</option>
+                                                <option value="Poesia">Poesia</option>
+                                                <option value="Literatura Angolana">Literatura Angolana</option>
                                             </select>
                                             {submitErrors.genre && <p className="text-red-500 text-[10px] mt-1 font-bold italic">{submitErrors.genre}</p>}
                                         </div>

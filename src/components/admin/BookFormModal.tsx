@@ -16,10 +16,11 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
 
     // Form State
     const [formData, setFormData] = useState({
+        id: '',
         title: '',
         author: '',
         price: '',
-        category: 'Ficção',
+        genre: 'Ficção',
         description: '',
         stock: '0',
         isbn: '',
@@ -43,10 +44,11 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
         if (isOpen) {
             if (book) {
                 setFormData({
+                    id: book.id,
                     title: book.title,
                     author: book.author,
                     price: book.price.toString(),
-                    category: book.category,
+                    genre: book.genre,
                     description: book.description,
                     stock: (book.stock || 0).toString(),
                     isbn: book.isbn || '',
@@ -67,10 +69,11 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
             } else {
                 // Reset for new book
                 setFormData({
+                    id: '',
                     title: '',
                     author: '',
                     price: '',
-                    category: 'Ficção',
+                    genre: 'Ficção',
                     description: '',
                     stock: '0',
                     isbn: '',
@@ -133,6 +136,7 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
         }
 
         setIsSubmitting(true);
+        setErrors({});
         try {
             // Further sanitize data before sending
             const sanitizedData = {
@@ -142,13 +146,19 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                 description: formData.description.trim(),
                 isbn: formData.isbn.trim(),
                 price: Number(formData.price) || 0,
-                stock: Number(formData.stock) || 0
+                stock: Number(formData.stock) || 0,
+                // Ensure ID is passed if it exists
+                id: formData.id || undefined
             };
 
             await onSave(sanitizedData, coverFile, digitalFile);
             onClose();
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error submitting form", error);
+            setErrors({
+                form: error.message || "Ocorreu um erro ao salvar o livro. Verifique os dados e tente novamente."
+            });
+            setActiveTab('info');
         } finally {
             setIsSubmitting(false);
         }
@@ -239,13 +249,13 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                 {errors.author && <p className="text-red-500 text-[10px] mt-1 font-bold italic">{errors.author}</p>}
                             </div>
                             <div className="form-group-premium">
-                                <label htmlFor="category-select" className="label-premium">Categoria</label>
+                                <label htmlFor="genre-select" className="label-premium">Gênero / Categoria</label>
                                 <select
-                                    id="category-select"
+                                    id="genre-select"
                                     className="input-premium"
-                                    value={formData.category}
-                                    onChange={e => setFormData({ ...formData, category: e.target.value })}
-                                    title="Selecione a categoria do livro"
+                                    value={formData.genre}
+                                    onChange={e => setFormData({ ...formData, genre: e.target.value })}
+                                    title="Selecione o gênero do livro"
                                 >
                                     <option value="Ficção">Ficção</option>
                                     <option value="Não-Ficção">Não-Ficção</option>

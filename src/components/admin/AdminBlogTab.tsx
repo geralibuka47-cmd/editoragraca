@@ -25,6 +25,7 @@ const AdminBlogTab: React.FC<AdminBlogTabProps> = ({ posts, onRefresh }) => {
     const [contentType, setContentType] = useState<ContentType>('post');
     const [isCreating, setIsCreating] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitErrors, setSubmitErrors] = useState<Record<string, string>>({});
 
     // Post state
     const [postContent, setPostContent] = useState('');
@@ -63,8 +64,9 @@ const AdminBlogTab: React.FC<AdminBlogTabProps> = ({ posts, onRefresh }) => {
             setPostImage('');
             setIsCreating(false);
             onRefresh();
-        } catch (error) {
-            showToast('Erro ao publicar post', 'error');
+        } catch (error: any) {
+            console.error('Erro ao publicar post:', error);
+            setSubmitErrors({ form: error.message || 'Erro ao publicar post. Tente novamente.' });
         } finally {
             setIsSubmitting(false);
         }
@@ -93,8 +95,9 @@ const AdminBlogTab: React.FC<AdminBlogTabProps> = ({ posts, onRefresh }) => {
             setEventData({ title: '', date: '', time: '', location: '', description: '', imageUrl: '' });
             setIsCreating(false);
             onRefresh();
-        } catch (error) {
-            showToast('Erro ao criar evento', 'error');
+        } catch (error: any) {
+            console.error('Erro ao criar evento:', error);
+            setSubmitErrors({ form: error.message || 'Erro ao criar evento. Tente novamente.' });
         } finally {
             setIsSubmitting(false);
         }
@@ -138,6 +141,12 @@ const AdminBlogTab: React.FC<AdminBlogTabProps> = ({ posts, onRefresh }) => {
                         {/* Post Form */}
                         {contentType === 'post' && (
                             <div className="space-y-4">
+                                {submitErrors.form && (
+                                    <div className="p-4 bg-red-50 border border-red-200 rounded-xl mb-6 flex items-center gap-2 text-red-600 text-sm font-bold">
+                                        <X className="w-5 h-5" />
+                                        {submitErrors.form}
+                                    </div>
+                                )}
                                 <textarea
                                     value={postContent}
                                     onChange={(e) => setPostContent(e.target.value)}
@@ -210,6 +219,12 @@ const AdminBlogTab: React.FC<AdminBlogTabProps> = ({ posts, onRefresh }) => {
                         {/* Event Form */}
                         {contentType === 'event' && (
                             <div className="space-y-4">
+                                {submitErrors.form && (
+                                    <div className="p-4 bg-red-50 border border-red-200 rounded-xl mb-6 flex items-center gap-2 text-red-600 text-sm font-bold">
+                                        <X className="w-5 h-5" />
+                                        {submitErrors.form}
+                                    </div>
+                                )}
                                 <div className="form-group-premium">
                                     <label className="label-premium">Nome do Evento</label>
                                     <input

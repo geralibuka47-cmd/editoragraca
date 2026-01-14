@@ -64,9 +64,6 @@ const AdminBooksTab: React.FC<AdminBooksTabProps> = ({ onStatsRefresh }) => {
             // Clean up empty optional fields
             const dataToSave = {
                 ...bookData,
-                id: editingBook?.id || '',
-                price: parseInt(bookData.price),
-                stock: parseInt(bookData.stock),
                 coverUrl: finalCoverUrl,
                 digitalFileUrl: finalDigitalUrl,
                 launchDate: bookData.launchDate || undefined
@@ -138,7 +135,7 @@ const AdminBooksTab: React.FC<AdminBooksTabProps> = ({ onStatsRefresh }) => {
                                 <tr key={book.id} className="hover:bg-gray-50">
                                     <td className="px-6 py-4 font-bold text-brand-dark">{book.title}</td>
                                     <td className="px-6 py-4 text-sm text-gray-600">{book.author}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-600">{book.category}</td>
+                                    <td className="px-6 py-4 text-sm text-gray-600">{book.genre}</td>
                                     <td className="px-6 py-4">
                                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest ${book.format === 'digital' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'}`}>
                                             {book.format || 'físico'}

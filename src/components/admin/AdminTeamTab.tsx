@@ -7,6 +7,7 @@ const AdminTeamTab: React.FC = () => {
     const [showTeamModal, setShowTeamModal] = useState(false);
     const [teamForm, setTeamForm] = useState<any>({ name: '', role: '', department: '', bio: '', photoUrl: '', order: 0 });
     const [isSavingTeam, setIsSavingTeam] = useState(false);
+    const [teamErrors, setTeamErrors] = useState<Record<string, string>>({});
 
     const fetchTeamMembers = async () => {
         setIsLoadingTeam(true);
@@ -27,10 +28,11 @@ const AdminTeamTab: React.FC = () => {
 
     const handleSaveTeam = async (e: React.FormEvent) => {
         e.preventDefault();
+        setTeamErrors({});
 
         // Basic validation
         if (!teamForm.name.trim() || !teamForm.role.trim()) {
-            alert('Nome e Cargo são obrigatórios');
+            setTeamErrors({ form: 'Nome e Cargo são obrigatórios' });
             return;
         }
 
@@ -51,10 +53,11 @@ const AdminTeamTab: React.FC = () => {
             await saveTeamMember(sanitizedMember);
             alert('Membro guardado com sucesso!');
             setShowTeamModal(false);
+            setTeamErrors({});
             fetchTeamMembers();
-        } catch (error) {
+        } catch (error: any) {
             console.error('Erro ao salvar membro:', error);
-            alert('Erro ao salvar membro.');
+            setTeamErrors({ form: error.message || 'Erro ao salvar membro. Verifique os dados e tente novamente.' });
         } finally {
             setIsSavingTeam(false);
         }
@@ -155,6 +158,12 @@ const AdminTeamTab: React.FC = () => {
                             <h2 className="text-2xl font-black text-brand-dark">{teamForm.id ? 'Editar Membro' : 'Novo Membro'}</h2>
                         </div>
                         <form onSubmit={handleSaveTeam} className="flex-1 overflow-y-auto p-8 space-y-6">
+                            {teamErrors.form && (
+                                <div className="p-4 bg-red-50 border border-red-200 rounded-xl mb-6 flex items-center gap-2 text-red-600 text-sm font-bold">
+                                    <X className="w-5 h-5" />
+                                    {teamErrors.form}
+                                </div>
+                            )}
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="form-group-premium">
                                     <label htmlFor="team-name" className="label-premium">Nome</label>

@@ -74,13 +74,18 @@ const cleanDataForSupabase = (data: any, table: string) => {
     const NumericFields = ['price', 'stock', 'pages', 'display_order', 'total_amount', 'rating', 'total'];
 
     Object.keys(data).forEach(key => {
-        // Skip internal/id fields
-        if (key === 'id' || key.startsWith('$')) return;
+        // Skip internal or temporary id fields
+        if (key.startsWith('$')) return;
 
-        const dbKey = mapping[key] || key;
         let value = data[key];
+        const dbKey = mapping[key] || key;
 
-        // 1. Skip undefined/null
+        // Skip id if it's temporary (starts with temp_)
+        if (key === 'id' && (typeof value === 'string' && value.startsWith('temp_'))) return;
+        // Skip id if it's empty
+        if (key === 'id' && !value) return;
+
+        // 1. Skip undefined/null (except if it's an intentional clear, but usually we want to skip)
         if (value === undefined || value === null) return;
 
         // 2. Sanitize Strings
@@ -90,9 +95,18 @@ const cleanDataForSupabase = (data: any, table: string) => {
 
         // 3. Handle specific types
         if (JSONFields.includes(dbKey)) {
-            clean[dbKey] = typeof value === 'string' ? JSON.parse(value) : value;
+            try {
+                if (typeof value === 'string') {
+                    clean[dbKey] = value.trim() ? JSON.parse(value) : [];
+                } else {
+                    clean[dbKey] = value;
+                }
+            } catch (e) {
+                console.warn(`Erro ao processar JSON para ${dbKey}:`, value);
+                clean[dbKey] = [];
+            }
         } else if (ArrayFields.includes(dbKey)) {
-            clean[dbKey] = Array.isArray(value) ? value : [value];
+            clean[dbKey] = Array.isArray(value) ? value : (value ? [value] : []);
         } else if (NumericFields.includes(dbKey)) {
             // Ensure numbers are numbers, not strings from forms
             const num = Number(value);
@@ -229,15 +243,15 @@ export const getPublicStats = async () => {
 export const getCategories = async (): Promise<{ name: string; count: number; image?: string }[]> => {
     try {
         const books = await getBooks();
-        const categoryMap = new Map<string, { count: number; image?: string }>();
+        const genreMap = new Map<string, { count: number; image?: string }>();
 
         books.forEach(book => {
-            const cat = book.category || 'Outros';
-            const current = categoryMap.get(cat) || { count: 0, image: book.coverUrl };
-            categoryMap.set(cat, { count: current.count + 1, image: current.image });
+            const gen = book.genre || 'Outros';
+            const current = genreMap.get(gen) || { count: 0, image: book.coverUrl };
+            genreMap.set(gen, { count: current.count + 1, image: current.image });
         });
 
-        return Array.from(categoryMap.entries()).map(([name, data]) => ({
+        return Array.from(genreMap.entries()).map(([name, data]) => ({
             name,
             count: data.count,
             image: data.image

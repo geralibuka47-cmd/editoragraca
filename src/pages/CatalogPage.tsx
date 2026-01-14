@@ -23,7 +23,7 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
     onNavigate
 }) => {
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('Todos');
+    const [selectedGenre, setSelectedGenre] = useState('Todos');
     const [sortBy, setSortBy] = useState('title-asc');
     const [showFilters, setShowFilters] = useState(false);
     const [priceRange, setPriceRange] = useState<'all' | 'low' | 'mid' | 'high'>('all');
@@ -38,9 +38,9 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
         }
     }, []);
 
-    const categories = useMemo(() => {
-        const cats = new Set(books.map(b => b.category));
-        return ['Todos', ...Array.from(cats).sort()];
+    const genres = useMemo(() => {
+        const gens = new Set(books.map(b => b.genre));
+        return ['Todos', ...Array.from(gens).sort()];
     }, [books]);
 
     const filteredBooks = useMemo(() => {
@@ -55,8 +55,8 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
             );
         }
 
-        if (selectedCategory !== 'Todos') {
-            result = result.filter(book => book.category === selectedCategory);
+        if (selectedGenre !== 'Todos') {
+            result = result.filter(book => book.genre === selectedGenre);
         }
 
         if (priceRange === 'low') {
@@ -86,11 +86,11 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
         }
 
         return result;
-    }, [books, searchQuery, selectedCategory, sortBy, priceRange, showOnlyNew, showOnlyBestsellers]);
+    }, [books, searchQuery, selectedGenre, sortBy, priceRange, showOnlyNew, showOnlyBestsellers]);
 
     const clearAllFilters = () => {
         setSearchQuery('');
-        setSelectedCategory('Todos');
+        setSelectedGenre('Todos');
         setSortBy('title-asc');
         setPriceRange('all');
         setShowOnlyNew(false);
@@ -98,7 +98,7 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
     };
 
     const activeFiltersCount = [
-        selectedCategory !== 'Todos' ? 1 : 0,
+        selectedGenre !== 'Todos' ? 1 : 0,
         priceRange !== 'all' ? 1 : 0,
         showOnlyNew ? 1 : 0,
         showOnlyBestsellers ? 1 : 0,
@@ -230,16 +230,16 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
                                                 Categorias
                                             </h4>
                                             <div className="flex flex-wrap gap-2">
-                                                {categories.map(cat => (
+                                                {genres.map(gen => (
                                                     <button
-                                                        key={cat}
-                                                        onClick={() => setSelectedCategory(cat)}
-                                                        className={`px-4 py-2 rounded-xl text-xs font-black transition-all border-2 ${selectedCategory === cat
+                                                        key={gen}
+                                                        onClick={() => setSelectedGenre(gen)}
+                                                        className={`px-4 py-2 rounded-xl text-xs font-black transition-all border-2 ${selectedGenre === gen
                                                             ? 'bg-brand-primary border-brand-primary text-white'
                                                             : 'bg-white border-transparent text-gray-500 hover:border-brand-primary/30'
                                                             }`}
                                                     >
-                                                        {cat}
+                                                        {gen}
                                                     </button>
                                                 ))}
                                             </div>

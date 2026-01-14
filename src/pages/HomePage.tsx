@@ -32,16 +32,17 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
     useEffect(() => {
         const loadDynamicData = async () => {
             // Compute categories from books prop instead of fetching again
-            const computedCategories = books.reduce((acc, book) => {
-                const cat = book.category || 'Outros';
-                const found = acc.find(c => c.name === cat);
-                if (found) {
-                    found.count++;
-                } else {
-                    acc.push({ name: cat, count: 1, image: book.coverUrl });
-                }
-                return acc;
-            }, [] as { name: string; count: number; image?: string }[]);
+            const genreMap = new Map<string, { count: number; image?: string }>();
+            books.forEach(book => {
+                const gen = book.genre || 'Outros';
+                const current = genreMap.get(gen) || { count: 0, image: book.coverUrl };
+                genreMap.set(gen, { count: current.count + 1, image: current.image || book.coverUrl });
+            });
+            const computedCategories = Array.from(genreMap.entries()).map(([name, data]) => ({
+                name,
+                count: data.count,
+                image: data.image
+            }));
             setCategories(computedCategories);
 
             // Fetch other data in parallel

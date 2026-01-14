@@ -31,7 +31,7 @@ export interface Book {
   author: string;
   price: number;
   coverUrl: string;
-  category: string;
+  genre: string;
   isbn?: string;
   isNew?: boolean;
   isBestseller?: boolean;

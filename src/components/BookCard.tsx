@@ -7,7 +7,7 @@ interface BookCardProps {
         title: string;
         author: string;
         price: number;
-        category: string;
+        genre: string;
         description: string;
         coverUrl: string;
         format?: string;
@@ -89,7 +89,7 @@ const BookCard: React.FC<BookCardProps> = ({ book, onAddToCart, onToggleWishlist
 
             {/* Content Area */}
             <div className="p-6 space-y-2">
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{book.category}</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{book.genre}</p>
                 <h3 className="font-serif text-lg font-bold text-brand-dark line-clamp-1 group-hover:text-brand-primary transition-colors">
                     {book.title}
                 </h3>

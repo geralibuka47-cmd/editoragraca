@@ -168,7 +168,7 @@ const BookDetailModal: React.FC<BookDetailModalProps & { user?: UserType }> = ({
                             <div className="space-y-6">
                                 <div className="flex flex-wrap items-center gap-2 md:gap-3">
                                     <span className="px-2 md:px-3 py-1 bg-brand-primary/10 text-brand-primary font-black text-[9px] md:text-[10px] uppercase tracking-widest rounded-full">
-                                        {book.category}
+                                        {book.genre}
                                     </span>
                                     <span className={`px-2 md:px-3 py-1 font-black text-[9px] md:text-[10px] uppercase tracking-widest rounded-full ${book.format === 'digital' ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'}`}>
                                         {book.format === 'digital' ? 'E-Book' : 'Livro Físico'}
