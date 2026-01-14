@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Heart, MessageCircle, Share2, BookOpen, Calendar, User, TrendingUp } from 'lucide-react';
 import { getBlogPosts } from '../services/dataService';
 import { BlogPost } from '../types';
+import { OptimizedImage } from '../components/OptimizedImage';
 
 const BlogPage: React.FC = () => {
     const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -116,8 +117,8 @@ const BlogPage: React.FC = () => {
                                     <button
                                         onClick={() => toggleLike(post.id)}
                                         className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${likedPosts.has(post.id)
-                                                ? 'bg-red-50 text-red-600'
-                                                : 'hover:bg-gray-50 text-gray-600'
+                                            ? 'bg-red-50 text-red-600'
+                                            : 'hover:bg-gray-50 text-gray-600'
                                             }`}
                                     >
                                         <Heart
