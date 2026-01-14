@@ -52,6 +52,8 @@ create table public.profiles (
     address text,
     bio text,
     photo_url text,
+    preferred_contact jsonb,
+    payment_methods jsonb,
     created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 -- Blog Posts Table

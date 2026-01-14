@@ -104,6 +104,15 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
         }
     };
 
+    const isFree = !formData.price || parseInt(formData.price) === 0;
+
+    // Switch tab if it becomes hidden
+    useEffect(() => {
+        if (isFree && activeTab === 'payment') {
+            setActiveTab('info');
+        }
+    }, [isFree, activeTab]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
@@ -123,7 +132,7 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
         { id: 'info', label: 'Info Básica' },
         { id: 'details', label: 'Detalhes' },
         { id: 'files', label: 'Imagens & Arquivos' },
-        { id: 'payment', label: 'Pagamento' }
+        ...(!isFree ? [{ id: 'payment', label: 'Pagamento' }] : [])
     ];
 
     return (
@@ -265,6 +274,11 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                         onChange={e => setFormData({ ...formData, price: e.target.value })}
                                         placeholder="0"
                                     />
+                                    {isFree && (
+                                        <div className="mt-2 flex items-center gap-2 text-xs text-green-600 font-bold uppercase tracking-wider">
+                                            <CheckCircle className="w-3 h-3" /> Livro Gratuito
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="form-group-premium flex-1">
                                     <label htmlFor="stock" className="label-premium">Stock</label>
