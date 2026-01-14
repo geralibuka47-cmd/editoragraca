@@ -22,6 +22,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
     const [recentPosts, setRecentPosts] = useState<BlogPost[]>([]);
     const [siteContent, setSiteContent] = useState<any>({});
     const [testimonials, setTestimonials] = useState<any[]>([]);
+    const [isFetching, setIsFetching] = useState(true);
 
     useEffect(() => {
         const loadDynamicData = async () => {
@@ -40,6 +41,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
             setRecentPosts(b.slice(0, 3));
             setSiteContent(content);
             setTestimonials(t);
+            setIsFetching(false);
         };
         loadDynamicData();
     }, [books]); // Reload if books change
@@ -197,7 +199,11 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
                         </div>
                     ) : (
                         <div className="text-center py-10">
-                            <p className="text-gray-500">Carregando categorias...</p>
+                            {isFetching ? (
+                                <p className="text-gray-500 italic">Carregando categorias...</p>
+                            ) : (
+                                <p className="text-gray-400">Nenhuma categoria encontrada.</p>
+                            )}
                         </div>
                     )}
                 </div>
@@ -273,14 +279,18 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
                                     <div className="flex-1 space-y-2 text-center md:text-left">
                                         <span className="text-xs font-bold text-brand-primary uppercase tracking-wider">Último Episódio</span>
                                         <h4 className="font-bold text-brand-dark text-lg line-clamp-2">{latestEpisode.title}</h4>
-                                        <button onClick={() => onNavigate('PODCAST')} className="text-sm font-medium text-gray-500 hover:text-brand-primary flex items-center justify-center md:justify-start gap-1 transition-colors">
+                                        <button onClick={() => onNavigate('BLOG')} className="text-sm font-medium text-gray-500 hover:text-brand-primary flex items-center justify-center md:justify-start gap-1 transition-colors">
                                             Ouvir Agora <ArrowRight className="w-4 h-4" />
                                         </button>
                                     </div>
                                 </div>
                             ) : (
                                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center py-10">
-                                    <p className="text-gray-400">Carregando podcast...</p>
+                                    {isFetching ? (
+                                        <p className="text-gray-400 italic">Carregando podcast...</p>
+                                    ) : (
+                                        <p className="text-gray-400">Nenhum episódio disponível.</p>
+                                    )}
                                 </div>
                             )}
 
@@ -323,7 +333,11 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
                                     ))
                                 ) : (
                                     <div className="text-center py-10">
-                                        <p className="text-gray-400">Buscando novidades...</p>
+                                        {isFetching ? (
+                                            <p className="text-gray-400 italic">Buscando novidades...</p>
+                                        ) : (
+                                            <p className="text-gray-400">Nenhum artigo publicado ainda.</p>
+                                        )}
                                     </div>
                                 )}
                             </div>

@@ -85,17 +85,6 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ onNavigate }) => {
         return BookOpen;
     };
 
-    if (isLoading) {
-        return (
-            <div className="min-h-screen bg-brand-light flex items-center justify-center">
-                <div className="text-center">
-                    <Loader2 className="w-12 h-12 text-brand-primary animate-spin mx-auto mb-4" />
-                    <p className="font-serif text-xl font-bold text-brand-dark italic">Preparando os nossos serviços...</p>
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div className="min-h-screen bg-brand-light">
             {/* Hero */}

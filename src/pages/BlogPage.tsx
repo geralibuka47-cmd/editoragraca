@@ -118,17 +118,6 @@ const BlogPage: React.FC<BlogPageProps> = ({ user }) => {
     };
 
 
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="text-center">
-                    <BookOpen className="w-12 h-12 text-brand-primary animate-pulse mx-auto mb-4" />
-                    <p className="text-gray-500 font-serif italic">Carregando histórias...</p>
-                </div>
-            </div>
-        );
-    }
-
     if (selectedPost) {
         const interactions = postInteractions[selectedPost.id] || { likesCount: 0, comments: [], isLiked: false };
 

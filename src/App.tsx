@@ -180,12 +180,6 @@ const App: React.FC = () => {
             />
 
             <main className="flex-grow">
-                {loading && (
-                    <div className="fixed inset-0 z-[200] bg-white/80 backdrop-blur-md flex flex-col items-center justify-center gap-4">
-                        <Loader2 className="w-12 h-12 text-brand-primary animate-spin" />
-                        <p className="font-serif text-xl font-bold text-brand-dark italic">Abrindo as portas da sabedoria...</p>
-                    </div>
-                )}
 
                 <React.Suspense fallback={
                     <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
