@@ -124,6 +124,7 @@ create table public.payment_notifications (
     reader_email text not null,
     total_amount numeric not null,
     items jsonb,
+    payment_method text,
     status text default 'pending',
     created_at timestamp with time zone default timezone('utc'::text, now()) not null,
     updated_at timestamp with time zone
