@@ -174,7 +174,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
                                     className="group relative h-64 md:h-80 rounded-[2rem] overflow-hidden bg-brand-dark flex items-end p-8 md:p-10 cursor-pointer shadow-lg hover:shadow-xl transition-all"
                                 >
                                     {cat.image && (
-                                        <img src={cat.image} alt={cat.name} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-700" />
+                                        <img src={cat.image} alt={cat.name} loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-700" />
                                     )}
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent group-hover:from-brand-primary/80 group-hover:via-brand-primary/30 transition-colors duration-500"></div>
                                     <div className="relative z-10 space-y-2 md:space-y-3">
@@ -261,7 +261,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
 
                             {latestEpisode ? (
                                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-6 items-center">
-                                    <img src={latestEpisode.imageUrl} alt={latestEpisode.title} className="w-24 h-24 rounded-xl object-cover shadow-md" />
+                                    <img src={latestEpisode.imageUrl} alt={latestEpisode.title} loading="lazy" className="w-24 h-24 rounded-xl object-cover shadow-md" />
                                     <div className="flex-1 space-y-2 text-center md:text-left">
                                         <span className="text-xs font-bold text-brand-primary uppercase tracking-wider">Último Episódio</span>
                                         <h4 className="font-bold text-brand-dark text-lg line-clamp-2">{latestEpisode.title}</h4>
@@ -305,7 +305,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
                                     recentPosts.map(post => (
                                         <div key={post.id} onClick={() => onNavigate('BLOG')} className="group flex gap-4 items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100 cursor-pointer hover:shadow-md transition-all">
                                             <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0">
-                                                <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                                                <img src={post.imageUrl} alt={post.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
                                             </div>
                                             <div className="flex-1">
                                                 <h4 className="font-bold text-brand-dark line-clamp-2 group-hover:text-brand-primary transition-colors">{post.title}</h4>
