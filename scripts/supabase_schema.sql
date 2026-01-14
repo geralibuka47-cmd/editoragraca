@@ -147,62 +147,68 @@ create table public.reviews (
 
 -- Row Level Security (RLS) - Comprehensive Setup
 
+-- Helper function to check if current user is admin (avoids recursion)
+create or replace function public.is_admin()
+returns boolean as $$
+begin
+  return exists (
+    select 1 from public.profiles 
+    where id = auth.uid() and role = 'adm'
+  );
+end;
+$$ language plpgsql security definer;
+
 -- Books
 alter table public.books enable row level security;
 create policy "Public Read Books" on public.books for select using (true);
-create policy "Admin Full Access Books" on public.books 
-    for all using (exists (select 1 from public.profiles where id = auth.uid() and role = 'adm'));
+create policy "Admin Full Access Books" on public.books for all using (public.is_admin());
 
 -- Blog Posts
 alter table public.blog_posts enable row level security;
 create policy "Public Read Blog" on public.blog_posts for select using (true);
-create policy "Admin Full Access Blog" on public.blog_posts 
-    for all using (exists (select 1 from public.profiles where id = auth.uid() and role = 'adm'));
+create policy "Admin Full Access Blog" on public.blog_posts for all using (public.is_admin());
 
 -- Team Members
 alter table public.team_members enable row level security;
 create policy "Public Read Team" on public.team_members for select using (true);
-create policy "Admin Full Access Team" on public.team_members 
-    for all using (exists (select 1 from public.profiles where id = auth.uid() and role = 'adm'));
+create policy "Admin Full Access Team" on public.team_members for all using (public.is_admin());
 
 -- Editorial Services
 alter table public.editorial_services enable row level security;
 create policy "Public Read Services" on public.editorial_services for select using (true);
-create policy "Admin Full Access Services" on public.editorial_services 
-    for all using (exists (select 1 from public.profiles where id = auth.uid() and role = 'adm'));
+create policy "Admin Full Access Services" on public.editorial_services for all using (public.is_admin());
 
--- Profiles
+-- Profiles (special handling to avoid recursion)
 alter table public.profiles enable row level security;
 create policy "Users can read own profile" on public.profiles for select using (auth.uid() = id);
-create policy "Admins can read all profiles" on public.profiles for select 
-    using (exists (select 1 from public.profiles where id = auth.uid() and role = 'adm'));
 create policy "Users can update own profile" on public.profiles for update using (auth.uid() = id);
-create policy "System/Admin can insert profiles" on public.profiles for insert with check (true);
+create policy "System can insert profiles" on public.profiles for insert with check (true);
 
 -- Orders
 alter table public.orders enable row level security;
 create policy "Users can see own orders" on public.orders for select using (auth.uid() = customer_id);
-create policy "Admins can see all orders" on public.orders for select 
-    using (exists (select 1 from public.profiles where id = auth.uid() and role = 'adm'));
+create policy "Admins can see all orders" on public.orders for select using (public.is_admin());
 create policy "Anyone can create orders" on public.orders for insert with check (true); 
-create policy "Admins can update orders" on public.orders for update 
-    using (exists (select 1 from public.profiles where id = auth.uid() and role = 'adm'));
+create policy "Admins can update orders" on public.orders for update using (public.is_admin());
 
 -- Reviews
 alter table public.reviews enable row level security;
 create policy "Everyone can read reviews" on public.reviews for select using (true);
 create policy "Auth users can create reviews" on public.reviews for insert with check (auth.role() = 'authenticated');
 create policy "Owners/Admins can delete reviews" on public.reviews for delete 
-    using (auth.uid() = user_id or exists (select 1 from public.profiles where id = auth.uid() and role = 'adm'));
+    using (auth.uid() = user_id or public.is_admin());
 
 -- Manuscripts
 alter table public.manuscripts enable row level security;
 create policy "Authors can see own manuscripts" on public.manuscripts for select using (auth.uid() = author_id);
-create policy "Admins can see all manuscripts" on public.manuscripts for select 
-    using (exists (select 1 from public.profiles where id = auth.uid() and role = 'adm'));
+create policy "Admins can see all manuscripts" on public.manuscripts for select using (public.is_admin());
 create policy "Authors can submit manuscripts" on public.manuscripts for insert with check (auth.uid() = author_id);
-create policy "Admins can update manuscripts" on public.manuscripts for update 
-    using (exists (select 1 from public.profiles where id = auth.uid() and role = 'adm'));
+create policy "Admins can update manuscripts" on public.manuscripts for update using (public.is_admin());
+
+-- Payment Proofs
+alter table public.payment_proofs enable row level security;
+create policy "Admins full access proofs" on public.payment_proofs for all using (public.is_admin());
+create policy "Users can insert own proofs" on public.payment_proofs for insert with check (true);
 
 -- Finalização: Criação da Conta administrativa inicial
 -- Habilitar pgcrypto para hashing de senha se necessário

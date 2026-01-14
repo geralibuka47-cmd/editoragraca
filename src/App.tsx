@@ -45,13 +45,6 @@ const App: React.FC = () => {
         return () => unsubscribe();
     }, []);
 
-    // Check Appwrite configuration
-    useEffect(() => {
-        if (!import.meta.env.VITE_APPWRITE_PROJECT_ID) {
-            console.warn("Appwrite Project ID is missing. Backend features will not work.");
-        }
-    }, []);
-
     // Fetch Data
     useEffect(() => {
         const loadData = async () => {
