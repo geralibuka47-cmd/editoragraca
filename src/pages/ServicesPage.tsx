@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BookOpen, Pencil, Palette, Shield, Megaphone, Printer, Check, ArrowRight, Loader2 } from 'lucide-react';
 import { ViewState, EditorialService } from '../types';
-import { getEditorialServices } from '../services/dataService';
+import { getEditorialServices, getSiteContent } from '../services/dataService';
 
 interface ServicesPageProps {
     onNavigate: (view: ViewState) => void;
@@ -9,6 +9,7 @@ interface ServicesPageProps {
 
 const ServicesPage: React.FC<ServicesPageProps> = ({ onNavigate }) => {
     const [services, setServices] = useState<EditorialService[]>([]);
+    const [siteContent, setSiteContent] = useState<any>({});
     const [isLoading, setIsLoading] = useState(true);
 
     const FALLBACK_SERVICES: (EditorialService & { icon: any })[] = [
@@ -54,19 +55,23 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ onNavigate }) => {
     ];
 
     useEffect(() => {
-        const loadServices = async () => {
+        const loadData = async () => {
             setIsLoading(true);
             try {
-                const data = await getEditorialServices();
-                setServices(data.length > 0 ? data : FALLBACK_SERVICES as any);
+                const [servicesData, content] = await Promise.all([
+                    getEditorialServices(),
+                    getSiteContent('services')
+                ]);
+                setServices(servicesData.length > 0 ? servicesData : FALLBACK_SERVICES as any);
+                setSiteContent(content);
             } catch (error) {
-                console.error("Erro ao carregar serviços:", error);
+                console.error("Erro ao carregar dados dos serviços:", error);
                 setServices(FALLBACK_SERVICES as any);
             } finally {
                 setIsLoading(false);
             }
         };
-        loadServices();
+        loadData();
     }, []);
 
     const getIcon = (title: string) => {
@@ -104,11 +109,10 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ onNavigate }) => {
 
                     <div className="max-w-4xl">
                         <h1 className="text-5xl md:text-8xl font-black tracking-tighter mb-8 leading-none">
-                            Serviços <span className="text-brand-primary italic font-serif font-normal">Editoriais</span>
+                            {siteContent['hero.title'] || "Serviços"} <span className="text-brand-primary italic font-serif font-normal">{siteContent['hero.subtitle'] || "Editoriais"}</span>
                         </h1>
                         <p className="text-xl md:text-2xl text-gray-300 leading-relaxed font-medium mb-12 max-w-2xl">
-                            Transformamos manuscritos em obras publicadas com excelência profissional.
-                            Oferecemos soluções completas para autores independentes.
+                            {siteContent['hero.description'] || "Transformamos manuscritos em obras publicadas com excelência profissional. Oferecemos soluções completas para autores independentes."}
                         </p>
                         <button
                             onClick={() => onNavigate('CONTACT')}
@@ -183,10 +187,10 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ onNavigate }) => {
                 <div className="absolute inset-0 bg-brand-primary/5 pattern-grid-white opacity-10"></div>
                 <div className="container mx-auto px-8 text-center relative z-10">
                     <h2 className="text-4xl md:text-5xl font-black tracking-tighter mb-8 italic font-serif">
-                        Transforme o seu <span className="text-brand-primary">Sonho</span> em Realidade
+                        {siteContent['cta.title'] || "Transforme o seu Sonho em Realidade"}
                     </h2>
                     <p className="text-xl text-white/70 mb-12 max-w-2xl mx-auto font-medium">
-                        Não deixe o seu manuscrito guardado. A Editora Graça ajuda-te a ser o próximo autor de sucesso em Angola.
+                        {siteContent['cta.description'] || "Não deixe o seu manuscrito guardado. A Editora Graça ajuda-te a ser o próximo autor de sucesso em Angola."}
                     </p>
                     <button
                         onClick={() => onNavigate('CONTACT')}

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Sparkles, BookOpen, ArrowRight, Zap, Star, Trophy, Mail, Clock, Mic, PenTool } from 'lucide-react';
+import { Sparkles, BookOpen, ArrowRight, Zap, Star, Trophy, Mail, Clock, Mic, PenTool, Users } from 'lucide-react';
 import { Book, ViewState, PodcastEpisode, BlogPost } from '../types';
 import BookCard from '../components/BookCard';
 import Countdown from '../components/Countdown';
-import { getPublicStats, getCategories, getBlogPosts } from '../services/dataService';
+import { getPublicStats, getCategories, getBlogPosts, getSiteContent, getTestimonials } from '../services/dataService';
 import { fetchPodcastEpisodes } from '../services/podcastService';
 
 interface HomePageProps {
@@ -20,18 +20,26 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
     const [categories, setCategories] = useState<{ name: string; count: number; image?: string }[]>([]);
     const [latestEpisode, setLatestEpisode] = useState<PodcastEpisode | null>(null);
     const [recentPosts, setRecentPosts] = useState<BlogPost[]>([]);
+    const [siteContent, setSiteContent] = useState<any>({});
+    const [testimonials, setTestimonials] = useState<any[]>([]);
 
     useEffect(() => {
         const loadDynamicData = async () => {
-            const s = await getPublicStats();
-            const c = await getCategories();
-            const p = await fetchPodcastEpisodes();
-            const b = await getBlogPosts();
+            const [s, c, p, b, content, t] = await Promise.all([
+                getPublicStats(),
+                getCategories(),
+                fetchPodcastEpisodes(),
+                getBlogPosts(),
+                getSiteContent('home'),
+                getTestimonials()
+            ]);
 
             setStats(s);
             setCategories(c);
             if (p.length > 0) setLatestEpisode(p[0]);
             setRecentPosts(b.slice(0, 3));
+            setSiteContent(content);
+            setTestimonials(t);
         };
         loadDynamicData();
     }, [books]); // Reload if books change
@@ -65,8 +73,8 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
                                 </>
                             ) : (
                                 <>
-                                    Onde Cada Página <br />
-                                    <span className="text-brand-primary italic font-serif font-normal text-[0.9em]">Ganha Vida</span>
+                                    {siteContent['hero.title'] || "Onde Cada Página"} <br />
+                                    <span className="text-brand-primary italic font-serif font-normal text-[0.9em]">{siteContent['hero.subtitle'] || "Ganha Vida"}</span>
                                 </>
                             )}
                         </h1>
@@ -74,7 +82,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
                         <p className="text-lg md:text-xl text-gray-500 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
                             {upcomingLaunch
                                 ? upcomingLaunch.description.slice(0, 150) + '...'
-                                : "Descubra o catálogo da Editora Graça. Uma seleção rigorosa de literatura angolana e internacional, desenhada para leitores exigentes."
+                                : (siteContent['hero.description'] || "Descubra o catálogo da Editora Graça. Uma seleção rigorosa de literatura angolana e internacional, desenhada para leitores exigentes.")
                             }
                         </p>
 
@@ -328,6 +336,39 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
                     </div>
                 </div>
             </section>
+            {/* Testimonials Section */}
+            {testimonials.length > 0 && (
+                <section className="py-24 bg-white overflow-hidden">
+                    <div className="container mx-auto px-4 md:px-8">
+                        <div className="text-center mb-16">
+                            <h2 className="text-4xl md:text-5xl font-black text-brand-dark tracking-tighter">
+                                O que dizem os nossos <span className="text-brand-primary italic font-serif font-normal">Autores e Leitores</span>
+                            </h2>
+                        </div>
+
+                        <div className="grid md:grid-cols-3 gap-8">
+                            {testimonials.map((t, idx) => (
+                                <div key={t.id || idx} className="bg-brand-light p-10 rounded-[2.5rem] relative group border border-gray-100 shadow-xl hover:shadow-brand-primary/5 transition-all">
+                                    <div className="flex gap-1 mb-6 text-yellow-400">
+                                        {[...Array(t.rating)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
+                                    </div>
+                                    <p className="text-gray-600 italic font-medium mb-8 leading-relaxed">"{t.content}"</p>
+                                    <div className="flex items-center gap-4 border-t pt-8">
+                                        <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200">
+                                            {t.photoUrl ? <img src={t.photoUrl} alt={t.name} className="w-full h-full object-cover" /> : <Users className="w-full h-full p-3 text-gray-400" />}
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-brand-dark">{t.name}</h4>
+                                            <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">{t.role}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            )}
+
             <section className="bg-brand-dark py-24 px-8 overflow-hidden relative">
                 <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-brand-primary/10 via-transparent to-transparent"></div>
 
@@ -339,10 +380,10 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
 
                         <div className="space-y-4">
                             <h2 className="text-4xl md:text-5xl font-black text-white tracking-tighter">
-                                Fique por <span className="text-brand-primary italic font-serif font-normal">Dentro</span>
+                                {siteContent['newsletter.title'] || "Fique por Dentro"}
                             </h2>
                             <p className="text-lg text-gray-400">
-                                Subscreva a nossa newsletter e receba novidades literárias, convites para lançamentos e ofertas exclusivas.
+                                {siteContent['newsletter.description'] || "Subscreva a nossa newsletter e receba novidades literárias, convites para lançamentos e ofertas exclusivas."}
                             </p>
                         </div>
 

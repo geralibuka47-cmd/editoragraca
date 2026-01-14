@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { X, ShoppingCart, Heart, Share2, Check, Star, Eye, Download } from 'lucide-react';
-import { Book } from '../types';
+import { X, ShoppingCart, Heart, Share2, Check, Star, Eye, Download, Send } from 'lucide-react';
+import { Book, User as UserType } from '../types';
+import {
+    getBookReviews,
+    addBookReview,
+    getBookStats,
+    incrementBookView,
+    checkIsFavorite,
+    toggleFavorite
+} from '../services/dataService';
 
 interface BookDetailModalProps {
     book: any;
@@ -9,29 +17,72 @@ interface BookDetailModalProps {
     onAddToCart: (book: any) => void;
 }
 
-const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, onClose, onAddToCart }) => {
+const BookDetailModal: React.FC<BookDetailModalProps & { user?: UserType }> = ({ book, isOpen, onClose, onAddToCart, user }) => {
     const [activeTab, setActiveTab] = useState<'details' | 'reviews'>('details');
-    const [stats, setStats] = useState<any>({ views: 0, rating: 0, downloads: 0, sales: 0 });
+    const [stats, setStats] = useState<any>({ views: 0, rating: 0, downloads: 0, sales: 0, reviewsCount: 0 });
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+    const [reviewContent, setReviewContent] = useState('');
+    const [reviewRating, setReviewRating] = useState(5);
     const [reviews, setReviews] = useState<any[]>([]);
 
     useEffect(() => {
         if (isOpen && book) {
-            // Mock random stats for demo purposes or fetch real ones
-            setStats({
-                views: Math.floor(Math.random() * 500) + 100,
-                rating: 4.8,
-                downloads: book.format === 'digital' ? Math.floor(Math.random() * 50) + 10 : 0,
-                sales: Math.floor(Math.random() * 30) + 5
+            const loadData = async () => {
+                const [realStats, bookReviews, favStatus] = await Promise.all([
+                    getBookStats(book.id),
+                    getBookReviews(book.id),
+                    user ? checkIsFavorite(book.id, user.id) : Promise.resolve(false)
+                ]);
+
+                setStats(realStats);
+                setReviews(bookReviews);
+                setIsFavorite(favStatus);
+
+                // Track view
+                await incrementBookView(book.id);
+            };
+            loadData();
+        }
+    }, [isOpen, book, user]);
+
+    const handleToggleFavorite = async () => {
+        if (!user) {
+            // Handle if not logged in - maybe toast?
+            return;
+        }
+        const newStatus = await toggleFavorite(book.id, user.id);
+        setIsFavorite(newStatus);
+    };
+
+    const handleAddReview = async () => {
+        if (!user || !reviewContent.trim()) return;
+
+        setIsSubmittingReview(true);
+        try {
+            await addBookReview({
+                bookId: book.id,
+                userId: user.id,
+                userName: user.name,
+                rating: reviewRating,
+                comment: reviewContent.trim()
             });
 
-            const loadReviews = async () => {
-                const { getBookReviews } = await import('../services/dataService');
-                const loaded = await getBookReviews(book.id);
-                setReviews(loaded);
-            };
-            loadReviews();
+            // Reload data
+            const [newStats, newReviews] = await Promise.all([
+                getBookStats(book.id),
+                getBookReviews(book.id)
+            ]);
+            setStats(newStats);
+            setReviews(newReviews);
+            setReviewContent('');
+            setReviewRating(5);
+        } catch (error) {
+            console.error("Error submitting review:", error);
+        } finally {
+            setIsSubmittingReview(false);
         }
-    }, [isOpen, book]);
+    };
 
     if (!isOpen || !book) return null;
 
@@ -82,7 +133,7 @@ const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, onClose
                         {book.format === 'digital' ? (
                             <div className="bg-white/80 backdrop-blur rounded-xl p-3 text-center shadow-sm col-span-2">
                                 <Download className="w-5 h-5 text-blue-500 mx-auto mb-1" />
-                                <div className="font-black text-brand-dark text-lg">{stats.downloads}</div>
+                                <div className="font-black text-brand-dark text-lg">{stats.sales}</div>
                                 <div className="text-[10px] uppercase tracking-widest text-gray-500">Downloads</div>
                             </div>
                         ) : (
@@ -148,8 +199,13 @@ const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, onClose
                                     </div>
 
                                     <div className="flex gap-2 md:gap-4">
-                                        <button className="p-3 md:p-4 border-2 border-gray-100 rounded-xl md:rounded-2xl hover:border-brand-primary hover:text-brand-primary transition-all text-gray-400" title="Favoritos" aria-label="Favoritos">
-                                            <Heart className="w-5 h-5 md:w-6 md:h-6" />
+                                        <button
+                                            onClick={handleToggleFavorite}
+                                            className={`p-3 md:p-4 border-2 rounded-xl md:rounded-2xl transition-all ${isFavorite ? 'bg-red-50 border-red-200 text-red-500' : 'border-gray-100 hover:border-brand-primary hover:text-brand-primary text-gray-400'}`}
+                                            title={isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+                                            aria-label={isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+                                        >
+                                            <Heart className={`w-5 h-5 md:w-6 md:h-6 ${isFavorite ? 'fill-current' : ''}`} />
                                         </button>
                                         <button className="p-3 md:p-4 border-2 border-gray-100 rounded-xl md:rounded-2xl hover:border-brand-primary hover:text-brand-primary transition-all text-gray-400" title="Partilhar" aria-label="Partilhar">
                                             <Share2 className="w-5 h-5 md:w-6 md:h-6" />
@@ -199,18 +255,47 @@ const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, onClose
                                     </div>
                                 )}
 
-                                {/* Add Review Form Mock */}
+                                {/* Add Review Form */}
                                 <div className="border-t pt-6">
                                     <h4 className="font-bold text-brand-dark mb-4">Escrever Avaliação</h4>
                                     <div className="space-y-4">
-                                        <textarea
-                                            placeholder="Partilhe a sua opinião sobre o livro..."
-                                            className="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-brand-primary"
-                                            rows={3}
-                                        />
-                                        <button className="px-6 py-2 bg-brand-dark text-white rounded-lg text-sm font-bold hover:bg-brand-primary transition-colors">
-                                            Enviar Avaliação
-                                        </button>
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <span className="text-sm text-gray-500 font-bold uppercase tracking-widest">A sua nota:</span>
+                                            <div className="flex gap-1">
+                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                    <button
+                                                        key={star}
+                                                        onClick={() => setReviewRating(star)}
+                                                        className="focus:outline-none transition-transform hover:scale-110"
+                                                        title={`${star} estrelas`}
+                                                        aria-label={`Avaliar com ${star} estrelas`}
+                                                    >
+                                                        <Star
+                                                            className={`w-6 h-6 ${star <= reviewRating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+                                                        />
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <div className="relative">
+                                            <textarea
+                                                placeholder={user ? "Partilhe a sua opinião sobre o livro..." : "Inicie sessão para avaliar este livro."}
+                                                value={reviewContent}
+                                                onChange={(e) => setReviewContent(e.target.value)}
+                                                disabled={!user || isSubmittingReview}
+                                                className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm focus:outline-none focus:ring-1 focus:ring-brand-primary focus:bg-white transition-all disabled:opacity-50"
+                                                rows={3}
+                                            />
+                                            <button
+                                                onClick={handleAddReview}
+                                                disabled={!user || isSubmittingReview || !reviewContent.trim()}
+                                                className="absolute right-3 bottom-3 p-2 bg-brand-primary text-white rounded-xl shadow-lg shadow-brand-primary/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100"
+                                                title="Enviar Avaliação"
+                                                aria-label="Enviar Avaliação"
+                                            >
+                                                <Send className="w-4 h-4" />
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Users, ShoppingCart, BookOpen, FileText, Layout, User as UserIcon } from 'lucide-react';
-import { ViewState, User } from '../types';
+import { Users, ShoppingCart, BookOpen, FileText, Layout, User as UserIcon, Type } from 'lucide-react';
+import { ViewState, User, BlogPost } from '../types';
 
 import AdminStats from '../components/admin/AdminStats';
 import AdminBooksTab from '../components/admin/AdminBooksTab';
@@ -10,6 +10,7 @@ import AdminManuscriptsTab from '../components/admin/AdminManuscriptsTab';
 import AdminBlogTab from '../components/admin/AdminBlogTab';
 import AdminTeamTab from '../components/admin/AdminTeamTab';
 import AdminServicesTab from '../components/admin/AdminServicesTab';
+import AdminContentTab from '../components/admin/AdminContentTab';
 
 interface AdminDashboardProps {
     user: User | null;
@@ -17,31 +18,35 @@ interface AdminDashboardProps {
 }
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => {
-    const [activeTab, setActiveTab] = useState<'stats' | 'books' | 'users' | 'manuscripts' | 'orders' | 'blog' | 'team' | 'services'>('stats');
+    const [activeTab, setActiveTab] = useState<'stats' | 'books' | 'users' | 'manuscripts' | 'orders' | 'blog' | 'team' | 'services' | 'content'>('stats');
     const [stats, setStats] = useState({
         totalBooks: 0,
         totalUsers: 0,
         pendingOrders: 0,
         revenue: 0
     });
-    const [isLoadingStats, setIsLoadingStats] = useState(true);
+    const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+    const [isLoadingData, setIsLoadingData] = useState(true);
 
-    const fetchStats = async () => {
-        setIsLoadingStats(true);
+    const fetchData = async () => {
+        setIsLoadingData(true);
         try {
-            const { getAdminStats } = await import('../services/dataService');
-            const data = await getAdminStats();
-            setStats(data);
+            const { getAdminStats, getBlogPosts } = await import('../services/dataService');
+            const [statsData, postsData] = await Promise.all([
+                getAdminStats(),
+                getBlogPosts()
+            ]);
+            setStats(statsData);
+            setBlogPosts(postsData);
         } catch (error) {
-            console.error('Erro ao buscar estatísticas:', error);
+            console.error('Erro ao buscar dados do dashboard:', error);
         } finally {
-            setIsLoadingStats(false);
+            setIsLoadingData(false);
         }
     };
 
     useEffect(() => {
-        // Fetch stats when mounting or when tabs that might affect stats are active
-        fetchStats();
+        fetchData();
     }, [activeTab]);
 
     if (!user || user.role !== 'adm') {
@@ -77,7 +82,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                     </div>
 
                     {/* Stats */}
-                    <AdminStats stats={stats} isLoading={isLoadingStats} />
+                    <AdminStats stats={stats} isLoading={isLoadingData} />
 
                     {/* Tabs */}
                     <div className="flex flex-wrap gap-3">
@@ -165,6 +170,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                             <Layout className="w-4 h-4 inline mr-2" />
                             Serviços
                         </button>
+                        <button
+                            onClick={() => setActiveTab('content')}
+                            title="Gerir conteúdo dinâmico"
+                            aria-label="Gerir conteúdo dinâmico"
+                            className={`px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider transition-all ${activeTab === 'content'
+                                ? 'bg-brand-primary text-white'
+                                : 'bg-white/10 text-white hover:bg-white/20'
+                                }`}
+                        >
+                            <Type className="w-4 h-4 inline mr-2" />
+                            Conteúdo
+                        </button>
                     </div>
                 </div>
             </section>
@@ -174,7 +191,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                 <div className="container mx-auto px-4 md:px-8">
                     {/* Books Tab */}
                     {activeTab === 'books' && (
-                        <AdminBooksTab onStatsRefresh={fetchStats} />
+                        <AdminBooksTab onStatsRefresh={fetchData} />
                     )}
 
                     {/* Users Tab */}
@@ -194,7 +211,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
 
                     {/* Blog Tab */}
                     {activeTab === 'blog' && (
-                        <AdminBlogTab />
+                        <AdminBlogTab posts={blogPosts} onRefresh={fetchData} />
                     )}
 
                     {/* Team Tab */}
@@ -205,6 +222,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                     {/* Services Tab */}
                     {activeTab === 'services' && (
                         <AdminServicesTab />
+                    )}
+
+                    {/* Content Tab */}
+                    {activeTab === 'content' && (
+                        <AdminContentTab />
                     )}
                 </div>
             </section>

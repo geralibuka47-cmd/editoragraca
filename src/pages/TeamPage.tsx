@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Users, X, Loader2 } from 'lucide-react';
 import { ViewState } from '../types';
-import { getTeamMembers } from '../services/dataService';
+import { getTeamMembers, getSiteContent } from '../services/dataService';
 
 interface TeamMember {
     id: string;
@@ -20,6 +20,7 @@ interface TeamPageProps {
 const TeamPage: React.FC<TeamPageProps> = ({ onNavigate }) => {
     const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
     const [members, setMembers] = useState<TeamMember[]>([]);
+    const [siteContent, setSiteContent] = useState<any>({});
     const [isLoading, setIsLoading] = useState(true);
     const [selectedDepartment, setSelectedDepartment] = useState('Todos');
 
@@ -54,19 +55,23 @@ const TeamPage: React.FC<TeamPageProps> = ({ onNavigate }) => {
     ];
 
     useEffect(() => {
-        const loadMembers = async () => {
+        const loadData = async () => {
             setIsLoading(true);
             try {
-                const data = await getTeamMembers();
-                setMembers(data.length > 0 ? data : FALLBACK_MEMBERS);
+                const [membersData, content] = await Promise.all([
+                    getTeamMembers(),
+                    getSiteContent('team')
+                ]);
+                setMembers(membersData.length > 0 ? membersData : FALLBACK_MEMBERS);
+                setSiteContent(content);
             } catch (error) {
-                console.error("Erro ao carregar equipa:", error);
+                console.error("Erro ao carregar dados da equipa:", error);
                 setMembers(FALLBACK_MEMBERS);
             } finally {
                 setIsLoading(false);
             }
         };
-        loadMembers();
+        loadData();
     }, []);
 
     const departments = ['Todos', ...Array.from(new Set(members.map(m => m.department)))];
@@ -99,11 +104,10 @@ const TeamPage: React.FC<TeamPageProps> = ({ onNavigate }) => {
 
                     <div className="max-w-4xl text-center md:text-left">
                         <h1 className="text-4xl md:text-7xl font-black tracking-tighter mb-4 md:mb-6 leading-tight">
-                            Conheça Nossa <span className="text-brand-primary italic font-serif font-normal">Equipa</span>
+                            {siteContent['hero.title'] || "Conheça Nossa"} <span className="text-brand-primary italic font-serif font-normal">{siteContent['hero.subtitle'] || "Equipa"}</span>
                         </h1>
                         <p className="text-lg md:text-2xl text-gray-300 leading-relaxed font-medium">
-                            Profissionais apaixonados pela literatura e dedicados a transformar
-                            manuscritos em obras de excelência.
+                            {siteContent['hero.description'] || "Profissionais apaixonados pela literatura e dedicados a transformar manuscritos em obras de excelência."}
                         </p>
                     </div>
                 </div>
@@ -223,10 +227,10 @@ const TeamPage: React.FC<TeamPageProps> = ({ onNavigate }) => {
                 <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
                 <div className="container mx-auto px-8 text-center relative z-10">
                     <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-8 max-w-3xl mx-auto leading-tight">
-                        Quer Fazer Parte da Nossa <span className="italic font-serif font-normal opacity-90 underline underline-offset-8 decoration-white/30">História</span>?
+                        {siteContent['cta.title'] || "Quer Fazer Parte da Nossa História?"}
                     </h2>
                     <p className="text-xl text-white/80 mb-12 max-w-2xl mx-auto font-medium">
-                        Estamos sempre em busca de mentes criativas e apaixonadas pelo mundo literário angolano.
+                        {siteContent['cta.description'] || "Estamos sempre em busca de mentes criativas e apaixonadas pelo mundo literário angolano."}
                     </p>
                     <button
                         onClick={() => onNavigate('CONTACT')}

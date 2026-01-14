@@ -1,43 +1,70 @@
-import React from 'react';
-import { BookOpen, Heart, Award, Users, TrendingUp, MapPin, Mail, Phone } from 'lucide-react';
+import { BookOpen, Heart, Award, Users, TrendingUp, MapPin, Mail, Phone, Loader2 } from 'lucide-react';
 import { ViewState } from '../types';
+import { getSiteContent } from '../services/dataService';
+import { useState, useEffect } from 'react';
 
 interface AboutPageProps {
     onNavigate: (view: ViewState) => void;
 }
 
 const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
-    const values = [
+    const [siteContent, setSiteContent] = useState<any>({});
+    const [isLoading, setIsLoading] = useState(true);
+
+    const iconMap: Record<string, any> = {
+        'BookOpen': BookOpen,
+        'Heart': Heart,
+        'Award': Award,
+        'Users': Users,
+        'TrendingUp': TrendingUp
+    };
+
+    useEffect(() => {
+        const loadContent = async () => {
+            setIsLoading(true);
+            try {
+                const content = await getSiteContent('about');
+                setSiteContent(content);
+            } catch (error) {
+                console.error("Error loading about content:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        loadContent();
+    }, []);
+
+    const values = siteContent['about.values'] || [
         {
-            icon: BookOpen,
+            icon: 'BookOpen',
             title: 'Excelência Literária',
             description: 'Compromisso inabalável com a qualidade e rigor editorial em cada publicação.'
         },
         {
-            icon: Heart,
+            icon: 'Heart',
             title: 'Paixão pela Cultura',
             description: 'Promover e preservar a riqueza cultural angolana através da literatura.'
         },
         {
-            icon: Users,
+            icon: 'Users',
             title: 'Valorização de Autores',
             description: 'Apoio integral a escritores locais, dando voz às suas histórias únicas.'
         },
         {
-            icon: Award,
+            icon: 'Award',
             title: 'Reconhecimento',
             description: 'Busca constante pela excelência reconhecida nacional e internacionalmente.'
         }
     ];
 
-    const stats = [
+    const stats = siteContent['about.stats'] || [
         { number: '26+', label: 'Obras Publicadas' },
         { number: '100%', label: 'Autores Angolanos' },
         { number: '5+', label: 'Anos de Actividade' },
         { number: '18', label: 'Províncias Alcançadas' }
     ];
 
-    const timeline = [
+    const timeline = siteContent['about.timeline'] || [
         {
             year: '2020',
             title: 'Fundação',
@@ -59,6 +86,14 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             description: 'Reorganização estratégica, consolidação da comunidade e expansão para formatos digitais.'
         }
     ];
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-brand-light flex items-center justify-center">
+                <Loader2 className="w-12 h-12 text-brand-primary animate-spin" />
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-brand-light">
@@ -151,21 +186,21 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-                        {values.map((value, index) => {
-                            const Icon = value.icon;
-                            return (
-                                <div
-                                    key={index}
-                                    className="bg-white p-6 md:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group"
-                                >
-                                    <div className="w-12 h-12 md:w-16 md:h-16 bg-brand-primary/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-brand-primary group-hover:scale-110 transition-all duration-300">
-                                        <Icon className="w-6 h-6 md:w-8 md:h-8 text-brand-primary group-hover:text-white transition-colors" />
-                                    </div>
-                                    <h3 className="text-lg md:text-xl font-bold text-brand-dark mb-3">{value.title}</h3>
-                                    <p className="text-sm md:text-gray-600 leading-relaxed">{value.description}</p>
+                        {values.map((value: any, index: number) => (
+                            <div
+                                key={index}
+                                className="bg-white p-6 md:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group"
+                            >
+                                <div className="w-12 h-12 md:w-16 md:h-16 bg-brand-primary/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-brand-primary group-hover:scale-110 transition-all duration-300">
+                                    {(() => {
+                                        const Icon = iconMap[value.icon] || BookOpen;
+                                        return <Icon className="w-6 h-6 md:w-8 md:h-8 text-brand-primary group-hover:text-white transition-colors" />;
+                                    })()}
                                 </div>
-                            );
-                        })}
+                                <h3 className="text-lg md:text-xl font-bold text-brand-dark mb-3">{value.title}</h3>
+                                <p className="text-sm md:text-gray-600 leading-relaxed">{value.description}</p>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </section>
@@ -187,7 +222,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                         <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-0.5 bg-brand-primary/20 -translate-x-1/2 hidden md:block"></div>
 
                         <div className="space-y-12">
-                            {timeline.map((item, index) => (
+                            {timeline.map((item: any, index: number) => (
                                 <div
                                     key={index}
                                     className={`relative flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-8 ${index % 2 === 0 ? '' : 'md:flex-row-reverse'}`}
@@ -213,7 +248,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             <section className="py-16 md:py-24 bg-brand-dark text-white">
                 <div className="container mx-auto px-4 md:px-8">
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
-                        {stats.map((stat, index) => (
+                        {stats.map((stat: any, index: number) => (
                             <div key={index} className="text-center group">
                                 <div className="text-3xl md:text-6xl font-black text-brand-primary mb-2 md:mb-3 group-hover:scale-110 transition-transform">
                                     {stat.number}

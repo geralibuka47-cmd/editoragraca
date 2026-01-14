@@ -202,6 +202,7 @@ const App: React.FC = () => {
                     isOpen={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
                     onAddToCart={handleAddToCart}
+                    user={user || undefined}
                 />
             </div>
         </ToastProvider>

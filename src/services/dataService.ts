@@ -14,7 +14,11 @@ const TABLES = {
     PAYMENT_PROOFS: 'payment_proofs',
     MANUSCRIPTS: 'manuscripts',
     BLOG_LIKES: 'blog_likes',
-    BLOG_COMMENTS: 'blog_comments'
+    BLOG_COMMENTS: 'blog_comments',
+    BOOK_VIEWS: 'book_views',
+    BOOK_FAVORITES: 'book_favorites',
+    SITE_CONTENT: 'site_content',
+    TESTIMONIALS: 'testimonials'
 };
 
 const cleanDataForSupabase = (data: any, table: string) => {
@@ -540,25 +544,171 @@ export const deleteEditorialService = async (id: string) => {
 
 // Reviews
 export const getBookReviews = async (bookId: string) => {
-    const { data, error } = await supabase
-        .from(TABLES.REVIEWS)
-        .select('*')
-        .eq('book_id', bookId)
-        .order('date', { ascending: false });
+    try {
+        const { data, error } = await supabase
+            .from(TABLES.REVIEWS)
+            .select('*')
+            .eq('book_id', bookId)
+            .order('date', { ascending: false });
 
-    if (error || !data || data.length === 0) {
-        return [
-            { id: '1', bookId, userId: 'mock1', userName: 'Maria Silva', rating: 5, comment: 'Uma obra prima! Adorei cada página.', date: new Date().toISOString() },
-            { id: '2', bookId, userId: 'mock2', userName: 'João Paulo', rating: 4, comment: 'Muito bom, mas o final poderia ser melhor.', date: new Date(Date.now() - 86400000).toISOString() }
-        ];
+        if (error) throw error;
+        return (data || []).map(parseDataFromSupabase);
+    } catch (error) {
+        console.error("Error fetching reviews:", error);
+        return [];
     }
-    return data.map(parseDataFromSupabase);
 };
 
-export const addBookReview = async (review: any) => {
-    const data = cleanDataForSupabase(review, TABLES.REVIEWS);
-    const { error } = await supabase.from(TABLES.REVIEWS).insert([data]);
-    if (error) throw error;
+export const addBookReview = async (review: { bookId: string; userId: string; userName: string; rating: number; comment: string }) => {
+    try {
+        const data = cleanDataForSupabase(review, TABLES.REVIEWS);
+        const { error } = await supabase.from(TABLES.REVIEWS).insert([data]);
+        if (error) throw error;
+    } catch (error) {
+        console.error("Error adding review:", error);
+        throw error;
+    }
+};
+
+// Book Stats & Interactions
+export const getBookStats = async (bookId: string) => {
+    try {
+        const [
+            { count: viewsCount },
+            { data: reviewsData },
+            { data: salesData }
+        ] = await Promise.all([
+            supabase.from(TABLES.BOOK_VIEWS).select('*', { count: 'exact', head: true }).eq('book_id', bookId),
+            supabase.from(TABLES.REVIEWS).select('rating').eq('book_id', bookId),
+            supabase.from(TABLES.PAYMENT_NOTIFICATIONS).select('items').eq('status', 'confirmed')
+        ]);
+
+        // Calculate average rating
+        const ratings = (reviewsData || []).map(r => r.rating);
+        const avgRating = ratings.length > 0 ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0;
+
+        // Calculate sales for this specific book
+        let salesCount = 0;
+        (salesData || []).forEach(sale => {
+            const items = Array.isArray(sale.items) ? sale.items : [];
+            items.forEach((item: any) => {
+                if (item.id === bookId || item.bookId === bookId) {
+                    salesCount += item.quantity || 1;
+                }
+            });
+        });
+
+        return {
+            views: viewsCount || 0,
+            rating: Number(avgRating.toFixed(1)),
+            sales: salesCount,
+            reviewsCount: reviewsData?.length || 0
+        };
+    } catch (error) {
+        console.error("Error fetching book stats:", error);
+        return { views: 0, rating: 0, sales: 0, reviewsCount: 0 };
+    }
+};
+
+export const incrementBookView = async (bookId: string) => {
+    try {
+        await supabase.from(TABLES.BOOK_VIEWS).insert([{ book_id: bookId }]);
+    } catch (error) {
+        // Fail silently for views
+    }
+};
+
+export const checkIsFavorite = async (bookId: string, userId: string): Promise<boolean> => {
+    try {
+        const { data } = await supabase
+            .from(TABLES.BOOK_FAVORITES)
+            .select('*')
+            .eq('book_id', bookId)
+            .eq('user_id', userId)
+            .single();
+        return !!data;
+    } catch (error) {
+        return false;
+    }
+};
+
+export const toggleFavorite = async (bookId: string, userId: string): Promise<boolean> => {
+    try {
+        const isFav = await checkIsFavorite(bookId, userId);
+        if (isFav) {
+            await supabase.from(TABLES.BOOK_FAVORITES).delete().eq('book_id', bookId).eq('user_id', userId);
+            return false;
+        } else {
+            await supabase.from(TABLES.BOOK_FAVORITES).insert([{ book_id: bookId, user_id: userId }]);
+            return true;
+        }
+    } catch (error) {
+        console.error("Error toggling favorite:", error);
+        return false;
+    }
+};
+
+// Site Content & Testimonials
+export const getSiteContent = async (section?: string) => {
+    try {
+        let query = supabase.from(TABLES.SITE_CONTENT).select('*');
+        if (section) query = query.eq('section', section);
+
+        const { data, error } = await query;
+        if (error) throw error;
+
+        // Convert to a convenient key-value object
+        const contentMap: Record<string, any> = {};
+        (data || []).forEach(item => {
+            contentMap[item.key] = item.content;
+        });
+        return contentMap;
+    } catch (error) {
+        console.error("Error fetching site content:", error);
+        return {};
+    }
+};
+
+export const saveSiteContent = async (key: string, section: string, content: any) => {
+    try {
+        const { error } = await supabase.from(TABLES.SITE_CONTENT).upsert({
+            key,
+            section,
+            content,
+            updated_at: new Date().toISOString()
+        }, { onConflict: 'key' });
+        if (error) throw error;
+    } catch (error) {
+        console.error("Error saving site content:", error);
+        throw error;
+    }
+};
+
+export const getTestimonials = async () => {
+    try {
+        const { data, error } = await supabase
+            .from(TABLES.TESTIMONIALS)
+            .select('*')
+            .eq('is_active', true)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        return (data || []).map(parseDataFromSupabase);
+    } catch (error) {
+        console.error("Error fetching testimonials:", error);
+        return [];
+    }
+};
+
+export const saveTestimonial = async (testimonial: any) => {
+    try {
+        const data = cleanDataForSupabase(testimonial, TABLES.TESTIMONIALS);
+        const { error } = await supabase.from(TABLES.TESTIMONIALS).upsert(data, { onConflict: 'id' });
+        if (error) throw error;
+    } catch (error) {
+        console.error("Error saving testimonial:", error);
+        throw error;
+    }
 };
 
 // Stats helpers
@@ -619,8 +769,4 @@ export const getUserBooks = async (readerId: string): Promise<Book[]> => {
 
     const allBooks = await getBooks();
     return allBooks.filter(book => bookIds.has(book.id));
-};
-
-export const incrementBookView = async (bookId: string) => {
-    // No increment logic for now
 };

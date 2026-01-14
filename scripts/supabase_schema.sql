@@ -137,12 +137,49 @@ create table public.manuscripts (
 -- Reviews Table
 create table public.reviews (
     id uuid default uuid_generate_v4() primary key,
-    book_id uuid references public.books,
-    user_id uuid references auth.users,
+    book_id uuid references public.books on delete cascade,
+    user_id uuid references auth.users on delete cascade,
     user_name text not null,
     rating integer not null check (rating >= 1 and rating <= 5),
     comment text,
     date timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Book Views Table
+create table public.book_views (
+    id uuid default uuid_generate_v4() primary key,
+    book_id uuid references public.books on delete cascade,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Book Favorites Table
+create table public.book_favorites (
+    id uuid default uuid_generate_v4() primary key,
+    book_id uuid references public.books on delete cascade,
+    user_id uuid references auth.users on delete cascade,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+    unique(book_id, user_id)
+);
+
+-- Site Content Table (Key-Value/JSON storage for dynamic text)
+create table public.site_content (
+    id uuid default uuid_generate_v4() primary key,
+    section text not null, -- e.g., 'home.hero', 'about.mission'
+    key text not null unique,
+    content jsonb not null,
+    updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Testimonials Table
+create table public.testimonials (
+    id uuid default uuid_generate_v4() primary key,
+    name text not null,
+    role text,
+    content text not null,
+    photo_url text,
+    rating integer default 5,
+    is_active boolean default true,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
 -- Row Level Security (RLS) - Comprehensive Setup
@@ -209,6 +246,27 @@ create policy "Admins can update manuscripts" on public.manuscripts for update u
 alter table public.payment_proofs enable row level security;
 create policy "Admins full access proofs" on public.payment_proofs for all using (public.is_admin());
 create policy "Users can insert own proofs" on public.payment_proofs for insert with check (true);
+
+-- Book Views
+alter table public.book_views enable row level security;
+create policy "Public can insert views" on public.book_views for insert with check (true);
+create policy "Public can read views" on public.book_views for select using (true);
+
+-- Book Favorites
+alter table public.book_favorites enable row level security;
+create policy "Users can see own favorites" on public.book_favorites for select using (auth.uid() = user_id);
+create policy "Users can control own favorites" on public.book_favorites for all using (auth.uid() = user_id);
+create policy "Admins can see all favorites" on public.book_favorites for select using (public.is_admin());
+
+-- Site Content
+alter table public.site_content enable row level security;
+create policy "Public can read site content" on public.site_content for select using (true);
+create policy "Admins can manage site content" on public.site_content for all using (public.is_admin());
+
+-- Testimonials
+alter table public.testimonials enable row level security;
+create policy "Public can read testimonials" on public.testimonials for select using (is_active = true);
+create policy "Admins can manage testimonials" on public.testimonials for all using (public.is_admin());
 
 -- Finalização: Criação da Conta administrativa inicial
 -- Habilitar pgcrypto para hashing de senha se necessário
