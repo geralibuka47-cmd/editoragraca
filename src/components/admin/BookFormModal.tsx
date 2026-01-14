@@ -12,6 +12,7 @@ interface BookFormModalProps {
 const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, onSave }) => {
     const [activeTab, setActiveTab] = useState<'info' | 'details' | 'files' | 'payment'>('info');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
     // Form State
     const [formData, setFormData] = useState({
@@ -113,11 +114,38 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
         }
     }, [isFree, activeTab]);
 
+    const validate = () => {
+        const newErrors: Record<string, string> = {};
+        if (!formData.title.trim()) newErrors.title = 'Título é obrigatório';
+        if (!formData.author.trim()) newErrors.author = 'Autor é obrigatório';
+        if (!formData.description.trim()) newErrors.description = 'Descrição é obrigatória';
+        if (!formData.price || isNaN(Number(formData.price))) newErrors.price = 'Preço inválido';
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!validate()) {
+            setActiveTab('info');
+            return;
+        }
+
         setIsSubmitting(true);
         try {
-            await onSave(formData, coverFile, digitalFile);
+            // Further sanitize data before sending
+            const sanitizedData = {
+                ...formData,
+                title: formData.title.trim(),
+                author: formData.author.trim(),
+                description: formData.description.trim(),
+                isbn: formData.isbn.trim(),
+                price: Number(formData.price) || 0,
+                stock: Number(formData.stock) || 0
+            };
+
+            await onSave(sanitizedData, coverFile, digitalFile);
             onClose();
         } catch (error) {
             console.error("Error submitting form", error);
@@ -184,11 +212,15 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                     id="title"
                                     type="text"
                                     required
-                                    className="input-premium"
+                                    className={`input-premium ${errors.title ? 'border-red-500 bg-red-50' : ''}`}
                                     value={formData.title}
-                                    onChange={e => setFormData({ ...formData, title: e.target.value })}
+                                    onChange={e => {
+                                        setFormData({ ...formData, title: e.target.value });
+                                        if (errors.title) setErrors({ ...errors, title: '' });
+                                    }}
                                     placeholder="Ex: O Menino que curava"
                                 />
+                                {errors.title && <p className="text-red-500 text-[10px] mt-1 font-bold italic">{errors.title}</p>}
                             </div>
                             <div className="form-group-premium">
                                 <label htmlFor="author" className="label-premium">Autor</label>
@@ -196,11 +228,15 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                     id="author"
                                     type="text"
                                     required
-                                    className="input-premium"
+                                    className={`input-premium ${errors.author ? 'border-red-500 bg-red-50' : ''}`}
                                     value={formData.author}
-                                    onChange={e => setFormData({ ...formData, author: e.target.value })}
+                                    onChange={e => {
+                                        setFormData({ ...formData, author: e.target.value });
+                                        if (errors.author) setErrors({ ...errors, author: '' });
+                                    }}
                                     placeholder="Nome do Autor"
                                 />
+                                {errors.author && <p className="text-red-500 text-[10px] mt-1 font-bold italic">{errors.author}</p>}
                             </div>
                             <div className="form-group-premium">
                                 <label htmlFor="category-select" className="label-premium">Categoria</label>
@@ -235,11 +271,15 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                 <textarea
                                     id="description"
                                     required
-                                    className="input-premium h-32 resize-none"
+                                    className={`input-premium h-32 resize-none ${errors.description ? 'border-red-500 bg-red-50' : ''}`}
                                     value={formData.description}
-                                    onChange={e => setFormData({ ...formData, description: e.target.value })}
+                                    onChange={e => {
+                                        setFormData({ ...formData, description: e.target.value });
+                                        if (errors.description) setErrors({ ...errors, description: '' });
+                                    }}
                                     placeholder="Escreva um resumo cativante sobre o livro..."
                                 />
+                                {errors.description && <p className="text-red-500 text-[10px] mt-1 font-bold italic">{errors.description}</p>}
                             </div>
                             <div className="md:col-span-2 bg-brand-primary/5 p-4 rounded-2xl border border-brand-primary/10">
                                 <div className="flex items-center gap-2 mb-2">
@@ -269,11 +309,15 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                         id="price"
                                         type="number"
                                         required
-                                        className="input-premium"
+                                        className={`input-premium ${errors.price ? 'border-red-500 bg-red-50' : ''}`}
                                         value={formData.price}
-                                        onChange={e => setFormData({ ...formData, price: e.target.value })}
+                                        onChange={e => {
+                                            setFormData({ ...formData, price: e.target.value });
+                                            if (errors.price) setErrors({ ...errors, price: '' });
+                                        }}
                                         placeholder="0"
                                     />
+                                    {errors.price && <p className="text-red-500 text-[10px] mt-1 font-bold italic">{errors.price}</p>}
                                     {isFree && (
                                         <div className="mt-2 flex items-center gap-2 text-xs text-green-600 font-bold uppercase tracking-wider">
                                             <CheckCircle className="w-3 h-3" /> Livro Gratuito

@@ -26,6 +26,7 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
         pages: '',
         description: ''
     });
+    const [submitErrors, setSubmitErrors] = useState<Record<string, string>>({});
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const fetchManuscripts = async () => {
@@ -87,12 +88,20 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
         }
     };
 
+    const validateManuscript = () => {
+        const errors: Record<string, string> = {};
+        if (!submitData.title.trim()) errors.title = 'Título é obrigatório';
+        if (!submitData.genre) errors.genre = 'Género é obrigatório';
+        if (!submitData.description.trim()) errors.description = 'Sinopse é obrigatória';
+        if (!selectedFile) errors.file = 'Ficheiro do manuscrito é obrigatório';
+        setSubmitErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+
     const handleSubmitManuscript = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!user || !selectedFile) {
-            alert('Por favor, selecione um ficheiro.');
-            return;
-        }
+        if (!user) return;
+        if (!validateManuscript()) return;
 
         setSubmitLoading(true);
         try {
@@ -100,18 +109,18 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
             const { createManuscript } = await import('../services/dataService');
 
             // 1. Upload file
-            const { fileId, fileUrl } = await uploadManuscriptFile(selectedFile);
+            const { fileUrl } = await uploadManuscriptFile(selectedFile as File);
 
             // 2. Create document
             await createManuscript({
                 authorId: user.id,
                 authorName: user.name,
-                title: submitData.title,
+                title: submitData.title.trim(),
                 genre: submitData.genre,
                 pages: submitData.pages ? parseInt(submitData.pages) : undefined,
-                description: submitData.description,
+                description: submitData.description.trim(),
                 fileUrl: fileUrl,
-                fileName: selectedFile.name,
+                fileName: (selectedFile as File).name,
                 status: 'pending',
                 submittedDate: new Date().toISOString()
             });
@@ -299,10 +308,14 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                                             type="text"
                                             required
                                             value={submitData.title}
-                                            onChange={e => setSubmitData(prev => ({ ...prev, title: e.target.value }))}
-                                            className="input-premium"
+                                            onChange={e => {
+                                                setSubmitData(prev => ({ ...prev, title: e.target.value }));
+                                                if (submitErrors.title) setSubmitErrors(prev => ({ ...prev, title: '' }));
+                                            }}
+                                            className={`input-premium ${submitErrors.title ? 'border-red-500 bg-red-50' : ''}`}
                                             placeholder="Digite o título"
                                         />
+                                        {submitErrors.title && <p className="text-red-500 text-[10px] mt-1 font-bold italic">{submitErrors.title}</p>}
                                     </div>
 
                                     <div className="grid md:grid-cols-2 gap-6">
@@ -314,8 +327,11 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                                                 required
                                                 aria-label="Género Literário"
                                                 value={submitData.genre}
-                                                onChange={e => setSubmitData(prev => ({ ...prev, genre: e.target.value }))}
-                                                className="input-premium"
+                                                onChange={e => {
+                                                    setSubmitData(prev => ({ ...prev, genre: e.target.value }));
+                                                    if (submitErrors.genre) setSubmitErrors(prev => ({ ...prev, genre: '' }));
+                                                }}
+                                                className={`input-premium ${submitErrors.genre ? 'border-red-500 bg-red-50' : ''}`}
                                             >
                                                 <option value="">Selecione...</option>
                                                 <option value="romance">Romance</option>
@@ -324,6 +340,7 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                                                 <option value="nao-ficcao">Não-Ficção</option>
                                                 <option value="infantil">Infantil</option>
                                             </select>
+                                            {submitErrors.genre && <p className="text-red-500 text-[10px] mt-1 font-bold italic">{submitErrors.genre}</p>}
                                         </div>
 
                                         <div className="form-group-premium">
@@ -348,24 +365,33 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                                             required
                                             rows={6}
                                             value={submitData.description}
-                                            onChange={e => setSubmitData(prev => ({ ...prev, description: e.target.value }))}
-                                            className="input-premium h-32 resize-none"
+                                            onChange={e => {
+                                                setSubmitData(prev => ({ ...prev, description: e.target.value }));
+                                                if (submitErrors.description) setSubmitErrors(prev => ({ ...prev, description: '' }));
+                                            }}
+                                            className={`input-premium h-32 resize-none ${submitErrors.description ? 'border-red-500 bg-red-50' : ''}`}
                                             placeholder="Descreva brevemente a sua obra..."
                                         />
+                                        {submitErrors.description && <p className="text-red-500 text-[10px] mt-1 font-bold italic">{submitErrors.description}</p>}
                                     </div>
 
                                     <div>
                                         <label className="block text-sm font-bold text-brand-dark mb-2 uppercase tracking-wider">
                                             Manuscrito (PDF, DOCX) *
                                         </label>
-                                        <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-brand-primary transition-all cursor-pointer">
+                                        <div className={`relative border-2 border-dashed rounded-lg p-12 text-center transition-all cursor-pointer ${submitErrors.file ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-brand-primary'}`}>
                                             <input
                                                 type="file"
                                                 required
                                                 accept=".pdf,.docx,.doc"
                                                 title="Carregar manuscrito"
                                                 aria-label="Carregar manuscrito"
-                                                onChange={e => e.target.files && setSelectedFile(e.target.files[0])}
+                                                onChange={e => {
+                                                    if (e.target.files && e.target.files[0]) {
+                                                        setSelectedFile(e.target.files[0]);
+                                                        if (submitErrors.file) setSubmitErrors(prev => ({ ...prev, file: '' }));
+                                                    }
+                                                }}
                                                 className="absolute inset-0 opacity-0 cursor-pointer"
                                             />
                                             {selectedFile ? (
@@ -379,6 +405,7 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                                                     <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                                                     <p className="text-gray-600 font-medium mb-2">Clique para carregar ou arraste o arquivo</p>
                                                     <p className="text-sm text-gray-500">Máximo 50MB (PDF, DOCX)</p>
+                                                    {submitErrors.file && <p className="text-red-500 text-[10px] mt-2 font-bold italic">{submitErrors.file}</p>}
                                                 </>
                                             )}
                                         </div>

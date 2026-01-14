@@ -27,10 +27,27 @@ const AdminServicesTab: React.FC = () => {
 
     const handleSaveService = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!serviceForm.title.trim()) {
+            alert('O título do serviço é obrigatório.');
+            return;
+        }
+
         setIsSavingService(true);
         try {
             const { saveEditorialService } = await import('../../services/dataService');
-            await saveEditorialService(serviceForm);
+
+            const sanitizedService = {
+                ...serviceForm,
+                title: serviceForm.title.trim(),
+                price: serviceForm.price.trim(),
+                details: serviceForm.details
+                    .map((d: string) => d.trim())
+                    .filter((d: string) => d.length > 0),
+                order: Number(serviceForm.order) || 0
+            };
+
+            await saveEditorialService(sanitizedService);
             alert('Serviço guardado com sucesso!');
             setShowServiceModal(false);
             fetchServices();

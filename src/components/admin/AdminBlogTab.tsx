@@ -50,9 +50,9 @@ const AdminBlogTab: React.FC<AdminBlogTabProps> = ({ posts, onRefresh }) => {
         try {
             const newPost: BlogPost = {
                 id: `temp_${Date.now()}`,
-                title: postContent.substring(0, 100),
-                content: postContent,
-                imageUrl: postImage || 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&h=500&fit=crop',
+                title: postContent.trim().substring(0, 100),
+                content: postContent.trim(),
+                imageUrl: postImage.trim() || 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&h=500&fit=crop',
                 date: new Date().toISOString(),
                 author: 'Editora Graça'
             };
@@ -81,9 +81,9 @@ const AdminBlogTab: React.FC<AdminBlogTabProps> = ({ posts, onRefresh }) => {
             // Create event as a special blog post with event metadata
             const eventPost: BlogPost = {
                 id: `temp_${Date.now()}`,
-                title: `📅 ${eventData.title}`,
-                content: `${eventData.description}\n\n📍 Local: ${eventData.location}\n🕐 Horário: ${eventData.time}`,
-                imageUrl: eventData.imageUrl || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&h=500&fit=crop',
+                title: `📅 ${eventData.title.trim()}`,
+                content: `${eventData.description.trim()}\n\n📍 Local: ${eventData.location.trim()}\n🕐 Horário: ${eventData.time.trim()}`,
+                imageUrl: eventData.imageUrl.trim() || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&h=500&fit=crop',
                 date: eventData.date,
                 author: 'Editora Graça'
             };

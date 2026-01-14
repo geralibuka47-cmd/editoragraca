@@ -55,12 +55,12 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
             const { createOrder } = await import('../services/dataService');
 
             await createOrder({
-                customerName: customerInfo.name,
-                customerEmail: customerInfo.email,
+                customerName: customerInfo.name.trim(),
+                customerEmail: customerInfo.email.trim(),
                 items: cart.map(item => ({
                     title: item.title,
                     quantity: item.quantity,
-                    price: item.price,
+                    price: Number(item.price) || 0,
                     authorId: item.authorId
                 })),
                 total: total,
@@ -269,7 +269,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
                                             name="phone"
                                             value={customerInfo.phone}
                                             onChange={handleChange}
-                                            placeholder="+244 XXX XXX XXX"
+                                            placeholder="Ex: 923 000 000"
                                             className={`input-premium ${errors.phone ? 'input-error-premium' : ''}`}
                                         />
                                         {errors.phone && <p className="error-text-premium">{errors.phone}</p>}

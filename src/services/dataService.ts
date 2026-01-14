@@ -63,25 +63,40 @@ const cleanDataForSupabase = (data: any, table: string) => {
         'authorName': 'author_name',
         'paymentInfo': 'payment_info',
         'paymentInfoNotes': 'payment_info_notes',
-        'launchDate': 'launch_date'
+        'launchDate': 'launch_date',
+        'photoUrl': 'photo_url', // Legacy support
+        'bio': 'bio',
+        'address': 'address'
     };
 
     const JSONFields = ['items', 'payment_methods', 'preferred_contact'];
     const ArrayFields = ['details'];
+    const NumericFields = ['price', 'stock', 'pages', 'display_order', 'total_amount', 'rating', 'total'];
 
     Object.keys(data).forEach(key => {
+        // Skip internal/id fields
         if (key === 'id' || key.startsWith('$')) return;
 
         const dbKey = mapping[key] || key;
-        const value = data[key];
+        let value = data[key];
 
+        // 1. Skip undefined/null
         if (value === undefined || value === null) return;
 
+        // 2. Sanitize Strings
+        if (typeof value === 'string') {
+            value = value.trim();
+        }
+
+        // 3. Handle specific types
         if (JSONFields.includes(dbKey)) {
-            // Supabase handles jsonb as objects, but let's be safe
             clean[dbKey] = typeof value === 'string' ? JSON.parse(value) : value;
         } else if (ArrayFields.includes(dbKey)) {
             clean[dbKey] = Array.isArray(value) ? value : [value];
+        } else if (NumericFields.includes(dbKey)) {
+            // Ensure numbers are numbers, not strings from forms
+            const num = Number(value);
+            clean[dbKey] = isNaN(num) ? 0 : num;
         } else {
             clean[dbKey] = value;
         }

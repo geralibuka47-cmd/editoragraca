@@ -27,10 +27,28 @@ const AdminTeamTab: React.FC = () => {
 
     const handleSaveTeam = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Basic validation
+        if (!teamForm.name.trim() || !teamForm.role.trim()) {
+            alert('Nome e Cargo são obrigatórios');
+            return;
+        }
+
         setIsSavingTeam(true);
         try {
             const { saveTeamMember } = await import('../../services/dataService');
-            await saveTeamMember(teamForm);
+
+            // Sanitize
+            const sanitizedMember = {
+                ...teamForm,
+                name: teamForm.name.trim(),
+                role: teamForm.role.trim(),
+                department: teamForm.department.trim(),
+                bio: teamForm.bio.trim(),
+                photoUrl: teamForm.photoUrl.trim()
+            };
+
+            await saveTeamMember(sanitizedMember);
             alert('Membro guardado com sucesso!');
             setShowTeamModal(false);
             fetchTeamMembers();

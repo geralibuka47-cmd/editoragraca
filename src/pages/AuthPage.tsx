@@ -17,18 +17,33 @@ const AuthPage: React.FC<AuthPageProps> = ({ onSuccess, onBack }) => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        const cleanEmail = email.trim();
+        const cleanName = name.trim();
+
+        if (!cleanEmail) {
+            setError('O e-mail é obrigatório.');
+            return;
+        }
+
+        if (!isLogin && !cleanName) {
+            setError('O nome é obrigatório.');
+            return;
+        }
+
         setLoading(true);
         setError('');
 
         try {
             if (isLogin) {
-                const user = await login(email, password);
+                const user = await login(cleanEmail, password);
                 onSuccess(user);
             } else {
-                const user = await signUp(email, password, name);
+                const user = await signUp(cleanEmail, password, cleanName);
                 onSuccess(user);
             }
         } catch (err: any) {
+            console.error("Auth error:", err);
             setError(err.message || 'Ocorreu um erro ao processar o seu pedido.');
         } finally {
             setLoading(false);

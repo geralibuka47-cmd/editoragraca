@@ -38,9 +38,11 @@ const AdminContentTab: React.FC = () => {
     const handleSaveText = async (key: string, value: any) => {
         setIsSaving(true);
         try {
-            await saveSiteContent(key, selectedPage, value);
-            setSiteContent({ ...siteContent, [key]: value });
-            // alert('Conteúdo atualizado!');
+            // Sanitize string content
+            const sanitizedValue = typeof value === 'string' ? value.trim() : value;
+
+            await saveSiteContent(key, selectedPage, sanitizedValue);
+            setSiteContent({ ...siteContent, [key]: sanitizedValue });
         } catch (error) {
             console.error("Error saving text:", error);
             alert('Erro ao salvar conteúdo.');
@@ -51,13 +53,28 @@ const AdminContentTab: React.FC = () => {
 
     const handleSaveTestimonial = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!testimonialForm.name.trim() || !testimonialForm.content.trim()) {
+            alert('Nome e conteúdo do depoimento são obrigatórios.');
+            return;
+        }
+
         setIsSaving(true);
         try {
-            await saveTestimonial(testimonialForm);
+            const sanitizedTestimonial = {
+                ...testimonialForm,
+                name: testimonialForm.name.trim(),
+                role: testimonialForm.role.trim(),
+                content: testimonialForm.content.trim(),
+                rating: Number(testimonialForm.rating) || 5
+            };
+
+            await saveTestimonial(sanitizedTestimonial);
             setShowTestimonialModal(false);
             loadData();
         } catch (error) {
             console.error("Error saving testimonial:", error);
+            alert('Erro ao salvar depoimento.');
         } finally {
             setIsSaving(false);
         }
