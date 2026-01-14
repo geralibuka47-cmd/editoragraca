@@ -209,7 +209,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                             placeholder="Pesquisar livros, autores, categorias..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-12 pr-12 py-3 bg-white border border-gray-200 rounded-full text-sm focus:ring-1 focus:ring-brand-primary focus:border-brand-primary"
+                            className="input-premium pl-12 pr-12 py-4"
                         />
                         <button
                             type="button"

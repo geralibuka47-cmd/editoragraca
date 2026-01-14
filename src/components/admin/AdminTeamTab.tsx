@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, Save, X } from 'lucide-react';
 
 const AdminTeamTab: React.FC = () => {
     const [teamMembers, setTeamMembers] = useState<any[]>([]);
@@ -138,101 +138,112 @@ const AdminTeamTab: React.FC = () => {
                         </div>
                         <form onSubmit={handleSaveTeam} className="flex-1 overflow-y-auto p-8 space-y-6">
                             <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label htmlFor="team-name" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Nome</label>
+                                <div className="form-group-premium">
+                                    <label htmlFor="team-name" className="label-premium">Nome</label>
                                     <input
                                         id="team-name"
                                         type="text"
                                         required
                                         value={teamForm.name}
                                         onChange={(e) => setTeamForm({ ...teamForm, name: e.target.value })}
-                                        className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                        className="input-premium"
                                         placeholder="Nome do Membro"
                                         title="Nome do Membro"
                                     />
                                 </div>
-                                <div>
-                                    <label htmlFor="team-role" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Cargo</label>
+                                <div className="form-group-premium">
+                                    <label htmlFor="team-role" className="label-premium">Cargo</label>
                                     <input
                                         id="team-role"
                                         type="text"
                                         required
                                         value={teamForm.role}
                                         onChange={(e) => setTeamForm({ ...teamForm, role: e.target.value })}
-                                        className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                        className="input-premium"
                                         placeholder="Cargo do Membro"
                                         title="Cargo do Membro"
                                     />
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label htmlFor="team-department" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Departamento</label>
+                                <div className="form-group-premium">
+                                    <label htmlFor="team-department" className="label-premium">Departamento</label>
                                     <input
                                         id="team-department"
                                         type="text"
                                         required
                                         value={teamForm.department}
                                         onChange={(e) => setTeamForm({ ...teamForm, department: e.target.value })}
-                                        className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                        className="input-premium"
                                         placeholder="Departamento"
                                         title="Departamento"
                                     />
                                 </div>
-                                <div>
-                                    <label htmlFor="team-order" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Ordem</label>
+                                <div className="form-group-premium">
+                                    <label htmlFor="team-order" className="label-premium">Ordem</label>
                                     <input
                                         id="team-order"
                                         type="number"
                                         required
                                         value={teamForm.order}
                                         onChange={(e) => setTeamForm({ ...teamForm, order: parseInt(e.target.value) })}
-                                        className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                        className="input-premium"
                                         placeholder="Ordem de Exibição"
                                         title="Ordem de Exibição"
                                     />
                                 </div>
                             </div>
-                            <div>
-                                <label htmlFor="team-photo" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">URL da Foto</label>
+                            <div className="form-group-premium">
+                                <label htmlFor="team-photo" className="label-premium">URL da Foto</label>
                                 <input
                                     id="team-photo"
                                     type="url"
                                     required
                                     value={teamForm.photoUrl}
                                     onChange={(e) => setTeamForm({ ...teamForm, photoUrl: e.target.value })}
-                                    className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                    className="input-premium"
                                     placeholder="https://..."
                                     title="URL da Foto"
                                 />
                             </div>
-                            <div>
-                                <label htmlFor="team-bio" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Bio</label>
+                            <div className="form-group-premium">
+                                <label htmlFor="team-bio" className="label-premium">Bio</label>
                                 <textarea
                                     id="team-bio"
                                     required
                                     value={teamForm.bio}
                                     onChange={(e) => setTeamForm({ ...teamForm, bio: e.target.value })}
-                                    className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary h-32 resize-none"
+                                    className="input-premium h-32 resize-none"
                                     placeholder="Biografia do Membro"
                                     title="Biografia do Membro"
                                 />
                             </div>
                         </form>
-                        <div className="p-6 border-t border-gray-100 flex gap-4 bg-white/50 backdrop-blur-sm">
+                        <div className="p-8 border-t border-gray-100 flex gap-4 bg-gray-50/50">
                             <button
                                 type="button"
                                 onClick={() => setShowTeamModal(false)}
-                                className="flex-1 py-4 border-2 border-brand-dark rounded-full font-black text-xs uppercase tracking-widest text-brand-dark hover:bg-brand-dark hover:text-white transition-all"
+                                className="flex-1 px-8 py-4 border-2 border-brand-dark text-brand-dark rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-brand-dark hover:text-white transition-all flex items-center justify-center gap-2"
                             >
+                                <X className="w-4 h-4" />
                                 Cancelar
                             </button>
                             <button
                                 onClick={handleSaveTeam}
                                 disabled={isSavingTeam}
-                                className="flex-1 py-4 bg-brand-primary text-white rounded-full font-black text-xs uppercase tracking-widest shadow-lg shadow-brand-primary/20 hover:brightness-110 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                                className="flex-1 btn-premium py-4"
                             >
-                                {isSavingTeam ? 'Salvando...' : 'Salvar Membro'}
+                                {isSavingTeam ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                        <span>Salvando...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Save className="w-4 h-4" />
+                                        <span>Salvar Membro</span>
+                                    </>
+                                )}
                             </button>
                         </div>
                     </div>

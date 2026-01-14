@@ -28,7 +28,23 @@
 /* Custom Utilities Inspired by Booksell */
 @layer components {
     .btn-premium {
-        @apply px-8 py-3 bg-brand-primary text-white font-semibold transition-all duration-300 hover:bg-brand-dark hover:scale-105 shadow-md flex items-center gap-2;
+        @apply flex items-center justify-center gap-2 px-8 py-4 bg-brand-primary text-white font-black rounded-2xl hover:bg-brand-dark hover:scale-105 active:scale-95 transition-all shadow-xl shadow-brand-primary/20 uppercase text-xs tracking-widest;
+    }
+
+    .input-premium {
+        @apply w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:bg-white focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 outline-none rounded-2xl transition-all font-medium text-brand-dark placeholder:text-gray-400 placeholder:font-normal;
+    }
+
+    .label-premium {
+        @apply block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-2 ml-1;
+    }
+
+    .error-text-premium {
+        @apply text-[10px] font-bold text-red-500 mt-1 ml-1 animate-in fade-in slide-in-from-top-1 duration-200;
+    }
+
+    .input-error-premium {
+        @apply border-red-200 focus:border-red-500 focus:ring-red-100 bg-red-50/30;
     }
 
     .section-bg-dark {
@@ -51,6 +67,34 @@
 
 .animate-fade-in {
     animation: fadeIn 0.5s ease-out forwards;
+}
+
+.animate-shake {
+    animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
+}
+
+@keyframes shake {
+
+    10%,
+    90% {
+        transform: translate3d(-1px, 0, 0);
+    }
+
+    20%,
+    80% {
+        transform: translate3d(2px, 0, 0);
+    }
+
+    30%,
+    50%,
+    70% {
+        transform: translate3d(-4px, 0, 0);
+    }
+
+    40%,
+    60% {
+        transform: translate3d(4px, 0, 0);
+    }
 }
 
 /* Podcast Progress Bar */

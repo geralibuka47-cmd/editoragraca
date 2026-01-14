@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Manuscript } from '../../types';
+import { Loader2, CheckCircle, XCircle, FileText, ExternalLink, MessageSquare } from 'lucide-react';
 
 const AdminManuscriptsTab: React.FC = () => {
     const [manuscripts, setManuscripts] = useState<Manuscript[]>([]);
     const [isLoadingManuscripts, setIsLoadingManuscripts] = useState(true);
     const [selectedManuscript, setSelectedManuscript] = useState<Manuscript | null>(null);
     const [feedback, setFeedback] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const fetchManuscripts = async () => {
         setIsLoadingManuscripts(true);
@@ -26,6 +28,7 @@ const AdminManuscriptsTab: React.FC = () => {
 
     const handleReviewManuscript = async (status: 'approved' | 'rejected') => {
         if (!selectedManuscript) return;
+        setIsSubmitting(true);
         try {
             const { updateManuscriptStatus } = await import('../../services/dataService');
             await updateManuscriptStatus(selectedManuscript.id, status, feedback);
@@ -36,6 +39,8 @@ const AdminManuscriptsTab: React.FC = () => {
         } catch (error) {
             console.error('Erro ao atualizar status:', error);
             alert('Erro ao atualizar o status do manuscrito.');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -134,34 +139,44 @@ const AdminManuscriptsTab: React.FC = () => {
                                 Ler Manuscrito (PDF)
                             </a>
 
-                            <div>
-                                <label className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Feedback para o Autor</label>
+                            <div className="form-group-premium">
+                                <label className="label-premium">Feedback para o Autor</label>
                                 <textarea
-                                    className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary h-32 resize-none"
+                                    className="input-premium h-32 resize-none"
                                     placeholder="Escreva as razões da aprovação ou rejeição..."
                                     value={feedback}
                                     onChange={(e) => setFeedback(e.target.value)}
                                 ></textarea>
                             </div>
                         </div>
-                        <div className="p-6 bg-gray-50 flex justify-end gap-3">
+                        <div className="p-8 bg-gray-50 flex justify-end gap-4 border-t border-gray-100">
                             <button
                                 onClick={() => setSelectedManuscript(null)}
-                                className="px-6 py-3 font-bold text-gray-500 hover:text-gray-700 uppercase tracking-wider text-xs"
+                                className="px-8 py-4 font-black text-xs text-gray-400 hover:text-brand-dark uppercase tracking-widest transition-colors"
                             >
                                 Cancelar
                             </button>
                             <button
                                 onClick={() => handleReviewManuscript('rejected')}
-                                className="px-6 py-3 bg-red-100 text-red-600 rounded-xl font-bold uppercase tracking-wider text-xs hover:bg-red-200 transition-colors"
+                                disabled={isSubmitting}
+                                className="px-8 py-4 bg-red-50 text-red-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all flex items-center gap-2 border border-red-100 disabled:opacity-50"
                             >
+                                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
                                 Rejeitar
                             </button>
                             <button
                                 onClick={() => handleReviewManuscript('approved')}
-                                className="px-6 py-3 bg-green-100 text-green-600 rounded-xl font-bold uppercase tracking-wider text-xs hover:bg-green-200 transition-colors"
+                                disabled={isSubmitting}
+                                className="btn-premium py-4 text-[10px]"
                             >
-                                Aprovar
+                                {isSubmitting ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                    <>
+                                        <CheckCircle className="w-4 h-4" />
+                                        <span>Aprovar</span>
+                                    </>
+                                )}
                             </button>
                         </div>
                     </div>

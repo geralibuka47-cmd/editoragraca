@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Image, Calendar, MapPin, Users, X, Plus, Smile } from 'lucide-react';
+import { Image as ImageIcon, Calendar, MapPin, Users, X, Plus, Smile, Loader2, Send } from 'lucide-react';
 import { BlogPost } from '../../types';
 import { saveBlogPost } from '../../services/dataService';
 import { useToast } from '../Toast';
@@ -24,6 +24,7 @@ const AdminBlogTab: React.FC<AdminBlogTabProps> = ({ posts, onRefresh }) => {
     const { showToast } = useToast();
     const [contentType, setContentType] = useState<ContentType>('post');
     const [isCreating, setIsCreating] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Post state
     const [postContent, setPostContent] = useState('');
@@ -45,6 +46,7 @@ const AdminBlogTab: React.FC<AdminBlogTabProps> = ({ posts, onRefresh }) => {
             return;
         }
 
+        setIsSubmitting(true);
         try {
             const newPost: BlogPost = {
                 id: `temp_${Date.now()}`,
@@ -63,6 +65,8 @@ const AdminBlogTab: React.FC<AdminBlogTabProps> = ({ posts, onRefresh }) => {
             onRefresh();
         } catch (error) {
             showToast('Erro ao publicar post', 'error');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -72,6 +76,7 @@ const AdminBlogTab: React.FC<AdminBlogTabProps> = ({ posts, onRefresh }) => {
             return;
         }
 
+        setIsSubmitting(true);
         try {
             // Create event as a special blog post with event metadata
             const eventPost: BlogPost = {
@@ -90,6 +95,8 @@ const AdminBlogTab: React.FC<AdminBlogTabProps> = ({ posts, onRefresh }) => {
             onRefresh();
         } catch (error) {
             showToast('Erro ao criar evento', 'error');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -135,18 +142,18 @@ const AdminBlogTab: React.FC<AdminBlogTabProps> = ({ posts, onRefresh }) => {
                                     value={postContent}
                                     onChange={(e) => setPostContent(e.target.value)}
                                     placeholder="No que está a pensar?"
-                                    className="w-full p-4 border-0 resize-none focus:outline-none text-lg"
+                                    className="input-premium h-48 resize-none !bg-white !p-0 !text-xl placeholder:text-gray-300 focus:ring-0 border-0"
                                     rows={4}
                                 />
 
-                                <div className="space-y-2">
-                                    <label className="block text-sm font-bold text-gray-700">URL da Imagem (opcional)</label>
+                                <div className="form-group-premium">
+                                    <label className="label-premium">URL da Imagem (opcional)</label>
                                     <input
                                         type="url"
                                         value={postImage}
                                         onChange={(e) => setPostImage(e.target.value)}
                                         placeholder="https://exemplo.com/imagem.jpg"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                                        className="input-premium"
                                     />
                                 </div>
 
@@ -166,7 +173,7 @@ const AdminBlogTab: React.FC<AdminBlogTabProps> = ({ posts, onRefresh }) => {
 
                                 <div className="flex items-center gap-2 pt-4 border-t border-gray-200">
                                     <button className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 rounded-lg transition-colors">
-                                        <Image className="w-5 h-5 text-green-600" />
+                                        <ImageIcon className="w-5 h-5 text-green-600" />
                                         <span className="text-sm font-bold text-gray-700">Foto</span>
                                     </button>
                                     <button className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 rounded-lg transition-colors">
@@ -175,18 +182,26 @@ const AdminBlogTab: React.FC<AdminBlogTabProps> = ({ posts, onRefresh }) => {
                                     </button>
                                 </div>
 
-                                <div className="flex gap-2">
+                                <div className="flex gap-4">
                                     <button
                                         onClick={() => setIsCreating(false)}
-                                        className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg font-bold text-gray-700 transition-colors"
+                                        className="flex-1 py-4 border-2 border-brand-dark text-brand-dark rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-brand-dark hover:text-white transition-all"
                                     >
                                         Cancelar
                                     </button>
                                     <button
                                         onClick={handleCreatePost}
-                                        className="flex-1 py-3 bg-brand-primary hover:bg-brand-primary/90 rounded-lg font-bold text-white transition-colors"
+                                        disabled={isSubmitting}
+                                        className="flex-1 btn-premium py-4"
                                     >
-                                        Publicar
+                                        {isSubmitting ? (
+                                            <Loader2 className="w-5 h-5 animate-spin" />
+                                        ) : (
+                                            <>
+                                                <span>Publicar</span>
+                                                <Send className="w-4 h-4" />
+                                            </>
+                                        )}
                                     </button>
                                 </div>
                             </div>
@@ -195,67 +210,70 @@ const AdminBlogTab: React.FC<AdminBlogTabProps> = ({ posts, onRefresh }) => {
                         {/* Event Form */}
                         {contentType === 'event' && (
                             <div className="space-y-4">
-                                <input
-                                    type="text"
-                                    value={eventData.title}
-                                    onChange={(e) => setEventData({ ...eventData, title: e.target.value })}
-                                    placeholder="Nome do evento"
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary text-lg font-bold"
-                                />
+                                <div className="form-group-premium">
+                                    <label className="label-premium">Nome do Evento</label>
+                                    <input
+                                        type="text"
+                                        value={eventData.title}
+                                        onChange={(e) => setEventData({ ...eventData, title: e.target.value })}
+                                        placeholder="Ex: Lançamento de Livro"
+                                        className="input-premium !text-xl font-black"
+                                    />
+                                </div>
 
                                 <div className="grid md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label htmlFor="event-date" className="block text-sm font-bold text-gray-700 mb-2">Data</label>
+                                    <div className="form-group-premium">
+                                        <label htmlFor="event-date" className="label-premium">Data</label>
                                         <input
                                             id="event-date"
                                             type="date"
                                             value={eventData.date}
                                             onChange={(e) => setEventData({ ...eventData, date: e.target.value })}
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                                            className="input-premium"
                                         />
                                     </div>
-                                    <div>
-                                        <label htmlFor="event-time" className="block text-sm font-bold text-gray-700 mb-2">Horário</label>
+                                    <div className="form-group-premium">
+                                        <label htmlFor="event-time" className="label-premium">Horário</label>
                                         <input
                                             id="event-time"
                                             type="time"
                                             value={eventData.time}
                                             onChange={(e) => setEventData({ ...eventData, time: e.target.value })}
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                                            className="input-premium"
                                         />
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">Local</label>
+                                <div className="form-group-premium">
+                                    <label className="label-premium">Local</label>
                                     <input
                                         type="text"
                                         value={eventData.location}
                                         onChange={(e) => setEventData({ ...eventData, location: e.target.value })}
                                         placeholder="Onde será o evento?"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                                        className="input-premium"
                                     />
                                 </div>
 
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">Descrição</label>
+                                <div className="form-group-premium">
+                                    <label className="label-premium">Descrição</label>
                                     <textarea
                                         value={eventData.description}
                                         onChange={(e) => setEventData({ ...eventData, description: e.target.value })}
                                         placeholder="Descreva o evento..."
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary resize-none"
+                                        className="input-premium h-32 resize-none"
                                         rows={4}
                                     />
                                 </div>
 
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">URL da Imagem</label>
+                                <div className="form-group-premium">
+                                    <label className="label-premium">URL da Imagem</label>
                                     <input
                                         type="url"
                                         value={eventData.imageUrl}
                                         onChange={(e) => setEventData({ ...eventData, imageUrl: e.target.value })}
                                         placeholder="https://exemplo.com/imagem.jpg"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                                        className="input-premium"
                                     />
                                 </div>
 
@@ -265,18 +283,26 @@ const AdminBlogTab: React.FC<AdminBlogTabProps> = ({ posts, onRefresh }) => {
                                     </div>
                                 )}
 
-                                <div className="flex gap-2">
+                                <div className="flex gap-4">
                                     <button
                                         onClick={() => setIsCreating(false)}
-                                        className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg font-bold text-gray-700 transition-colors"
+                                        className="flex-1 py-4 border-2 border-brand-dark text-brand-dark rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-brand-dark hover:text-white transition-all"
                                     >
                                         Cancelar
                                     </button>
                                     <button
                                         onClick={handleCreateEvent}
-                                        className="flex-1 py-3 bg-brand-primary hover:bg-brand-primary/90 rounded-lg font-bold text-white transition-colors"
+                                        disabled={isSubmitting}
+                                        className="flex-1 btn-premium py-4"
                                     >
-                                        Criar Evento
+                                        {isSubmitting ? (
+                                            <Loader2 className="w-5 h-5 animate-spin" />
+                                        ) : (
+                                            <>
+                                                <span>Criar Evento</span>
+                                                <Calendar className="w-4 h-4" />
+                                            </>
+                                        )}
                                     </button>
                                 </div>
                             </div>

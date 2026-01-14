@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingCart, Trash2, Plus, Minus, CreditCard, CheckCircle, ArrowLeft } from 'lucide-react';
+import { ShoppingCart, Trash2, Plus, Minus, CreditCard, CheckCircle, ArrowLeft, Loader2 } from 'lucide-react';
 import { ViewState, CartItem } from '../types';
 
 interface CheckoutPageProps {
@@ -226,8 +226,8 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
                             )}
 
                             <form onSubmit={(e) => { e.preventDefault(); handleConfirmOrder(); }} className="space-y-6">
-                                <div>
-                                    <label htmlFor="name" className="block text-sm font-bold text-brand-dark mb-2 uppercase tracking-wider">
+                                <div className="form-group-premium">
+                                    <label htmlFor="name" className="label-premium">
                                         Nome Completo *
                                     </label>
                                     <input
@@ -236,15 +236,15 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
                                         name="name"
                                         value={customerInfo.name}
                                         onChange={handleChange}
-                                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 ${errors.name ? 'border-red-300 focus:border-red-500 focus:ring-red-100' : 'border-gray-300 focus:border-brand-primary focus:ring-brand-primary/10'
-                                            }`}
+                                        className={`input-premium ${errors.name ? 'input-error-premium' : ''}`}
+                                        placeholder="Ex: João Ferreira"
                                     />
-                                    {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
+                                    {errors.name && <p className="error-text-premium">{errors.name}</p>}
                                 </div>
 
                                 <div className="grid md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label htmlFor="email" className="block text-sm font-bold text-brand-dark mb-2 uppercase tracking-wider">
+                                    <div className="form-group-premium">
+                                        <label htmlFor="email" className="label-premium">
                                             Email *
                                         </label>
                                         <input
@@ -253,14 +253,14 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
                                             name="email"
                                             value={customerInfo.email}
                                             onChange={handleChange}
-                                            className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 ${errors.email ? 'border-red-300 focus:border-red-500 focus:ring-red-100' : 'border-gray-300 focus:border-brand-primary focus:ring-brand-primary/10'
-                                                }`}
+                                            className={`input-premium ${errors.email ? 'input-error-premium' : ''}`}
+                                            placeholder="seu@email.com"
                                         />
-                                        {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
+                                        {errors.email && <p className="error-text-premium">{errors.email}</p>}
                                     </div>
 
-                                    <div>
-                                        <label htmlFor="phone" className="block text-sm font-bold text-brand-dark mb-2 uppercase tracking-wider">
+                                    <div className="form-group-premium">
+                                        <label htmlFor="phone" className="label-premium">
                                             Telefone *
                                         </label>
                                         <input
@@ -270,15 +270,14 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
                                             value={customerInfo.phone}
                                             onChange={handleChange}
                                             placeholder="+244 XXX XXX XXX"
-                                            className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 ${errors.phone ? 'border-red-300 focus:border-red-500 focus:ring-red-100' : 'border-gray-300 focus:border-brand-primary focus:ring-brand-primary/10'
-                                                }`}
+                                            className={`input-premium ${errors.phone ? 'input-error-premium' : ''}`}
                                         />
-                                        {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
+                                        {errors.phone && <p className="error-text-premium">{errors.phone}</p>}
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label htmlFor="address" className="block text-sm font-bold text-brand-dark mb-2 uppercase tracking-wider">
+                                <div className="form-group-premium">
+                                    <label htmlFor="address" className="label-premium">
                                         Endereço de Entrega *
                                     </label>
                                     <input
@@ -288,14 +287,13 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
                                         value={customerInfo.address}
                                         onChange={handleChange}
                                         placeholder="Rua, Bairro, Número"
-                                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 ${errors.address ? 'border-red-300 focus:border-red-500 focus:ring-red-100' : 'border-gray-300 focus:border-brand-primary focus:ring-brand-primary/10'
-                                            }`}
+                                        className={`input-premium ${errors.address ? 'input-error-premium' : ''}`}
                                     />
-                                    {errors.address && <p className="mt-1 text-sm text-red-600">{errors.address}</p>}
+                                    {errors.address && <p className="error-text-premium">{errors.address}</p>}
                                 </div>
 
-                                <div>
-                                    <label htmlFor="city" className="block text-sm font-bold text-brand-dark mb-2 uppercase tracking-wider">
+                                <div className="form-group-premium">
+                                    <label htmlFor="city" className="label-premium">
                                         Cidade
                                     </label>
                                     <select
@@ -303,7 +301,8 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
                                         name="city"
                                         value={customerInfo.city}
                                         onChange={handleChange}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-brand-primary focus:ring-brand-primary/10"
+                                        className="input-premium"
+                                        title="Cidade"
                                     >
                                         <option value="Malanje">Malanje</option>
                                         <option value="Luanda">Luanda</option>
@@ -334,9 +333,16 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
                                 <button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className="w-full btn-premium justify-center text-lg disabled:opacity-50"
+                                    className="w-full btn-premium py-5 text-lg disabled:opacity-50"
                                 >
-                                    {isSubmitting ? 'A processar pedido...' : 'Confirmar Pedido'}
+                                    {isSubmitting ? (
+                                        <>
+                                            <Loader2 className="w-6 h-6 animate-spin" />
+                                            <span>A processar pedido...</span>
+                                        </>
+                                    ) : (
+                                        <span>Confirmar Pedido</span>
+                                    )}
                                 </button>
                             </form>
                         </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Loader2, ExternalLink } from 'lucide-react';
 import { User } from '../../types';
 
 interface AdminOrdersTabProps {
@@ -9,6 +9,7 @@ interface AdminOrdersTabProps {
 const AdminOrdersTab: React.FC<AdminOrdersTabProps> = ({ user }) => {
     const [notifications, setNotifications] = useState<import('../../types').PaymentNotification[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
     const fetchNotifications = async () => {
         try {
@@ -29,6 +30,7 @@ const AdminOrdersTab: React.FC<AdminOrdersTabProps> = ({ user }) => {
     const handleConfirm = async (notif: import('../../types').PaymentNotification) => {
         if (!confirm(`Confirmar pagamento de ${notif.readerName} no valor de ${notif.totalAmount} Kz?`)) return;
 
+        setConfirmingId(notif.id);
         try {
             const { updatePaymentNotificationStatus, confirmPaymentProof, getPaymentProofByNotification } = await import('../../services/dataService');
             const { sendPaymentConfirmationToReader } = await import('../../services/emailService');
@@ -49,6 +51,8 @@ const AdminOrdersTab: React.FC<AdminOrdersTabProps> = ({ user }) => {
         } catch (error) {
             console.error('Erro ao confirmar:', error);
             alert('Erro ao confirmar pagamento.');
+        } finally {
+            setConfirmingId(null);
         }
     };
 
@@ -109,11 +113,16 @@ const AdminOrdersTab: React.FC<AdminOrdersTabProps> = ({ user }) => {
                                         {n.status !== 'confirmed' ? (
                                             <button
                                                 onClick={() => handleConfirm(n)}
+                                                disabled={confirmingId === n.id}
                                                 title="Confirmar este pagamento"
                                                 aria-label="Confirmar este pagamento"
-                                                className="px-4 py-2 bg-brand-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:brightness-110 shadow-lg shadow-brand-primary/20 transition-all"
+                                                className="px-6 py-2 bg-brand-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:brightness-110 shadow-lg shadow-brand-primary/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                                             >
-                                                Confirmar
+                                                {confirmingId === n.id ? (
+                                                    <Loader2 className="w-3 h-3 animate-spin" />
+                                                ) : (
+                                                    'Confirmar'
+                                                )}
                                             </button>
                                         ) : (
                                             <span className="flex items-center gap-2 text-green-600 text-[10px] font-black uppercase tracking-widest bg-green-50 px-4 py-2 rounded-xl">

@@ -152,13 +152,13 @@ const AdminContentTab: React.FC = () => {
                                 return (
                                     <div key={key} className="space-y-4">
                                         <div className="flex justify-between items-end">
-                                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{field.label}</label>
+                                            <label className="label-premium">{field.label}</label>
                                             <button
                                                 onClick={() => handleSaveText(key, siteContent[key])}
                                                 disabled={isSaving}
                                                 className="text-[10px] font-black text-brand-primary uppercase tracking-[0.2em] hover:text-brand-dark transition-colors flex items-center gap-2"
                                             >
-                                                <Save className="w-3 h-3" />
+                                                {isSaving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
                                                 Salvar Alteração
                                             </button>
                                         </div>
@@ -167,7 +167,7 @@ const AdminContentTab: React.FC = () => {
                                             <textarea
                                                 title={field.label}
                                                 placeholder={`Insira ${field.label.toLowerCase()}...`}
-                                                className="w-full bg-gray-50 border-none rounded-3xl p-6 text-sm font-medium focus:ring-2 focus:ring-brand-primary/20 min-h-[150px] transition-all"
+                                                className="input-premium h-48 resize-none"
                                                 value={field.type === 'json' ? JSON.stringify(siteContent[key] || [], null, 2) : (siteContent[key] || '')}
                                                 onChange={(e) => {
                                                     let val = e.target.value;
@@ -180,9 +180,10 @@ const AdminContentTab: React.FC = () => {
                                         ) : (
                                             <input
                                                 type="text"
+                                                id={key}
                                                 title={field.label}
                                                 placeholder={`Insira ${field.label.toLowerCase()}...`}
-                                                className="w-full bg-gray-50 border-none rounded-2xl p-6 text-sm font-bold focus:ring-2 focus:ring-brand-primary/20 transition-all text-brand-dark"
+                                                className="input-premium font-bold"
                                                 value={siteContent[key] || ''}
                                                 onChange={(e) => setSiteContent({ ...siteContent, [key]: e.target.value })}
                                             />
@@ -257,38 +258,41 @@ const AdminContentTab: React.FC = () => {
 
                         <form onSubmit={handleSaveTestimonial} className="p-8 space-y-6">
                             <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Nome</label>
+                                <div className="form-group-premium">
+                                    <label htmlFor="testimonial-name" className="label-premium">Nome</label>
                                     <input
+                                        id="testimonial-name"
                                         type="text"
                                         required
                                         title="Nome do autor do depoimento"
                                         placeholder="Ex: João Silva"
-                                        className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm font-bold"
+                                        className="input-premium"
                                         value={testimonialForm.name}
                                         onChange={(e) => setTestimonialForm({ ...testimonialForm, name: e.target.value })}
                                     />
                                 </div>
-                                <div>
-                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Cargo/Título</label>
+                                <div className="form-group-premium">
+                                    <label htmlFor="testimonial-role" className="label-premium">Cargo/Título</label>
                                     <input
+                                        id="testimonial-role"
                                         type="text"
                                         title="Cargo ou título do autor"
                                         placeholder="Ex: Escritor ou Leitor"
-                                        className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm font-bold"
+                                        className="input-premium"
                                         value={testimonialForm.role}
                                         onChange={(e) => setTestimonialForm({ ...testimonialForm, role: e.target.value })}
                                     />
                                 </div>
                             </div>
 
-                            <div>
-                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Depoimento</label>
+                            <div className="form-group-premium">
+                                <label htmlFor="testimonial-content" className="label-premium">Depoimento</label>
                                 <textarea
+                                    id="testimonial-content"
                                     required
                                     title="Conteúdo do depoimento"
                                     placeholder="Escreva aqui o depoimento..."
-                                    className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm font-medium h-32 resize-none"
+                                    className="input-premium h-32 resize-none"
                                     value={testimonialForm.content}
                                     onChange={(e) => setTestimonialForm({ ...testimonialForm, content: e.target.value })}
                                 />
@@ -305,9 +309,16 @@ const AdminContentTab: React.FC = () => {
                                 <button
                                     type="submit"
                                     disabled={isSaving}
-                                    className="flex-1 py-4 bg-brand-primary text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg disabled:opacity-50"
+                                    className="flex-1 btn-premium py-4"
                                 >
-                                    {isSaving ? 'Salvando...' : 'Guardar Depoimento'}
+                                    {isSaving ? (
+                                        <>
+                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                            <span>Salvando...</span>
+                                        </>
+                                    ) : (
+                                        <span>Guardar Depoimento</span>
+                                    )}
                                 </button>
                             </div>
                         </form>

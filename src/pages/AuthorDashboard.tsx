@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileText, Upload, Eye, CheckCircle, Clock, XCircle, User as UserIcon } from 'lucide-react';
+import { FileText, Upload, Eye, CheckCircle, Clock, XCircle, User as UserIcon, Loader2, Save } from 'lucide-react';
 import { ViewState, User } from '../types';
 
 interface AuthorDashboardProps {
@@ -291,8 +291,8 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                             <h2 className="text-3xl font-black text-brand-dark mb-8">Submeter Novo Manuscrito</h2>
                             <div className="bg-white rounded-3xl shadow-lg p-8 max-w-3xl">
                                 <form onSubmit={handleSubmitManuscript} className="space-y-6">
-                                    <div>
-                                        <label className="block text-sm font-bold text-brand-dark mb-2 uppercase tracking-wider">
+                                    <div className="form-group-premium">
+                                        <label className="label-premium">
                                             Título da Obra *
                                         </label>
                                         <input
@@ -300,14 +300,14 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                                             required
                                             value={submitData.title}
                                             onChange={e => setSubmitData(prev => ({ ...prev, title: e.target.value }))}
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-primary"
+                                            className="input-premium"
                                             placeholder="Digite o título"
                                         />
                                     </div>
 
                                     <div className="grid md:grid-cols-2 gap-6">
-                                        <div>
-                                            <label className="block text-sm font-bold text-brand-dark mb-2 uppercase tracking-wider">
+                                        <div className="form-group-premium">
+                                            <label className="label-premium">
                                                 Género Literário *
                                             </label>
                                             <select
@@ -315,7 +315,7 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                                                 aria-label="Género Literário"
                                                 value={submitData.genre}
                                                 onChange={e => setSubmitData(prev => ({ ...prev, genre: e.target.value }))}
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-primary"
+                                                className="input-premium"
                                             >
                                                 <option value="">Selecione...</option>
                                                 <option value="romance">Romance</option>
@@ -326,22 +326,22 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                                             </select>
                                         </div>
 
-                                        <div>
-                                            <label className="block text-sm font-bold text-brand-dark mb-2 uppercase tracking-wider">
+                                        <div className="form-group-premium">
+                                            <label className="label-premium">
                                                 Número de Páginas
                                             </label>
                                             <input
                                                 type="number"
                                                 value={submitData.pages}
                                                 onChange={e => setSubmitData(prev => ({ ...prev, pages: e.target.value }))}
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-primary"
+                                                className="input-premium"
                                                 placeholder="Ex: 250"
                                             />
                                         </div>
                                     </div>
 
-                                    <div>
-                                        <label className="block text-sm font-bold text-brand-dark mb-2 uppercase tracking-wider">
+                                    <div className="form-group-premium">
+                                        <label className="label-premium">
                                             Sinopse *
                                         </label>
                                         <textarea
@@ -349,7 +349,7 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                                             rows={6}
                                             value={submitData.synopsis}
                                             onChange={e => setSubmitData(prev => ({ ...prev, synopsis: e.target.value }))}
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-primary resize-none"
+                                            className="input-premium h-32 resize-none"
                                             placeholder="Descreva brevemente a sua obra..."
                                         />
                                     </div>
@@ -387,9 +387,19 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                                     <button
                                         type="submit"
                                         disabled={submitLoading}
-                                        className="w-full btn-premium justify-center text-lg disabled:opacity-50"
+                                        className="w-full btn-premium py-4 justify-center text-lg disabled:opacity-50"
                                     >
-                                        {submitLoading ? 'Submetendo...' : 'Submeter Manuscrito'}
+                                        {submitLoading ? (
+                                            <>
+                                                <Loader2 className="w-5 h-5 animate-spin" />
+                                                <span>Submetendo...</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Upload className="w-5 h-5" />
+                                                <span>Submeter Manuscrito</span>
+                                            </>
+                                        )}
                                     </button>
                                 </form>
                             </div>
@@ -461,9 +471,19 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                                 <button
                                     onClick={handleSaveProfile}
                                     disabled={isSaving}
-                                    className="btn-premium"
+                                    className="btn-premium px-8 py-4"
                                 >
-                                    {isSaving ? 'Salvando...' : 'Guardar Alterações'}
+                                    {isSaving ? (
+                                        <>
+                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                            <span>Salvando...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Save className="w-4 h-4" />
+                                            <span>Guardar Alterações</span>
+                                        </>
+                                    )}
                                 </button>
                             </div>
 
@@ -498,24 +518,30 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                                         <div className="border-t border-gray-100 pt-6">
                                             <h4 className="font-bold text-brand-dark mb-4 text-sm uppercase tracking-wider">Adicionar Nova Conta</h4>
                                             <div className="space-y-4">
-                                                <input
-                                                    id="new-bank-name"
-                                                    type="text"
-                                                    placeholder="Nome do Banco (Ex: BFA, Atlântico)"
-                                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary"
-                                                />
-                                                <input
-                                                    id="new-bank-acc"
-                                                    type="text"
-                                                    placeholder="Número de Conta"
-                                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary"
-                                                />
-                                                <input
-                                                    id="new-bank-iban"
-                                                    type="text"
-                                                    placeholder="IBAN"
-                                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary"
-                                                />
+                                                <div className="form-group-premium">
+                                                    <input
+                                                        id="new-bank-name"
+                                                        type="text"
+                                                        placeholder="Nome do Banco (Ex: BFA, Atlântico)"
+                                                        className="input-premium"
+                                                    />
+                                                </div>
+                                                <div className="form-group-premium">
+                                                    <input
+                                                        id="new-bank-acc"
+                                                        type="text"
+                                                        placeholder="Número de Conta"
+                                                        className="input-premium"
+                                                    />
+                                                </div>
+                                                <div className="form-group-premium">
+                                                    <input
+                                                        id="new-bank-iban"
+                                                        type="text"
+                                                        placeholder="IBAN"
+                                                        className="input-premium"
+                                                    />
+                                                </div>
                                                 <button
                                                     onClick={() => {
                                                         const name = (document.getElementById('new-bank-name') as HTMLInputElement).value;
@@ -547,15 +573,15 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                                 <div className="space-y-6">
                                     <div className="bg-white rounded-3xl shadow-lg p-8">
                                         <h3 className="text-xl font-bold text-brand-dark mb-6">Contacto de Notificação</h3>
-                                        <div>
-                                            <label className="block text-sm font-bold text-brand-dark mb-2 uppercase tracking-wider">Número de WhatsApp *</label>
+                                        <div className="form-group-premium">
+                                            <label className="label-premium">Número de WhatsApp *</label>
                                             <div className="relative">
-                                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">+244</span>
+                                                <span className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 font-black">+244</span>
                                                 <input
                                                     type="tel"
                                                     value={whatsapp}
                                                     onChange={(e) => setWhatsapp(e.target.value)}
-                                                    className="w-full pl-16 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary"
+                                                    className="input-premium !pl-20"
                                                     placeholder="9XX XXX XXX"
                                                 />
                                             </div>

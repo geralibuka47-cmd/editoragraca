@@ -217,8 +217,8 @@ const ContactPage: React.FC<ContactPageProps> = ({ onNavigate }) => {
                                 )}
 
                                 <form onSubmit={handleSubmit} className="space-y-6">
-                                    <div>
-                                        <label htmlFor="name" className="block text-sm font-bold text-brand-dark mb-2 uppercase tracking-wider">
+                                    <div className="form-group-premium">
+                                        <label htmlFor="name" className="label-premium">
                                             Nome Completo *
                                         </label>
                                         <input
@@ -227,17 +227,14 @@ const ContactPage: React.FC<ContactPageProps> = ({ onNavigate }) => {
                                             name="name"
                                             value={formData.name}
                                             onChange={handleChange}
-                                            className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all ${errors.name
-                                                ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                                                : 'border-gray-300 focus:border-brand-primary focus:ring-brand-primary/10'
-                                                }`}
+                                            className={`input-premium ${errors.name ? 'input-error-premium' : ''}`}
                                             placeholder="Seu nome completo"
                                         />
-                                        {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
+                                        {errors.name && <p className="error-text-premium">{errors.name}</p>}
                                     </div>
 
-                                    <div>
-                                        <label htmlFor="email" className="block text-sm font-bold text-brand-dark mb-2 uppercase tracking-wider">
+                                    <div className="form-group-premium">
+                                        <label htmlFor="email" className="label-premium">
                                             Email *
                                         </label>
                                         <input
@@ -246,17 +243,14 @@ const ContactPage: React.FC<ContactPageProps> = ({ onNavigate }) => {
                                             name="email"
                                             value={formData.email}
                                             onChange={handleChange}
-                                            className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all ${errors.email
-                                                ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                                                : 'border-gray-300 focus:border-brand-primary focus:ring-brand-primary/10'
-                                                }`}
+                                            className={`input-premium ${errors.email ? 'input-error-premium' : ''}`}
                                             placeholder="seu.email@exemplo.com"
                                         />
-                                        {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
+                                        {errors.email && <p className="error-text-premium">{errors.email}</p>}
                                     </div>
 
-                                    <div>
-                                        <label htmlFor="subject" className="block text-sm font-bold text-brand-dark mb-2 uppercase tracking-wider">
+                                    <div className="form-group-premium">
+                                        <label htmlFor="subject" className="label-premium">
                                             Assunto *
                                         </label>
                                         <select
@@ -264,10 +258,8 @@ const ContactPage: React.FC<ContactPageProps> = ({ onNavigate }) => {
                                             name="subject"
                                             value={formData.subject}
                                             onChange={handleChange}
-                                            className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all ${errors.subject
-                                                ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                                                : 'border-gray-300 focus:border-brand-primary focus:ring-brand-primary/10'
-                                                }`}
+                                            className={`input-premium ${errors.subject ? 'input-error-premium' : ''}`}
+                                            title="Assunto"
                                         >
                                             <option value="">Selecione um assunto</option>
                                             <option value="manuscrito">Submissão de Manuscrito</option>
@@ -276,11 +268,11 @@ const ContactPage: React.FC<ContactPageProps> = ({ onNavigate }) => {
                                             <option value="parceria">Parceria / Colaboração</option>
                                             <option value="outro">Outro</option>
                                         </select>
-                                        {errors.subject && <p className="mt-1 text-sm text-red-600">{errors.subject}</p>}
+                                        {errors.subject && <p className="error-text-premium">{errors.subject}</p>}
                                     </div>
 
-                                    <div>
-                                        <label htmlFor="message" className="block text-sm font-bold text-brand-dark mb-2 uppercase tracking-wider">
+                                    <div className="form-group-premium">
+                                        <label htmlFor="message" className="label-premium">
                                             Mensagem *
                                         </label>
                                         <textarea
@@ -289,22 +281,19 @@ const ContactPage: React.FC<ContactPageProps> = ({ onNavigate }) => {
                                             value={formData.message}
                                             onChange={handleChange}
                                             rows={6}
-                                            className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all resize-none ${errors.message
-                                                ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                                                : 'border-gray-300 focus:border-brand-primary focus:ring-brand-primary/10'
-                                                }`}
+                                            className={`input-premium resize-none h-32 ${errors.message ? 'input-error-premium' : ''}`}
                                             placeholder="Escreva sua mensagem aqui..."
                                         />
-                                        {errors.message && <p className="mt-1 text-sm text-red-600">{errors.message}</p>}
+                                        {errors.message && <p className="error-text-premium">{errors.message}</p>}
                                     </div>
 
                                     <button
                                         type="submit"
-                                        disabled={formStatus === 'success'}
-                                        className="w-full btn-premium justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                                        disabled={formStatus === 'success' || formStatus === 'error'} // or while loading if added
+                                        className="w-full btn-premium py-5 text-lg rounded-2xl shadow-xl shadow-brand-primary/20 disabled:opacity-50"
                                     >
                                         <Send className="w-5 h-5" />
-                                        Enviar Mensagem
+                                        <span>Enviar Mensagem</span>
                                     </button>
                                 </form>
                             </div>

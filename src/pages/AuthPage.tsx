@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { login, signUp } from '../services/authService';
-import { User, Mail, Lock, ArrowRight, BookOpen, Check } from 'lucide-react';
+import { User, Mail, Lock, ArrowRight, BookOpen, Check, Loader2 } from 'lucide-react';
 
 interface AuthPageProps {
     onSuccess: (user: any) => void;
@@ -99,48 +99,51 @@ const AuthPage: React.FC<AuthPageProps> = ({ onSuccess, onBack }) => {
 
                         <form onSubmit={handleSubmit} className="space-y-6">
                             {!isLogin && (
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block ml-1">Nome Completo</label>
+                                <div className="form-group-premium">
+                                    <label htmlFor="name" className="label-premium">Nome Completo</label>
                                     <div className="relative group">
                                         <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-brand-primary transition-colors" />
                                         <input
+                                            id="name"
                                             type="text"
                                             required
                                             placeholder="Ex: João Silva"
                                             value={name}
                                             onChange={(e) => setName(e.target.value)}
-                                            className="w-full pl-12 pr-6 py-4 bg-gray-50 border-2 border-transparent focus:bg-white focus:border-brand-primary outline-none rounded-2xl transition-all font-medium text-brand-dark"
+                                            className="input-premium pl-12"
                                         />
                                     </div>
                                 </div>
                             )}
 
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block ml-1">Endereço de E-mail</label>
+                            <div className="form-group-premium">
+                                <label htmlFor="email" className="label-premium">Endereço de E-mail</label>
                                 <div className="relative group">
                                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-brand-primary transition-colors" />
                                     <input
+                                        id="email"
                                         type="email"
                                         required
                                         placeholder="seu@email.com"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="w-full pl-12 pr-6 py-4 bg-gray-50 border-2 border-transparent focus:bg-white focus:border-brand-primary outline-none rounded-2xl transition-all font-medium text-brand-dark"
+                                        className="input-premium pl-12"
                                     />
                                 </div>
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block ml-1">Sua Senha</label>
+                            <div className="form-group-premium">
+                                <label htmlFor="password" className="label-premium">Sua Senha</label>
                                 <div className="relative group">
                                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-brand-primary transition-colors" />
                                     <input
+                                        id="password"
                                         type="password"
                                         required
                                         placeholder="••••••••"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="w-full pl-12 pr-6 py-4 bg-gray-50 border-2 border-transparent focus:bg-white focus:border-brand-primary outline-none rounded-2xl transition-all font-medium text-brand-dark"
+                                        className="input-premium pl-12"
                                     />
                                 </div>
                             </div>
@@ -148,10 +151,19 @@ const AuthPage: React.FC<AuthPageProps> = ({ onSuccess, onBack }) => {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full btn-premium py-5 justify-center text-lg rounded-2xl shadow-xl shadow-brand-primary/20 disabled:opacity-50"
+                                className="w-full btn-premium py-5 text-lg rounded-2xl shadow-xl shadow-brand-primary/20 disabled:opacity-50"
                             >
-                                {loading ? 'Processando...' : isLogin ? 'Entrar Agora' : 'Finalizar Registo'}
-                                <ArrowRight className="w-6 h-6" />
+                                {loading ? (
+                                    <>
+                                        <Loader2 className="w-6 h-6 animate-spin" />
+                                        <span>Processando...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span>{isLogin ? 'Entrar Agora' : 'Finalizar Registo'}</span>
+                                        <ArrowRight className="w-6 h-6" />
+                                    </>
+                                )}
                             </button>
                         </form>
 

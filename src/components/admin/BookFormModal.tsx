@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Upload, Image, File, CheckCircle, AlertCircle, Calendar } from 'lucide-react';
+import { X, Upload, Image, File, CheckCircle, AlertCircle, Calendar, Loader2 } from 'lucide-react';
 import { Book } from '../../types';
 
 interface BookFormModalProps {
@@ -169,33 +169,35 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                     {/* INFO TAB */}
                     {activeTab === 'info' && (
                         <div className="grid md:grid-cols-2 gap-6 animate-fade-in">
-                            <div>
-                                <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Título do Livro</label>
+                            <div className="form-group-premium">
+                                <label htmlFor="title" className="label-premium">Título do Livro</label>
                                 <input
+                                    id="title"
                                     type="text"
                                     required
-                                    className="input-premium w-full"
+                                    className="input-premium"
                                     value={formData.title}
                                     onChange={e => setFormData({ ...formData, title: e.target.value })}
                                     placeholder="Ex: O Menino que curava"
                                 />
                             </div>
-                            <div>
-                                <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Autor</label>
+                            <div className="form-group-premium">
+                                <label htmlFor="author" className="label-premium">Autor</label>
                                 <input
+                                    id="author"
                                     type="text"
                                     required
-                                    className="input-premium w-full"
+                                    className="input-premium"
                                     value={formData.author}
                                     onChange={e => setFormData({ ...formData, author: e.target.value })}
                                     placeholder="Nome do Autor"
                                 />
                             </div>
-                            <div>
-                                <label htmlFor="category-select" className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Categoria</label>
+                            <div className="form-group-premium">
+                                <label htmlFor="category-select" className="label-premium">Categoria</label>
                                 <select
                                     id="category-select"
-                                    className="input-premium w-full"
+                                    className="input-premium"
                                     value={formData.category}
                                     onChange={e => setFormData({ ...formData, category: e.target.value })}
                                     title="Selecione a categoria do livro"
@@ -208,21 +210,23 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                     <option value="Literatura Angolana">Literatura Angolana</option>
                                 </select>
                             </div>
-                            <div>
-                                <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">ISBN</label>
+                            <div className="form-group-premium">
+                                <label htmlFor="isbn" className="label-premium">ISBN</label>
                                 <input
+                                    id="isbn"
                                     type="text"
-                                    className="input-premium w-full"
+                                    className="input-premium"
                                     value={formData.isbn}
                                     onChange={e => setFormData({ ...formData, isbn: e.target.value })}
                                     placeholder="ISBN-13"
                                 />
                             </div>
-                            <div className="md:col-span-2">
-                                <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Descrição / Sinopse</label>
+                            <div className="form-group-premium md:col-span-2">
+                                <label htmlFor="description" className="label-premium">Descrição / Sinopse</label>
                                 <textarea
+                                    id="description"
                                     required
-                                    className="input-premium w-full h-32 resize-none"
+                                    className="input-premium h-32 resize-none"
                                     value={formData.description}
                                     onChange={e => setFormData({ ...formData, description: e.target.value })}
                                     placeholder="Escreva um resumo cativante sobre o livro..."
@@ -250,42 +254,44 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                     {activeTab === 'details' && (
                         <div className="grid md:grid-cols-2 gap-6 animate-fade-in">
                             <div className="flex gap-4">
-                                <div className="flex-1">
-                                    <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Preço (Kz)</label>
+                                <div className="form-group-premium flex-1">
+                                    <label htmlFor="price" className="label-premium">Preço (Kz)</label>
                                     <input
+                                        id="price"
                                         type="number"
                                         required
-                                        className="input-premium w-full"
+                                        className="input-premium"
                                         value={formData.price}
                                         onChange={e => setFormData({ ...formData, price: e.target.value })}
                                         placeholder="0"
                                     />
                                 </div>
-                                <div className="flex-1">
-                                    <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Stock</label>
+                                <div className="form-group-premium flex-1">
+                                    <label htmlFor="stock" className="label-premium">Stock</label>
                                     <input
+                                        id="stock"
                                         type="number"
                                         required
-                                        className="input-premium w-full"
+                                        className="input-premium"
                                         value={formData.stock}
                                         onChange={e => setFormData({ ...formData, stock: e.target.value })}
                                         placeholder="0"
                                     />
                                 </div>
                             </div>
-                            <div>
-                                <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Formato</label>
-                                <div className="flex gap-4 p-1 bg-gray-100 rounded-xl">
+                            <div className="form-group-premium">
+                                <label className="label-premium">Formato</label>
+                                <div className="flex gap-4 p-1 bg-gray-100 rounded-2xl">
                                     <button
                                         type="button"
-                                        className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all ${formData.format === 'físico' ? 'bg-white shadow text-brand-dark' : 'text-gray-500 hover:text-gray-700'}`}
+                                        className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all ${formData.format === 'físico' ? 'bg-white shadow text-brand-dark' : 'text-gray-500 hover:text-gray-700'}`}
                                         onClick={() => setFormData({ ...formData, format: 'físico' })}
                                     >
                                         Físico
                                     </button>
                                     <button
                                         type="button"
-                                        className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all ${formData.format === 'digital' ? 'bg-white shadow text-brand-dark' : 'text-gray-500 hover:text-gray-700'}`}
+                                        className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all ${formData.format === 'digital' ? 'bg-white shadow text-brand-dark' : 'text-gray-500 hover:text-gray-700'}`}
                                         onClick={() => setFormData({ ...formData, format: 'digital' })}
                                     >
                                         Digital
@@ -468,7 +474,10 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                         aria-label={book ? 'Atualizar Livro' : 'Publicar Livro'}
                     >
                         {isSubmitting ? (
-                            <span className="animate-pulse">Guardando...</span>
+                            <>
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                                <span>Guardando...</span>
+                            </>
                         ) : (
                             <>
                                 <CheckCircle className="w-5 h-5" />

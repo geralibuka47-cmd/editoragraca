@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, ShoppingCart, Heart, Share2, Check, Star, Eye, Download, Send } from 'lucide-react';
+import { X, ShoppingCart, Heart, Share2, Check, Star, Eye, Download, Send, Loader2 } from 'lucide-react';
 import { Book, User as UserType } from '../types';
 import {
     getBookReviews,
@@ -283,17 +283,21 @@ const BookDetailModal: React.FC<BookDetailModalProps & { user?: UserType }> = ({
                                                 value={reviewContent}
                                                 onChange={(e) => setReviewContent(e.target.value)}
                                                 disabled={!user || isSubmittingReview}
-                                                className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm focus:outline-none focus:ring-1 focus:ring-brand-primary focus:bg-white transition-all disabled:opacity-50"
+                                                className="input-premium h-32 resize-none !text-sm"
                                                 rows={3}
                                             />
                                             <button
                                                 onClick={handleAddReview}
                                                 disabled={!user || isSubmittingReview || !reviewContent.trim()}
-                                                className="absolute right-3 bottom-3 p-2 bg-brand-primary text-white rounded-xl shadow-lg shadow-brand-primary/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100"
+                                                className="absolute right-3 bottom-3 p-3 bg-brand-primary text-white rounded-xl shadow-lg shadow-brand-primary/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100"
                                                 title="Enviar Avaliação"
                                                 aria-label="Enviar Avaliação"
                                             >
-                                                <Send className="w-4 h-4" />
+                                                {isSubmittingReview ? (
+                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                ) : (
+                                                    <Send className="w-4 h-4" />
+                                                )}
                                             </button>
                                         </div>
                                     </div>

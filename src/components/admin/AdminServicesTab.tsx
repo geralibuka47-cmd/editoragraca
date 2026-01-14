@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, Save, X } from 'lucide-react';
 
 const AdminServicesTab: React.FC = () => {
     const [editorialServices, setEditorialServices] = useState<any[]>([]);
@@ -145,20 +145,20 @@ const AdminServicesTab: React.FC = () => {
                             <h2 className="text-2xl font-black text-brand-dark">{serviceForm.id ? 'Editar Serviço' : 'Novo Serviço'}</h2>
                         </div>
                         <form onSubmit={handleSaveService} className="flex-1 overflow-y-auto p-8 space-y-6">
-                            <div>
-                                <label className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Título do Serviço</label>
+                            <div className="form-group-premium">
+                                <label className="label-premium">Título do Serviço</label>
                                 <input
                                     type="text"
                                     required
                                     value={serviceForm.title}
                                     onChange={(e) => setServiceForm({ ...serviceForm, title: e.target.value })}
-                                    className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary font-bold"
+                                    className="input-premium font-bold"
                                     placeholder="Ex: Revisão Literária"
                                 />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label htmlFor="service-price" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Preço Estimado</label>
+                                <div className="form-group-premium">
+                                    <label htmlFor="service-price" className="label-premium">Preço Estimado</label>
                                     <input
                                         id="service-price"
                                         required
@@ -167,11 +167,11 @@ const AdminServicesTab: React.FC = () => {
                                         value={serviceForm.price}
                                         onChange={(e) => setServiceForm({ ...serviceForm, price: e.target.value })}
                                         placeholder="Ex: 50.000 Kz"
-                                        className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                        className="input-premium"
                                     />
                                 </div>
-                                <div>
-                                    <label htmlFor="service-order" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Ordem</label>
+                                <div className="form-group-premium">
+                                    <label htmlFor="service-order" className="label-premium">Ordem</label>
                                     <input
                                         id="service-order"
                                         type="number"
@@ -179,12 +179,12 @@ const AdminServicesTab: React.FC = () => {
                                         placeholder="0"
                                         value={serviceForm.order}
                                         onChange={(e) => setServiceForm({ ...serviceForm, order: parseInt(e.target.value) })}
-                                        className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
+                                        className="input-premium"
                                     />
                                 </div>
                             </div>
-                            <div>
-                                <label htmlFor="service-details" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Detalhes (um por linha)</label>
+                            <div className="form-group-premium">
+                                <label htmlFor="service-details" className="label-premium">Detalhes (um por linha)</label>
                                 <textarea
                                     id="service-details"
                                     required
@@ -192,24 +192,35 @@ const AdminServicesTab: React.FC = () => {
                                     value={serviceForm.details.join('\n')}
                                     onChange={(e) => setServiceForm({ ...serviceForm, details: e.target.value.split('\n') })}
                                     placeholder="Detalhe 1&#10;Detalhe 2..."
-                                    className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary h-32 resize-none"
+                                    className="input-premium h-32 resize-none"
                                 />
                             </div>
                         </form>
-                        <div className="p-6 border-t border-gray-100 flex gap-4 bg-white/50 backdrop-blur-sm">
+                        <div className="p-8 border-t border-gray-100 flex gap-4 bg-gray-50/50">
                             <button
                                 type="button"
                                 onClick={() => setShowServiceModal(false)}
-                                className="flex-1 py-4 border-2 border-brand-dark rounded-full font-black text-xs uppercase tracking-widest text-brand-dark hover:bg-brand-dark hover:text-white transition-all"
+                                className="flex-1 px-8 py-4 border-2 border-brand-dark text-brand-dark rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-brand-dark hover:text-white transition-all flex items-center justify-center gap-2"
                             >
+                                <X className="w-4 h-4" />
                                 Cancelar
                             </button>
                             <button
                                 onClick={handleSaveService}
                                 disabled={isSavingService}
-                                className="flex-1 py-4 bg-brand-primary text-white rounded-full font-black text-xs uppercase tracking-widest shadow-lg shadow-brand-primary/20 hover:brightness-110 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                                className="flex-1 btn-premium py-4"
                             >
-                                {isSavingService ? 'Salvando...' : 'Salvar Serviço'}
+                                {isSavingService ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                        <span>Salvando...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Save className="w-4 h-4" />
+                                        <span>Salvar Serviço</span>
+                                    </>
+                                )}
                             </button>
                         </div>
                     </div>

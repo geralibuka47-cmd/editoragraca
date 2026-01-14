@@ -27,18 +27,28 @@ const BlogPage: React.FC<BlogPageProps> = ({ user }) => {
     useEffect(() => {
         const loadPosts = async () => {
             setLoading(true);
-            const data = await getBlogPosts();
-            setPosts(data);
+            try {
+                const data = await getBlogPosts();
+                setPosts(data || []);
 
-            // Load interactions for all posts
-            const interactionData: Record<string, any> = {};
-            await Promise.all(data.map(async (post) => {
-                const interactions = await getBlogPostInteractions(post.id);
-                const isLiked = user ? await checkUserLike(post.id, user.id) : false;
-                interactionData[post.id] = { ...interactions, isLiked };
-            }));
-            setPostInteractions(interactionData);
-            setLoading(false);
+                // Load interactions only for the visible posts or in batch
+                const interactionData: Record<string, any> = {};
+                // Limit the number of parallel requests or batch them
+                await Promise.all((data || []).slice(0, 10).map(async (post) => {
+                    try {
+                        const interactions = await getBlogPostInteractions(post.id);
+                        const isLiked = user ? await checkUserLike(post.id, user.id) : false;
+                        interactionData[post.id] = { ...interactions, isLiked };
+                    } catch (e) {
+                        console.error(`Error loading interactions for post ${post.id}:`, e);
+                    }
+                }));
+                setPostInteractions(interactionData);
+            } catch (error) {
+                console.error("Error loading blog posts:", error);
+            } finally {
+                setLoading(false);
+            }
         };
         loadPosts();
     }, [user]);
@@ -269,16 +279,20 @@ const BlogPage: React.FC<BlogPageProps> = ({ user }) => {
                                         onChange={(e) => setCommentText(e.target.value)}
                                         disabled={!user || isSubmittingComment}
                                         onKeyDown={(e) => e.key === 'Enter' && handleAddComment(selectedPost.id)}
-                                        className="w-full bg-gray-100 border-0 rounded-full px-4 py-2 pr-12 text-sm focus:ring-1 focus:ring-brand-primary disabled:opacity-50"
+                                        className="w-full bg-gray-100 border-0 rounded-full px-6 py-3 pr-14 text-sm focus:ring-2 focus:ring-brand-primary/50 transition-all disabled:opacity-50"
                                     />
                                     <button
                                         onClick={() => handleAddComment(selectedPost.id)}
                                         disabled={!user || isSubmittingComment || !commentText.trim()}
-                                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-brand-primary hover:bg-white rounded-full transition-colors disabled:opacity-50"
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-brand-primary text-white rounded-full transition-all hover:brightness-110 shadow-lg shadow-brand-primary/20 disabled:opacity-50"
                                         title="Enviar comentário"
                                         aria-label="Enviar comentário"
                                     >
-                                        <Send className="w-4 h-4" />
+                                        {isSubmittingComment ? (
+                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                        ) : (
+                                            <Send className="w-4 h-4" />
+                                        )}
                                     </button>
                                 </div>
                             </div>

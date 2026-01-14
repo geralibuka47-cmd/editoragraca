@@ -753,6 +753,33 @@ export const getAuthorStats = async (authorId: string) => {
     };
 };
 
+export const getAuthorConfirmedSales = async (authorId: string) => {
+    const { data: sales, error } = await supabase
+        .from(TABLES.PAYMENT_NOTIFICATIONS)
+        .select('id, created_at, items')
+        .eq('status', 'confirmed');
+
+    if (error) return [];
+
+    const authorSales: any[] = [];
+    (sales || []).forEach(sale => {
+        const items = Array.isArray(sale.items) ? sale.items : [];
+        items.forEach((item: any) => {
+            if (item.authorId === authorId) {
+                authorSales.push({
+                    id: `${sale.id}-${item.bookId}`,
+                    date: sale.created_at,
+                    bookTitle: item.bookTitle,
+                    quantity: item.quantity,
+                    royalty: (item.price * item.quantity) * 0.7
+                });
+            }
+        });
+    });
+
+    return authorSales;
+};
+
 export const getUserBooks = async (readerId: string): Promise<Book[]> => {
     const { data: confirmed } = await supabase
         .from(TABLES.PAYMENT_NOTIFICATIONS)
