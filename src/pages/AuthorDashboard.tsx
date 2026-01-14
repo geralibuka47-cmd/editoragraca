@@ -24,7 +24,7 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
         title: '',
         genre: '',
         pages: '',
-        synopsis: ''
+        description: ''
     });
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -109,7 +109,7 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                 title: submitData.title,
                 genre: submitData.genre,
                 pages: submitData.pages ? parseInt(submitData.pages) : undefined,
-                synopsis: submitData.synopsis,
+                description: submitData.description,
                 fileUrl: fileUrl,
                 fileName: selectedFile.name,
                 status: 'pending',
@@ -117,7 +117,7 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
             });
 
             alert('Manuscrito submetido com sucesso! A nossa equipa irá analisar e entrará em contacto brevemente.');
-            setSubmitData({ title: '', genre: '', pages: '', synopsis: '' });
+            setSubmitData({ title: '', genre: '', pages: '', description: '' });
             setSelectedFile(null);
             setActiveTab('manuscripts');
         } catch (error) {
@@ -347,8 +347,8 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                                         <textarea
                                             required
                                             rows={6}
-                                            value={submitData.synopsis}
-                                            onChange={e => setSubmitData(prev => ({ ...prev, synopsis: e.target.value }))}
+                                            value={submitData.description}
+                                            onChange={e => setSubmitData(prev => ({ ...prev, description: e.target.value }))}
                                             className="input-premium h-32 resize-none"
                                             placeholder="Descreva brevemente a sua obra..."
                                         />

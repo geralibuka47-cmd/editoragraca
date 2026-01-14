@@ -33,11 +33,13 @@ const cleanDataForSupabase = (data: any, table: string) => {
         'authorId': 'author_id',
         'digitalFileUrl': 'digital_file_url',
         'whatsappNumber': 'whatsapp_number',
-        'photoUrl': 'photo_url',
+        'avatarUrl': 'photo_url',
         'customerId': 'customer_id',
         'customerName': 'customer_name',
         'customerEmail': 'customer_email',
         'paymentMethod': 'payment_method',
+        'paymentMethods': 'payment_methods',
+        'preferredContact': 'preferred_contact',
         'totalAmount': 'total_amount',
         'readerId': 'reader_id',
         'readerName': 'reader_name',
@@ -55,10 +57,13 @@ const cleanDataForSupabase = (data: any, table: string) => {
         'displayOrder': 'display_order',
         'imageUrl': 'image_url',
         'postId': 'post_id',
-        'createdAt': 'created_at'
+        'createdAt': 'created_at',
+        'fileUrl': 'file_url',
+        'fileName': 'file_name',
+        'authorName': 'author_name',
     };
 
-    const JSONFields = ['items'];
+    const JSONFields = ['items', 'payment_methods', 'preferred_contact'];
     const ArrayFields = ['details'];
 
     Object.keys(data).forEach(key => {
@@ -94,11 +99,13 @@ const parseDataFromSupabase = (item: any) => {
         'author_id': 'authorId',
         'digital_file_url': 'digitalFileUrl',
         'whatsapp_number': 'whatsappNumber',
-        'photo_url': 'photoUrl',
+        'photo_url': 'avatarUrl',
         'customer_id': 'customerId',
         'customer_name': 'customerName',
         'customer_email': 'customerEmail',
         'payment_method': 'paymentMethod',
+        'payment_methods': 'paymentMethods',
+        'preferred_contact': 'preferredContact',
         'total_amount': 'totalAmount',
         'reader_id': 'readerId',
         'reader_name': 'readerName',
@@ -116,7 +123,10 @@ const parseDataFromSupabase = (item: any) => {
         'display_order': 'displayOrder', // Correcting to match frontend usage
         'image_url': 'imageUrl',
         'post_id': 'postId',
-        'created_at': 'createdAt'
+        'created_at': 'createdAt',
+        'file_url': 'fileUrl',
+        'file_name': 'fileName',
+        'author_name': 'authorName',
     };
 
     Object.keys(item).forEach(key => {

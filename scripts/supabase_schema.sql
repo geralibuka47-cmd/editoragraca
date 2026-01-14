@@ -145,6 +145,7 @@ create table public.manuscripts (
     genre text,
     description text,
     file_url text not null,
+    file_name text,
     status text default 'pending',
     submitted_date timestamp with time zone default timezone('utc'::text, now()) not null,
     reviewed_date timestamp with time zone,

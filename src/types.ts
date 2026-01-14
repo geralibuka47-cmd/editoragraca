@@ -168,7 +168,7 @@ export interface Manuscript {
   title: string;
   genre: string;
   pages?: number;
-  synopsis: string;
+  description: string;
   fileUrl: string;
   fileName: string;
   status: 'pending' | 'approved' | 'rejected';
