@@ -61,6 +61,9 @@ const cleanDataForSupabase = (data: any, table: string) => {
         'fileUrl': 'file_url',
         'fileName': 'file_name',
         'authorName': 'author_name',
+        'paymentInfo': 'payment_info',
+        'paymentInfoNotes': 'payment_info_notes',
+        'launchDate': 'launch_date'
     };
 
     const JSONFields = ['items', 'payment_methods', 'preferred_contact'];
@@ -127,6 +130,9 @@ const parseDataFromSupabase = (item: any) => {
         'file_url': 'fileUrl',
         'file_name': 'fileName',
         'author_name': 'authorName',
+        'payment_info': 'paymentInfo',
+        'payment_info_notes': 'paymentInfoNotes',
+        'launch_date': 'launchDate'
     };
 
     Object.keys(item).forEach(key => {

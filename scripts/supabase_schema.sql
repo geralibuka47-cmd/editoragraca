@@ -37,6 +37,9 @@ create table public.books (
     format text,
     pages integer,
     digital_file_url text,
+    payment_info text,
+    payment_info_notes text,
+    launch_date timestamp with time zone,
     created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 -- Users Profile Table (Extensions of Supabase Auth)
