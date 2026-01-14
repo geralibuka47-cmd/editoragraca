@@ -205,8 +205,9 @@ const AdminBlogTab: React.FC<AdminBlogTabProps> = ({ posts, onRefresh }) => {
 
                                 <div className="grid md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-sm font-bold text-gray-700 mb-2">Data</label>
+                                        <label htmlFor="event-date" className="block text-sm font-bold text-gray-700 mb-2">Data</label>
                                         <input
+                                            id="event-date"
                                             type="date"
                                             value={eventData.date}
                                             onChange={(e) => setEventData({ ...eventData, date: e.target.value })}
@@ -214,8 +215,9 @@ const AdminBlogTab: React.FC<AdminBlogTabProps> = ({ posts, onRefresh }) => {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-bold text-gray-700 mb-2">Horário</label>
+                                        <label htmlFor="event-time" className="block text-sm font-bold text-gray-700 mb-2">Horário</label>
                                         <input
+                                            id="event-time"
                                             type="time"
                                             value={eventData.time}
                                             onChange={(e) => setEventData({ ...eventData, time: e.target.value })}
