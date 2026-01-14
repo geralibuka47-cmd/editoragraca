@@ -178,4 +178,15 @@ export interface Manuscript {
   email?: string;
 }
 
-export type ViewState = 'HOME' | 'CATALOG' | 'DETAILS' | 'ABOUT' | 'TEAM' | 'SERVICES' | 'CHECKOUT' | 'PODCAST' | 'CONTACT' | 'ADMIN' | 'AUTH' | 'AUTHOR_DASHBOARD' | 'READER_DASHBOARD' | 'BLOG';
+export interface Notification {
+  id: string;
+  userId: string;
+  type: 'order' | 'blog' | 'manuscript' | 'info';
+  title: string;
+  content: string;
+  link?: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
+export type ViewState = 'HOME' | 'CATALOG' | 'DETAILS' | 'ABOUT' | 'SERVICES' | 'CHECKOUT' | 'CONTACT' | 'ADMIN' | 'AUTH' | 'AUTHOR_DASHBOARD' | 'READER_DASHBOARD' | 'BLOG';

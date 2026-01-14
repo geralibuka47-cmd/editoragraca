@@ -182,6 +182,18 @@ create table public.testimonials (
     created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- Notifications Table
+create table public.notifications (
+    id uuid default uuid_generate_v4() primary key,
+    user_id uuid references auth.users on delete cascade,
+    type text not null, -- 'order', 'blog', 'manuscript', 'info'
+    title text not null,
+    content text not null,
+    link text,
+    is_read boolean default false,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
 -- Row Level Security (RLS) - Comprehensive Setup
 
 -- Helper function to check if current user is admin (avoids recursion)
@@ -267,6 +279,12 @@ create policy "Admins can manage site content" on public.site_content for all us
 alter table public.testimonials enable row level security;
 create policy "Public can read testimonials" on public.testimonials for select using (is_active = true);
 create policy "Admins can manage testimonials" on public.testimonials for all using (public.is_admin());
+
+-- Notifications
+alter table public.notifications enable row level security;
+create policy "Users can see own notifications" on public.notifications for select using (auth.uid() = user_id);
+create policy "Users can update own notifications" on public.notifications for update using (auth.uid() = user_id);
+create policy "Admins can manage all notifications" on public.notifications for all using (public.is_admin());
 
 -- Finalização: Criação da Conta administrativa inicial
 -- Habilitar pgcrypto para hashing de senha se necessário

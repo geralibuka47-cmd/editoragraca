@@ -1,7 +1,8 @@
 import React from 'react';
 import logo from '../assets/imagens/logo.png';
-import { ShoppingBag, Search, User, Heart, LogOut, Menu, X } from 'lucide-react';
-import { User as UserType } from '../types';
+import { ShoppingBag, Search, User, Heart, LogOut, Menu, X, Bell } from 'lucide-react';
+import { User as UserType, Notification } from '../types';
+import { getNotifications, markNotificationAsRead } from '../services/dataService';
 
 interface NavbarProps {
     onNavigate: (view: any) => void;
@@ -15,6 +16,27 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
     const [isSearchOpen, setIsSearchOpen] = React.useState(false);
     const [searchQuery, setSearchQuery] = React.useState('');
+    const [isNotificationsOpen, setIsNotificationsOpen] = React.useState(false);
+    const [notifications, setNotifications] = React.useState<Notification[]>([]);
+
+    React.useEffect(() => {
+        if (user) {
+            const fetchNotifs = async () => {
+                const data = await getNotifications(user.id);
+                setNotifications(data);
+            };
+            fetchNotifs();
+            const interval = setInterval(fetchNotifs, 30000); // Check every 30s
+            return () => clearInterval(interval);
+        }
+    }, [user]);
+
+    const unreadCount = notifications.filter(n => !n.isRead).length;
+
+    const handleMarkRead = async (id: string) => {
+        await markNotificationAsRead(id);
+        setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+    };
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -33,9 +55,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
         { name: 'Início', view: 'HOME' },
         { name: 'Catálogo', view: 'CATALOG' },
         { name: 'Blog', view: 'BLOG' },
-        { name: 'Podcast', view: 'PODCAST' },
         { name: 'Serviços', view: 'SERVICES' },
-        { name: 'Equipa', view: 'TEAM' },
         { name: 'Sobre Nós', view: 'ABOUT' },
         { name: 'Contacto', view: 'CONTACT' },
     ];
@@ -117,6 +137,55 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                     <button className="hidden sm:block text-brand-dark hover:text-brand-primary transition-colors relative" title="Favoritos" aria-label="Ver favoritos">
                         <Heart className="w-5 h-5" />
                     </button>
+
+                    <div className="relative">
+                        <button
+                            onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                            className="text-brand-dark hover:text-brand-primary transition-colors relative group"
+                            title="Notificações"
+                            aria-label="Ver notificações"
+                        >
+                            <Bell className="w-5 h-5" />
+                            {unreadCount > 0 && (
+                                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                                    {unreadCount}
+                                </span>
+                            )}
+                        </button>
+
+                        {isNotificationsOpen && (
+                            <div className="absolute right-0 mt-4 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-[100] animate-in slide-in-from-top-2 duration-200 overflow-hidden">
+                                <div className="p-4 border-b border-gray-50 flex items-center justify-between">
+                                    <h4 className="font-black text-brand-dark uppercase tracking-widest text-xs">Notificações</h4>
+                                    <button className="text-[10px] text-brand-primary font-bold hover:underline">Marcar todas como lidas</button>
+                                </div>
+                                <div className="max-h-96 overflow-y-auto">
+                                    {notifications.length > 0 ? (
+                                        notifications.map(n => (
+                                            <div
+                                                key={n.id}
+                                                onClick={() => {
+                                                    handleMarkRead(n.id);
+                                                    if (n.link) onNavigate(n.link as any);
+                                                    setIsNotificationsOpen(false);
+                                                }}
+                                                className={`p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-50 transition-colors ${!n.isRead ? 'bg-brand-primary/5' : ''}`}
+                                            >
+                                                <p className="font-bold text-brand-dark text-xs mb-1">{n.title}</p>
+                                                <p className="text-gray-500 text-[11px] leading-tight mb-2">{n.content}</p>
+                                                <span className="text-[9px] text-gray-400">{new Date(n.createdAt).toLocaleDateString()}</span>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="p-8 text-center">
+                                            <Bell className="w-10 h-10 text-gray-200 mx-auto mb-3" />
+                                            <p className="text-xs text-gray-400 font-medium italic">Nenhuma notificação por agora.</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
 
                     <button className="text-brand-dark hover:text-brand-primary transition-colors relative group" onClick={() => onNavigate('CHECKOUT')}>
                         <ShoppingBag className="w-5 h-5" />

@@ -60,9 +60,23 @@ export const signUp = async (email: string, password: string, name: string): Pro
 
 export const logout = async () => {
     try {
-        await supabase.auth.signOut();
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
+
+        // Manual cleanup as a fallback
+        for (const key in localStorage) {
+            if (key.startsWith('sb-') || key.includes('supabase.auth')) {
+                localStorage.removeItem(key);
+            }
+        }
     } catch (error) {
         console.error("Erro ao fazer logout:", error);
+        // Even if supabase fails, we should clear local storage
+        for (const key in localStorage) {
+            if (key.startsWith('sb-') || key.includes('supabase.auth')) {
+                localStorage.removeItem(key);
+            }
+        }
     }
 };
 

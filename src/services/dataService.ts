@@ -18,7 +18,8 @@ const TABLES = {
     BOOK_VIEWS: 'book_views',
     BOOK_FAVORITES: 'book_favorites',
     SITE_CONTENT: 'site_content',
-    TESTIMONIALS: 'testimonials'
+    TESTIMONIALS: 'testimonials',
+    NOTIFICATIONS: 'notifications'
 };
 
 const cleanDataForSupabase = (data: any, table: string) => {
@@ -769,4 +770,43 @@ export const getUserBooks = async (readerId: string): Promise<Book[]> => {
 
     const allBooks = await getBooks();
     return allBooks.filter(book => bookIds.has(book.id));
+};
+
+// Notifications
+export const getNotifications = async (userId: string) => {
+    try {
+        const { data, error } = await supabase
+            .from(TABLES.NOTIFICATIONS)
+            .select('*')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        return (data || []).map(parseDataFromSupabase);
+    } catch (error) {
+        console.error("Error fetching notifications:", error);
+        return [];
+    }
+};
+
+export const markNotificationAsRead = async (id: string) => {
+    try {
+        const { error } = await supabase
+            .from(TABLES.NOTIFICATIONS)
+            .update({ is_read: true })
+            .eq('id', id);
+        if (error) throw error;
+    } catch (error) {
+        console.error("Error marking notification as read:", error);
+    }
+};
+
+export const createNotification = async (notif: { userId: string; type: string; title: string; content: string; link?: string }) => {
+    try {
+        const data = cleanDataForSupabase(notif, TABLES.NOTIFICATIONS);
+        const { error } = await supabase.from(TABLES.NOTIFICATIONS).insert([data]);
+        if (error) throw error;
+    } catch (error) {
+        console.error("Error creating notification:", error);
+    }
 };

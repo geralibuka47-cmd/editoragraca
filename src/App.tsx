@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import BookDetailModal from './components/BookDetailModal';
-import { ToastProvider } from './components/Toast';
+import { ToastProvider, useToast } from './components/Toast';
 const AuthPage = React.lazy(() => import('./pages/AuthPage'));
 const CatalogPage = React.lazy(() => import('./pages/CatalogPage'));
 const HomePage = React.lazy(() => import('./pages/HomePage')); // Import HomePage
@@ -10,9 +10,7 @@ const AboutPage = React.lazy(() => import('./pages/AboutPage'));
 const ContactPage = React.lazy(() => import('./pages/ContactPage'));
 const CheckoutPage = React.lazy(() => import('./pages/CheckoutPage'));
 const ServicesPage = React.lazy(() => import('./pages/ServicesPage'));
-const TeamPage = React.lazy(() => import('./pages/TeamPage'));
 const BlogPage = React.lazy(() => import('./pages/BlogPage'));
-const PodcastPage = React.lazy(() => import('./pages/PodcastPage'));
 const ReaderDashboard = React.lazy(() => import('./pages/ReaderDashboard'));
 const AuthorDashboard = React.lazy(() => import('./pages/AuthorDashboard'));
 const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard'));
@@ -90,10 +88,19 @@ const App: React.FC = () => {
         setIsModalOpen(true);
     };
 
+    const { showToast } = useToast();
+
     const handleLogout = async () => {
-        await logout();
-        setUser(null);
-        handleNavigate('HOME');
+        try {
+            await logout();
+            setUser(null);
+            showToast('Sessão terminada com sucesso.', 'success');
+            handleNavigate('HOME');
+        } catch (error) {
+            showToast('Ocorreu um erro ao sair. Limpando sessão local...', 'error');
+            setUser(null);
+            handleNavigate('HOME');
+        }
     };
 
     const handleAuthSuccess = (u: User) => {
@@ -143,12 +150,8 @@ const App: React.FC = () => {
                 );
             case 'SERVICES':
                 return <ServicesPage onNavigate={handleNavigate} />;
-            case 'TEAM':
-                return <TeamPage onNavigate={handleNavigate} />;
             case 'BLOG':
                 return <BlogPage user={user} />;
-            case 'PODCAST':
-                return <PodcastPage onNavigate={handleNavigate} />;
             case 'READER_DASHBOARD':
                 return <ReaderDashboard user={user} onNavigate={handleNavigate} />;
             case 'AUTHOR_DASHBOARD':
@@ -167,45 +170,43 @@ const App: React.FC = () => {
     };
 
     return (
-        <ToastProvider>
-            <div className="min-h-screen flex flex-col font-sans bg-brand-light relative">
-                <Navbar
-                    onNavigate={handleNavigate}
-                    currentView={currentView}
-                    cartCount={cart.length}
-                    user={user}
-                    onLogout={handleLogout}
-                />
+        <div className="min-h-screen flex flex-col font-sans bg-brand-light relative">
+            <Navbar
+                onNavigate={handleNavigate}
+                currentView={currentView}
+                cartCount={cart.length}
+                user={user}
+                onLogout={handleLogout}
+            />
 
-                <main className="flex-grow">
-                    {loading && (
-                        <div className="fixed inset-0 z-[200] bg-white/80 backdrop-blur-md flex flex-col items-center justify-center gap-4">
-                            <Loader2 className="w-12 h-12 text-brand-primary animate-spin" />
-                            <p className="font-serif text-xl font-bold text-brand-dark italic">Abrindo as portas da sabedoria...</p>
-                        </div>
-                    )}
+            <main className="flex-grow">
+                {loading && (
+                    <div className="fixed inset-0 z-[200] bg-white/80 backdrop-blur-md flex flex-col items-center justify-center gap-4">
+                        <Loader2 className="w-12 h-12 text-brand-primary animate-spin" />
+                        <p className="font-serif text-xl font-bold text-brand-dark italic">Abrindo as portas da sabedoria...</p>
+                    </div>
+                )}
 
-                    <React.Suspense fallback={
-                        <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
-                            <Loader2 className="w-8 h-8 text-brand-primary animate-spin" />
-                            <p className="text-gray-400 font-serif italic text-sm">Carregando...</p>
-                        </div>
-                    }>
-                        {renderContent()}
-                    </React.Suspense>
-                </main>
+                <React.Suspense fallback={
+                    <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
+                        <Loader2 className="w-8 h-8 text-brand-primary animate-spin" />
+                        <p className="text-gray-400 font-serif italic text-sm">Carregando...</p>
+                    </div>
+                }>
+                    {renderContent()}
+                </React.Suspense>
+            </main>
 
-                <Footer onNavigate={handleNavigate} />
+            <Footer onNavigate={handleNavigate} />
 
-                <BookDetailModal
-                    book={selectedBook}
-                    isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
-                    onAddToCart={handleAddToCart}
-                    user={user || undefined}
-                />
-            </div>
-        </ToastProvider>
+            <BookDetailModal
+                book={selectedBook}
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onAddToCart={handleAddToCart}
+                user={user || undefined}
+            />
+        </div>
     );
 };
 
