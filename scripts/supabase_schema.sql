@@ -5,6 +5,13 @@
 create extension if not exists "uuid-ossp";
 
 -- Limpar tabelas existentes (Cascade apaga dependências)
+drop table if exists public.blog_comments cascade;
+drop table if exists public.blog_likes cascade;
+drop table if exists public.book_views cascade;
+drop table if exists public.book_favorites cascade;
+drop table if exists public.site_content cascade;
+drop table if exists public.testimonials cascade;
+drop table if exists public.notifications cascade;
 drop table if exists public.payment_proofs cascade;
 drop table if exists public.manuscripts cascade;
 drop table if exists public.payment_notifications cascade;
@@ -57,6 +64,25 @@ create table public.blog_posts (
     image_url text,
     author text,
     date timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Blog Likes Table
+create table public.blog_likes (
+    id uuid default uuid_generate_v4() primary key,
+    post_id uuid references public.blog_posts on delete cascade,
+    user_id uuid references auth.users on delete cascade,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+    unique(post_id, user_id)
+);
+
+-- Blog Comments Table
+create table public.blog_comments (
+    id uuid default uuid_generate_v4() primary key,
+    post_id uuid references public.blog_posts on delete cascade,
+    user_id uuid references auth.users on delete cascade,
+    user_name text not null,
+    content text not null,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
 -- Team Members Table
@@ -217,6 +243,17 @@ alter table public.blog_posts enable row level security;
 create policy "Public Read Blog" on public.blog_posts for select using (true);
 create policy "Admin Full Access Blog" on public.blog_posts for all using (public.is_admin());
 
+-- Blog Likes
+alter table public.blog_likes enable row level security;
+create policy "Public Read Blog Likes" on public.blog_likes for select using (true);
+create policy "Auth Users Toggle Likes" on public.blog_likes for all using (auth.role() = 'authenticated');
+
+-- Blog Comments
+alter table public.blog_comments enable row level security;
+create policy "Public Read Blog Comments" on public.blog_comments for select using (true);
+create policy "Auth Users Post Comments" on public.blog_comments for insert with check (auth.role() = 'authenticated');
+create policy "Owners/Admins Delete Comments" on public.blog_comments for delete using (auth.uid() = user_id or public.is_admin());
+
 -- Team Members
 alter table public.team_members enable row level security;
 create policy "Public Read Team" on public.team_members for select using (true);
@@ -229,9 +266,10 @@ create policy "Admin Full Access Services" on public.editorial_services for all 
 
 -- Profiles (special handling to avoid recursion)
 alter table public.profiles enable row level security;
-create policy "Users can read own profile" on public.profiles for select using (auth.uid() = id);
+create policy "Public can read profiles" on public.profiles for select using (true);
 create policy "Users can update own profile" on public.profiles for update using (auth.uid() = id);
 create policy "System can insert profiles" on public.profiles for insert with check (true);
+create policy "Admins can manage profiles" on public.profiles for all using (public.is_admin());
 
 -- Orders
 alter table public.orders enable row level security;
@@ -257,7 +295,14 @@ create policy "Admins can update manuscripts" on public.manuscripts for update u
 -- Payment Proofs
 alter table public.payment_proofs enable row level security;
 create policy "Admins full access proofs" on public.payment_proofs for all using (public.is_admin());
+create policy "Users can see own proofs" on public.payment_proofs for select using (auth.uid() = reader_id);
 create policy "Users can insert own proofs" on public.payment_proofs for insert with check (true);
+
+-- Payment Notifications
+alter table public.payment_notifications enable row level security;
+create policy "Public can create notifications" on public.payment_notifications for insert with check (true);
+create policy "Users can see own notifications" on public.payment_notifications for select using (auth.uid() = reader_id);
+create policy "Admins can manage notifications" on public.payment_notifications for all using (public.is_admin());
 
 -- Book Views
 alter table public.book_views enable row level security;
