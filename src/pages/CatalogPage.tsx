@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { Book, ViewState } from '../types';
 import BookCard from '../components/BookCard';
@@ -25,6 +25,14 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
     const [priceRange, setPriceRange] = useState<'all' | 'low' | 'mid' | 'high'>('all');
     const [showOnlyNew, setShowOnlyNew] = useState(false);
     const [showOnlyBestsellers, setShowOnlyBestsellers] = useState(false);
+
+    useEffect(() => {
+        const pendingSearch = localStorage.getItem('pendingSearch');
+        if (pendingSearch) {
+            setSearchQuery(pendingSearch);
+            localStorage.removeItem('pendingSearch');
+        }
+    }, []);
 
     // Unique categories from books
     const categories = useMemo(() => {

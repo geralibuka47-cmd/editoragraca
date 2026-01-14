@@ -13,6 +13,21 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, user, onLogout }) => {
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+    const [isSearchOpen, setIsSearchOpen] = React.useState(false);
+    const [searchQuery, setSearchQuery] = React.useState('');
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            // Navigate to catalog with query - we'll handle this in App.tsx or just by setting a global state
+            // For now, let's assume we can pass it or just navigate
+            onNavigate('CATALOG');
+            // We might need a way to pass the query. Let's use localStorage or a prop.
+            localStorage.setItem('pendingSearch', searchQuery.trim());
+            setIsSearchOpen(false);
+            setSearchQuery('');
+        }
+    };
 
     const navLinks = [
         { name: 'Início', view: 'HOME' },
@@ -60,8 +75,13 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                     >
                         {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                     </button>
-                    <button className="hidden md:block text-gray-400 hover:text-brand-primary transition-colors" title="Pesquisar" aria-label="Pesquisar livros">
-                        <Search className="w-5 h-5" />
+                    <button
+                        className="hidden md:block text-gray-400 hover:text-brand-primary transition-colors"
+                        title="Pesquisar"
+                        aria-label="Pesquisar livros"
+                        onClick={() => setIsSearchOpen(!isSearchOpen)}
+                    >
+                        <Search className={`w-5 h-5 ${isSearchOpen ? 'text-brand-primary' : ''}`} />
                     </button>
                 </div>
 
@@ -108,6 +128,32 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                     </button>
                 </div>
             </div>
+
+            {/* Search Bar Overlay */}
+            {isSearchOpen && (
+                <div className="bg-brand-light border-b border-gray-100 py-3 px-4 md:px-8 animate-in slide-in-from-top duration-300">
+                    <form onSubmit={handleSearch} className="container mx-auto max-w-4xl relative">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                            autoFocus
+                            type="text"
+                            placeholder="Pesquisar livros, autores, categorias..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-12 pr-12 py-3 bg-white border border-gray-200 rounded-full text-sm focus:ring-1 focus:ring-brand-primary focus:border-brand-primary"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setIsSearchOpen(false)}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-dark"
+                            title="Fechar pesquisa"
+                            aria-label="Fechar barra de pesquisa"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                    </form>
+                </div>
+            )}
 
             {/* Navigation Menu Area - Desktop */}
             <nav className="hidden md:flex bg-white py-4 px-8 justify-center border-b border-gray-50">

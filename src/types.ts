@@ -140,6 +140,15 @@ export interface PaymentProof {
   notes?: string;
 }
 
+export interface BlogComment {
+  id: string;
+  postId: string;
+  userId: string;
+  userName: string;
+  content: string;
+  createdAt: string;
+}
+
 export interface BlogPost {
   id: string;
   title: string;
@@ -147,6 +156,9 @@ export interface BlogPost {
   imageUrl: string;
   date: string;
   author: string;
+  likesCount?: number;
+  commentsCount?: number;
+  sharesCount?: number;
 }
 
 export interface Manuscript {

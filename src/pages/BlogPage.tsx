@@ -1,35 +1,90 @@
 import React, { useEffect, useState } from 'react';
-import { Heart, MessageCircle, Share2, BookOpen, Calendar, User, TrendingUp } from 'lucide-react';
-import { getBlogPosts } from '../services/dataService';
-import { BlogPost } from '../types';
+import { Heart, MessageCircle, Share2, BookOpen, Calendar, User, TrendingUp, Send } from 'lucide-react';
+import { getBlogPosts, getBlogPostInteractions, toggleBlogPostLike, addBlogPostComment, checkUserLike } from '../services/dataService';
+import { BlogPost, User as UserType, BlogComment } from '../types';
 import { OptimizedImage } from '../components/OptimizedImage';
 
-const BlogPage: React.FC = () => {
+interface BlogPageProps {
+    user: UserType | null;
+}
+
+const BlogPage: React.FC<BlogPageProps> = ({ user }) => {
     const [posts, setPosts] = useState<BlogPost[]>([]);
     const [loading, setLoading] = useState(true);
-    const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
     const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
+    const [postInteractions, setPostInteractions] = useState<Record<string, { likesCount: number, comments: BlogComment[], isLiked: boolean }>>({});
+    const [commentText, setCommentText] = useState('');
+    const [isSubmittingComment, setIsSubmittingComment] = useState(false);
 
     useEffect(() => {
         const loadPosts = async () => {
             setLoading(true);
             const data = await getBlogPosts();
             setPosts(data);
+
+            // Load interactions for all posts
+            const interactionData: Record<string, any> = {};
+            await Promise.all(data.map(async (post) => {
+                const interactions = await getBlogPostInteractions(post.id);
+                const isLiked = user ? await checkUserLike(post.id, user.id) : false;
+                interactionData[post.id] = { ...interactions, isLiked };
+            }));
+            setPostInteractions(interactionData);
             setLoading(false);
         };
         loadPosts();
-    }, []);
+    }, [user]);
 
-    const toggleLike = (postId: string) => {
-        setLikedPosts(prev => {
-            const newSet = new Set(prev);
-            if (newSet.has(postId)) {
-                newSet.delete(postId);
-            } else {
-                newSet.add(postId);
+    const handleToggleLike = async (postId: string) => {
+        if (!user) {
+            alert('Por favor, inicie sessão para gostar deste artigo.');
+            return;
+        }
+
+        const wasLiked = postInteractions[postId]?.isLiked;
+        // Optimistic update
+        setPostInteractions(prev => ({
+            ...prev,
+            [postId]: {
+                ...prev[postId],
+                isLiked: !wasLiked,
+                likesCount: (prev[postId]?.likesCount || 0) + (wasLiked ? -1 : 1),
+                comments: prev[postId]?.comments || []
             }
-            return newSet;
-        });
+        }));
+
+        await toggleBlogPostLike(postId, user.id);
+    };
+
+    const handleAddComment = async (postId: string) => {
+        if (!user) {
+            alert('Por favor, inicie sessão para comentar.');
+            return;
+        }
+        if (!commentText.trim()) return;
+
+        setIsSubmittingComment(true);
+        try {
+            await addBlogPostComment({
+                postId,
+                userId: user.id,
+                userName: user.name,
+                content: commentText.trim()
+            });
+
+            // Reload interactions for this post
+            const interactions = await getBlogPostInteractions(postId);
+            const isLiked = await checkUserLike(postId, user.id);
+            setPostInteractions(prev => ({
+                ...prev,
+                [postId]: { ...interactions, isLiked }
+            }));
+            setCommentText('');
+        } catch (error) {
+            alert('Erro ao adicionar comentário.');
+        } finally {
+            setIsSubmittingComment(false);
+        }
     };
 
     if (loading) {
@@ -44,6 +99,8 @@ const BlogPage: React.FC = () => {
     }
 
     if (selectedPost) {
+        const interactions = postInteractions[selectedPost.id] || { likesCount: 0, comments: [], isLiked: false };
+
         return (
             <div className="min-h-screen bg-gray-50 pb-12">
                 {/* Header Navigation */}
@@ -115,12 +172,14 @@ const BlogPage: React.FC = () => {
                                     </div>
                                 </div>
                                 <span className="hover:underline cursor-pointer">
-                                    {likedPosts.has(selectedPost.id) ? 'Você e outras 42 pessoas' : '42 pessoas'}
+                                    {interactions.likesCount > 0
+                                        ? `${interactions.isLiked ? 'Você e outras ' : ''}${interactions.likesCount} pessoas`
+                                        : 'Seja o primeiro a gostar'}
                                 </span>
                             </div>
                             <div className="flex gap-3">
-                                <span className="hover:underline cursor-pointer">8 comentários</span>
-                                <span className="hover:underline cursor-pointer">12 partilhas</span>
+                                <span className="hover:underline cursor-pointer">{interactions.comments.length} comentários</span>
+                                <span className="hover:underline cursor-pointer">0 partilhas</span>
                             </div>
                         </div>
 
@@ -128,13 +187,13 @@ const BlogPage: React.FC = () => {
                         <div className="px-6 py-2">
                             <div className="flex items-center justify-between border-t border-b border-gray-100 py-1">
                                 <button
-                                    onClick={() => toggleLike(selectedPost.id)}
-                                    className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg transition-all ${likedPosts.has(selectedPost.id)
-                                            ? 'text-brand-primary'
-                                            : 'hover:bg-gray-100 text-gray-600'
+                                    onClick={() => handleToggleLike(selectedPost.id)}
+                                    className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg transition-all ${interactions.isLiked
+                                        ? 'text-brand-primary'
+                                        : 'hover:bg-gray-100 text-gray-600'
                                         }`}
                                 >
-                                    <Heart className={`w-5 h-5 ${likedPosts.has(selectedPost.id) ? 'fill-current' : ''}`} />
+                                    <Heart className={`w-5 h-5 ${interactions.isLiked ? 'fill-current' : ''}`} />
                                     <span className="text-sm font-bold">Gosto</span>
                                 </button>
 
@@ -150,21 +209,31 @@ const BlogPage: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Comments Section (Static Placeholder) */}
+                        {/* Comments Section */}
                         <div className="p-6 bg-gray-50/50">
-                            <div className="flex gap-3 mb-6">
-                                <div className="w-8 h-8 bg-gray-300 rounded-full flex-shrink-0" />
-                                <div className="flex-1">
-                                    <div className="bg-white border border-gray-200 rounded-2xl px-4 py-2 inline-block max-w-full">
-                                        <p className="font-bold text-sm text-brand-dark">Visitante</p>
-                                        <p className="text-sm text-gray-700">Artigo fantástico! Angola precisa de mais iniciativas como esta.</p>
+                            <div className="space-y-6 mb-6">
+                                {interactions.comments.map((comment) => (
+                                    <div key={comment.id} className="flex gap-3">
+                                        <div className="w-8 h-8 bg-brand-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                                            <User className="w-4 h-4 text-brand-primary" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="bg-white border border-gray-200 rounded-2xl px-4 py-2 inline-block max-w-full">
+                                                <p className="font-bold text-sm text-brand-dark">{comment.userName}</p>
+                                                <p className="text-sm text-gray-700">{comment.content}</p>
+                                            </div>
+                                            <div className="flex gap-4 mt-2 text-xs font-bold text-gray-500 px-2">
+                                                <button className="hover:underline">Gosto</button>
+                                                <button className="hover:underline">Responder</button>
+                                                <span>{new Date(comment.createdAt).toLocaleDateString()}</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="flex gap-4 mt-2 text-xs font-bold text-gray-500 px-2">
-                                        <button className="hover:underline">Gosto</button>
-                                        <button className="hover:underline">Responder</button>
-                                        <span>2h</span>
-                                    </div>
-                                </div>
+                                ))}
+
+                                {interactions.comments.length === 0 && (
+                                    <p className="text-center text-gray-400 text-sm italic py-4">Nenhum comentário ainda. Seja o primeiro!</p>
+                                )}
                             </div>
 
                             {/* Comment Input */}
@@ -172,12 +241,25 @@ const BlogPage: React.FC = () => {
                                 <div className="w-8 h-8 bg-brand-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
                                     <User className="w-4 h-4 text-brand-primary" />
                                 </div>
-                                <div className="flex-1">
+                                <div className="flex-1 relative">
                                     <input
                                         type="text"
-                                        placeholder="Escreva um comentário..."
-                                        className="w-full bg-gray-100 border-0 rounded-full px-4 py-2 text-sm focus:ring-1 focus:ring-brand-primary"
+                                        placeholder={user ? "Escreva um comentário..." : "Inicie sessão para comentar"}
+                                        value={commentText}
+                                        onChange={(e) => setCommentText(e.target.value)}
+                                        disabled={!user || isSubmittingComment}
+                                        onKeyDown={(e) => e.key === 'Enter' && handleAddComment(selectedPost.id)}
+                                        className="w-full bg-gray-100 border-0 rounded-full px-4 py-2 pr-12 text-sm focus:ring-1 focus:ring-brand-primary disabled:opacity-50"
                                     />
+                                    <button
+                                        onClick={() => handleAddComment(selectedPost.id)}
+                                        disabled={!user || isSubmittingComment || !commentText.trim()}
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-brand-primary hover:bg-white rounded-full transition-colors disabled:opacity-50"
+                                        title="Enviar comentário"
+                                        aria-label="Enviar comentário"
+                                    >
+                                        <Send className="w-4 h-4" />
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -210,102 +292,107 @@ const BlogPage: React.FC = () => {
             {/* Feed */}
             <div className="container mx-auto px-4 py-8 max-w-3xl">
                 <div className="space-y-6">
-                    {posts.map((post) => (
-                        <article
-                            key={post.id}
-                            className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
-                        >
-                            {/* Post Header */}
-                            <div className="p-6 pb-4">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <div className="w-12 h-12 bg-brand-primary/10 rounded-full flex items-center justify-center">
-                                        <User className="w-6 h-6 text-brand-primary" />
-                                    </div>
-                                    <div className="flex-1" onClick={() => setSelectedPost(post)}>
-                                        <h3 className="font-bold text-brand-dark cursor-pointer hover:underline">{post.author || 'Editora Graça'}</h3>
-                                        <div className="flex items-center gap-2 text-sm text-gray-500">
-                                            <Calendar className="w-4 h-4" />
-                                            <span>{new Date(post.date).toLocaleDateString('pt-PT', {
-                                                day: 'numeric',
-                                                month: 'long',
-                                                year: 'numeric'
-                                            })}</span>
+                    {posts.map((post) => {
+                        const interactions = postInteractions[post.id] || { likesCount: 0, comments: [], isLiked: false };
+
+                        return (
+                            <article
+                                key={post.id}
+                                className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
+                            >
+                                {/* Post Header */}
+                                <div className="p-6 pb-4">
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <div className="w-12 h-12 bg-brand-primary/10 rounded-full flex items-center justify-center">
+                                            <User className="w-6 h-6 text-brand-primary" />
+                                        </div>
+                                        <div className="flex-1" onClick={() => setSelectedPost(post)}>
+                                            <h3 className="font-bold text-brand-dark cursor-pointer hover:underline">{post.author || 'Editora Graça'}</h3>
+                                            <div className="flex items-center gap-2 text-sm text-gray-500">
+                                                <Calendar className="w-4 h-4" />
+                                                <span>{new Date(post.date).toLocaleDateString('pt-PT', {
+                                                    day: 'numeric',
+                                                    month: 'long',
+                                                    year: 'numeric'
+                                                })}</span>
+                                            </div>
                                         </div>
                                     </div>
+
+                                    {/* Post Title */}
+                                    <h2
+                                        onClick={() => setSelectedPost(post)}
+                                        className="text-2xl font-black text-brand-dark mb-3 leading-tight cursor-pointer hover:text-brand-primary transition-colors"
+                                    >
+                                        {post.title}
+                                    </h2>
+
+                                    {/* Post Content Preview */}
+                                    <p className="text-gray-600 leading-relaxed line-clamp-3">
+                                        {post.content.substring(0, 200)}...
+                                    </p>
                                 </div>
 
-                                {/* Post Title */}
-                                <h2
-                                    onClick={() => setSelectedPost(post)}
-                                    className="text-2xl font-black text-brand-dark mb-3 leading-tight cursor-pointer hover:text-brand-primary transition-colors"
-                                >
-                                    {post.title}
-                                </h2>
+                                {/* Post Image */}
+                                {post.imageUrl && (
+                                    <div
+                                        onClick={() => setSelectedPost(post)}
+                                        className="relative w-full aspect-[16/9] bg-gray-100 cursor-pointer overflow-hidden"
+                                    >
+                                        <OptimizedImage
+                                            src={post.imageUrl}
+                                            alt={post.title}
+                                            className="w-full h-full object-cover transition-transform hover:scale-105 duration-500"
+                                        />
+                                    </div>
+                                )}
 
-                                {/* Post Content Preview */}
-                                <p className="text-gray-600 leading-relaxed line-clamp-3">
-                                    {post.content.substring(0, 200)}...
-                                </p>
-                            </div>
-
-                            {/* Post Image */}
-                            {post.imageUrl && (
-                                <div
-                                    onClick={() => setSelectedPost(post)}
-                                    className="relative w-full aspect-[16/9] bg-gray-100 cursor-pointer overflow-hidden"
-                                >
-                                    <OptimizedImage
-                                        src={post.imageUrl}
-                                        alt={post.title}
-                                        className="w-full h-full object-cover transition-transform hover:scale-105 duration-500"
-                                    />
-                                </div>
-                            )}
-
-                            {/* Interaction Bar */}
-                            <div className="px-6 py-4 border-t border-gray-100">
-                                <div className="flex items-center justify-between">
-                                    <button
-                                        onClick={() => toggleLike(post.id)}
-                                        className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg transition-all ${likedPosts.has(post.id)
+                                {/* Interaction Bar */}
+                                <div className="px-6 py-4 border-t border-gray-100">
+                                    <div className="flex items-center justify-between">
+                                        <button
+                                            onClick={() => handleToggleLike(post.id)}
+                                            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg transition-all ${interactions.isLiked
                                                 ? 'bg-red-50 text-red-600'
                                                 : 'hover:bg-gray-50 text-gray-600'
-                                            }`}
-                                    >
-                                        <Heart
-                                            className={`w-5 h-5 ${likedPosts.has(post.id) ? 'fill-current' : ''}`}
-                                        />
-                                        <span className="text-sm font-bold">
-                                            {likedPosts.has(post.id) ? 'Gostei' : 'Gostar'}
-                                        </span>
-                                    </button>
+                                                }`}
+                                        >
+                                            <Heart
+                                                className={`w-5 h-5 ${interactions.isLiked ? 'fill-current' : ''}`}
+                                            />
+                                            <span className="text-sm font-bold">
+                                                {interactions.likesCount > 0 && `${interactions.likesCount} `}
+                                                {interactions.isLiked ? 'Gostei' : 'Gostar'}
+                                            </span>
+                                        </button>
 
+                                        <button
+                                            onClick={() => setSelectedPost(post)}
+                                            className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg hover:bg-gray-50 text-gray-600 transition-all font-bold text-sm"
+                                        >
+                                            <MessageCircle className="w-5 h-5" />
+                                            {interactions.comments.length} Comentários
+                                        </button>
+
+                                        <button className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg hover:bg-gray-50 text-gray-600 transition-all font-bold text-sm">
+                                            <Share2 className="w-5 h-5" />
+                                            Partilhar
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Read More Button */}
+                                <div className="px-6 pb-6">
                                     <button
                                         onClick={() => setSelectedPost(post)}
-                                        className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg hover:bg-gray-50 text-gray-600 transition-all font-bold text-sm"
+                                        className="w-full py-3 bg-brand-light hover:bg-brand-primary/10 text-brand-primary font-bold rounded-xl transition-colors border border-brand-primary/5"
                                     >
-                                        <MessageCircle className="w-5 h-5" />
-                                        Comentar
-                                    </button>
-
-                                    <button className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg hover:bg-gray-50 text-gray-600 transition-all font-bold text-sm">
-                                        <Share2 className="w-5 h-5" />
-                                        Partilhar
+                                        Ler Artigo Completo
                                     </button>
                                 </div>
-                            </div>
-
-                            {/* Read More Button */}
-                            <div className="px-6 pb-6">
-                                <button
-                                    onClick={() => setSelectedPost(post)}
-                                    className="w-full py-3 bg-brand-light hover:bg-brand-primary/10 text-brand-primary font-bold rounded-xl transition-colors border border-brand-primary/5"
-                                >
-                                    Ler Artigo Completo
-                                </button>
-                            </div>
-                        </article>
-                    ))}
+                            </article>
+                        );
+                    })}
 
                     {posts.length === 0 && (
                         <div className="text-center py-20">

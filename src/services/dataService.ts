@@ -12,7 +12,9 @@ const TABLES = {
     REVIEWS: 'reviews',
     PAYMENT_NOTIFICATIONS: 'payment_notifications',
     PAYMENT_PROOFS: 'payment_proofs',
-    MANUSCRIPTS: 'manuscripts'
+    MANUSCRIPTS: 'manuscripts',
+    BLOG_LIKES: 'blog_likes',
+    BLOG_COMMENTS: 'blog_comments'
 };
 
 const cleanDataForSupabase = (data: any, table: string) => {
@@ -46,7 +48,9 @@ const cleanDataForSupabase = (data: any, table: string) => {
         'bookId': 'book_id',
         'userId': 'user_id',
         'displayOrder': 'display_order',
-        'imageUrl': 'image_url'
+        'imageUrl': 'image_url',
+        'postId': 'post_id',
+        'createdAt': 'created_at'
     };
 
     const JSONFields = ['items'];
@@ -105,7 +109,9 @@ const parseDataFromSupabase = (item: any) => {
         'book_id': 'bookId',
         'user_id': 'userId',
         'display_order': 'displayOrder', // Correcting to match frontend usage
-        'image_url': 'imageUrl'
+        'image_url': 'imageUrl',
+        'post_id': 'postId',
+        'created_at': 'createdAt'
     };
 
     Object.keys(item).forEach(key => {
@@ -413,6 +419,77 @@ export const saveBlogPost = async (post: any) => {
 
 export const deleteBlogPost = async (id: string) => {
     await supabase.from(TABLES.BLOG).delete().eq('id', id);
+};
+
+// Blog Interactions
+export const getBlogPostInteractions = async (postId: string) => {
+    try {
+        const [{ count: likesCount }, { data: comments, error: commentsError }] = await Promise.all([
+            supabase.from(TABLES.BLOG_LIKES).select('*', { count: 'exact', head: true }).eq('post_id', postId),
+            supabase.from(TABLES.BLOG_COMMENTS).select('*').eq('post_id', postId).order('created_at', { ascending: true })
+        ]);
+
+        if (commentsError) throw commentsError;
+
+        return {
+            likesCount: likesCount || 0,
+            comments: (comments || []).map(parseDataFromSupabase)
+        };
+    } catch (error) {
+        console.error("Error fetching interactions:", error);
+        return { likesCount: 0, comments: [] };
+    }
+};
+
+export const checkUserLike = async (postId: string, userId: string) => {
+    try {
+        const { data, error } = await supabase
+            .from(TABLES.BLOG_LIKES)
+            .select('*')
+            .eq('post_id', postId)
+            .eq('user_id', userId)
+            .single();
+
+        return !!data;
+    } catch (error) {
+        return false;
+    }
+};
+
+export const toggleBlogPostLike = async (postId: string, userId: string): Promise<boolean> => {
+    try {
+        const isLiked = await checkUserLike(postId, userId);
+
+        if (isLiked) {
+            const { error } = await supabase
+                .from(TABLES.BLOG_LIKES)
+                .delete()
+                .eq('post_id', postId)
+                .eq('user_id', userId);
+            if (error) throw error;
+            return false;
+        } else {
+            const { error } = await supabase
+                .from(TABLES.BLOG_LIKES)
+                .insert([{ post_id: postId, user_id: userId }]);
+            if (error) throw error;
+            return true;
+        }
+    } catch (error) {
+        console.error("Error toggling like:", error);
+        return false;
+    }
+};
+
+export const addBlogPostComment = async (comment: { postId: string; userId: string; userName: string; content: string }) => {
+    try {
+        const data = cleanDataForSupabase(comment, TABLES.BLOG_COMMENTS);
+        const { error } = await supabase.from(TABLES.BLOG_COMMENTS).insert([data]);
+        if (error) throw error;
+    } catch (error) {
+        console.error("Error adding comment:", error);
+        throw error;
+    }
 };
 
 // Team
