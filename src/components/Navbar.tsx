@@ -231,7 +231,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                         <li key={link.view}>
                             <button
                                 onClick={() => onNavigate(link.view as any)}
-                                className={`hover: text - brand - primary transition - colors border - b pb - 1 ${currentView === link.view ? 'text-brand-primary border-brand-primary' : 'border-transparent'} `}
+                                className={`hover:text-brand-primary transition-colors border-b pb-1 ${currentView === link.view ? 'text-brand-primary border-brand-primary' : 'border-transparent'}`}
                             >
                                 {link.name}
                             </button>
@@ -251,7 +251,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                                         onNavigate(link.view as any);
                                         setIsMenuOpen(false);
                                     }}
-                                    className={`w - full text - left px - 8 py - 3 text - [11px] font - bold uppercase tracking - [0.2em] ${currentView === link.view ? 'text-brand-primary bg-brand-light' : 'text-gray-500 hover:bg-gray-50'} `}
+                                    className={`w-full text-left px-8 py-3 text-[11px] font-bold uppercase tracking-[0.2em] ${currentView === link.view ? 'text-brand-primary bg-brand-light' : 'text-gray-500 hover:bg-gray-50'}`}
                                 >
                                     {link.name}
                                 </button>

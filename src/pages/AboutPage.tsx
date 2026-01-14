@@ -88,6 +88,14 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
     ];
 
 
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-brand-light flex items-center justify-center">
+                <Loader2 className="w-12 h-12 text-brand-primary animate-spin" />
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-brand-light">
             {/* Hero Section */}
