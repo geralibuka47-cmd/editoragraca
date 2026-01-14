@@ -1,225 +1,310 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Image, Calendar, MapPin, Users, X, Plus, Smile } from 'lucide-react';
+import { BlogPost } from '../../types';
+import { saveBlogPost } from '../../services/dataService';
+import { useToast } from '../Toast';
 
-const AdminBlogTab: React.FC = () => {
-    const [blogPosts, setBlogPosts] = useState<any[]>([]);
-    const [isLoadingBlog, setIsLoadingBlog] = useState(true);
-    const [showBlogModal, setShowBlogModal] = useState(false);
-    const [blogForm, setBlogForm] = useState<any>({ title: '', content: '', imageUrl: '', author: '', date: new Date().toISOString().split('T')[0] });
-    const [isSavingBlog, setIsSavingBlog] = useState(false);
+interface AdminBlogTabProps {
+    posts: BlogPost[];
+    onRefresh: () => void;
+}
 
-    const fetchBlogPosts = async () => {
-        setIsLoadingBlog(true);
+type ContentType = 'post' | 'event';
+
+interface EventData {
+    title: string;
+    date: string;
+    time: string;
+    location: string;
+    description: string;
+    imageUrl: string;
+}
+
+const AdminBlogTab: React.FC<AdminBlogTabProps> = ({ posts, onRefresh }) => {
+    const { showToast } = useToast();
+    const [contentType, setContentType] = useState<ContentType>('post');
+    const [isCreating, setIsCreating] = useState(false);
+
+    // Post state
+    const [postContent, setPostContent] = useState('');
+    const [postImage, setPostImage] = useState('');
+
+    // Event state
+    const [eventData, setEventData] = useState<EventData>({
+        title: '',
+        date: '',
+        time: '',
+        location: '',
+        description: '',
+        imageUrl: ''
+    });
+
+    const handleCreatePost = async () => {
+        if (!postContent.trim()) {
+            showToast('Por favor, escreva algo para publicar', 'error');
+            return;
+        }
+
         try {
-            const { getBlogPosts } = await import('../../services/dataService');
-            const data = await getBlogPosts();
-            setBlogPosts(data);
+            const newPost: BlogPost = {
+                id: `temp_${Date.now()}`,
+                title: postContent.substring(0, 100),
+                content: postContent,
+                imageUrl: postImage || 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&h=500&fit=crop',
+                date: new Date().toISOString(),
+                author: 'Editora Graça'
+            };
+
+            await saveBlogPost(newPost);
+            showToast('Post publicado com sucesso!', 'success');
+            setPostContent('');
+            setPostImage('');
+            setIsCreating(false);
+            onRefresh();
         } catch (error) {
-            console.error('Erro ao buscar posts do blog:', error);
-        } finally {
-            setIsLoadingBlog(false);
+            showToast('Erro ao publicar post', 'error');
         }
     };
 
-    useEffect(() => {
-        fetchBlogPosts();
-    }, []);
-
-    const handleSaveBlog = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsSavingBlog(true);
-        try {
-            const { saveBlogPost } = await import('../../services/dataService');
-            await saveBlogPost(blogForm);
-            alert('Post guardado com sucesso!');
-            setShowBlogModal(false);
-            fetchBlogPosts();
-        } catch (error) {
-            console.error('Erro ao salvar post:', error);
-            alert('Erro ao salvar post. Verifique os dados.');
-        } finally {
-            setIsSavingBlog(false);
+    const handleCreateEvent = async () => {
+        if (!eventData.title || !eventData.date) {
+            showToast('Preencha pelo menos o título e a data do evento', 'error');
+            return;
         }
-    };
 
-    const handleDeleteBlog = async (id: string) => {
-        if (!confirm('Eliminar este post?')) return;
         try {
-            const { deleteBlogPost } = await import('../../services/dataService');
-            await deleteBlogPost(id);
-            alert('Post eliminado.');
-            fetchBlogPosts();
+            // Create event as a special blog post with event metadata
+            const eventPost: BlogPost = {
+                id: `temp_${Date.now()}`,
+                title: `📅 ${eventData.title}`,
+                content: `${eventData.description}\n\n📍 Local: ${eventData.location}\n🕐 Horário: ${eventData.time}`,
+                imageUrl: eventData.imageUrl || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&h=500&fit=crop',
+                date: eventData.date,
+                author: 'Editora Graça'
+            };
+
+            await saveBlogPost(eventPost);
+            showToast('Evento criado com sucesso!', 'success');
+            setEventData({ title: '', date: '', time: '', location: '', description: '', imageUrl: '' });
+            setIsCreating(false);
+            onRefresh();
         } catch (error) {
-            console.error('Erro ao eliminar post:', error);
-            alert('Erro ao eliminar post.');
+            showToast('Erro ao criar evento', 'error');
         }
     };
 
     return (
-        <div>
-            <div className="flex justify-between items-center mb-8">
-                <h2 className="text-2xl md:text-3xl font-black text-brand-dark">Gestão do Blog</h2>
-                <button
-                    onClick={() => {
-                        setBlogForm({ title: '', content: '', imageUrl: '', author: '', date: new Date().toISOString().split('T')[0] });
-                        setShowBlogModal(true);
-                    }}
-                    title="Criar novo post"
-                    aria-label="Criar novo post"
-                    className="btn-premium py-3 px-6 text-sm"
-                >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Novo Post
-                </button>
-            </div>
-            <div className="bg-white rounded-2xl shadow-lg overflow-hidden overflow-x-auto">
-                <table className="w-full min-w-[800px]">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-brand-dark uppercase tracking-wider">Título</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-brand-dark uppercase tracking-wider">Autor</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-brand-dark uppercase tracking-wider">Data</th>
-                            <th className="px-6 py-4 text-right text-xs font-bold text-brand-dark uppercase tracking-wider">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                        {isLoadingBlog ? (
-                            <tr>
-                                <td colSpan={4} className="px-6 py-12 text-center text-gray-500 italic">Carregando posts...</td>
-                            </tr>
-                        ) : blogPosts.length > 0 ? (
-                            blogPosts.map((post) => (
-                                <tr key={post.id} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 font-bold text-brand-dark">{post.title}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-600">{post.author}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-600">{new Date(post.date).toLocaleDateString('pt-AO')}</td>
-                                    <td className="px-6 py-4 text-right">
-                                        <div className="flex items-center justify-end gap-2">
-                                            <button
-                                                onClick={() => {
-                                                    setBlogForm(post);
-                                                    setShowBlogModal(true);
-                                                }}
-                                                title="Editar post"
-                                                aria-label="Editar post"
-                                                className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 flex items-center justify-center transition-all"
-                                            >
-                                                <Edit className="w-4 h-4" />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDeleteBlog(post.id)}
-                                                title="Eliminar post"
-                                                aria-label="Eliminar post"
-                                                className="w-8 h-8 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 flex items-center justify-center transition-all"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan={4} className="px-6 py-12 text-center text-gray-500 italic">Nenhum post encontrado.</td>
-                            </tr>
+        <div className="space-y-6">
+            {/* Create Post/Event Card */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                {!isCreating ? (
+                    <button
+                        onClick={() => setIsCreating(true)}
+                        className="w-full text-left px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-full text-gray-500 transition-colors"
+                    >
+                        No que está a pensar, Administrador?
+                    </button>
+                ) : (
+                    <div className="space-y-4">
+                        {/* Content Type Selector */}
+                        <div className="flex gap-2 border-b border-gray-200 pb-4">
+                            <button
+                                onClick={() => setContentType('post')}
+                                className={`flex-1 py-2 px-4 rounded-lg font-bold transition-colors ${contentType === 'post'
+                                        ? 'bg-brand-primary text-white'
+                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                    }`}
+                            >
+                                Criar Post
+                            </button>
+                            <button
+                                onClick={() => setContentType('event')}
+                                className={`flex-1 py-2 px-4 rounded-lg font-bold transition-colors ${contentType === 'event'
+                                        ? 'bg-brand-primary text-white'
+                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                    }`}
+                            >
+                                Criar Evento
+                            </button>
+                        </div>
+
+                        {/* Post Form */}
+                        {contentType === 'post' && (
+                            <div className="space-y-4">
+                                <textarea
+                                    value={postContent}
+                                    onChange={(e) => setPostContent(e.target.value)}
+                                    placeholder="No que está a pensar?"
+                                    className="w-full p-4 border-0 resize-none focus:outline-none text-lg"
+                                    rows={4}
+                                />
+
+                                <div className="space-y-2">
+                                    <label className="block text-sm font-bold text-gray-700">URL da Imagem (opcional)</label>
+                                    <input
+                                        type="url"
+                                        value={postImage}
+                                        onChange={(e) => setPostImage(e.target.value)}
+                                        placeholder="https://exemplo.com/imagem.jpg"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                                    />
+                                </div>
+
+                                {postImage && (
+                                    <div className="relative rounded-lg overflow-hidden">
+                                        <img src={postImage} alt="Preview" className="w-full h-64 object-cover" />
+                                        <button
+                                            onClick={() => setPostImage('')}
+                                            className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-lg hover:bg-gray-100"
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                )}
+
+                                <div className="flex items-center gap-2 pt-4 border-t border-gray-200">
+                                    <button className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 rounded-lg transition-colors">
+                                        <Image className="w-5 h-5 text-green-600" />
+                                        <span className="text-sm font-bold text-gray-700">Foto</span>
+                                    </button>
+                                    <button className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 rounded-lg transition-colors">
+                                        <Smile className="w-5 h-5 text-yellow-600" />
+                                        <span className="text-sm font-bold text-gray-700">Sentimento</span>
+                                    </button>
+                                </div>
+
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setIsCreating(false)}
+                                        className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg font-bold text-gray-700 transition-colors"
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        onClick={handleCreatePost}
+                                        className="flex-1 py-3 bg-brand-primary hover:bg-brand-primary/90 rounded-lg font-bold text-white transition-colors"
+                                    >
+                                        Publicar
+                                    </button>
+                                </div>
+                            </div>
                         )}
-                    </tbody>
-                </table>
+
+                        {/* Event Form */}
+                        {contentType === 'event' && (
+                            <div className="space-y-4">
+                                <input
+                                    type="text"
+                                    value={eventData.title}
+                                    onChange={(e) => setEventData({ ...eventData, title: e.target.value })}
+                                    placeholder="Nome do evento"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary text-lg font-bold"
+                                />
+
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-2">Data</label>
+                                        <input
+                                            type="date"
+                                            value={eventData.date}
+                                            onChange={(e) => setEventData({ ...eventData, date: e.target.value })}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-2">Horário</label>
+                                        <input
+                                            type="time"
+                                            value={eventData.time}
+                                            onChange={(e) => setEventData({ ...eventData, time: e.target.value })}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-2">Local</label>
+                                    <input
+                                        type="text"
+                                        value={eventData.location}
+                                        onChange={(e) => setEventData({ ...eventData, location: e.target.value })}
+                                        placeholder="Onde será o evento?"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-2">Descrição</label>
+                                    <textarea
+                                        value={eventData.description}
+                                        onChange={(e) => setEventData({ ...eventData, description: e.target.value })}
+                                        placeholder="Descreva o evento..."
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary resize-none"
+                                        rows={4}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-2">URL da Imagem</label>
+                                    <input
+                                        type="url"
+                                        value={eventData.imageUrl}
+                                        onChange={(e) => setEventData({ ...eventData, imageUrl: e.target.value })}
+                                        placeholder="https://exemplo.com/imagem.jpg"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                                    />
+                                </div>
+
+                                {eventData.imageUrl && (
+                                    <div className="relative rounded-lg overflow-hidden">
+                                        <img src={eventData.imageUrl} alt="Preview" className="w-full h-64 object-cover" />
+                                    </div>
+                                )}
+
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setIsCreating(false)}
+                                        className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg font-bold text-gray-700 transition-colors"
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        onClick={handleCreateEvent}
+                                        className="flex-1 py-3 bg-brand-primary hover:bg-brand-primary/90 rounded-lg font-bold text-white transition-colors"
+                                    >
+                                        Criar Evento
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
-            {/* Blog Modal */}
-            {showBlogModal && (
-                <div className="fixed inset-0 bg-brand-dark/90 backdrop-blur-sm z-50 flex items-center justify-center p-8">
-                    <div className="bg-white rounded-[32px] w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col animate-fade-in">
-                        <div className="p-8 border-b border-gray-100 bg-gray-50">
-                            <h2 className="text-2xl font-black text-brand-dark">{blogForm.id ? 'Editar Post' : 'Novo Post'}</h2>
-                        </div>
-                        <form onSubmit={handleSaveBlog} className="flex-1 overflow-y-auto p-8 space-y-6">
-                            <div>
-                                <label htmlFor="blog-title" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Título do Post</label>
-                                <input
-                                    id="blog-title"
-                                    type="text"
-                                    required
-                                    value={blogForm.title}
-                                    onChange={(e) => setBlogForm({ ...blogForm, title: e.target.value })}
-                                    className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary font-bold"
-                                    placeholder="Ex: Lançamento de Novos Livros"
-                                    title="Título do Post"
-                                />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label htmlFor="blog-author" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Autor</label>
-                                    <input
-                                        id="blog-author"
-                                        type="text"
-                                        required
-                                        value={blogForm.author}
-                                        onChange={(e) => setBlogForm({ ...blogForm, author: e.target.value })}
-                                        className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
-                                        placeholder="Nome do Autor"
-                                        title="Nome do Autor"
-                                    />
+            {/* Posts List */}
+            <div className="space-y-4">
+                <h3 className="text-xl font-black text-brand-dark">Posts Publicados ({posts.length})</h3>
+                {posts.map((post) => (
+                    <div key={post.id} className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div className="p-6">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-10 h-10 bg-brand-primary/10 rounded-full flex items-center justify-center">
+                                    <Users className="w-5 h-5 text-brand-primary" />
                                 </div>
                                 <div>
-                                    <label htmlFor="blog-date" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Data</label>
-                                    <input
-                                        id="blog-date"
-                                        type="date"
-                                        required
-                                        value={blogForm.date}
-                                        onChange={(e) => setBlogForm({ ...blogForm, date: e.target.value })}
-                                        className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
-                                        title="Data do Post"
-                                    />
+                                    <p className="font-bold text-brand-dark">{post.author}</p>
+                                    <p className="text-xs text-gray-500">{new Date(post.date).toLocaleDateString('pt-PT')}</p>
                                 </div>
                             </div>
-                            <div>
-                                <label htmlFor="blog-image" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">URL da Imagem</label>
-                                <input
-                                    id="blog-image"
-                                    type="url"
-                                    required
-                                    value={blogForm.imageUrl}
-                                    onChange={(e) => setBlogForm({ ...blogForm, imageUrl: e.target.value })}
-                                    className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary"
-                                    placeholder="https://..."
-                                    title="URL da Imagem"
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="blog-content" className="block text-xs font-black text-brand-dark uppercase tracking-wider mb-2">Conteúdo</label>
-                                <textarea
-                                    id="blog-content"
-                                    required
-                                    value={blogForm.content}
-                                    onChange={(e) => setBlogForm({ ...blogForm, content: e.target.value })}
-                                    className="w-full bg-gray-50 border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-brand-primary h-64 resize-none"
-                                    placeholder="Escreva o conteúdo do post..."
-                                    title="Conteúdo do Post"
-                                />
-                            </div>
-                        </form>
-                        <div className="p-6 border-t border-gray-100 flex gap-4 bg-white/50 backdrop-blur-sm">
-                            <button
-                                type="button"
-                                onClick={() => setShowBlogModal(false)}
-                                className="flex-1 py-4 border-2 border-brand-dark rounded-full font-black text-xs uppercase tracking-widest text-brand-dark hover:bg-brand-dark hover:text-white transition-all"
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={handleSaveBlog}
-                                disabled={isSavingBlog}
-                                className="flex-1 py-4 bg-brand-primary text-white rounded-full font-black text-xs uppercase tracking-widest shadow-lg shadow-brand-primary/20 hover:brightness-110 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-                            >
-                                {isSavingBlog ? 'Salvando...' : 'Salvar Post'}
-                            </button>
+                            <h4 className="font-bold text-lg mb-2">{post.title}</h4>
+                            <p className="text-gray-600 line-clamp-2">{post.content}</p>
                         </div>
+                        {post.imageUrl && (
+                            <img src={post.imageUrl} alt={post.title} className="w-full h-64 object-cover" />
+                        )}
                     </div>
-                </div>
-            )}
+                ))}
+            </div>
         </div>
     );
 };
