@@ -111,8 +111,8 @@ const AdminBlogTab: React.FC<AdminBlogTabProps> = ({ posts, onRefresh }) => {
                             <button
                                 onClick={() => setContentType('post')}
                                 className={`flex-1 py-2 px-4 rounded-lg font-bold transition-colors ${contentType === 'post'
-                                        ? 'bg-brand-primary text-white'
-                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                    ? 'bg-brand-primary text-white'
+                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                     }`}
                             >
                                 Criar Post
@@ -120,8 +120,8 @@ const AdminBlogTab: React.FC<AdminBlogTabProps> = ({ posts, onRefresh }) => {
                             <button
                                 onClick={() => setContentType('event')}
                                 className={`flex-1 py-2 px-4 rounded-lg font-bold transition-colors ${contentType === 'event'
-                                        ? 'bg-brand-primary text-white'
-                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                    ? 'bg-brand-primary text-white'
+                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                     }`}
                             >
                                 Criar Evento
@@ -156,6 +156,8 @@ const AdminBlogTab: React.FC<AdminBlogTabProps> = ({ posts, onRefresh }) => {
                                         <button
                                             onClick={() => setPostImage('')}
                                             className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-lg hover:bg-gray-100"
+                                            aria-label="Remover imagem"
+                                            title="Remover imagem"
                                         >
                                             <X className="w-4 h-4" />
                                         </button>
