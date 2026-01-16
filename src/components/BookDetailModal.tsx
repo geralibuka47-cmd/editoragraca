@@ -7,7 +7,8 @@ import {
     getBookStats,
     incrementBookView,
     checkIsFavorite,
-    toggleFavorite
+    toggleFavorite,
+    checkDownloadAccess
 } from '../services/dataService';
 
 interface BookDetailModalProps {
@@ -21,6 +22,7 @@ const BookDetailModal: React.FC<BookDetailModalProps & { user?: UserType }> = ({
     const [activeTab, setActiveTab] = useState<'details' | 'reviews'>('details');
     const [stats, setStats] = useState<any>({ views: 0, rating: 0, downloads: 0, sales: 0, reviewsCount: 0 });
     const [isFavorite, setIsFavorite] = useState(false);
+    const [hasDownloadAccess, setHasDownloadAccess] = useState(false);
     const [isSubmittingReview, setIsSubmittingReview] = useState(false);
     const [reviewContent, setReviewContent] = useState('');
     const [reviewRating, setReviewRating] = useState(5);
@@ -29,15 +31,17 @@ const BookDetailModal: React.FC<BookDetailModalProps & { user?: UserType }> = ({
     useEffect(() => {
         if (isOpen && book) {
             const loadData = async () => {
-                const [realStats, bookReviews, favStatus] = await Promise.all([
+                const [realStats, bookReviews, favStatus, downloadAccess] = await Promise.all([
                     getBookStats(book.id),
                     getBookReviews(book.id),
-                    user ? checkIsFavorite(book.id, user.id) : Promise.resolve(false)
+                    user ? checkIsFavorite(book.id, user.id) : Promise.resolve(false),
+                    checkDownloadAccess(book.id, user?.id, book.price || 0)
                 ]);
 
                 setStats(realStats);
                 setReviews(bookReviews);
                 setIsFavorite(favStatus);
+                setHasDownloadAccess(downloadAccess);
 
                 // Track view
                 await incrementBookView(book.id);
@@ -213,17 +217,56 @@ const BookDetailModal: React.FC<BookDetailModalProps & { user?: UserType }> = ({
                                     </div>
                                 </div>
 
-                                <div className="pt-4 md:pt-6">
-                                    <button
-                                        onClick={() => {
-                                            onAddToCart(book);
-                                            onClose();
-                                        }}
-                                        className="w-full btn-premium py-4 md:py-5 justify-center text-base md:text-lg rounded-xl md:rounded-2xl shadow-xl shadow-brand-primary/30"
-                                    >
-                                        <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
-                                        Adicionar ao Carrinho
-                                    </button>
+                                <div className="pt-4 md:pt-6 space-y-3">
+                                    {/* Download Button for Digital Books */}
+                                    {book.format === 'digital' && book.digitalFileUrl && (
+                                        <div>
+                                            {book.price === 0 ? (
+                                                <a
+                                                    href={book.digitalFileUrl}
+                                                    download
+                                                    className="w-full btn-premium py-4 md:py-5 justify-center text-base md:text-lg rounded-xl md:rounded-2xl shadow-xl shadow-green-500/30 !bg-green-600 hover:!bg-green-700"
+                                                >
+                                                    <Download className="w-5 h-5 md:w-6 md:h-6" />
+                                                    Download Gratuito
+                                                </a>
+                                            ) : hasDownloadAccess ? (
+                                                <a
+                                                    href={book.digitalFileUrl}
+                                                    download
+                                                    className="w-full btn-premium py-4 md:py-5 justify-center text-base md:text-lg rounded-xl md:rounded-2xl shadow-xl shadow-blue-500/30 !bg-blue-600 hover:!bg-blue-700"
+                                                >
+                                                    <Download className="w-5 h-5 md:w-6 md:h-6" />
+                                                    Fazer Download
+                                                </a>
+                                            ) : (
+                                                <button
+                                                    onClick={() => {
+                                                        onAddToCart(book);
+                                                        onClose();
+                                                    }}
+                                                    className="w-full btn-premium py-4 md:py-5 justify-center text-base md:text-lg rounded-xl md:rounded-2xl shadow-xl shadow-brand-primary/30"
+                                                >
+                                                    <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
+                                                    Comprar para Download
+                                                </button>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Add to Cart Button (for physical books or digital without download access) */}
+                                    {(book.format !== 'digital' || !book.digitalFileUrl) && (
+                                        <button
+                                            onClick={() => {
+                                                onAddToCart(book);
+                                                onClose();
+                                            }}
+                                            className="w-full btn-premium py-4 md:py-5 justify-center text-base md:text-lg rounded-xl md:rounded-2xl shadow-xl shadow-brand-primary/30"
+                                        >
+                                            <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
+                                            Adicionar ao Carrinho
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         ) : (

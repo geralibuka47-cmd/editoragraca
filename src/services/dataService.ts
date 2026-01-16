@@ -951,6 +951,43 @@ export const getUserBooks = async (readerId: string): Promise<Book[]> => {
     return allBooks.filter(book => bookIds.has(book.id));
 };
 
+// Digital Book Downloads
+export const checkDownloadAccess = async (bookId: string, userId: string | undefined, bookPrice: number): Promise<boolean> => {
+    // Free books are always accessible
+    if (bookPrice === 0) {
+        return true;
+    }
+
+    // Paid books require authentication and confirmed payment
+    if (!userId) {
+        return false;
+    }
+
+    try {
+        const { data: confirmed } = await supabase
+            .from(TABLES.PAYMENT_NOTIFICATIONS)
+            .select('items')
+            .eq('reader_id', userId)
+            .eq('status', 'confirmed');
+
+        // Check if user has purchased this book
+        const hasPurchased = (confirmed || []).some(sale => {
+            const items = Array.isArray(sale.items) ? sale.items : [];
+            return items.some((item: any) => item.bookId === bookId);
+        });
+
+        return hasPurchased;
+    } catch (error) {
+        console.error("Error checking download access:", error);
+        return false;
+    }
+};
+
+export const getUserPurchasedDigitalBooks = async (readerId: string): Promise<Book[]> => {
+    const allPurchased = await getUserBooks(readerId);
+    return allPurchased.filter(book => book.format === 'digital' && book.digitalFileUrl);
+};
+
 // Notifications
 export const getNotifications = async (userId: string) => {
     try {

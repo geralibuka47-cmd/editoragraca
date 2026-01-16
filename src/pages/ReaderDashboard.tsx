@@ -183,12 +183,12 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) =
                     {/* Library Tab */}
                     {activeTab === 'library' && (
                         <div>
-                            <h2 className="text-3xl font-black text-brand-dark mb-8">Minha Biblioteca</h2>
+                            <h2 className="text-3xl font-black text-brand-dark mb-8">Meus Livros Digitais</h2>
                             {isLoadingLibrary ? (
                                 <div className="text-center py-12 text-gray-500 italic">A carregar a sua biblioteca...</div>
-                            ) : purchasedBooks.length > 0 ? (
+                            ) : purchasedBooks.filter(b => b.format === 'digital' && b.digitalFileUrl).length > 0 ? (
                                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                    {purchasedBooks.map((book) => (
+                                    {purchasedBooks.filter(b => b.format === 'digital' && b.digitalFileUrl).map((book) => (
                                         <div key={book.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all group">
                                             <div className="aspect-[3/4] overflow-hidden bg-gray-200">
                                                 <img
@@ -201,12 +201,12 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) =
                                                 <h3 className="font-bold text-brand-dark mb-1 line-clamp-1">{book.title}</h3>
                                                 <p className="text-sm text-gray-600 mb-3">{book.author}</p>
                                                 <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
-                                                    <span>Digital</span>
-                                                    <span>Disponível</span>
+                                                    <span className="px-2 py-1 bg-blue-100 text-blue-600 rounded font-bold">E-Book</span>
+                                                    <span className="text-green-600 font-bold">✓ Disponível</span>
                                                 </div>
                                                 <button
                                                     onClick={() => handleDownload(book)}
-                                                    className="w-full btn-premium justify-center text-sm"
+                                                    className="w-full btn-premium justify-center text-sm !bg-blue-600 hover:!bg-blue-700"
                                                 >
                                                     <Download className="w-4 h-4" />
                                                     Download
@@ -218,8 +218,8 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) =
                             ) : (
                                 <div className="bg-white rounded-3xl shadow-lg p-16 text-center">
                                     <BookIcon className="w-20 h-20 text-gray-300 mx-auto mb-6" />
-                                    <h3 className="text-2xl font-bold text-brand-dark mb-4">Biblioteca Vazia</h3>
-                                    <p className="text-gray-600 mb-8">Comece a explorar nosso catálogo!</p>
+                                    <h3 className="text-2xl font-bold text-brand-dark mb-4">Nenhum Livro Digital</h3>
+                                    <p className="text-gray-600 mb-8">Compre livros digitais para ter acesso ao download!</p>
                                     <button onClick={() => onNavigate('CATALOG')} className="btn-premium">
                                         Ver Catálogo
                                     </button>
