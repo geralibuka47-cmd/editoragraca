@@ -48,7 +48,7 @@
     }
 
     .error-text-premium {
-        @apply text-[10px] font-bold text-red-500 mt-1 ml-1 animate-in fade-in slide-in-from-top-1 duration-200;
+        @apply text-[10px] font-bold text-red-500 mt-1 ml-1;
     }
 
     .input-error-premium {
