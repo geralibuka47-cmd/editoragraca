@@ -203,50 +203,43 @@ export const getBooks = async (): Promise<Book[]> => {
 };
 
 export const saveBook = async (book: Book) => {
-    const TIMEOUT_MS = 15000; // 15 second timeout
+    try {
+        console.log("dataService.saveBook - Iniciando limpeza de dados...");
+        const bookData = cleanDataForSupabase(book, TABLES.BOOKS);
 
-    const savePromise = (async () => {
-        try {
-            console.log("dataService.saveBook - Iniciando limpeza de dados...");
-            const bookData = cleanDataForSupabase(book, TABLES.BOOKS);
+        // Critical: Remove ID from payload to avoid Supabase errors on update/insert
+        const { id, ...payload } = bookData;
 
-            // Critical: Remove ID from payload to avoid Supabase errors on update/insert
-            const { id, ...payload } = bookData;
-            console.log("dataService.saveBook - Payload (sem ID):", payload);
+        // Log keys to verify snake_case
+        console.log("dataService.saveBook - Colunas sendo enviadas:", Object.keys(payload));
+        console.log("dataService.saveBook - Payload final:", payload);
 
-            if (id && id.length > 5 && !id.startsWith('temp_')) {
-                console.log("dataService.saveBook - Executando UPDATE para id:", id);
-                const { error } = await supabase
-                    .from(TABLES.BOOKS)
-                    .update(payload)
-                    .eq('id', id);
-                if (error) {
-                    console.error("dataService.saveBook - Erro no UPDATE:", error);
-                    throw error;
-                }
-                console.log("dataService.saveBook - UPDATE concluído com sucesso");
-            } else {
-                console.log("dataService.saveBook - Executando INSERT...");
-                const { error } = await supabase
-                    .from(TABLES.BOOKS)
-                    .insert([payload]);
-                if (error) {
-                    console.error("dataService.saveBook - Erro no INSERT:", error);
-                    throw error;
-                }
-                console.log("dataService.saveBook - INSERT concluído com sucesso");
+        if (id && id.length > 5 && !id.startsWith('temp_')) {
+            console.log("dataService.saveBook - Executando UPDATE para id:", id);
+            const { error } = await supabase
+                .from(TABLES.BOOKS)
+                .update(payload)
+                .eq('id', id);
+            if (error) {
+                console.error("dataService.saveBook - Erro no UPDATE:", error);
+                throw error;
             }
-        } catch (error) {
-            console.error("Erro interno no saveBook:", error);
-            throw error;
+            console.log("dataService.saveBook - UPDATE concluído com sucesso");
+        } else {
+            console.log("dataService.saveBook - Executando INSERT...");
+            const { error } = await supabase
+                .from(TABLES.BOOKS)
+                .insert([payload]);
+            if (error) {
+                console.error("dataService.saveBook - Erro no INSERT:", error);
+                throw error;
+            }
+            console.log("dataService.saveBook - INSERT concluído com sucesso");
         }
-    })();
-
-    const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Tempo de espera excedido. O servidor demorou muito a responder.")), TIMEOUT_MS)
-    );
-
-    return Promise.race([savePromise, timeoutPromise]);
+    } catch (error) {
+        console.error("Erro interno no saveBook:", error);
+        throw error;
+    }
 };
 
 export const deleteBook = async (id: string) => {
