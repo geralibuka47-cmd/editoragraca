@@ -221,6 +221,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
                                 <img
                                     src={featuredBook.coverUrl}
                                     alt={featuredBook.title}
+                                    loading="lazy"
                                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                                 />
                             ) : (

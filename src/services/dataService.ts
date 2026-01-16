@@ -187,14 +187,21 @@ const parseDataFromSupabase = (item: any) => {
 };
 
 // Books
-// Books Cache
+// Cache implementation
 let booksCache: Book[] | null = null;
-let lastFetchTime = 0;
+let blogPostsCache: any[] | null = null;
+let siteContentCache: Map<string, Record<string, any>> = new Map();
+let testimonialsCache: any[] | null = null;
+
+let lastBooksFetch = 0;
+let lastBlogFetch = 0;
+let lastTestimonialsFetch = 0;
+
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 export const getBooks = async (forceRefresh = false): Promise<Book[]> => {
     const now = Date.now();
-    if (!forceRefresh && booksCache && (now - lastFetchTime < CACHE_DURATION)) {
+    if (!forceRefresh && booksCache && (now - lastBooksFetch < CACHE_DURATION)) {
         console.log("dataService - Retornando livros do cache");
         return booksCache;
     }
@@ -209,7 +216,7 @@ export const getBooks = async (forceRefresh = false): Promise<Book[]> => {
         const parsed = (data || []).map(parseDataFromSupabase) as Book[];
 
         booksCache = parsed;
-        lastFetchTime = now;
+        lastBooksFetch = now;
 
         return parsed;
     } catch (error) {
@@ -255,7 +262,7 @@ export const saveBook = async (book: Book) => {
 
         // Invalidate cache
         booksCache = null;
-        lastFetchTime = 0;
+        lastBooksFetch = 0;
     } catch (error) {
         console.error("Erro interno no saveBook:", error);
         throw error;
@@ -497,14 +504,30 @@ export const updateManuscriptStatus = async (id: string, status: string, feedbac
 };
 
 // Blog
-export const getBlogPosts = async (): Promise<any[]> => {
-    const { data, error } = await supabase
-        .from(TABLES.BLOG)
-        .select('*')
-        .order('date', { ascending: false });
+export const getBlogPosts = async (forceRefresh = false): Promise<any[]> => {
+    const now = Date.now();
+    if (!forceRefresh && blogPostsCache && (now - lastBlogFetch < CACHE_DURATION)) {
+        console.log("dataService - Retornando posts do cache");
+        return blogPostsCache;
+    }
 
-    if (error) return [];
-    return (data || []).map(parseDataFromSupabase);
+    try {
+        const { data, error } = await supabase
+            .from(TABLES.BLOG)
+            .select('*')
+            .order('date', { ascending: false });
+
+        if (error) throw error;
+        const parsed = (data || []).map(parseDataFromSupabase);
+
+        blogPostsCache = parsed;
+        lastBlogFetch = now;
+
+        return parsed;
+    } catch (error) {
+        console.error("Erro ao buscar posts:", error);
+        return blogPostsCache || [];
+    }
 };
 
 export const saveBlogPost = async (post: any) => {
@@ -513,10 +536,18 @@ export const saveBlogPost = async (post: any) => {
         .from(TABLES.BLOG)
         .upsert({ id: post.id && !post.id.startsWith('temp_') ? post.id : undefined, ...data });
     if (error) throw error;
+
+    // Invalidate cache
+    blogPostsCache = null;
+    lastBlogFetch = 0;
 };
 
 export const deleteBlogPost = async (id: string) => {
     await supabase.from(TABLES.BLOG).delete().eq('id', id);
+
+    // Invalidate cache
+    blogPostsCache = null;
+    lastBlogFetch = 0;
 };
 
 // Blog Interactions
@@ -744,6 +775,14 @@ export const toggleFavorite = async (bookId: string, userId: string): Promise<bo
 
 // Site Content & Testimonials
 export const getSiteContent = async (section?: string) => {
+    const cacheKey = section || 'all';
+    const cached = siteContentCache.get(cacheKey);
+
+    if (cached) {
+        console.log("dataService - Retornando conteúdo do site do cache");
+        return cached;
+    }
+
     try {
         let query = supabase.from(TABLES.SITE_CONTENT).select('*');
         if (section) query = query.eq('section', section);
@@ -756,6 +795,8 @@ export const getSiteContent = async (section?: string) => {
         (data || []).forEach(item => {
             contentMap[item.key] = item.content;
         });
+
+        siteContentCache.set(cacheKey, contentMap);
         return contentMap;
     } catch (error) {
         console.error("Error fetching site content:", error);
@@ -772,13 +813,22 @@ export const saveSiteContent = async (key: string, section: string, content: any
             updated_at: new Date().toISOString()
         }, { onConflict: 'key' });
         if (error) throw error;
+
+        // Invalidate cache
+        siteContentCache.clear();
     } catch (error) {
         console.error("Error saving site content:", error);
         throw error;
     }
 };
 
-export const getTestimonials = async () => {
+export const getTestimonials = async (forceRefresh = false) => {
+    const now = Date.now();
+    if (!forceRefresh && testimonialsCache && (now - lastTestimonialsFetch < CACHE_DURATION)) {
+        console.log("dataService - Retornando depoimentos do cache");
+        return testimonialsCache;
+    }
+
     try {
         const { data, error } = await supabase
             .from(TABLES.TESTIMONIALS)
@@ -787,10 +837,15 @@ export const getTestimonials = async () => {
             .order('created_at', { ascending: false });
 
         if (error) throw error;
-        return (data || []).map(parseDataFromSupabase);
+        const parsed = (data || []).map(parseDataFromSupabase);
+
+        testimonialsCache = parsed;
+        lastTestimonialsFetch = now;
+
+        return parsed;
     } catch (error) {
         console.error("Error fetching testimonials:", error);
-        return [];
+        return testimonialsCache || [];
     }
 };
 
@@ -799,6 +854,10 @@ export const saveTestimonial = async (testimonial: any) => {
         const data = cleanDataForSupabase(testimonial, TABLES.TESTIMONIALS);
         const { error } = await supabase.from(TABLES.TESTIMONIALS).upsert(data, { onConflict: 'id' });
         if (error) throw error;
+
+        // Invalidate cache
+        testimonialsCache = null;
+        lastTestimonialsFetch = 0;
     } catch (error) {
         console.error("Error saving testimonial:", error);
         throw error;
