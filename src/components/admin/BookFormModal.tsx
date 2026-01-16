@@ -277,10 +277,13 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                 />
                             </div>
                             <div className="form-group-premium md:col-span-2">
-                                <label htmlFor="description" className="label-premium">Descrição / Sinopse</label>
+                                <label htmlFor="book-description" className="label-premium">Descrição / Sinopse</label>
                                 <textarea
-                                    id="description"
+                                    id="book-description"
                                     required
+                                    spellCheck="false"
+                                    autoComplete="off"
+                                    data-gramm="false"
                                     className={`input-premium h-32 resize-none ${errors.description ? 'border-red-500 bg-red-50' : ''}`}
                                     value={formData.description}
                                     onChange={e => {

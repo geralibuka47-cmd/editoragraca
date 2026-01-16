@@ -377,11 +377,15 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                                     </div>
 
                                     <div className="form-group-premium">
-                                        <label className="label-premium">
+                                        <label htmlFor="ms-description" className="label-premium">
                                             Sinopse *
                                         </label>
                                         <textarea
+                                            id="ms-description"
                                             required
+                                            spellCheck="false"
+                                            autoComplete="off"
+                                            data-gramm="false"
                                             rows={6}
                                             value={submitData.description}
                                             onChange={e => {

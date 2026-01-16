@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import BookDetailModal from './components/BookDetailModal';
+const BookDetailModal = React.lazy(() => import('./components/BookDetailModal'));
 import { ToastProvider, useToast } from './components/Toast';
 const AuthPage = React.lazy(() => import('./pages/AuthPage'));
 const CatalogPage = React.lazy(() => import('./pages/CatalogPage'));
-const HomePage = React.lazy(() => import('./pages/HomePage')); // Import HomePage
+const HomePage = React.lazy(() => import('./pages/HomePage'));
 const AboutPage = React.lazy(() => import('./pages/AboutPage'));
 const ContactPage = React.lazy(() => import('./pages/ContactPage'));
 const CheckoutPage = React.lazy(() => import('./pages/CheckoutPage'));
@@ -193,13 +193,15 @@ const App: React.FC = () => {
 
             <Footer onNavigate={handleNavigate} />
 
-            <BookDetailModal
-                book={selectedBook}
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onAddToCart={handleAddToCart}
-                user={user || undefined}
-            />
+            <React.Suspense fallback={null}>
+                <BookDetailModal
+                    book={selectedBook}
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    onAddToCart={handleAddToCart}
+                    user={user || undefined}
+                />
+            </React.Suspense>
         </div>
     );
 };
