@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, BookOpen, ArrowRight, Zap, Star, Trophy, Mail, Clock, Mic, PenTool, Users, CheckCircle, Loader2, ChevronUp } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { Book, ViewState, PodcastEpisode, BlogPost } from '../types';
 import BookCard from '../components/BookCard';
 import Countdown from '../components/Countdown';
@@ -73,7 +73,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const containerVariants = {
+    const containerVariants: Variants = {
         hidden: { opacity: 0 },
         visible: {
             opacity: 1,
@@ -83,7 +83,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
         }
     };
 
-    const itemVariants = {
+    const itemVariants: Variants = {
         hidden: { y: 20, opacity: 0 },
         visible: {
             y: 0,
