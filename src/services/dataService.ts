@@ -66,7 +66,8 @@ const cleanDataForSupabase = (data: any, table: string) => {
         'launchDate': 'launch_date',
         'photoUrl': 'photo_url', // Legacy support
         'bio': 'bio',
-        'address': 'address'
+        'address': 'address',
+        'genre': 'category'
     };
 
     const JSONFields = ['items', 'payment_methods', 'preferred_contact'];
@@ -161,7 +162,8 @@ const parseDataFromSupabase = (item: any) => {
         'author_name': 'authorName',
         'payment_info': 'paymentInfo',
         'payment_info_notes': 'paymentInfoNotes',
-        'launch_date': 'launchDate'
+        'launch_date': 'launchDate',
+        'category': 'genre'
     };
 
     Object.keys(item).forEach(key => {
