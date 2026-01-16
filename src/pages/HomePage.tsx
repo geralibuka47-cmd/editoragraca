@@ -396,20 +396,34 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
                                     <Loader2 className="w-8 h-8 text-brand-primary animate-spin" />
                                 </div>
                             ) : latestEpisode ? (
-                                <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl shadow-brand-dark/5 border border-gray-100 flex flex-col md:flex-row gap-8 items-center group hover:translate-y-[-5px] transition-all">
-                                    <div className="w-40 h-40 rounded-3xl overflow-hidden shadow-xl shrink-0">
-                                        <img src={latestEpisode.imageUrl} alt={latestEpisode.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                                    </div>
-                                    <div className="flex-1 space-y-4 text-center md:text-left">
-                                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-primary/10 rounded-full">
-                                            <div className="w-1.5 h-1.5 bg-brand-primary rounded-full animate-pulse"></div>
-                                            <span className="text-[10px] font-black text-brand-primary uppercase tracking-widest">Último Episódio</span>
+                                <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl shadow-brand-dark/5 border border-gray-100 space-y-6">
+                                    <div className="flex flex-col md:flex-row gap-8 items-center">
+                                        <div className="w-40 h-40 rounded-3xl overflow-hidden shadow-xl shrink-0">
+                                            <img src={latestEpisode.imageUrl} alt={latestEpisode.title} loading="lazy" className="w-full h-full object-cover" />
                                         </div>
-                                        <h4 className="font-black text-brand-dark text-2xl tracking-tight leading-tight group-hover:text-brand-primary transition-colors">{latestEpisode.title}</h4>
-                                        <button onClick={() => onNavigate('BLOG')} className="btn-premium !py-3 !px-6 !text-[10px] inline-flex">
-                                            Conectar & Ouvir <ArrowRight className="w-4 h-4 ml-2" />
-                                        </button>
+                                        <div className="flex-1 space-y-4 text-center md:text-left">
+                                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-primary/10 rounded-full">
+                                                <div className="w-1.5 h-1.5 bg-brand-primary rounded-full animate-pulse"></div>
+                                                <span className="text-[10px] font-black text-brand-primary uppercase tracking-widest">Último Episódio</span>
+                                            </div>
+                                            <h4 className="font-black text-brand-dark text-2xl tracking-tight leading-tight">{latestEpisode.title}</h4>
+                                            <p className="text-sm text-gray-600 line-clamp-2">{latestEpisode.description}</p>
+                                        </div>
                                     </div>
+
+                                    {/* Audio Player */}
+                                    <audio
+                                        controls
+                                        className="w-full"
+                                        preload="metadata"
+                                        style={{
+                                            height: '54px',
+                                            borderRadius: '12px'
+                                        }}
+                                    >
+                                        <source src={latestEpisode.audioUrl} type="audio/mpeg" />
+                                        O seu navegador não suporta o elemento de áudio.
+                                    </audio>
                                 </div>
                             ) : (
                                 <div className="bg-white p-10 rounded-3xl border border-dashed border-gray-200 text-center">
