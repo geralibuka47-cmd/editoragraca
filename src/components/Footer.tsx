@@ -9,7 +9,7 @@ interface FooterProps {
 
 const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
     return (
-        <footer className="bg-brand-dark text-white pt-20 pb-10">
+        <footer className="bg-brand-black text-white pt-20 pb-10">
             <div className="container mx-auto px-8 grid md:grid-cols-4 gap-12 border-b border-white/5 pb-16 mb-10">
                 <div className="space-y-6">
                     <div className="flex flex-col">
@@ -37,7 +37,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                         <li><button onClick={() => onNavigate('HOME')} className="hover:text-white transition-colors">Início</button></li>
                         <li><button onClick={() => onNavigate('CATALOG')} className="hover:text-white transition-colors">Todos os Livros</button></li>
                         <li><button onClick={() => onNavigate('ABOUT')} className="hover:text-white transition-colors">Sobre a Editora</button></li>
-                        <li><button onClick={() => onNavigate('PODCAST')} className="hover:text-white transition-colors">Podcast</button></li>
+                        <li><button onClick={() => onNavigate('BLOG')} className="hover:text-white transition-colors">Podcast</button></li>
                         <li><button onClick={() => onNavigate('BLOG')} className="hover:text-white transition-colors">Blog & Novidades</button></li>
                     </ul>
                 </div>

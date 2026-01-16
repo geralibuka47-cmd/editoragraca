@@ -63,7 +63,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
     return (
         <header className="flex flex-col w-full sticky top-0 z-50 shadow-sm">
             {/* Utility Top Bar */}
-            <div className="bg-brand-dark text-white py-2 px-4 md:px-8 flex flex-col md:flex-row justify-between items-center text-[9px] md:text-[10px] uppercase tracking-[0.1em] md:tracking-[0.2em] font-medium gap-2 md:gap-0">
+            <div className="bg-brand-black text-white py-2 px-4 md:px-8 flex flex-col md:flex-row justify-between items-center text-[9px] md:text-[10px] uppercase tracking-[0.1em] md:tracking-[0.2em] font-medium gap-2 md:gap-0">
                 <div className="flex gap-4 items-center">
                     <span className="hidden sm:inline">Envios para todo o país</span>
                     <span className="text-brand-primary">Ligue: +244 947 472 230</span>
