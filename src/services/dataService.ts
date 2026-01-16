@@ -195,23 +195,35 @@ export const getBooks = async (): Promise<Book[]> => {
 
 export const saveBook = async (book: Book) => {
     try {
+        console.log("dataService.saveBook - Iniciando limpeza de dados...");
         const bookData = cleanDataForSupabase(book, TABLES.BOOKS);
+        console.log("dataService.saveBook - Dados limpos:", bookData);
         const { id } = book;
 
         if (id && id.length > 5 && !id.startsWith('temp_')) {
+            console.log("dataService.saveBook - Executando UPDATE para id:", id);
             const { error } = await supabase
                 .from(TABLES.BOOKS)
                 .update(bookData)
                 .eq('id', id);
-            if (error) throw error;
+            if (error) {
+                console.error("dataService.saveBook - Erro no UPDATE:", error);
+                throw error;
+            }
+            console.log("dataService.saveBook - UPDATE concluído com sucesso");
         } else {
+            console.log("dataService.saveBook - Executando INSERT...");
             const { error } = await supabase
                 .from(TABLES.BOOKS)
                 .insert([bookData]);
-            if (error) throw error;
+            if (error) {
+                console.error("dataService.saveBook - Erro no INSERT:", error);
+                throw error;
+            }
+            console.log("dataService.saveBook - INSERT concluído com sucesso");
         }
     } catch (error) {
-        console.error("Erro ao salvar livro:", error);
+        console.error("Erro ao salvar livro no dataService:", error);
         throw error;
     }
 };

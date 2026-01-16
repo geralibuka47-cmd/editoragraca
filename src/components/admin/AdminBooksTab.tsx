@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { Book } from '../../types';
 import BookFormModal from './BookFormModal';
+import { saveBook, getBooks, deleteBook } from '../../services/dataService';
+import { uploadFile } from '../../services/storageService';
 
 interface AdminBooksTabProps {
     onStatsRefresh: () => void;
@@ -17,7 +19,6 @@ const AdminBooksTab: React.FC<AdminBooksTabProps> = ({ onStatsRefresh }) => {
     const fetchBooks = async () => {
         setIsLoadingBooks(true);
         try {
-            const { getBooks } = await import('../../services/dataService');
             const data = await getBooks();
             setBooks(data);
         } catch (error) {
@@ -42,10 +43,9 @@ const AdminBooksTab: React.FC<AdminBooksTabProps> = ({ onStatsRefresh }) => {
     };
 
     const handleSaveBook = async (bookData: any, coverFile: File | null, digitalFile: File | null) => {
+        console.log("Iniciando salvamento do livro:", bookData.title);
         setIsSavingBook(true);
         try {
-            const { saveBook } = await import('../../services/dataService');
-            const { uploadFile } = await import('../../services/storageService');
 
             // Handle file uploads if present
             let finalCoverUrl = bookData.coverUrl;
@@ -69,7 +69,9 @@ const AdminBooksTab: React.FC<AdminBooksTabProps> = ({ onStatsRefresh }) => {
                 launchDate: bookData.launchDate || undefined
             };
 
+            console.log("Dados preparados para salvar:", dataToSave);
             await saveBook(dataToSave);
+            console.log("Resposta do saveBook recebida");
 
             alert('Livro guardado com sucesso!');
             setIsBookModalOpen(false);
@@ -87,7 +89,6 @@ const AdminBooksTab: React.FC<AdminBooksTabProps> = ({ onStatsRefresh }) => {
     const handleDeleteBook = async (id: string) => {
         if (!confirm('Tem a certeza que deseja eliminar este livro?')) return;
         try {
-            const { deleteBook } = await import('../../services/dataService');
             await deleteBook(id);
             alert('Livro eliminado com sucesso.');
             fetchBooks();

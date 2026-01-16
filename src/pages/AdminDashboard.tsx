@@ -11,6 +11,7 @@ import AdminBlogTab from '../components/admin/AdminBlogTab';
 import AdminTeamTab from '../components/admin/AdminTeamTab';
 import AdminServicesTab from '../components/admin/AdminServicesTab';
 import AdminContentTab from '../components/admin/AdminContentTab';
+import { getAdminStats, getBlogPosts } from '../services/dataService';
 
 interface AdminDashboardProps {
     user: User | null;
@@ -31,7 +32,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
     const fetchData = async () => {
         setIsLoadingData(true);
         try {
-            const { getAdminStats, getBlogPosts } = await import('../services/dataService');
             const [statsData, postsData] = await Promise.all([
                 getAdminStats(),
                 getBlogPosts()
