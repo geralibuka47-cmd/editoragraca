@@ -316,7 +316,7 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
             </section>
 
             {/* Book Grid Section */}
-            <section className="py-20 md:py-32">
+            <section className="py-20 md:py-32 optimize-render">
                 <div className="container mx-auto px-4 md:px-8">
                     <div className="flex flex-col md:flex-row justify-between items-center mb-16 gap-6">
                         <div className="space-y-2 text-center md:text-left">

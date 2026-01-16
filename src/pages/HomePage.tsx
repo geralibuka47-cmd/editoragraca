@@ -263,7 +263,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px" }}
                 variants={containerVariants}
-                className="py-12 md:py-32 bg-white relative overflow-hidden"
+                className="py-12 md:py-32 bg-white relative overflow-hidden optimize-render"
             >
                 {/* Decorative blob */}
                 <div className="absolute -left-20 top-40 w-80 h-80 bg-brand-primary/5 rounded-full blur-[80px]"></div>
@@ -320,7 +320,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px" }}
                 variants={containerVariants}
-                className="py-12 md:py-32 bg-brand-light relative"
+                className="py-12 md:py-32 bg-brand-light relative optimize-render"
             >
                 <div className="container mx-auto px-4 md:px-8">
                     <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-16 md:mb-24 gap-8 text-center md:text-left">
@@ -377,7 +377,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={containerVariants}
-                className="py-24 bg-gray-50 overflow-hidden"
+                className="py-24 bg-gray-50 overflow-hidden optimize-render"
             >
                 <div className="container mx-auto px-4 md:px-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 md:gap-24">
@@ -486,7 +486,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
                     whileInView="visible"
                     viewport={{ once: true }}
                     variants={containerVariants}
-                    className="py-24 md:py-40 bg-white overflow-hidden"
+                    className="py-24 md:py-40 bg-white overflow-hidden optimize-render"
                 >
                     <div className="container mx-auto px-4 md:px-8">
                         <motion.div variants={itemVariants} className="text-center mb-24">

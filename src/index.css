@@ -19,8 +19,29 @@
 }
 
 @layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
     body {
-        @apply font-sans bg-brand-light text-brand-dark;
+        @apply font-sans bg-brand-light text-brand-dark antialiased;
+    }
+
+    ::selection {
+        @apply bg-brand-primary/30 text-brand-dark;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+        @apply bg-brand-light;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        @apply bg-gray-200 border-4 border-brand-light rounded-full hover:bg-brand-primary transition-colors;
     }
 
     h1,
@@ -57,6 +78,12 @@
 
     .section-bg-dark {
         @apply bg-brand-dark text-white py-16;
+    }
+
+    /* Performance optimization for heavy sections */
+    .optimize-render {
+        content-visibility: auto;
+        contain-intrinsic-size: 1px 500px;
     }
 }
 

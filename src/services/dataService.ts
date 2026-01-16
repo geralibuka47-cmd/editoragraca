@@ -187,7 +187,18 @@ const parseDataFromSupabase = (item: any) => {
 };
 
 // Books
-export const getBooks = async (): Promise<Book[]> => {
+// Books Cache
+let booksCache: Book[] | null = null;
+let lastFetchTime = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+export const getBooks = async (forceRefresh = false): Promise<Book[]> => {
+    const now = Date.now();
+    if (!forceRefresh && booksCache && (now - lastFetchTime < CACHE_DURATION)) {
+        console.log("dataService - Retornando livros do cache");
+        return booksCache;
+    }
+
     try {
         const { data, error } = await supabase
             .from(TABLES.BOOKS)
@@ -195,10 +206,15 @@ export const getBooks = async (): Promise<Book[]> => {
             .order('created_at', { ascending: false });
 
         if (error) throw error;
-        return (data || []).map(parseDataFromSupabase) as Book[];
+        const parsed = (data || []).map(parseDataFromSupabase) as Book[];
+
+        booksCache = parsed;
+        lastFetchTime = now;
+
+        return parsed;
     } catch (error) {
         console.error("Erro ao procurar livros:", error);
-        return [];
+        return booksCache || []; // Return cache even if expired if fetch fails
     }
 };
 
@@ -236,6 +252,10 @@ export const saveBook = async (book: Book) => {
             }
             console.log("dataService.saveBook - INSERT concluído com sucesso");
         }
+
+        // Invalidate cache
+        booksCache = null;
+        lastFetchTime = 0;
     } catch (error) {
         console.error("Erro interno no saveBook:", error);
         throw error;
