@@ -51,12 +51,26 @@ const AdminBooksTab: React.FC<AdminBooksTabProps> = ({ onStatsRefresh }) => {
             let finalCoverUrl = bookData.coverUrl;
             let finalDigitalUrl = bookData.digitalFileUrl;
 
+            // Sanitize numbers (remove dots/spaces that might be thousand separators)
+            const sanitizeNumber = (val: any) => {
+                if (typeof val === 'string') {
+                    // Remove dots and spaces, then replace comma with dot for conversion if needed
+                    return val.replace(/\s/g, '').replace(/\./g, '').replace(',', '.');
+                }
+                return val;
+            };
+
+            const sanitizedPrice = sanitizeNumber(bookData.price);
+            const sanitizedStock = sanitizeNumber(bookData.stock);
+
             if (coverFile) {
+                console.log("Fazendo upload da capa...");
                 const { fileUrl } = await uploadFile(coverFile);
                 finalCoverUrl = fileUrl;
             }
 
             if (digitalFile) {
+                console.log("Fazendo upload do arquivo digital...");
                 const { fileUrl } = await uploadFile(digitalFile);
                 finalDigitalUrl = fileUrl;
             }
@@ -64,12 +78,14 @@ const AdminBooksTab: React.FC<AdminBooksTabProps> = ({ onStatsRefresh }) => {
             // Clean up empty optional fields
             const dataToSave = {
                 ...bookData,
+                price: Number(sanitizedPrice) || 0,
+                stock: Number(sanitizedStock) || 0,
                 coverUrl: finalCoverUrl,
                 digitalFileUrl: finalDigitalUrl,
                 launchDate: bookData.launchDate || undefined
             };
 
-            console.log("Dados preparados para salvar:", dataToSave);
+            console.log("Dados finais preparados para o Supabase:", dataToSave);
             await saveBook(dataToSave);
             console.log("Resposta do saveBook recebida");
 

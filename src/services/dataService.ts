@@ -28,58 +28,64 @@ const cleanDataForSupabase = (data: any, table: string) => {
     // Mapping frontend CamelCase to Supabase snake_case
     const mapping: Record<string, string> = {
         'coverUrl': 'cover_url',
-        'isBestseller': 'is_bestseller',
-        'isNew': 'is_new',
-        'authorId': 'author_id',
         'digitalFileUrl': 'digital_file_url',
-        'whatsappNumber': 'whatsapp_number',
-        'avatarUrl': 'photo_url',
-        'customerId': 'customer_id',
+        'authorId': 'author_id',
+        'createdAt': 'created_at',
+        'updatedAt': 'updated_at',
+        'publishedAt': 'published_at',
+        'userId': 'user_id',
+        'orderId': 'order_id',
+        'bookId': 'book_id',
         'customerName': 'customer_name',
         'customerEmail': 'customer_email',
-        'paymentMethod': 'payment_method',
-        'paymentMethods': 'payment_methods',
-        'preferredContact': 'preferred_contact',
+        'customerId': 'customer_id',
+        'paymentNotificationId': 'payment_notification_id',
         'totalAmount': 'total_amount',
         'readerId': 'reader_id',
         'readerName': 'reader_name',
         'readerEmail': 'reader_email',
-        'orderId': 'order_id',
-        'paymentNotificationId': 'payment_notification_id',
-        'uploadedAt': 'uploaded_at',
-        'confirmedBy': 'confirmed_by',
-        'confirmedAt': 'confirmed_at',
+        'userName': 'user_name',
+        'postId': 'post_id',
+        'imageUrl': 'image_url',
+        'likesCount': 'likes_count',
+        'commentsCount': 'comments_count',
+        'sharesCount': 'shares_count',
+        'authorName': 'author_name',
         'submittedDate': 'submitted_date',
         'reviewedDate': 'reviewed_date',
-        'userName': 'user_name',
-        'bookId': 'book_id',
-        'userId': 'user_id',
-        'displayOrder': 'display_order',
-        'imageUrl': 'image_url',
-        'postId': 'post_id',
-        'createdAt': 'created_at',
         'fileUrl': 'file_url',
         'fileName': 'file_name',
-        'authorName': 'author_name',
-        'paymentInfo': 'payment_info',
-        'paymentInfoNotes': 'payment_info_notes',
+        'isRead': 'is_read',
+        'isNew': 'is_new',
+        'isBestseller': 'is_bestseller',
         'launchDate': 'launch_date',
+        'bankName': 'bank_name',
+        'accountNumber': 'account_number',
+        'isPrimary': 'is_primary',
+        'paymentMethods': 'payment_methods',
+        'whatsappNumber': 'whatsapp_number',
+        'preferredContact': 'preferred_contact',
+        'avatarUrl': 'avatar_url',
         'photoUrl': 'photo_url', // Legacy support
         'bio': 'bio',
-        'address': 'address',
-        'genre': 'category'
+        'address': 'address'
     };
 
     const JSONFields = ['items', 'payment_methods', 'preferred_contact'];
     const ArrayFields = ['details'];
+    const MappingTables = [TABLES.BOOKS];
     const NumericFields = ['price', 'stock', 'pages', 'display_order', 'total_amount', 'rating', 'total'];
 
     Object.keys(data).forEach(key => {
+        let value = data[key];
+        let dbKey = mapping[key] || key;
+
+        // Custom mapping for specific tables (e.g. books)
+        if (MappingTables.includes(table)) {
+            if (key === 'genre') dbKey = 'category';
+        }
         // Skip internal or temporary id fields
         if (key.startsWith('$')) return;
-
-        let value = data[key];
-        const dbKey = mapping[key] || key;
 
         // Skip id if it's temporary (starts with temp_)
         if (key === 'id' && (typeof value === 'string' && value.startsWith('temp_'))) return;
@@ -194,38 +200,50 @@ export const getBooks = async (): Promise<Book[]> => {
 };
 
 export const saveBook = async (book: Book) => {
-    try {
-        console.log("dataService.saveBook - Iniciando limpeza de dados...");
-        const bookData = cleanDataForSupabase(book, TABLES.BOOKS);
-        console.log("dataService.saveBook - Dados limpos:", bookData);
-        const { id } = book;
+    const TIMEOUT_MS = 15000; // 15 second timeout
 
-        if (id && id.length > 5 && !id.startsWith('temp_')) {
-            console.log("dataService.saveBook - Executando UPDATE para id:", id);
-            const { error } = await supabase
-                .from(TABLES.BOOKS)
-                .update(bookData)
-                .eq('id', id);
-            if (error) {
-                console.error("dataService.saveBook - Erro no UPDATE:", error);
-                throw error;
+    const savePromise = (async () => {
+        try {
+            console.log("dataService.saveBook - Iniciando limpeza de dados...");
+            const bookData = cleanDataForSupabase(book, TABLES.BOOKS);
+
+            // Critical: Remove ID from payload to avoid Supabase errors on update/insert
+            const { id, ...payload } = bookData;
+            console.log("dataService.saveBook - Payload (sem ID):", payload);
+
+            if (id && id.length > 5 && !id.startsWith('temp_')) {
+                console.log("dataService.saveBook - Executando UPDATE para id:", id);
+                const { error } = await supabase
+                    .from(TABLES.BOOKS)
+                    .update(payload)
+                    .eq('id', id);
+                if (error) {
+                    console.error("dataService.saveBook - Erro no UPDATE:", error);
+                    throw error;
+                }
+                console.log("dataService.saveBook - UPDATE concluído com sucesso");
+            } else {
+                console.log("dataService.saveBook - Executando INSERT...");
+                const { error } = await supabase
+                    .from(TABLES.BOOKS)
+                    .insert([payload]);
+                if (error) {
+                    console.error("dataService.saveBook - Erro no INSERT:", error);
+                    throw error;
+                }
+                console.log("dataService.saveBook - INSERT concluído com sucesso");
             }
-            console.log("dataService.saveBook - UPDATE concluído com sucesso");
-        } else {
-            console.log("dataService.saveBook - Executando INSERT...");
-            const { error } = await supabase
-                .from(TABLES.BOOKS)
-                .insert([bookData]);
-            if (error) {
-                console.error("dataService.saveBook - Erro no INSERT:", error);
-                throw error;
-            }
-            console.log("dataService.saveBook - INSERT concluído com sucesso");
+        } catch (error) {
+            console.error("Erro interno no saveBook:", error);
+            throw error;
         }
-    } catch (error) {
-        console.error("Erro ao salvar livro no dataService:", error);
-        throw error;
-    }
+    })();
+
+    const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Tempo de espera excedido. O servidor demorou muito a responder.")), TIMEOUT_MS)
+    );
+
+    return Promise.race([savePromise, timeoutPromise]);
 };
 
 export const deleteBook = async (id: string) => {
