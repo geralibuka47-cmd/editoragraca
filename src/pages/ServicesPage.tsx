@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { BookOpen, Pencil, Palette, Shield, Megaphone, Printer, Check, ArrowRight, Loader2, Zap, Award, Search, FileText, CloudUpload, Sparkles, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { ViewState, EditorialService } from '../types';
 import { getEditorialServices, getSiteContent } from '../services/dataService';
 import { ServiceCardSkeleton } from '../components/SkeletonLoader';
 
-interface ServicesPageProps {
-    onNavigate: (view: ViewState) => void;
-}
-
-const ServicesPage: React.FC<ServicesPageProps> = ({ onNavigate }) => {
+const ServicesPage: React.FC = () => {
+    const navigate = useNavigate();
     const [services, setServices] = useState<EditorialService[]>([]);
     const [siteContent, setSiteContent] = useState<any>({});
     const [isLoading, setIsLoading] = useState(true);
@@ -154,7 +152,7 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ onNavigate }) => {
                         className="max-w-4xl"
                     >
                         <motion.div variants={itemVariants} className="flex items-center gap-2 text-sm text-brand-primary uppercase tracking-[0.3em] font-black mb-8">
-                            <button onClick={() => onNavigate('HOME')} className="hover:text-white transition-colors">Início</button>
+                            <button onClick={() => navigate('/')} className="hover:text-white transition-colors">Início</button>
                             <span>/</span>
                             <span className="text-white">Serviços</span>
                         </motion.div>
@@ -170,7 +168,7 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ onNavigate }) => {
 
                         <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-6">
                             <button
-                                onClick={() => onNavigate('CONTACT')}
+                                onClick={() => navigate('/contacto')}
                                 className="bg-brand-primary text-white px-12 py-6 rounded-2xl font-black uppercase tracking-[0.2em] hover:bg-white hover:text-brand-dark transition-all duration-300 shadow-2xl flex items-center gap-4 group w-full sm:w-auto justify-center"
                             >
                                 Solicitar Orçamento
@@ -271,7 +269,7 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ onNavigate }) => {
                                                 </div>
 
                                                 <button
-                                                    onClick={() => onNavigate('CONTACT')}
+                                                    onClick={() => navigate('/contacto')}
                                                     className="w-full px-10 py-6 bg-brand-dark text-white rounded-2xl font-black hover:bg-brand-primary transition-all duration-300 uppercase text-xs tracking-[0.3em] shadow-xl hover:-translate-y-1 active:translate-y-0"
                                                 >
                                                     Solicitar Agora
@@ -355,7 +353,7 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ onNavigate }) => {
                         </p>
                         <div className="flex flex-col sm:flex-row justify-center gap-6">
                             <button
-                                onClick={() => onNavigate('CONTACT')}
+                                onClick={() => navigate('/contacto')}
                                 className="px-16 py-8 bg-brand-primary text-white font-black rounded-[2rem] hover:bg-white hover:text-brand-dark transition-all duration-500 text-sm uppercase tracking-[0.3em] shadow-[0_20px_50px_rgba(196,160,82,0.3)] hover:scale-105 active:scale-95 group"
                             >
                                 <span className="flex items-center gap-4">

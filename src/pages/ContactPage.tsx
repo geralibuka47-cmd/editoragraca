@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MapPin, Phone, Mail, Clock, Send, CheckCircle, Facebook, Instagram, Twitter, Users, X, Loader2 } from 'lucide-react';
 import { ViewState } from '../types';
 import { getTeamMembers, getSiteContent } from '../services/dataService';
@@ -13,11 +14,8 @@ interface TeamMember {
     order?: number;
 }
 
-interface ContactPageProps {
-    onNavigate: (view: ViewState) => void;
-}
-
-const ContactPage: React.FC<ContactPageProps> = ({ onNavigate }) => {
+const ContactPage: React.FC = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -174,7 +172,7 @@ const ContactPage: React.FC<ContactPageProps> = ({ onNavigate }) => {
             <section className="bg-brand-dark text-white py-12 md:py-16">
                 <div className="container mx-auto px-4 md:px-8">
                     <div className="flex items-center justify-center md:justify-start gap-2 text-[10px] md:text-sm text-brand-primary uppercase tracking-widest font-bold mb-6">
-                        <button onClick={() => onNavigate('HOME')} className="hover:underline">Início</button>
+                        <button onClick={() => navigate('/')} className="hover:underline">Início</button>
                         <span>/</span>
                         <span>Contacto</span>
                     </div>

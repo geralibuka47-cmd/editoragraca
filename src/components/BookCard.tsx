@@ -39,6 +39,11 @@ const BookCard: React.FC<BookCardProps> = ({ book, onAddToCart, onToggleWishlist
                         Digital
                     </span>
                 )}
+                {book.price === 0 && (
+                    <span className="bg-green-500 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">
+                        Grátis
+                    </span>
+                )}
             </div>
 
             {/* Image Area */}
@@ -47,11 +52,15 @@ const BookCard: React.FC<BookCardProps> = ({ book, onAddToCart, onToggleWishlist
                     <img
                         src={book.coverUrl}
                         alt={book.title}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 cursor-pointer"
                         loading="lazy"
+                        onClick={() => onViewDetails(book)}
                     />
                 ) : (
-                    <div className="w-full h-full p-8 flex items-center justify-center">
+                    <div
+                        className="w-full h-full p-8 flex items-center justify-center cursor-pointer"
+                        onClick={() => onViewDetails(book)}
+                    >
                         <div className="w-full h-full bg-white/40 border border-brand-primary/10 rounded shadow-md transform group-hover:rotate-3 transition-transform duration-500 flex items-center justify-center">
                             <div className="text-center p-4">
                                 <p className="font-serif font-bold text-brand-dark group-hover:text-brand-primary transition-colors leading-tight">{book.title}</p>
@@ -90,7 +99,10 @@ const BookCard: React.FC<BookCardProps> = ({ book, onAddToCart, onToggleWishlist
             {/* Content Area */}
             <div className="p-6 space-y-2">
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{book.genre}</p>
-                <h3 className="font-serif text-lg font-bold text-brand-dark line-clamp-1 group-hover:text-brand-primary transition-colors">
+                <h3
+                    className="font-serif text-lg font-bold text-brand-dark line-clamp-1 group-hover:text-brand-primary transition-colors cursor-pointer"
+                    onClick={() => onViewDetails(book)}
+                >
                     {book.title}
                 </h3>
                 <p className="text-sm text-gray-500 font-medium italic">{book.author}</p>
@@ -98,14 +110,25 @@ const BookCard: React.FC<BookCardProps> = ({ book, onAddToCart, onToggleWishlist
                 <div className="flex justify-between items-center pt-4 border-t border-gray-50 mt-4">
                     <div className="flex flex-col">
                         <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Preço</span>
-                        <span className="text-xl font-black text-brand-dark">{book.price.toLocaleString()} Kz</span>
+                        <span className="text-xl font-black text-brand-dark">
+                            {book.price === 0 ? 'GRATUITO' : `${book.price.toLocaleString()} Kz`}
+                        </span>
                     </div>
-                    <button
-                        onClick={() => onAddToCart(book)}
-                        className="text-brand-primary font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:gap-3 transition-all"
-                    >
-                        Comprar <ArrowRight className="w-3 h-3" />
-                    </button>
+                    {book.price === 0 && book.format === 'digital' ? (
+                        <button
+                            onClick={() => onViewDetails(book)}
+                            className="text-green-600 font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:gap-3 transition-all"
+                        >
+                            Baixar <ArrowRight className="w-3 h-3" />
+                        </button>
+                    ) : (
+                        <button
+                            onClick={() => onAddToCart(book)}
+                            className="text-brand-primary font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:gap-3 transition-all"
+                        >
+                            Comprar <ArrowRight className="w-3 h-3" />
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, SlidersHorizontal, X, ArrowRight, Filter, BookOpen, Loader2, Sparkles, Star } from 'lucide-react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { Book, ViewState } from '../types';
@@ -11,7 +12,6 @@ interface CatalogPageProps {
     onAddToCart: (book: Book) => void;
     onToggleWishlist: (book: Book) => void;
     onViewDetails: (book: Book) => void;
-    onNavigate: (view: ViewState) => void;
 }
 
 const CatalogPage: React.FC<CatalogPageProps> = ({
@@ -19,9 +19,9 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
     loading = false,
     onAddToCart,
     onToggleWishlist,
-    onViewDetails,
-    onNavigate
+    onViewDetails
 }) => {
+    const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedGenre, setSelectedGenre] = useState('Todos');
     const [sortBy, setSortBy] = useState('title-asc');
@@ -139,7 +139,7 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
                         className="max-w-3xl text-center md:text-left"
                     >
                         <div className="flex items-center justify-center md:justify-start gap-3 text-[10px] md:text-xs text-brand-primary uppercase tracking-[0.3em] font-black mb-8">
-                            <button onClick={() => onNavigate('HOME')} className="hover:text-white transition-colors">Início</button>
+                            <button onClick={() => navigate('/')} className="hover:text-white transition-colors">Início</button>
                             <span className="text-gray-600">/</span>
                             <span className="text-white">Catálogo</span>
                         </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Users, ShoppingCart, BookOpen, FileText, Layout, User as UserIcon, Type } from 'lucide-react';
 import { ViewState, User, BlogPost } from '../types';
 
@@ -15,10 +16,10 @@ import { getAdminStats, getBlogPosts } from '../services/dataService';
 
 interface AdminDashboardProps {
     user: User | null;
-    onNavigate: (view: ViewState) => void;
 }
 
-const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => {
+const AdminDashboard: React.FC<AdminDashboardProps> = ({ user }) => {
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<'stats' | 'books' | 'users' | 'manuscripts' | 'orders' | 'blog' | 'team' | 'services' | 'content'>('stats');
     const [stats, setStats] = useState({
         totalBooks: 0,
@@ -60,7 +61,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => 
                     <h2 className="text-3xl font-black text-brand-dark mb-4">Acesso Restrito</h2>
                     <p className="text-gray-600 mb-8">Esta área é exclusiva para administradores.</p>
                     <button
-                        onClick={() => onNavigate('HOME')}
+                        onClick={() => navigate('/')}
                         title="Voltar para a página inicial"
                         aria-label="Voltar para a página inicial"
                         className="btn-premium w-full justify-center"

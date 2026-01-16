@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ShoppingCart, Trash2, Plus, Minus, CreditCard, CheckCircle, ArrowLeft, Loader2 } from 'lucide-react';
 import { ViewState, CartItem } from '../types';
 
 interface CheckoutPageProps {
     cart: CartItem[];
     onUpdateQuantity: (bookId: string, newQuantity: number) => void;
-    onRemoveItem: (bookId: string) => void;
-    onNavigate: (view: ViewState) => void;
+    onRemoveItem: (id: string) => void;
 }
 
-const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onRemoveItem, onNavigate }) => {
+const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onRemoveItem }) => {
+    const navigate = useNavigate();
     const [step, setStep] = useState<'cart' | 'details' | 'success'>('cart');
     const [customerInfo, setCustomerInfo] = useState({
         name: '',
@@ -91,7 +92,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
             <div className="min-h-screen bg-brand-light py-8 md:py-16">
                 <div className="container mx-auto px-4 md:px-8">
                     <button
-                        onClick={() => onNavigate('HOME')}
+                        onClick={() => navigate('/')}
                         className="flex items-center gap-2 text-brand-dark hover:text-brand-primary transition-colors mb-6 md:mb-8 font-bold text-sm"
                     >
                         <ArrowLeft className="w-5 h-5" />
@@ -107,7 +108,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
                             <ShoppingCart className="w-20 h-20 text-gray-300 mx-auto mb-6" />
                             <h2 className="text-2xl font-bold text-brand-dark mb-4">Carrinho Vazio</h2>
                             <p className="text-gray-600 mb-8">Adicione livros ao carrinho para finalizar a compra.</p>
-                            <button onClick={() => onNavigate('CATALOG')} className="btn-premium">
+                            <button onClick={() => navigate('/livros')} className="btn-premium">
                                 Explorar Catálogo
                             </button>
                         </div>
@@ -401,11 +402,11 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <button onClick={() => onNavigate('HOME')} className="btn-premium py-4">
+                        <button onClick={() => navigate('/')} className="btn-premium py-4">
                             Voltar ao Início
                         </button>
                         <button
-                            onClick={() => onNavigate('CATALOG')}
+                            onClick={() => navigate('/livros')}
                             className="px-8 py-4 border-2 border-brand-dark text-brand-dark font-bold rounded-lg hover:bg-brand-dark hover:text-white transition-all uppercase text-xs tracking-wider"
                         >
                             Ver Catálogo

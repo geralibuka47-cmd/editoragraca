@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { BookOpen, Heart, Award, Users, TrendingUp, MapPin, Mail, Phone, Loader2, Sparkles, Target, Zap, ArrowRight, Quote, Star } from 'lucide-react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { ViewState } from '../types';
 import { getSiteContent } from '../services/dataService';
 
-interface AboutPageProps {
-    onNavigate: (view: ViewState) => void;
-}
-
-const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
+const AboutPage: React.FC = () => {
+    const navigate = useNavigate();
     const [siteContent, setSiteContent] = useState<any>({});
     const [isLoading, setIsLoading] = useState(true);
 
@@ -436,14 +434,14 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                         </p>
                         <div className="flex flex-col sm:flex-row gap-6 justify-center">
                             <button
-                                onClick={() => onNavigate('CONTACT')}
+                                onClick={() => navigate('/contacto')}
                                 className="px-12 py-6 bg-brand-primary text-white font-black rounded-2xl hover:scale-105 active:scale-95 transition-all uppercase tracking-widest text-xs shadow-2xl shadow-brand-primary/30"
                             >
                                 Iniciar Projecto
                                 <ArrowRight className="w-5 h-5 inline-block ml-3" />
                             </button>
                             <button
-                                onClick={() => onNavigate('SERVICES')}
+                                onClick={() => navigate('/servicos')}
                                 className="px-12 py-6 bg-brand-dark text-white font-black rounded-2xl hover:scale-105 active:scale-95 transition-all uppercase tracking-widest text-xs shadow-2xl shadow-brand-dark/30"
                             >
                                 Ver Nossos Serviços

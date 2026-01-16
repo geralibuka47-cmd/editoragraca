@@ -52,12 +52,12 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
     };
 
     const navLinks = [
-        { name: 'Início', view: 'HOME' },
-        { name: 'Catálogo', view: 'CATALOG' },
-        { name: 'Blog', view: 'BLOG' },
-        { name: 'Serviços', view: 'SERVICES' },
-        { name: 'Sobre Nós', view: 'ABOUT' },
-        { name: 'Contacto', view: 'CONTACT' },
+        { name: 'Início', path: '/' },
+        { name: 'Catálogo', path: '/livros' },
+        { name: 'Blog', path: '/blog' },
+        { name: 'Serviços', path: '/servicos' },
+        { name: 'Sobre Nós', path: '/sobre' },
+        { name: 'Contacto', path: '/contacto' },
     ];
 
     return (
@@ -228,10 +228,13 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
             <nav className="hidden md:flex bg-white py-4 px-8 justify-center border-b border-gray-50">
                 <ul className="flex gap-12 font-bold text-[11px] uppercase tracking-[0.2em] text-gray-500">
                     {navLinks.map((link) => (
-                        <li key={link.view}>
+                        <li key={link.path}>
                             <button
-                                onClick={() => onNavigate(link.view as any)}
-                                className={`hover:text-brand-primary transition-colors border-b pb-1 ${currentView === link.view ? 'text-brand-primary border-brand-primary' : 'border-transparent'}`}
+                                onClick={() => onNavigate(link.path)}
+                                className={`hover:text-brand-primary transition-colors border-b pb-1 ${(link.path === '/' && currentView === '/') || (link.path !== '/' && currentView.startsWith(link.path))
+                                        ? 'text-brand-primary border-brand-primary'
+                                        : 'border-transparent'
+                                    }`}
                             >
                                 {link.name}
                             </button>
@@ -245,13 +248,16 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                 <div className="md:hidden bg-white border-b border-gray-100 animate-in slide-in-from-top duration-300">
                     <ul className="flex flex-col py-4">
                         {navLinks.map((link) => (
-                            <li key={link.view}>
+                            <li key={link.path}>
                                 <button
                                     onClick={() => {
-                                        onNavigate(link.view as any);
+                                        onNavigate(link.path);
                                         setIsMenuOpen(false);
                                     }}
-                                    className={`w-full text-left px-8 py-3 text-[11px] font-bold uppercase tracking-[0.2em] ${currentView === link.view ? 'text-brand-primary bg-brand-light' : 'text-gray-500 hover:bg-gray-50'}`}
+                                    className={`w-full text-left px-8 py-3 text-[11px] font-bold uppercase tracking-[0.2em] ${(link.path === '/' && currentView === '/') || (link.path !== '/' && currentView.startsWith(link.path))
+                                            ? 'text-brand-primary bg-brand-light'
+                                            : 'text-gray-500 hover:bg-gray-50'
+                                        }`}
                                 >
                                     {link.name}
                                 </button>

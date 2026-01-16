@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FileText, Upload, Eye, CheckCircle, Clock, XCircle, User as UserIcon, Loader2, Save } from 'lucide-react';
 import { ViewState, User } from '../types';
 
 interface AuthorDashboardProps {
     user: User | null;
-    onNavigate: (view: ViewState) => void;
 }
 
-const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) => {
+const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<'manuscripts' | 'submit' | 'royalties' | 'banking'>('manuscripts');
     const [bankAccounts, setBankAccounts] = useState<import('../types').BankInfo[]>(user?.paymentMethods || []);
     const [whatsapp, setWhatsapp] = useState(user?.whatsappNumber || '');
@@ -179,7 +180,7 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user, onNavigate }) =
                     <h2 className="text-3xl font-black text-brand-dark mb-4">Área para Autores</h2>
                     <p className="text-gray-600 mb-8">Esta área é exclusiva para autores registados.</p>
                     <button
-                        onClick={() => onNavigate('CONTACT')}
+                        onClick={() => navigate('/contacto')}
                         className="btn-premium w-full justify-center"
                     >
                         Tornar-se Autor

@@ -201,10 +201,14 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 export const getBooks = async (forceRefresh = false): Promise<Book[]> => {
     const now = Date.now();
+    // Check if cache exists and is valid
     if (!forceRefresh && booksCache && (now - lastBooksFetch < CACHE_DURATION)) {
-        console.log("dataService - Retornando livros do cache");
+        // console.log("dataService - Retornando livros do cache");
         return booksCache;
     }
+
+    // Double check local storage for backup if memory cache is empty?
+    // For now, we rely on Supabase fetch.
 
     try {
         const { data, error } = await supabase
@@ -507,7 +511,7 @@ export const updateManuscriptStatus = async (id: string, status: string, feedbac
 export const getBlogPosts = async (forceRefresh = false): Promise<any[]> => {
     const now = Date.now();
     if (!forceRefresh && blogPostsCache && (now - lastBlogFetch < CACHE_DURATION)) {
-        console.log("dataService - Retornando posts do cache");
+        // console.log("dataService - Retornando posts do cache");
         return blogPostsCache;
     }
 

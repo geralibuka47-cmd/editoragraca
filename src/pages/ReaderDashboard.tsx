@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Book as BookIcon, Heart, Clock, Settings, Download, User as UserIcon, CheckCircle, CreditCard } from 'lucide-react';
 import { ViewState, User, Book } from '../types';
 
 interface ReaderDashboardProps {
     user: User | null;
-    onNavigate: (view: ViewState) => void;
 }
 
-const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) => {
+const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user }) => {
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<'library' | 'wishlist' | 'history' | 'settings' | 'payments'>('library');
     const [notifications, setNotifications] = useState<import('../types').PaymentNotification[]>([]);
     const [isUploading, setIsUploading] = useState<string | null>(null);
@@ -107,7 +108,7 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) =
                     <h2 className="text-3xl font-black text-brand-dark mb-4">Área Restrita</h2>
                     <p className="text-gray-600 mb-8">Faça login para aceder ao seu painel de leitor.</p>
                     <button
-                        onClick={() => onNavigate('AUTH')}
+                        onClick={() => navigate('/entrar')}
                         className="btn-premium w-full justify-center"
                     >
                         Fazer Login
@@ -220,7 +221,7 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) =
                                     <BookIcon className="w-20 h-20 text-gray-300 mx-auto mb-6" />
                                     <h3 className="text-2xl font-bold text-brand-dark mb-4">Nenhum Livro Digital</h3>
                                     <p className="text-gray-600 mb-8">Compre livros digitais para ter acesso ao download!</p>
-                                    <button onClick={() => onNavigate('CATALOG')} className="btn-premium">
+                                    <button onClick={() => navigate('/catalogo')} className="btn-premium">
                                         Ver Catálogo
                                     </button>
                                 </div>
@@ -261,7 +262,7 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) =
                                     <Heart className="w-20 h-20 text-gray-300 mx-auto mb-6" />
                                     <h3 className="text-2xl font-bold text-brand-dark mb-4">Lista Vazia</h3>
                                     <p className="text-gray-600 mb-8">Adicione livros à sua lista de desejos!</p>
-                                    <button onClick={() => onNavigate('CATALOG')} className="btn-premium">
+                                    <button onClick={() => navigate('/catalogo')} className="btn-premium">
                                         Explorar Livros
                                     </button>
                                 </div>
@@ -430,7 +431,7 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user, onNavigate }) =
                                         <CreditCard className="w-20 h-20 text-gray-300 mx-auto mb-6" />
                                         <h3 className="text-2xl font-bold text-brand-dark mb-4">Sem Pagamentos Pendentes</h3>
                                         <p className="text-gray-600 mb-8">As suas compras aparecerão aqui para acompanhamento.</p>
-                                        <button onClick={() => onNavigate('CATALOG')} className="btn-premium">
+                                        <button onClick={() => navigate('/catalogo')} className="btn-premium">
                                             Ir às Compras
                                         </button>
                                     </div>

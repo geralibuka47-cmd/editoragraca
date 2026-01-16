@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { login, signUp } from '../services/authService';
 import { User, Mail, Lock, ArrowRight, BookOpen, Check, Loader2 } from 'lucide-react';
 
 interface AuthPageProps {
-    onSuccess: (user: any) => void;
-    onBack: () => void;
+    onLogin: () => void;
 }
 
-const AuthPage: React.FC<AuthPageProps> = ({ onSuccess, onBack }) => {
+const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
+    const navigate = useNavigate();
     const [isLogin, setIsLogin] = useState(true);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -36,11 +37,13 @@ const AuthPage: React.FC<AuthPageProps> = ({ onSuccess, onBack }) => {
 
         try {
             if (isLogin) {
-                const user = await login(cleanEmail, password);
-                onSuccess(user);
+                await login(cleanEmail, password);
+                onLogin();
+                navigate('/');
             } else {
-                const user = await signUp(cleanEmail, password, cleanName);
-                onSuccess(user);
+                await signUp(cleanEmail, password, cleanName);
+                onLogin();
+                navigate('/');
             }
         } catch (err: any) {
             console.error("Auth error:", err);
@@ -54,7 +57,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onSuccess, onBack }) => {
         <div className="min-h-[80vh] flex items-center justify-center p-6 bg-brand-light">
             <div className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row animate-fade-in relative">
                 <div className="absolute top-8 left-8 z-20">
-                    <button onClick={onBack} className="text-brand-dark/40 hover:text-brand-primary transition-colors flex items-center gap-2 font-bold text-[10px] uppercase tracking-widest">
+                    <button onClick={() => navigate('/')} className="text-brand-dark/40 hover:text-brand-primary transition-colors flex items-center gap-2 font-bold text-[10px] uppercase tracking-widest">
                         Voltar ao Início
                     </button>
                 </div>

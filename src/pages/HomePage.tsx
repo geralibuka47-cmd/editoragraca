@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Sparkles, BookOpen, ArrowRight, Zap, Star, Trophy, Mail, Clock, Mic, PenTool, Users, CheckCircle, Loader2, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { Book, ViewState, PodcastEpisode, BlogPost } from '../types';
@@ -11,18 +12,18 @@ import { BookCardSkeleton, PostCardSkeleton } from '../components/SkeletonLoader
 interface HomePageProps {
     books: Book[];
     loading: boolean;
-    onNavigate: (view: ViewState) => void;
     onViewDetails: (book: Book) => void;
     onAddToCart: (book: Book) => void;
     onToggleWishlist: (book: Book) => void;
 }
 
-const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewDetails, onAddToCart, onToggleWishlist }) => {
+const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAddToCart, onToggleWishlist }) => {
     const [stats, setStats] = useState({ booksCount: 0, authorsCount: 0, readersCount: 0 });
     const [categories, setCategories] = useState<{ name: string; count: number; image?: string }[]>([]);
     const [latestEpisode, setLatestEpisode] = useState<PodcastEpisode | null>(null);
     const [recentPosts, setRecentPosts] = useState<BlogPost[]>([]);
     const [siteContent, setSiteContent] = useState<any>({});
+    const navigate = useNavigate();
     const [testimonials, setTestimonials] = useState<any[]>([]);
     const [isFetching, setIsFetching] = useState(true);
     const [newsletterEmail, setNewsletterEmail] = useState('');
@@ -169,7 +170,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
                         <motion.div variants={itemVariants} className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 md:gap-6 pt-4">
                             <button
                                 className="btn-premium group w-full sm:w-auto justify-center py-5 px-10 text-sm shadow-2xl shadow-brand-primary/20"
-                                onClick={() => upcomingLaunch ? onViewDetails(upcomingLaunch) : onNavigate('CATALOG')}
+                                onClick={() => upcomingLaunch ? onViewDetails(upcomingLaunch) : navigate('/livros')}
                             >
                                 {upcomingLaunch ? 'Pré-Encomendar Agora' : 'Explorar Catálogo'}
                                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -283,7 +284,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
                                 <motion.div
                                     key={idx}
                                     variants={itemVariants}
-                                    onClick={() => onNavigate('CATALOG')}
+                                    onClick={() => navigate('/livros')}
                                     className="group relative h-[400px] rounded-[3rem] overflow-hidden bg-brand-dark flex items-end p-10 md:p-12 cursor-pointer shadow-2xl hover:shadow-brand-primary/20 transition-all border-4 border-white"
                                 >
                                     {cat.image && (
@@ -337,7 +338,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
                         </div>
                         <motion.button
                             variants={itemVariants}
-                            onClick={() => onNavigate('CATALOG')}
+                            onClick={() => navigate('/livros')}
                             className="group flex items-center gap-5 font-black text-[12px] uppercase tracking-[0.2em] text-brand-dark hover:text-brand-primary transition-all bg-white px-8 py-4 rounded-2xl shadow-xl hover:shadow-brand-primary/10"
                         >
                             Ver Todo o Catálogo
@@ -414,12 +415,8 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
                                     {/* Audio Player */}
                                     <audio
                                         controls
-                                        className="w-full"
+                                        className="w-full h-[54px] rounded-[12px]"
                                         preload="metadata"
-                                        style={{
-                                            height: '54px',
-                                            borderRadius: '12px'
-                                        }}
                                     >
                                         <source src={latestEpisode.audioUrl} type="audio/mpeg" />
                                         O seu navegador não suporta o elemento de áudio.
@@ -462,7 +459,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
                                     ))
                                 ) : recentPosts.length > 0 ? (
                                     recentPosts.map(post => (
-                                        <div key={post.id} onClick={() => onNavigate('BLOG')} className="group flex gap-6 items-center bg-white p-5 rounded-3xl shadow-sm border border-gray-50 cursor-pointer hover:shadow-2xl hover:translate-x-2 transition-all">
+                                        <div key={post.id} onClick={() => navigate('/blog')} className="group flex gap-6 items-center bg-white p-5 rounded-3xl shadow-sm border border-gray-50 cursor-pointer hover:shadow-2xl hover:translate-x-2 transition-all">
                                             <div className="w-24 h-24 rounded-2xl overflow-hidden shrink-0 shadow-md">
                                                 <img src={post.imageUrl} alt={post.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                             </div>
@@ -482,7 +479,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onNavigate, onViewD
                                 )}
                             </div>
                             <div className="text-right">
-                                <button onClick={() => onNavigate('BLOG')} className="text-sm font-black text-brand-primary hover:text-brand-dark transition-all inline-flex items-center gap-3 uppercase tracking-widest group">
+                                <button onClick={() => navigate('/blog')} className="text-sm font-black text-brand-primary hover:text-brand-dark transition-all inline-flex items-center gap-3 uppercase tracking-widest group">
                                     Ver todas as novidades
                                     <span className="w-10 h-10 border-2 border-brand-primary/20 rounded-full flex items-center justify-center group-hover:bg-brand-primary group-hover:text-white transition-all">
                                         <ArrowRight className="w-4 h-4" />

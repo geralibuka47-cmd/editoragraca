@@ -18,7 +18,7 @@ interface BookDetailModalProps {
     onAddToCart: (book: any) => void;
 }
 
-const BookDetailModal: React.FC<BookDetailModalProps & { user?: UserType }> = ({ book, isOpen, onClose, onAddToCart, user }) => {
+const BookDetailModal: React.FC<BookDetailModalProps & { user?: UserType | null; onNavigate?: (path: string) => void }> = ({ book, isOpen, onClose, onAddToCart, user, onNavigate }) => {
     const [activeTab, setActiveTab] = useState<'details' | 'reviews'>('details');
     const [stats, setStats] = useState<any>({ views: 0, rating: 0, downloads: 0, sales: 0, reviewsCount: 0 });
     const [isFavorite, setIsFavorite] = useState(false);
@@ -99,7 +99,7 @@ const BookDetailModal: React.FC<BookDetailModalProps & { user?: UserType }> = ({
             />
 
             {/* Modal Content */}
-            <div className="relative bg-white w-full max-w-5xl rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row animate-fade-in group max-h-[90vh] overflow-y-auto md:overflow-visible">
+            <div className="relative bg-white w-full max-w-5xl rounded-3xl shadow-2xl flex flex-col md:flex-row animate-fade-in group max-h-[90vh] md:h-auto overflow-y-auto md:overflow-visible my-auto">
                 <button
                     onClick={onClose}
                     className="absolute top-4 right-4 md:top-6 md:right-6 z-30 p-2 bg-white/80 md:bg-gray-100 backdrop-blur-sm rounded-full hover:bg-brand-primary hover:text-white transition-all text-gray-500 shadow-lg"
@@ -109,7 +109,7 @@ const BookDetailModal: React.FC<BookDetailModalProps & { user?: UserType }> = ({
                 </button>
 
                 {/* Left: Image Section */}
-                <div className="w-full md:w-5/12 bg-brand-light p-8 md:p-12 flex flex-col items-center justify-center relative overflow-hidden shrink-0">
+                <div className="w-full md:w-5/12 bg-brand-light p-8 md:p-12 flex flex-col items-center justify-center relative shrink-0 min-h-[400px]">
                     <div className="absolute inset-0 bg-gradient-to-tr from-brand-primary/10 to-transparent"></div>
                     <div className="relative z-10 w-full max-w-[240px] md:max-w-none aspect-[3/4] rounded-lg shadow-2xl flex items-center justify-center overflow-hidden border-4 border-white group-hover:scale-105 transition-transform duration-700 mb-8">
                         {book.coverUrl ? (
@@ -151,7 +151,7 @@ const BookDetailModal: React.FC<BookDetailModalProps & { user?: UserType }> = ({
                 </div>
 
                 {/* Right: Info Section */}
-                <div className="w-full md:w-7/12 flex flex-col h-full overflow-hidden">
+                <div className="w-full md:w-7/12 flex flex-col bg-white">
                     <div className="p-6 md:p-8 border-b border-gray-100 flex gap-6">
                         <button
                             onClick={() => setActiveTab('details')}
@@ -167,7 +167,7 @@ const BookDetailModal: React.FC<BookDetailModalProps & { user?: UserType }> = ({
                         </button>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto p-6 md:p-8">
+                    <div className="p-6 md:p-8">
                         {activeTab === 'details' ? (
                             <div className="space-y-6">
                                 <div className="flex flex-wrap items-center gap-2 md:gap-3">
@@ -199,7 +199,9 @@ const BookDetailModal: React.FC<BookDetailModalProps & { user?: UserType }> = ({
                                 <div className="flex items-center justify-between pt-2">
                                     <div className="flex flex-col">
                                         <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Preço Online</span>
-                                        <span className="text-2xl md:text-4xl font-black text-brand-dark">{book.price?.toLocaleString()} Kz</span>
+                                        <span className="text-2xl md:text-4xl font-black text-brand-dark">
+                                            {book.price === 0 ? 'GRATUITO' : `${book.price?.toLocaleString()} Kz`}
+                                        </span>
                                     </div>
 
                                     <div className="flex gap-2 md:gap-4">

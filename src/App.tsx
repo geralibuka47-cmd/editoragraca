@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import { ToastProvider } from './components/Toast';
+import { subscribeToAuthChanges } from './services/authService';
+import { getBooks } from './services/dataService';
+import { Book, User } from './types';
+import { Loader2 } from 'lucide-react';
+
+// Lazy loading pages
 const BookDetailModal = React.lazy(() => import('./components/BookDetailModal'));
-import { ToastProvider, useToast } from './components/Toast';
 const AuthPage = React.lazy(() => import('./pages/AuthPage'));
 const CatalogPage = React.lazy(() => import('./pages/CatalogPage'));
 const HomePage = React.lazy(() => import('./pages/HomePage'));
@@ -14,22 +21,46 @@ const BlogPage = React.lazy(() => import('./pages/BlogPage'));
 const ReaderDashboard = React.lazy(() => import('./pages/ReaderDashboard'));
 const AuthorDashboard = React.lazy(() => import('./pages/AuthorDashboard'));
 const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard'));
-import { subscribeToAuthChanges, logout } from './services/authService';
-import { getBooks } from './services/dataService';
-import { Book, User, ViewState } from './types';
-import { Loader2 } from 'lucide-react';
 
-const App: React.FC = () => {
-    const [currentView, setCurrentView] = useState<ViewState>('HOME');
+// Scroll to top on route change
+const ScrollToTop = () => {
+    const { pathname } = useLocation();
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [pathname]);
+    return null;
+};
+
+// Protected Route Component
+const ProtectedRoute = ({ children, allowedRoles, user, loading }: { children: React.ReactNode, allowedRoles?: string[], user: User | null, loading: boolean }) => {
+    if (loading) return (
+        <div className="h-screen flex items-center justify-center bg-brand-light">
+            <Loader2 className="w-12 h-12 text-brand-primary animate-spin" />
+        </div>
+    );
+
+    if (!user) {
+        return <Navigate to="/login" replace />;
+    }
+
+    if (allowedRoles && !allowedRoles.includes(user.role)) {
+        return <Navigate to="/" replace />;
+    }
+
+    return children;
+};
+
+const AppContent: React.FC = () => {
     const [user, setUser] = useState<User | null>(null);
     const [books, setBooks] = useState<Book[]>([]);
     const [loading, setLoading] = useState(true);
+    const [authLoading, setAuthLoading] = useState(true); // Start true to block until auth check
     const [cart, setCart] = useState<any[]>(() => {
         const saved = localStorage.getItem('cart');
         return saved ? JSON.parse(saved) : [];
     });
     const [selectedBook, setSelectedBook] = useState<Book | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const navigate = useNavigate();
 
     // Sync cart to local storage
     useEffect(() => {
@@ -40,6 +71,7 @@ const App: React.FC = () => {
     useEffect(() => {
         const unsubscribe = subscribeToAuthChanges((u) => {
             setUser(u);
+            setAuthLoading(false);
         });
         return () => unsubscribe();
     }, []);
@@ -60,149 +92,200 @@ const App: React.FC = () => {
         loadData();
     }, []);
 
-    const handleNavigate = (view: ViewState) => {
-        setCurrentView(view);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
     const handleAddToCart = (book: Book) => {
-        setCart(prev => [...prev, book]);
-    };
-
-    const handleToggleWishlist = (book: Book) => {
-        console.log('Toggled wishlist for:', book.title);
+        setCart(prev => {
+            const existing = prev.find(item => item.id === book.id);
+            if (existing) {
+                return prev.map(item => item.id === book.id ? { ...item, quantity: item.quantity + 1 } : item);
+            }
+            return [...prev, { ...book, quantity: 1 }];
+        });
     };
 
     const handleUpdateQuantity = (bookId: string, newQuantity: number) => {
-        setCart(prev => prev.map(item =>
-            item.id === bookId ? { ...item, quantity: newQuantity } : item
-        ));
-    };
-
-    const handleRemoveFromCart = (bookId: string) => {
-        setCart(prev => prev.filter(item => item.id !== bookId));
-    };
-
-    const handleViewDetails = (book: Book) => {
-        setSelectedBook(book);
-        setIsModalOpen(true);
-    };
-
-    const { showToast } = useToast();
-
-    const handleLogout = async () => {
-        try {
-            await logout();
-            setUser(null);
-            showToast('Sessão terminada com sucesso.', 'success');
-            handleNavigate('HOME');
-        } catch (error) {
-            showToast('Ocorreu um erro ao sair. Limpando sessão local...', 'error');
-            setUser(null);
-            handleNavigate('HOME');
+        if (newQuantity < 1) {
+            setCart(prev => prev.filter(item => item.id !== bookId));
+        } else {
+            setCart(prev => prev.map(item => item.id === bookId ? { ...item, quantity: newQuantity } : item));
         }
     };
 
-    const handleAuthSuccess = (u: User) => {
-        setUser(u);
-        handleNavigate('HOME');
-    };
-
-
-
-    const renderContent = () => {
-        switch (currentView) {
-            case 'HOME':
-                return (
-                    <HomePage
-                        books={books}
-                        loading={loading}
-                        onNavigate={handleNavigate}
-                        onViewDetails={handleViewDetails}
-                        onAddToCart={handleAddToCart}
-                        onToggleWishlist={handleToggleWishlist}
-                    />
-                );
-            case 'AUTH':
-                return <AuthPage onSuccess={handleAuthSuccess} onBack={() => handleNavigate('HOME')} />;
-            case 'CATALOG':
-                return (
-                    <CatalogPage
-                        books={books}
-                        onAddToCart={handleAddToCart}
-                        onToggleWishlist={handleToggleWishlist}
-                        onViewDetails={handleViewDetails}
-                        onNavigate={handleNavigate}
-                    />
-                );
-            case 'ABOUT':
-                return <AboutPage onNavigate={handleNavigate} />;
-            case 'CONTACT':
-                return <ContactPage onNavigate={handleNavigate} />;
-            case 'CHECKOUT':
-                return (
-                    <CheckoutPage
-                        cart={cart}
-                        onUpdateQuantity={handleUpdateQuantity}
-                        onRemoveItem={handleRemoveFromCart}
-                        onNavigate={handleNavigate}
-                    />
-                );
-            case 'SERVICES':
-                return <ServicesPage onNavigate={handleNavigate} />;
-            case 'BLOG':
-                return <BlogPage user={user} />;
-            case 'READER_DASHBOARD':
-                return <ReaderDashboard user={user} onNavigate={handleNavigate} />;
-            case 'AUTHOR_DASHBOARD':
-                return <AuthorDashboard user={user} onNavigate={handleNavigate} />;
-            case 'ADMIN':
-                return <AdminDashboard user={user} onNavigate={handleNavigate} />;
-            default:
-                return (
-                    <div className="container mx-auto px-8 py-32 text-center h-[60vh] flex flex-col items-center justify-center">
-                        <h2 className="text-4xl font-black text-brand-dark mb-4 tracking-tighter">Secção em Construção</h2>
-                        <p className="text-gray-500 mb-8 font-medium">Estamos a preparar algo especial para si.</p>
-                        <button onClick={() => handleNavigate('HOME')} className="btn-premium">Voltar ao Início</button>
-                    </div>
-                );
+    const handleAction = (type: string, payload?: any) => {
+        if (type === 'VIEW_BOOK') {
+            setSelectedBook(payload);
+        } else if (type === 'ADD_TO_CART') {
+            handleAddToCart(payload);
+        } else if (type === 'NAVIGATE') {
+            // Map legacy ViewState to routes
+            const routes: Record<string, string> = {
+                'HOME': '/',
+                'CATALOG': '/livros',
+                'BLOG': '/blog',
+                'SERVICES': '/servicos',
+                'ABOUT': '/sobre',
+                'CONTACT': '/contacto',
+                'CHECKOUT': '/carrinho',
+                'AUTH': '/login',
+                'READER_DASHBOARD': '/minha-biblioteca',
+                'AUTHOR_DASHBOARD': '/autor',
+                'ADMIN': '/admin'
+            };
+            if (routes[payload]) {
+                navigate(routes[payload]);
+            } else {
+                // If payload is already a path or unknown view
+                console.warn('Unknown view:', payload);
+            }
         }
     };
+
+    if (authLoading) {
+        return (
+            <div className="h-screen flex items-center justify-center bg-brand-light">
+                <Loader2 className="w-12 h-12 text-brand-primary animate-spin" />
+            </div>
+        );
+    }
 
     return (
-        <div className="min-h-screen flex flex-col font-sans bg-brand-light relative">
+        <div className="min-h-screen flex flex-col font-sans text-brand-dark bg-brand-light">
             <Navbar
-                onNavigate={handleNavigate}
-                currentView={currentView}
-                cartCount={cart.length}
+                cartCount={cart.reduce((acc, item) => acc + item.quantity, 0)}
                 user={user}
-                onLogout={handleLogout}
+                onLogout={async () => {
+                    const { logout } = await import('./services/authService');
+                    await logout();
+                    navigate('/');
+                }}
+                currentView={location.pathname} // Passing path as currentView for now
+                onNavigate={(v: string) => handleAction('NAVIGATE', v)}
             />
 
             <main className="flex-grow">
-
                 <React.Suspense fallback={
-                    <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
-                        <Loader2 className="w-8 h-8 text-brand-primary animate-spin" />
-                        <p className="text-gray-400 font-serif italic text-sm">Carregando...</p>
+                    <div className="h-96 flex items-center justify-center">
+                        <Loader2 className="w-12 h-12 text-brand-primary animate-spin" />
                     </div>
                 }>
-                    {renderContent()}
+                    <Routes>
+                        <Route path="/" element={
+                            <HomePage
+                                books={books}
+                                loading={loading}
+                                onViewDetails={(b) => handleAction('VIEW_BOOK', b)}
+                                onAddToCart={(b) => handleAction('ADD_TO_CART', b)}
+                                onToggleWishlist={(b) => console.log('Wishlist', b)}
+                            />
+                        } />
+                        <Route path="/livros" element={
+                            <CatalogPage
+                                books={books}
+                                loading={loading}
+                                onViewDetails={(b) => handleAction('VIEW_BOOK', b)}
+                                onAddToCart={(b) => handleAction('ADD_TO_CART', b)}
+                                onToggleWishlist={(b) => console.log('Wishlist', b)}
+                            />
+                        } />
+                        <Route path="/blog" element={<BlogPage user={user} />} />
+                        <Route path="/servicos" element={<ServicesPage />} />
+                        <Route path="/sobre" element={<AboutPage />} />
+                        <Route path="/contacto" element={<ContactPage />} />
+
+                        <Route path="/carrinho" element={
+                            <CheckoutPage
+                                cart={cart}
+                                onUpdateQuantity={handleUpdateQuantity}
+                                onRemoveItem={(id) => handleUpdateQuantity(id, 0)}
+                            />
+                        } />
+
+                        <Route path="/login" element={
+                            user ? <Navigate to="/" replace /> : <AuthPage onLogin={() => { }} />
+                        } />
+
+                        {/* Protected Routes */}
+                        <Route path="/minha-biblioteca" element={
+                            <ProtectedRoute user={user} loading={authLoading}>
+                                <ReaderDashboard user={user} />
+                            </ProtectedRoute>
+                        } />
+
+                        <Route path="/autor" element={
+                            <ProtectedRoute user={user} loading={authLoading} allowedRoles={['autor', 'adm']}>
+                                <AuthorDashboard user={user} />
+                            </ProtectedRoute>
+                        } />
+
+                        <Route path="/admin" element={
+                            <ProtectedRoute user={user} loading={authLoading} allowedRoles={['adm']}>
+                                <AdminDashboard user={user} />
+                            </ProtectedRoute>
+                        } />
+
+                        <Route path="*" element={<Navigate to="/" replace />} />
+                    </Routes>
                 </React.Suspense>
             </main>
 
-            <Footer onNavigate={handleNavigate} />
+            <Footer onNavigate={(v: string) => handleAction('NAVIGATE', v)} />
 
-            <React.Suspense fallback={null}>
-                <BookDetailModal
-                    book={selectedBook}
-                    isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
-                    onAddToCart={handleAddToCart}
-                    user={user || undefined}
-                />
-            </React.Suspense>
+            {/* Logic for Book Modal - kept global for simplicity */}
+            {selectedBook && (
+                <React.Suspense fallback={null}>
+                    <BookDetailModal
+                        isOpen={!!selectedBook}
+                        onClose={() => setSelectedBook(null)}
+                        book={selectedBook}
+                        onAddToCart={(b) => {
+                            handleAction('ADD_TO_CART', b);
+                            setSelectedBook(null);
+                        }}
+                        onNavigate={(v: string) => handleAction('NAVIGATE', v)}
+                        user={user}
+                    />
+                </React.Suspense>
+            )}
         </div>
+    );
+};
+
+import ErrorBoundary from './components/ErrorBoundary';
+
+// APP_VERSION: Change this string to force a cache clear on all users' devices
+const APP_VERSION = '2.0.1';
+
+const checkAppVersion = () => {
+    const storedVersion = localStorage.getItem('app_version');
+    if (storedVersion !== APP_VERSION) {
+        console.log(`New version detected (${APP_VERSION}). Clearing cache...`);
+
+        // Keep essential data if needed, or clear everything
+        // For this case, we clear everything to ensure a clean slate
+        localStorage.clear();
+
+        // Set new version
+        localStorage.setItem('app_version', APP_VERSION);
+
+        // Optional: Reload to ensure clean in-memory state if called after app init
+        // window.location.reload(); 
+    }
+};
+
+const App: React.FC = () => {
+    // Check version before render
+    useEffect(() => {
+        checkAppVersion();
+    }, []);
+
+    return (
+        <ErrorBoundary>
+            <Router>
+                <ToastProvider>
+                    <ScrollToTop />
+                    <AppContent />
+                </ToastProvider>
+            </Router>
+        </ErrorBoundary>
     );
 };
 
