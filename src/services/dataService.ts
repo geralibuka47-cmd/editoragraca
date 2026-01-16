@@ -68,7 +68,10 @@ const cleanDataForSupabase = (data: any, table: string) => {
         'avatarUrl': 'avatar_url',
         'photoUrl': 'photo_url', // Legacy support
         'bio': 'bio',
-        'address': 'address'
+        'address': 'address',
+        'paymentInfo': 'payment_info',
+        'paymentInfoNotes': 'payment_info_notes',
+        'displayOrder': 'display_order'
     };
 
     const JSONFields = ['items', 'payment_methods', 'preferred_contact'];
