@@ -279,7 +279,7 @@ const App: React.FC = () => {
 
     return (
         <ErrorBoundary>
-            <Router>
+            <Router basename="/editoragraca-novo">
                 <ToastProvider>
                     <ScrollToTop />
                     <AppContent />
