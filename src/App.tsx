@@ -271,6 +271,16 @@ const checkAppVersion = () => {
     }
 };
 
+// Helper to determine the correct basename
+const getBasename = () => {
+    // If we are on localhost and in the subdir
+    if (window.location.hostname === 'localhost' && window.location.pathname.startsWith('/editoragraca-novo')) {
+        return '/editoragraca-novo';
+    }
+    // Vercel or other root deployments
+    return '/';
+};
+
 const App: React.FC = () => {
     // Check version before render
     useEffect(() => {
@@ -279,7 +289,7 @@ const App: React.FC = () => {
 
     return (
         <ErrorBoundary>
-            <Router basename="/editoragraca-novo">
+            <Router basename={getBasename()}>
                 <ToastProvider>
                     <ScrollToTop />
                     <AppContent />
