@@ -20,24 +20,48 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
 
     const checkConnection = async () => {
         setConnectionStatus('checking');
+        setError('A testar conectividade...');
+
         try {
             const start = Date.now();
             // Simple fetch to check internet access
             await fetch('/favicon.ico', { cache: 'no-store' });
+            const internetTime = Date.now() - start;
 
-            // Allow time for UI feedback
-            await new Promise(r => setTimeout(r, 1000));
+            // Now check Supabase specifically
+            const sbUrl = import.meta.env.VITE_SUPABASE_URL;
+            if (sbUrl) {
+                try {
+                    const startSb = Date.now();
+                    // Timeout for Supabase check (5s)
+                    const sbTimeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000));
 
-            const time = Date.now() - start;
-            setConnectionStatus('ok');
-            setError(`Conexão OK (${time}ms). O problema pode ser no servidor de banco de dados.`);
+                    // fetch with no-cors to allowing cross-origin opaque checking
+                    await Promise.race([
+                        fetch(`${sbUrl}/auth/v1/health`, { mode: 'no-cors', cache: 'no-store' }),
+                        sbTimeout
+                    ]);
+
+                    const sbTime = Date.now() - startSb;
+                    setConnectionStatus('ok');
+                    setError(`Diagnóstico: Internet OK (${internetTime}ms). Servidor Banco de Dados OK (${sbTime}ms). Se falhar novamente, tente dados móveis.`);
+                } catch (sbErr) {
+                    console.error("Supabase check failed:", sbErr);
+                    setConnectionStatus('error');
+                    setError(`Internet OK (${internetTime}ms), mas o Servidor de Dados NÃO responde (Bloqueio ou Falha). Tente outra rede (ex: dados móveis).`);
+                    return;
+                }
+            } else {
+                setConnectionStatus('ok');
+                setError(`Conexão OK (${internetTime}ms). URL do servidor não configurada.`);
+            }
         } catch (e) {
             setConnectionStatus('error');
             setError('Sem acesso à internet. Verifique sua conexão.');
         } finally {
             setTimeout(() => {
                 if (mounted.current) setConnectionStatus('idle');
-            }, 3000);
+            }, 10000); // Show result for 10s
         }
     };
 
