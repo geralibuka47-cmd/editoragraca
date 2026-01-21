@@ -147,9 +147,12 @@ const AppContent: React.FC = () => {
             };
             if (routes[payload]) {
                 navigate(routes[payload]);
+            } else if (typeof payload === 'string' && payload.startsWith('/')) {
+                // If payload is a direct path
+                navigate(payload);
             } else {
-                // If payload is already a path or unknown view
-                console.warn('Unknown view:', payload);
+                // Unknown view key
+                console.warn('Unknown view/route:', payload);
             }
         }
     };
