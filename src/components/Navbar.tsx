@@ -232,8 +232,8 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                             <button
                                 onClick={() => onNavigate(link.path)}
                                 className={`hover:text-brand-primary transition-colors border-b pb-1 ${(link.path === '/' && currentView === '/') || (link.path !== '/' && currentView.startsWith(link.path))
-                                        ? 'text-brand-primary border-brand-primary'
-                                        : 'border-transparent'
+                                    ? 'text-brand-primary border-brand-primary'
+                                    : 'border-transparent'
                                     }`}
                             >
                                 {link.name}
@@ -251,12 +251,13 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                             <li key={link.path}>
                                 <button
                                     onClick={() => {
-                                        onNavigate(link.path);
                                         setIsMenuOpen(false);
+                                        // Allow small interaction delay for menu animation if needed, but direct call is better
+                                        onNavigate(link.path);
                                     }}
-                                    className={`w-full text-left px-8 py-3 text-[11px] font-bold uppercase tracking-[0.2em] ${(link.path === '/' && currentView === '/') || (link.path !== '/' && currentView.startsWith(link.path))
-                                            ? 'text-brand-primary bg-brand-light'
-                                            : 'text-gray-500 hover:bg-gray-50'
+                                    className={`w-full text-left px-8 py-3 text-[11px] font-bold uppercase tracking-[0.2em] ${(link.path === '/' && currentView === '/') || (link.path !== '/' && currentView?.startsWith(link.path))
+                                        ? 'text-brand-primary bg-brand-light'
+                                        : 'text-gray-500 hover:bg-gray-50'
                                         }`}
                                 >
                                     {link.name}

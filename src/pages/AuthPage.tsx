@@ -15,7 +15,31 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
     const [name, setName] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [connectionStatus, setConnectionStatus] = useState<'idle' | 'checking' | 'ok' | 'error'>('idle');
     const mounted = React.useRef(true);
+
+    const checkConnection = async () => {
+        setConnectionStatus('checking');
+        try {
+            const start = Date.now();
+            // Simple fetch to check internet access
+            await fetch('/favicon.ico', { cache: 'no-store' });
+
+            // Allow time for UI feedback
+            await new Promise(r => setTimeout(r, 1000));
+
+            const time = Date.now() - start;
+            setConnectionStatus('ok');
+            setError(`Conexão OK (${time}ms). O problema pode ser no servidor de banco de dados.`);
+        } catch (e) {
+            setConnectionStatus('error');
+            setError('Sem acesso à internet. Verifique sua conexão.');
+        } finally {
+            setTimeout(() => {
+                if (mounted.current) setConnectionStatus('idle');
+            }, 3000);
+        }
+    };
 
     React.useEffect(() => {
         return () => { mounted.current = false; };
@@ -41,9 +65,8 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
         setError('');
 
         try {
-            // Timeout promise (15 seconds)
             const timeoutPromise = new Promise((_, reject) => {
-                setTimeout(() => reject(new Error('O pedido expirou. Verifique a sua conexão.')), 15000);
+                setTimeout(() => reject(new Error('O pedido expirou. Verifique a sua conexão.')), 25000);
             });
 
             if (isLogin) {
@@ -63,7 +86,12 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
             }
         } catch (err: any) {
             console.error("Auth error:", err);
-            setError(err.message || 'Ocorreu um erro ao processar o seu pedido.');
+            // If it's a timeout error, give a specific helpful message
+            if (err.message?.includes('expirou')) {
+                setError('A conexão com o servidor demorou muito. Verifique a sua internet e tente novamente.');
+            } else {
+                setError(err.message || 'Ocorreu um erro ao processar o seu pedido.');
+            }
         } finally {
             if (mounted.current) {
                 setLoading(false);
@@ -130,6 +158,19 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
                         {error && (
                             <div className="p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm font-bold animate-shake">
                                 {error}
+                                <div className="mt-2">
+                                    <button
+                                        type="button"
+                                        onClick={checkConnection}
+                                        disabled={connectionStatus === 'checking'}
+                                        className="text-xs underline hover:text-red-900 font-bold flex items-center gap-2"
+                                    >
+                                        {connectionStatus === 'checking' && <Loader2 className="w-3 h-3 animate-spin" />}
+                                        {connectionStatus === 'idle' && 'Testar minha conexão'}
+                                        {connectionStatus === 'ok' && 'Internet OK'}
+                                        {connectionStatus === 'error' && 'Sem Internet'}
+                                    </button>
+                                </div>
                             </div>
                         )}
 
