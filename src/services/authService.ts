@@ -12,8 +12,13 @@ export const login = async (email: string, password: string): Promise<User | nul
         if (error) throw error;
         if (!data.user) return null;
 
-        // Get extra profile info from Database
-        const profile = await getUserProfile(data.user.id);
+        // Get extra profile info from Database with timeout
+        // If profile fetch hangs, we proceed with basic auth data
+        const profilePromise = getUserProfile(data.user.id);
+        const timeoutProfile = new Promise<null>((resolve) => setTimeout(() => resolve(null), 3000));
+
+        const profile = await Promise.race([profilePromise, timeoutProfile]);
+
         if (profile) return profile;
 
         return {
