@@ -43,7 +43,7 @@ const AdminBooksTab: React.FC<AdminBooksTabProps> = ({ onStatsRefresh }) => {
     };
 
     const handleSaveBook = async (bookData: any, coverFile: File | null, digitalFile: File | null) => {
-        console.log("Iniciando salvamento do livro:", bookData.title);
+
         setIsSavingBook(true);
         try {
 
@@ -64,13 +64,13 @@ const AdminBooksTab: React.FC<AdminBooksTabProps> = ({ onStatsRefresh }) => {
             const sanitizedStock = sanitizeNumber(bookData.stock);
 
             if (coverFile) {
-                console.log("Fazendo upload da capa...");
+
                 const { fileUrl } = await uploadFile(coverFile);
                 finalCoverUrl = fileUrl;
             }
 
             if (digitalFile) {
-                console.log("Fazendo upload do arquivo digital...");
+
                 const { fileUrl } = await uploadFile(digitalFile);
                 finalDigitalUrl = fileUrl;
             }
@@ -85,9 +85,9 @@ const AdminBooksTab: React.FC<AdminBooksTabProps> = ({ onStatsRefresh }) => {
                 launchDate: bookData.launchDate || undefined
             };
 
-            console.log("Dados finais preparados para o Supabase:", dataToSave);
+
             await saveBook(dataToSave);
-            console.log("Resposta do saveBook recebida");
+
 
             alert('Livro guardado com sucesso!');
             setIsBookModalOpen(false);

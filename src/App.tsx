@@ -174,7 +174,7 @@ const AppContent: React.FC = () => {
                                 loading={loading}
                                 onViewDetails={(b) => handleAction('VIEW_BOOK', b)}
                                 onAddToCart={(b) => handleAction('ADD_TO_CART', b)}
-                                onToggleWishlist={(b) => console.log('Wishlist', b)}
+                                onToggleWishlist={(b) => { }}
                             />
                         } />
                         <Route path="/livros" element={
@@ -183,7 +183,7 @@ const AppContent: React.FC = () => {
                                 loading={loading}
                                 onViewDetails={(b) => handleAction('VIEW_BOOK', b)}
                                 onAddToCart={(b) => handleAction('ADD_TO_CART', b)}
-                                onToggleWishlist={(b) => console.log('Wishlist', b)}
+                                onToggleWishlist={(b) => { }}
                             />
                         } />
                         <Route path="/blog" element={<BlogPage user={user} />} />

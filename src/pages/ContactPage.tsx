@@ -111,7 +111,7 @@ const ContactPage: React.FC = () => {
         if (!validateForm()) return;
 
         // Simulate form submission
-        console.log('Form submitted:', formData);
+
         setFormStatus('success');
 
         // Reset form after 3 seconds

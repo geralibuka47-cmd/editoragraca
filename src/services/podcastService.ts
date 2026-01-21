@@ -29,7 +29,7 @@ export const fetchPodcastEpisodes = async (forceRefresh = false): Promise<Podcas
 
     // Return cache if valid
     if (!forceRefresh && podcastCache && (now - lastPodcastFetch < CACHE_DURATION)) {
-        console.log("podcastService - Retornando episódios do cache");
+
         return podcastCache;
     }
 

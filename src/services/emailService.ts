@@ -22,7 +22,7 @@ const sendEmail = async ({ to, subject, html }: EmailData): Promise<void> => {
     } catch (error) {
         console.error('Erro ao enviar email:', error);
         // Em desenvolvimento, apenas log o erro mas não falhar
-        console.log('Email que seria enviado:', { to, subject, html });
+        console.info('Email que seria enviado (mock):', { to, subject, html });
     }
 };
 

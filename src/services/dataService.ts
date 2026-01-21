@@ -231,18 +231,17 @@ export const getBooks = async (forceRefresh = false): Promise<Book[]> => {
 
 export const saveBook = async (book: Book) => {
     try {
-        console.log("dataService.saveBook - Iniciando limpeza de dados...");
+
         const bookData = cleanDataForSupabase(book, TABLES.BOOKS);
 
         // Critical: Remove ID from payload to avoid Supabase errors on update/insert
         const { id, ...payload } = bookData;
 
         // Log keys to verify snake_case
-        console.log("dataService.saveBook - Colunas sendo enviadas:", Object.keys(payload));
-        console.log("dataService.saveBook - Payload final:", payload);
+
 
         if (id && id.length > 5 && !id.startsWith('temp_')) {
-            console.log("dataService.saveBook - Executando UPDATE para id:", id);
+
             const { error } = await supabase
                 .from(TABLES.BOOKS)
                 .update(payload)
@@ -251,9 +250,9 @@ export const saveBook = async (book: Book) => {
                 console.error("dataService.saveBook - Erro no UPDATE:", error);
                 throw error;
             }
-            console.log("dataService.saveBook - UPDATE concluído com sucesso");
+
         } else {
-            console.log("dataService.saveBook - Executando INSERT...");
+
             const { error } = await supabase
                 .from(TABLES.BOOKS)
                 .insert([payload]);
@@ -261,7 +260,7 @@ export const saveBook = async (book: Book) => {
                 console.error("dataService.saveBook - Erro no INSERT:", error);
                 throw error;
             }
-            console.log("dataService.saveBook - INSERT concluído com sucesso");
+
         }
 
         // Invalidate cache
@@ -783,7 +782,7 @@ export const getSiteContent = async (section?: string) => {
     const cached = siteContentCache.get(cacheKey);
 
     if (cached) {
-        console.log("dataService - Retornando conteúdo do site do cache");
+
         return cached;
     }
 
