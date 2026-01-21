@@ -193,6 +193,7 @@ const AppContent: React.FC = () => {
                                 onViewDetails={(b) => handleAction('VIEW_BOOK', b)}
                                 onAddToCart={(b) => handleAction('ADD_TO_CART', b)}
                                 onToggleWishlist={(b) => { }}
+                                onNavigate={(v) => handleAction('NAVIGATE', v)}
                             />
                         } />
                         <Route path="/livros" element={

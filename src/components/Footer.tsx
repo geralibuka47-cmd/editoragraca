@@ -4,7 +4,7 @@ import { Facebook, Instagram, Twitter, Mail, MapPin, Phone } from 'lucide-react'
 import { ViewState } from '../types';
 
 interface FooterProps {
-    onNavigate: (view: ViewState) => void;
+    onNavigate: (view: string) => void;
 }
 
 const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
@@ -34,22 +34,22 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                 <div>
                     <h4 className="font-serif text-xl font-bold mb-8 text-brand-primary italic">Navegação</h4>
                     <ul className="space-y-4 text-sm text-gray-400 font-medium">
-                        <li><button onClick={() => onNavigate('HOME')} className="hover:text-white transition-colors">Início</button></li>
-                        <li><button onClick={() => onNavigate('CATALOG')} className="hover:text-white transition-colors">Todos os Livros</button></li>
-                        <li><button onClick={() => onNavigate('ABOUT')} className="hover:text-white transition-colors">Sobre a Editora</button></li>
-                        <li><button onClick={() => onNavigate('BLOG')} className="hover:text-white transition-colors">Podcast</button></li>
-                        <li><button onClick={() => onNavigate('BLOG')} className="hover:text-white transition-colors">Blog & Novidades</button></li>
+                        <li><button onClick={() => onNavigate('/')} className="hover:text-white transition-colors">Início</button></li>
+                        <li><button onClick={() => onNavigate('/livros')} className="hover:text-white transition-colors">Todos os Livros</button></li>
+                        <li><button onClick={() => onNavigate('/sobre')} className="hover:text-white transition-colors">Sobre a Editora</button></li>
+                        <li><button onClick={() => onNavigate('/blog')} className="hover:text-white transition-colors">Podcast</button></li>
+                        <li><button onClick={() => onNavigate('/blog')} className="hover:text-white transition-colors">Blog & Novidades</button></li>
                     </ul>
                 </div>
 
                 <div>
                     <h4 className="font-serif text-xl font-bold mb-8 text-brand-primary italic">Informações</h4>
                     <ul className="space-y-4 text-sm text-gray-400 font-medium">
-                        <li><button onClick={() => onNavigate('SERVICES')} className="hover:text-white transition-colors">Termos e Condições</button></li>
-                        <li><button onClick={() => onNavigate('SERVICES')} className="hover:text-white transition-colors">Política de Privacidade</button></li>
-                        <li><button onClick={() => onNavigate('SERVICES')} className="hover:text-white transition-colors">Envios e Devoluções</button></li>
-                        <li><button onClick={() => onNavigate('SERVICES')} className="hover:text-white transition-colors">Perguntas Frequentes</button></li>
-                        <li><button onClick={() => onNavigate('CONTACT')} className="hover:text-white transition-colors">Trabalhe Connosco</button></li>
+                        <li><button onClick={() => onNavigate('/servicos')} className="hover:text-white transition-colors">Termos e Condições</button></li>
+                        <li><button onClick={() => onNavigate('/servicos')} className="hover:text-white transition-colors">Política de Privacidade</button></li>
+                        <li><button onClick={() => onNavigate('/servicos')} className="hover:text-white transition-colors">Envios e Devoluções</button></li>
+                        <li><button onClick={() => onNavigate('/servicos')} className="hover:text-white transition-colors">Perguntas Frequentes</button></li>
+                        <li><button onClick={() => onNavigate('/contacto')} className="hover:text-white transition-colors">Trabalhe Connosco</button></li>
                     </ul>
                 </div>
 

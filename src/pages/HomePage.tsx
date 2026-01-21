@@ -15,9 +15,10 @@ interface HomePageProps {
     onViewDetails: (book: Book) => void;
     onAddToCart: (book: Book) => void;
     onToggleWishlist: (book: Book) => void;
+    onNavigate: (view: string) => void;
 }
 
-const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAddToCart, onToggleWishlist }) => {
+const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAddToCart, onToggleWishlist, onNavigate }) => {
     const [stats, setStats] = useState({ booksCount: 0, authorsCount: 0, readersCount: 0 });
     const [categories, setCategories] = useState<{ name: string; count: number; image?: string }[]>([]);
     const [latestEpisode, setLatestEpisode] = useState<PodcastEpisode | null>(null);
