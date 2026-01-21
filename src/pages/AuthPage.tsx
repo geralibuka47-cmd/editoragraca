@@ -4,7 +4,7 @@ import { login, signUp } from '../services/authService';
 import { User, Mail, Lock, ArrowRight, BookOpen, Check, Loader2 } from 'lucide-react';
 
 interface AuthPageProps {
-    onLogin: () => void;
+    onLogin: (user: any) => void;
 }
 
 const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
@@ -70,19 +70,25 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
             });
 
             if (isLogin) {
-                await Promise.race([
+                const user = await Promise.race([
                     login(cleanEmail, password),
                     timeoutPromise
-                ]);
-                onLogin();
-                navigate('/');
+                ]) as any;
+
+                if (user) {
+                    onLogin(user);
+                    navigate('/');
+                }
             } else {
-                await Promise.race([
+                const user = await Promise.race([
                     signUp(cleanEmail, password, cleanName),
                     timeoutPromise
-                ]);
-                onLogin();
-                navigate('/');
+                ]) as any;
+
+                if (user) {
+                    onLogin(user);
+                    navigate('/');
+                }
             }
         } catch (err: any) {
             console.error("Auth error:", err);

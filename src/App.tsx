@@ -219,7 +219,7 @@ const AppContent: React.FC = () => {
                         } />
 
                         <Route path="/login" element={
-                            user ? <Navigate to="/" replace /> : <AuthPage onLogin={() => { }} />
+                            user ? <Navigate to="/" replace /> : <AuthPage onLogin={(u) => { setUser(u); }} />
                         } />
 
                         {/* Protected Routes */}
