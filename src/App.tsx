@@ -252,7 +252,7 @@ const AppContent: React.FC = () => {
 import ErrorBoundary from './components/ErrorBoundary';
 
 // APP_VERSION: Change this string to force a cache clear on all users' devices
-const APP_VERSION = '2.0.1';
+const APP_VERSION = '2.1.0';
 
 const checkAppVersion = () => {
     const storedVersion = localStorage.getItem('app_version');
@@ -266,8 +266,8 @@ const checkAppVersion = () => {
         // Set new version
         localStorage.setItem('app_version', APP_VERSION);
 
-        // Optional: Reload to ensure clean in-memory state if called after app init
-        // window.location.reload(); 
+        // Force a reload to ensure the new version is loaded
+        window.location.reload();
     }
 };
 
