@@ -73,7 +73,22 @@ const AppContent: React.FC = () => {
             setUser(u);
             setAuthLoading(false);
         });
-        return () => unsubscribe();
+
+        // Safety timeout: If auth takes too long (e.g. 8s), force unblock
+        const safetyTimer = setTimeout(() => {
+            setAuthLoading((prev) => {
+                if (prev) {
+                    console.warn("Auth timed out, forcing UI unlock");
+                    return false;
+                }
+                return prev;
+            });
+        }, 8000);
+
+        return () => {
+            unsubscribe();
+            clearTimeout(safetyTimer);
+        };
     }, []);
 
     // Fetch Data

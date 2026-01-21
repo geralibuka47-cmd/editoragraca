@@ -83,17 +83,24 @@ export const logout = async () => {
 export const subscribeToAuthChanges = (callback: (user: User | null) => void) => {
     // Check initial session
     const checkInitialSession = async () => {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-            const profile = await getUserProfile(session.user.id);
-            callback(profile || {
-                id: session.user.id,
-                name: session.user.user_metadata?.name || 'Utilizador',
-                email: session.user.email || '',
-                role: 'leitor'
-            });
-        } else {
-            callback(null);
+        try {
+            const { data: { session }, error } = await supabase.auth.getSession();
+            if (error) throw error;
+
+            if (session?.user) {
+                const profile = await getUserProfile(session.user.id);
+                callback(profile || {
+                    id: session.user.id,
+                    name: session.user.user_metadata?.name || 'Utilizador',
+                    email: session.user.email || '',
+                    role: 'leitor'
+                });
+            } else {
+                callback(null);
+            }
+        } catch (error) {
+            console.error("Auth check failed:", error);
+            callback(null); // Ensure we unblock the UI even on error
         }
     };
 

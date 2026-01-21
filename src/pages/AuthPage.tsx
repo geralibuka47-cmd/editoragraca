@@ -15,6 +15,11 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
     const [name, setName] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const mounted = React.useRef(true);
+
+    React.useEffect(() => {
+        return () => { mounted.current = false; };
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -36,12 +41,23 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
         setError('');
 
         try {
+            // Timeout promise (15 seconds)
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => reject(new Error('O pedido expirou. Verifique a sua conexão.')), 15000);
+            });
+
             if (isLogin) {
-                await login(cleanEmail, password);
+                await Promise.race([
+                    login(cleanEmail, password),
+                    timeoutPromise
+                ]);
                 onLogin();
                 navigate('/');
             } else {
-                await signUp(cleanEmail, password, cleanName);
+                await Promise.race([
+                    signUp(cleanEmail, password, cleanName),
+                    timeoutPromise
+                ]);
                 onLogin();
                 navigate('/');
             }
@@ -49,7 +65,9 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
             console.error("Auth error:", err);
             setError(err.message || 'Ocorreu um erro ao processar o seu pedido.');
         } finally {
-            setLoading(false);
+            if (mounted.current) {
+                setLoading(false);
+            }
         }
     };
 
