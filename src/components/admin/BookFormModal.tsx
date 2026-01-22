@@ -49,7 +49,7 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                     author: book.author,
                     price: book.price.toString(),
                     genre: book.genre,
-                    description: book.description,
+                    description: book.description || '',
                     stock: (book.stock || 0).toString(),
                     isbn: book.isbn || '',
                     format: book.format || 'físico',

@@ -153,7 +153,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
 
                         <m.p variants={itemVariants} className="text-lg md:text-xl text-gray-500 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
                             {upcomingLaunch
-                                ? upcomingLaunch.description.slice(0, 180) + '...'
+                                ? (upcomingLaunch.description || '').slice(0, 180) + '...'
                                 : (siteContent['hero.description'] || "Descubra o catálogo da Editora Graça. Uma seleção rigorosa de literatura angolana e internacional, desenhada para leitores exigentes.")
                             }
                         </m.p>
@@ -262,7 +262,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px" }}
                 variants={containerVariants}
-                className="py-12 md:py-32 bg-white relative overflow-hidden optimize-render"
+                className="py-12 md:py-32 bg-white relative overflow-hidden optimize-scroll"
             >
                 {/* Decorative blob */}
                 <div className="absolute -left-20 top-40 w-80 h-80 bg-brand-primary/5 rounded-full blur-[80px]"></div>
@@ -319,7 +319,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px" }}
                 variants={containerVariants}
-                className="py-12 md:py-32 bg-brand-light relative optimize-render"
+                className="py-12 md:py-32 bg-brand-light relative optimize-scroll"
             >
                 <div className="container mx-auto px-4 md:px-8">
                     <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-16 md:mb-24 gap-8 text-center md:text-left">
@@ -376,7 +376,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={containerVariants}
-                className="py-24 bg-gray-50 overflow-hidden optimize-render"
+                className="py-24 bg-gray-50 overflow-hidden optimize-scroll"
             >
                 <div className="container mx-auto px-4 md:px-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 md:gap-24">
@@ -451,7 +451,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                     whileInView="visible"
                     viewport={{ once: true }}
                     variants={containerVariants}
-                    className="py-24 md:py-40 bg-white overflow-hidden optimize-render"
+                    className="py-24 md:py-40 bg-white overflow-hidden optimize-scroll"
                 >
                     <div className="container mx-auto px-4 md:px-8">
                         <m.div variants={itemVariants} className="text-center mb-24">

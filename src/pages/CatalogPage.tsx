@@ -51,7 +51,7 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
             result = result.filter(book =>
                 book.title.toLowerCase().includes(query) ||
                 book.author.toLowerCase().includes(query) ||
-                book.description.toLowerCase().includes(query)
+                (book.description || '').toLowerCase().includes(query)
             );
         }
 
@@ -316,7 +316,7 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
             </section>
 
             {/* Book Grid Section */}
-            <section className="py-20 md:py-32 optimize-render">
+            <section className="py-20 md:py-32 optimize-scroll">
                 <div className="container mx-auto px-4 md:px-8">
                     <div className="flex flex-col md:flex-row justify-between items-center mb-16 gap-6">
                         <div className="space-y-2 text-center md:text-left">

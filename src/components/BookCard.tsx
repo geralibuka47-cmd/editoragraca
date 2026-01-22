@@ -1,19 +1,10 @@
 import React from 'react';
 import { ShoppingCart, Heart, Eye } from 'lucide-react';
 
+import { Book } from '../types';
+
 interface BookCardProps {
-    book: {
-        id: string;
-        title: string;
-        author: string;
-        price: number;
-        genre: string;
-        description: string;
-        coverUrl: string;
-        format?: string;
-        isBestseller?: boolean;
-        isNew?: boolean;
-    };
+    book: Book;
     onAddToCart: (book: any) => void;
     onToggleWishlist: (book: any) => void;
     onViewDetails: (book: any) => void;

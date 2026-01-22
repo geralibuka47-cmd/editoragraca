@@ -35,7 +35,7 @@ export interface Book {
   isbn?: string;
   isNew?: boolean;
   isBestseller?: boolean;
-  description: string;
+  description?: string;
   authorId?: string;
   stock?: number;
   digitalFileUrl?: string;

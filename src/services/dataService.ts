@@ -196,19 +196,17 @@ let testimonialsCache: any[] | null = null;
 let lastBooksFetch = 0;
 let lastBlogFetch = 0;
 let lastTestimonialsFetch = 0;
+let lastStatsFetch = 0;
+let lastStatsData: any = null;
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const SHORT_CACHE = 1 * 60 * 1000;   // 1 minute for volatile data
 
 export const getBooks = async (forceRefresh = false): Promise<Book[]> => {
     const now = Date.now();
-    // Check if cache exists and is valid
     if (!forceRefresh && booksCache && (now - lastBooksFetch < CACHE_DURATION)) {
-        // console.log("dataService - Retornando livros do cache");
         return booksCache;
     }
-
-    // Double check local storage for backup if memory cache is empty?
-    // For now, we rely on Supabase fetch.
 
     try {
         const { data, error } = await supabase
@@ -225,7 +223,42 @@ export const getBooks = async (forceRefresh = false): Promise<Book[]> => {
         return parsed;
     } catch (error) {
         console.error("Erro ao procurar livros:", error);
-        return booksCache || []; // Return cache even if expired if fetch fails
+        return booksCache || [];
+    }
+};
+
+/**
+ * Optimized version for listing pages (Home, Catalog)
+ * Fetches only the essential fields to reduce payload size.
+ */
+export const getBooksMinimal = async (forceRefresh = false): Promise<Book[]> => {
+    const now = Date.now();
+    if (!forceRefresh && booksCache && (now - lastBooksFetch < CACHE_DURATION)) {
+        return booksCache;
+    }
+
+    try {
+        // Essential fields for cards and filters
+        const fields = 'id, title, author, price, category, cover_url, is_bestseller, is_new, format, stock, created_at';
+        const { data, error } = await supabase
+            .from(TABLES.BOOKS)
+            .select(fields)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        const parsed = (data || []).map(parseDataFromSupabase) as Book[];
+
+        // We don't overwrite the full cache if we only got partial data, 
+        // unless the cache was empty.
+        if (!booksCache) {
+            booksCache = parsed;
+            lastBooksFetch = now;
+        }
+
+        return parsed;
+    } catch (error) {
+        console.error("Erro ao procurar livros (minimal):", error);
+        return booksCache || [];
     }
 };
 
@@ -282,18 +315,27 @@ export const deleteBook = async (id: string) => {
 
 // Public Stats
 export const getPublicStats = async () => {
+    const now = Date.now();
+    if (lastStatsData && (now - lastStatsFetch < SHORT_CACHE)) {
+        return lastStatsData;
+    }
+
     try {
         const { count: booksCount } = await supabase.from(TABLES.BOOKS).select('*', { count: 'exact', head: true });
         const { count: readersCount } = await supabase.from(TABLES.PROFILES).select('*', { count: 'exact', head: true });
 
-        return {
+        const stats = {
             booksCount: booksCount || 0,
             authorsCount: 0,
             readersCount: readersCount || 0
         };
+
+        lastStatsData = stats;
+        lastStatsFetch = now;
+        return stats;
     } catch (error) {
         console.error("Error fetching public stats:", error);
-        return { booksCount: 0, authorsCount: 0, readersCount: 0 };
+        return lastStatsData || { booksCount: 0, authorsCount: 0, readersCount: 0 };
     }
 };
 

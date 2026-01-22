@@ -96,7 +96,8 @@ const AppContent: React.FC = () => {
         const loadData = async () => {
             setLoading(true);
             try {
-                const fetchedBooks = await getBooks();
+                const { getBooksMinimal } = await import('./services/dataService');
+                const fetchedBooks = await getBooksMinimal();
                 setBooks(fetchedBooks);
             } catch (error) {
                 console.error("Failed to fetch books:", error);
@@ -127,7 +128,18 @@ const AppContent: React.FC = () => {
 
     const handleAction = (type: string, payload?: any) => {
         if (type === 'VIEW_BOOK') {
-            setSelectedBook(payload);
+            // Fetch full book info if needed (minimal fetch doesn't have description/isbn)
+            const fetchFullBook = async () => {
+                try {
+                    const { getBooks } = await import('./services/dataService');
+                    const allBooks = await getBooks();
+                    const fullBook = allBooks.find(b => b.id === payload.id);
+                    setSelectedBook(fullBook || payload);
+                } catch (e) {
+                    setSelectedBook(payload);
+                }
+            };
+            fetchFullBook();
         } else if (type === 'ADD_TO_CART') {
             handleAddToCart(payload);
         } else if (type === 'NAVIGATE') {
