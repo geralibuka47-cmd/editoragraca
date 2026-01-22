@@ -132,11 +132,3 @@
     }
 }
 
-/* Podcast Progress Bar */
-.progress-bar-playing {
-    width: 30%;
-}
-
-.progress-bar-stopped {
-    width: 0%;
-}

@@ -281,9 +281,7 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                 <textarea
                                     id="book-description"
                                     required
-                                    spellCheck="false"
-                                    autoComplete="off"
-                                    data-gramm="false"
+                                    spellCheck="true"
                                     className={`input-premium h-32 resize-none ${errors.description ? 'border-red-500 bg-red-50' : ''}`}
                                     value={formData.description}
                                     onChange={e => {
@@ -297,7 +295,7 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                             <div className="md:col-span-2 bg-brand-primary/5 p-4 rounded-2xl border border-brand-primary/10">
                                 <div className="flex items-center gap-2 mb-2">
                                     <Calendar className="w-4 h-4 text-brand-primary" />
-                                    <label className="text-xs font-bold uppercase tracking-widest text-brand-primary">Data de Lançamento (Lançamentos Futuros)</label>
+                                    <label className="text-xs font-bold uppercase tracking-widest text-brand-primary">Lançamento & Destaque Especial</label>
                                 </div>
                                 <input
                                     type="datetime-local"

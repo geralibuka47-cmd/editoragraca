@@ -19,6 +19,8 @@ interface BookCardProps {
     onViewDetails: (book: any) => void;
 }
 
+import { optimizeImageUrl } from '../components/OptimizedImage';
+
 const BookCard: React.FC<BookCardProps> = ({ book, onAddToCart, onToggleWishlist, onViewDetails }) => {
     return (
         <div className="group relative bg-white rounded-2xl overflow-hidden border border-gray-100 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2">
@@ -50,7 +52,7 @@ const BookCard: React.FC<BookCardProps> = ({ book, onAddToCart, onToggleWishlist
             <div className="relative aspect-[3/4] bg-brand-light flex items-center justify-center overflow-hidden">
                 {book.coverUrl ? (
                     <img
-                        src={book.coverUrl}
+                        src={optimizeImageUrl(book.coverUrl, 400, 533)}
                         alt={book.title}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 cursor-pointer"
                         loading="lazy"

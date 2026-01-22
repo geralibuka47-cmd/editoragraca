@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, SlidersHorizontal, X, ArrowRight, Filter, BookOpen, Loader2, Sparkles, Star } from 'lucide-react';
-import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { m, AnimatePresence, Variants } from 'framer-motion';
 import { Book, ViewState } from '../types';
 import BookCard from '../components/BookCard';
 import { BookCardSkeleton } from '../components/SkeletonLoader';
@@ -132,7 +132,7 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
                 <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-brand-primary/50 to-transparent"></div>
 
                 <div className="container mx-auto px-4 md:px-8 relative z-10">
-                    <motion.div
+                    <m.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6 }}
@@ -150,7 +150,7 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
                         <p className="text-xl md:text-2xl text-gray-400 font-medium leading-relaxed max-w-2xl">
                             Uma curadoria de literatura angolana e internacional, desenhada para leitores que procuram excelência em cada página.
                         </p>
-                    </motion.div>
+                    </m.div>
                 </div>
             </section>
 
@@ -215,7 +215,7 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
                     {/* Enhanced Filters Panel */}
                     <AnimatePresence>
                         {showFilters && (
-                            <motion.div
+                            <m.div
                                 initial={{ height: 0, opacity: 0 }}
                                 animate={{ height: 'auto', opacity: 1 }}
                                 exit={{ height: 0, opacity: 0 }}
@@ -309,7 +309,7 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
                                         </div>
                                     </div>
                                 </div>
-                            </motion.div>
+                            </m.div>
                         )}
                     </AnimatePresence>
                 </div>
@@ -336,25 +336,25 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
                             {Array(8).fill(0).map((_, i) => <BookCardSkeleton key={i} />)}
                         </div>
                     ) : filteredBooks.length > 0 ? (
-                        <motion.div
+                        <m.div
                             initial="hidden"
                             animate="visible"
                             variants={containerVariants}
                             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 md:gap-14"
                         >
                             {filteredBooks.map(book => (
-                                <motion.div key={book.id} variants={itemVariants}>
+                                <m.div key={book.id} variants={itemVariants}>
                                     <BookCard
                                         book={book}
                                         onAddToCart={onAddToCart}
                                         onToggleWishlist={onToggleWishlist}
                                         onViewDetails={onViewDetails}
                                     />
-                                </motion.div>
+                                </m.div>
                             ))}
-                        </motion.div>
+                        </m.div>
                     ) : (
-                        <motion.div
+                        <m.div
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             className="text-center py-32 bg-white rounded-[4rem] border-2 border-dashed border-gray-100 px-8 group"
@@ -376,7 +376,7 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
                                     Limpar todos os filtros
                                 </button>
                             </div>
-                        </motion.div>
+                        </m.div>
                     )}
                 </div>
             </section>

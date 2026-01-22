@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sparkles, BookOpen, ArrowRight, Zap, Star, Trophy, Mail, Clock, PenTool, Users, CheckCircle, Loader2, ChevronUp } from 'lucide-react';
-import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { m, AnimatePresence, Variants } from 'framer-motion';
 import { Book, ViewState, BlogPost } from '../types';
 import BookCard from '../components/BookCard';
 import Countdown from '../components/Countdown';
@@ -118,26 +118,26 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
             <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-white">
                 {/* Modern Dynamic Background Elements */}
                 <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-brand-primary/5 to-transparent pointer-events-none"></div>
-                <motion.div
+                <m.div
                     initial={{ opacity: 0, rotate: -45 }}
                     animate={{ opacity: 1, rotate: -45 }}
                     transition={{ duration: 2 }}
                     className="absolute -top-40 -right-20 w-[600px] h-[600px] bg-brand-primary/5 rounded-[100px] blur-[100px] pointer-events-none"
-                ></motion.div>
+                ></m.div>
 
                 <div className="container mx-auto px-4 md:px-8 grid lg:grid-cols-2 items-center gap-10 md:gap-20 py-10 md:py-20 relative z-10">
-                    <motion.div
+                    <m.div
                         initial="hidden"
                         animate="visible"
                         variants={containerVariants}
                         className="space-y-6 md:space-y-10 text-center lg:text-left"
                     >
-                        <motion.div variants={itemVariants} className="inline-flex items-center gap-3 px-5 py-2.5 bg-brand-primary/10 rounded-full text-brand-primary font-bold tracking-[0.2em] uppercase text-[10px]">
+                        <m.div variants={itemVariants} className="inline-flex items-center gap-3 px-5 py-2.5 bg-brand-primary/10 rounded-full text-brand-primary font-bold tracking-[0.2em] uppercase text-[10px]">
                             {upcomingLaunch ? <Clock className="w-4 h-4 animate-pulse" /> : <Sparkles className="w-4 h-4" />}
                             <span>{upcomingLaunch ? 'Próximo Grande Lançamento' : 'Edições de Colecionador agora disponíveis'}</span>
-                        </motion.div>
+                        </m.div>
 
-                        <motion.h1 variants={itemVariants} className="text-5xl md:text-7xl lg:text-[6.5rem] font-black leading-[0.9] text-brand-dark tracking-tighter">
+                        <m.h1 variants={itemVariants} className="text-5xl md:text-7xl lg:text-[6.5rem] font-black leading-[0.9] text-brand-dark tracking-tighter">
                             {upcomingLaunch ? (
                                 <>
                                     {upcomingLaunch.title} <br />
@@ -149,22 +149,22 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                                     <span className="text-brand-primary italic font-serif font-normal text-[0.85em]">{siteContent['hero.subtitle'] || "Ganha Vida"}</span>
                                 </>
                             )}
-                        </motion.h1>
+                        </m.h1>
 
-                        <motion.p variants={itemVariants} className="text-lg md:text-xl text-gray-500 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
+                        <m.p variants={itemVariants} className="text-lg md:text-xl text-gray-500 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
                             {upcomingLaunch
                                 ? upcomingLaunch.description.slice(0, 180) + '...'
                                 : (siteContent['hero.description'] || "Descubra o catálogo da Editora Graça. Uma seleção rigorosa de literatura angolana e internacional, desenhada para leitores exigentes.")
                             }
-                        </motion.p>
+                        </m.p>
 
                         {upcomingLaunch && upcomingLaunch.launchDate && (
-                            <motion.div variants={itemVariants} className="py-4 flex justify-center lg:justify-start">
+                            <m.div variants={itemVariants} className="py-4 flex justify-center lg:justify-start">
                                 <Countdown targetDate={upcomingLaunch.launchDate} />
-                            </motion.div>
+                            </m.div>
                         )}
 
-                        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 md:gap-6 pt-4">
+                        <m.div variants={itemVariants} className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 md:gap-6 pt-4">
                             <button
                                 className="btn-premium group w-full sm:w-auto justify-center py-5 px-10 text-sm shadow-2xl shadow-brand-primary/20"
                                 onClick={() => upcomingLaunch ? onViewDetails(upcomingLaunch) : navigate('/livros')}
@@ -180,16 +180,16 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                                     Nossa História
                                 </button>
                             )}
-                        </motion.div>
+                        </m.div>
 
                         {!upcomingLaunch && (
-                            <motion.div variants={itemVariants} className="flex items-center justify-center lg:justify-start gap-8 md:gap-12 pt-10 border-t border-gray-100/50">
+                            <m.div variants={itemVariants} className="flex items-center justify-center lg:justify-start gap-8 md:gap-12 pt-10 border-t border-gray-100/50">
                                 <div className="flex flex-col">
                                     <span className="text-3xl md:text-5xl font-black text-brand-dark tracking-tighter">
                                         {stats.booksCount > 0 ? (
-                                            <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                                            <m.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                                                 {stats.booksCount}+
-                                            </motion.span>
+                                            </m.span>
                                         ) : '...'}
                                     </span>
                                     <span className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-black">Livros Publicados</span>
@@ -197,18 +197,18 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                                 <div className="flex flex-col">
                                     <span className="text-3xl md:text-5xl font-black text-brand-dark tracking-tighter">
                                         {stats.readersCount > 0 ? (
-                                            <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                                            <m.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                                                 {stats.readersCount}+
-                                            </motion.span>
+                                            </m.span>
                                         ) : '100+'}
                                     </span>
                                     <span className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-black">Leitores</span>
                                 </div>
-                            </motion.div>
+                            </m.div>
                         )}
-                    </motion.div>
+                    </m.div>
 
-                    <motion.div
+                    <m.div
                         initial={{ opacity: 0, scale: 0.9, x: 50 }}
                         animate={{ opacity: 1, scale: 1, x: 0 }}
                         transition={{ duration: 0.8, delay: 0.2 }}
@@ -235,11 +235,11 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                         </div>
 
                         {/* Floating elements for depth */}
-                        <motion.div
+                        <m.div
                             animate={{ y: [0, -20, 0] }}
                             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                             className="absolute -top-12 -right-12 w-48 h-48 bg-brand-primary/20 rounded-full blur-3xl -z-10"
-                        ></motion.div>
+                        ></m.div>
 
                         <div className="absolute -bottom-8 -left-8 bg-white p-7 rounded-[2rem] shadow-2xl flex items-center gap-6 border border-gray-100 z-20 group hover:translate-y-[-5px] transition-all">
                             <div className="w-16 h-16 bg-brand-primary flex items-center justify-center rounded-2xl text-white shadow-lg shadow-brand-primary/30 group-hover:rotate-12 transition-transform">
@@ -252,12 +252,12 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                                 </p>
                             </div>
                         </div>
-                    </motion.div>
+                    </m.div>
                 </div>
             </section>
 
             {/* Categories Section */}
-            <motion.section
+            <m.section
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px" }}
@@ -268,17 +268,17 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                 <div className="absolute -left-20 top-40 w-80 h-80 bg-brand-primary/5 rounded-full blur-[80px]"></div>
 
                 <div className="container mx-auto px-4 md:px-8 relative z-10">
-                    <motion.div variants={itemVariants} className="text-center mb-16 md:mb-24">
+                    <m.div variants={itemVariants} className="text-center mb-16 md:mb-24">
                         <h2 className="text-4xl md:text-6xl font-black text-brand-dark tracking-tighter mb-4">
                             Explore por <span className="text-brand-primary italic font-serif font-normal">Categorias</span>
                         </h2>
                         <div className="w-24 h-1.5 bg-brand-primary mx-auto rounded-full"></div>
-                    </motion.div>
+                    </m.div>
 
                     {categories.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
                             {categories.map((cat, idx) => (
-                                <motion.div
+                                <m.div
                                     key={idx}
                                     variants={itemVariants}
                                     onClick={() => navigate('/livros')}
@@ -295,7 +295,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                                             Explorar Tudo <ArrowRight className="w-4 h-4" />
                                         </button>
                                     </div>
-                                </motion.div>
+                                </m.div>
                             ))}
                         </div>
                     ) : (
@@ -311,10 +311,10 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                         </div>
                     )}
                 </div>
-            </motion.section>
+            </m.section>
 
             {/* New Arrivals Section */}
-            <motion.section
+            <m.section
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px" }}
@@ -324,16 +324,16 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                 <div className="container mx-auto px-4 md:px-8">
                     <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-16 md:mb-24 gap-8 text-center md:text-left">
                         <div className="space-y-5">
-                            <motion.div variants={itemVariants} className="flex items-center justify-center md:justify-start gap-3 text-brand-primary font-black tracking-[0.3em] uppercase text-[10px]">
+                            <m.div variants={itemVariants} className="flex items-center justify-center md:justify-start gap-3 text-brand-primary font-black tracking-[0.3em] uppercase text-[10px]">
                                 <div className="w-12 h-1 bg-brand-primary rounded-full"></div>
                                 <span>Novidades</span>
-                            </motion.div>
-                            <motion.h2 variants={itemVariants} className="text-5xl md:text-7xl font-black text-brand-dark tracking-tighter leading-tight">
+                            </m.div>
+                            <m.h2 variants={itemVariants} className="text-5xl md:text-7xl font-black text-brand-dark tracking-tighter leading-tight">
                                 Acabados de <br />
                                 <span className="text-brand-primary italic font-serif font-normal">Sair do Forno</span>
-                            </motion.h2>
+                            </m.h2>
                         </div>
-                        <motion.button
+                        <m.button
                             variants={itemVariants}
                             onClick={() => navigate('/livros')}
                             className="group flex items-center gap-5 font-black text-[12px] uppercase tracking-[0.2em] text-brand-dark hover:text-brand-primary transition-all bg-white px-8 py-4 rounded-2xl shadow-xl hover:shadow-brand-primary/10"
@@ -342,7 +342,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                             <span className="w-10 h-10 bg-brand-dark text-white rounded-full flex items-center justify-center group-hover:bg-brand-primary transition-all">
                                 <ArrowRight className="w-5 h-5" />
                             </span>
-                        </motion.button>
+                        </m.button>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10">
@@ -350,14 +350,14 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                             Array(4).fill(0).map((_, i) => <BookCardSkeleton key={i} />)
                         ) : (
                             books.filter(b => b.isNew || b.isBestseller).slice(0, 4).map(book => (
-                                <motion.div key={book.id} variants={itemVariants}>
+                                <m.div key={book.id} variants={itemVariants}>
                                     <BookCard
                                         book={book}
                                         onAddToCart={onAddToCart}
                                         onToggleWishlist={onToggleWishlist}
                                         onViewDetails={onViewDetails}
                                     />
-                                </motion.div>
+                                </m.div>
                             ))
                         )}
                         {!loading && !isFetching && books.length === 0 && (
@@ -368,10 +368,10 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                         )}
                     </div>
                 </div>
-            </motion.section>
+            </m.section>
 
             {/* Podcast & Blog Preview Section */}
-            <motion.section
+            <m.section
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
@@ -381,7 +381,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                 <div className="container mx-auto px-4 md:px-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 md:gap-24">
                         {/* Call to Authors */}
-                        <motion.div variants={itemVariants} className="space-y-10">
+                        <m.div variants={itemVariants} className="space-y-10">
                             <div className="bg-brand-dark p-10 md:p-12 rounded-[3rem] text-white relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 p-12 opacity-5 -translate-y-1/4 translate-x-1/4 group-hover:scale-110 transition-transform duration-1000">
                                     <PenTool className="w-64 h-64" />
@@ -394,10 +394,10 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                                     </button>
                                 </div>
                             </div>
-                        </motion.div>
+                        </m.div>
 
                         {/* Recent Blog Posts */}
-                        <motion.div variants={itemVariants} className="space-y-10">
+                        <m.div variants={itemVariants} className="space-y-10">
                             <div className="flex items-center gap-5">
                                 <div className="p-4 bg-brand-primary/10 rounded-3xl text-brand-primary shadow-lg shadow-brand-primary/5">
                                     <BookOpen className="w-8 h-8" />
@@ -439,14 +439,14 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                                     </span>
                                 </button>
                             </div>
-                        </motion.div>
+                        </m.div>
                     </div>
                 </div>
-            </motion.section>
+            </m.section>
 
             {/* Testimonials Section */}
             {testimonials.length > 0 && (
-                <motion.section
+                <m.section
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true }}
@@ -454,16 +454,16 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                     className="py-24 md:py-40 bg-white overflow-hidden optimize-render"
                 >
                     <div className="container mx-auto px-4 md:px-8">
-                        <motion.div variants={itemVariants} className="text-center mb-24">
+                        <m.div variants={itemVariants} className="text-center mb-24">
                             <h2 className="text-5xl md:text-7xl font-black text-brand-dark tracking-tighter leading-tight">
                                 O que dizem os nossos <br />
                                 <span className="text-brand-primary italic font-serif font-normal">Autores e Leitores</span>
                             </h2>
-                        </motion.div>
+                        </m.div>
 
                         <div className="grid md:grid-cols-3 gap-10 md:gap-14">
                             {testimonials.map((t, idx) => (
-                                <motion.div
+                                <m.div
                                     key={t.id || idx}
                                     variants={itemVariants}
                                     className="bg-brand-light p-12 rounded-[3.5rem] relative group border border-gray-100/50 shadow-2xl shadow-brand-dark/5 hover:translate-y-[-10px] transition-all duration-500"
@@ -484,15 +484,15 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                                             <p className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-black">{t.role}</p>
                                         </div>
                                     </div>
-                                </motion.div>
+                                </m.div>
                             ))}
                         </div>
                     </div>
-                </motion.section>
+                </m.section>
             )}
 
             {/* Newsletter Section with Premium Glassmorphism */}
-            <motion.section
+            <m.section
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
@@ -503,16 +503,16 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
 
                 <div className="container mx-auto relative z-10 text-center">
                     <div className="max-w-3xl mx-auto space-y-12">
-                        <motion.div
+                        <m.div
                             initial={{ y: 20, opacity: 0 }}
                             whileInView={{ y: 0, opacity: 1 }}
                             transition={{ duration: 0.6 }}
                             className="w-24 h-24 bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2.5rem] flex items-center justify-center text-brand-primary mx-auto rotate-12 shadow-2xl"
                         >
                             <Mail className="w-10 h-10" />
-                        </motion.div>
+                        </m.div>
 
-                        <motion.div
+                        <m.div
                             initial={{ y: 20, opacity: 0 }}
                             whileInView={{ y: 0, opacity: 1 }}
                             transition={{ duration: 0.6, delay: 0.1 }}
@@ -524,9 +524,9 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                             <p className="text-xl text-gray-400 font-medium max-w-2xl mx-auto leading-relaxed">
                                 {siteContent['newsletter.description'] || "Subscreva a nossa newsletter e receba novidades literárias, convites para lançamentos e ofertas exclusivas."}
                             </p>
-                        </motion.div>
+                        </m.div>
 
-                        <motion.form
+                        <m.form
                             initial={{ y: 20, opacity: 0 }}
                             whileInView={{ y: 0, opacity: 1 }}
                             transition={{ duration: 0.6, delay: 0.2 }}
@@ -560,7 +560,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                                     <span>Subscrever</span>
                                 )}
                             </button>
-                        </motion.form>
+                        </m.form>
 
                         <p className="text-sm text-gray-500 font-medium tracking-wide">
                             Respeitamos a sua privacidade. Cancele quando quiser.
@@ -569,7 +569,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                 </div>
 
                 {/* Back to Top Floating Button - Functional */}
-                <motion.button
+                <m.button
                     initial={{ opacity: 0, scale: 0 }}
                     animate={{ opacity: 1, scale: 1 }}
                     whileHover={{ scale: 1.1 }}
@@ -579,8 +579,8 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                     title="Voltar ao Topo"
                 >
                     <ChevronUp className="w-7 h-7 group-hover:-translate-y-1 transition-transform" />
-                </motion.button>
-            </motion.section>
+                </m.button>
+            </m.section>
         </div>
     );
 };

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Heart, Award, Users, TrendingUp, MapPin, Mail, Phone, Loader2, Sparkles, Target, Zap, ArrowRight, Quote, Star } from 'lucide-react';
-import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { m, AnimatePresence, Variants } from 'framer-motion';
 import { ViewState } from '../types';
 import { getSiteContent } from '../services/dataService';
 
@@ -118,36 +118,36 @@ const AboutPage: React.FC = () => {
             <section className="relative min-h-[80vh] flex items-center bg-brand-dark text-white py-20 overflow-hidden">
                 {/* Visual Elements */}
                 <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-brand-primary/10 to-transparent"></div>
-                <motion.div
+                <m.div
                     initial={{ opacity: 0, rotate: -30 }}
                     animate={{ opacity: 1, rotate: -30 }}
                     transition={{ duration: 2 }}
                     className="absolute -top-40 -right-20 w-[600px] h-[600px] bg-brand-primary/5 rounded-[100px] blur-[120px]"
-                ></motion.div>
+                ></m.div>
                 <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-brand-primary/30 to-transparent"></div>
 
                 <div className="container mx-auto px-4 md:px-8 relative z-10">
-                    <motion.div
+                    <m.div
                         initial="hidden"
                         animate="visible"
                         variants={containerVariants}
                         className="max-w-5xl"
                     >
-                        <motion.div variants={itemVariants} className="flex items-center gap-3 text-brand-primary uppercase tracking-[0.4em] font-black text-[10px] md:text-sm mb-10">
+                        <m.div variants={itemVariants} className="flex items-center gap-3 text-brand-primary uppercase tracking-[0.4em] font-black text-[10px] md:text-sm mb-10">
                             <div className="w-12 h-px bg-brand-primary"></div>
                             <span>Sobre a Editora Graça</span>
-                        </motion.div>
+                        </m.div>
 
-                        <motion.h1 variants={itemVariants} className="text-5xl md:text-[8rem] font-black tracking-tighter mb-10 leading-[0.85]">
+                        <m.h1 variants={itemVariants} className="text-5xl md:text-[8rem] font-black tracking-tighter mb-10 leading-[0.85]">
                             Onde Cada Página <br />
                             <span className="text-brand-primary italic font-serif font-normal">Cria Futuro</span>
-                        </motion.h1>
+                        </m.h1>
 
-                        <motion.p variants={itemVariants} className="text-xl md:text-3xl text-gray-400 leading-relaxed font-medium max-w-3xl mb-12">
+                        <m.p variants={itemVariants} className="text-xl md:text-3xl text-gray-400 leading-relaxed font-medium max-w-3xl mb-12">
                             Transformamos manuscritos em legados. Uma casa editorial angolana comprometida com a <span className="text-white">excelência literária</span> e o impacto cultural.
-                        </motion.p>
+                        </m.p>
 
-                        <motion.div variants={itemVariants} className="flex flex-wrap gap-6">
+                        <m.div variants={itemVariants} className="flex flex-wrap gap-6">
                             <div className="flex -space-x-4">
                                 {[1, 2, 3, 4].map(i => (
                                     <div key={i} className="w-14 h-14 rounded-full border-4 border-brand-dark bg-gray-800 flex items-center justify-center overflow-hidden">
@@ -159,8 +159,8 @@ const AboutPage: React.FC = () => {
                                 <span className="text-white font-black text-lg">Comunidade de Autores</span>
                                 <span className="text-brand-primary text-xs font-bold uppercase tracking-widest">+100 Escritores Parceiros</span>
                             </div>
-                        </motion.div>
-                    </motion.div>
+                        </m.div>
+                    </m.div>
                 </div>
             </section>
 
@@ -188,7 +188,7 @@ const AboutPage: React.FC = () => {
                                 description: 'Usar a palavra escrita como motor de mudança intelectual e preservação da memória colectiva.'
                             }
                         ].map((item, i) => (
-                            <motion.div
+                            <m.div
                                 key={i}
                                 initial="hidden"
                                 whileInView="visible"
@@ -204,7 +204,7 @@ const AboutPage: React.FC = () => {
                                     <h2 className="text-3xl font-black text-brand-dark tracking-tight">{item.title}</h2>
                                     <p className="text-gray-500 leading-relaxed text-lg">{item.description}</p>
                                 </div>
-                            </motion.div>
+                            </m.div>
                         ))}
                     </div>
                 </div>
@@ -215,27 +215,27 @@ const AboutPage: React.FC = () => {
                 <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-white to-transparent"></div>
 
                 <div className="container mx-auto px-4 md:px-8 relative z-10">
-                    <motion.div
+                    <m.div
                         initial="hidden"
                         whileInView="visible"
                         viewport={{ once: true }}
                         variants={containerVariants}
                         className="text-center max-w-4xl mx-auto mb-24"
                     >
-                        <motion.h2 variants={itemVariants} className="text-4xl md:text-7xl font-black text-brand-dark tracking-tighter mb-8">
+                        <m.h2 variants={itemVariants} className="text-4xl md:text-7xl font-black text-brand-dark tracking-tighter mb-8">
                             Os Valores que <br />
                             <span className="text-brand-primary italic font-serif font-normal">Nos Movem</span>
-                        </motion.h2>
-                        <motion.p variants={itemVariants} className="text-xl text-gray-500 font-medium">
+                        </m.h2>
+                        <m.p variants={itemVariants} className="text-xl text-gray-500 font-medium">
                             Na Editora Graça, cada detalhe é pautado por princípios que garantem a excelência da sua obra.
-                        </motion.p>
-                    </motion.div>
+                        </m.p>
+                    </m.div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
                         {values.map((value: any, index: number) => {
                             const Icon = iconMap[value.icon] || BookOpen;
                             return (
-                                <motion.div
+                                <m.div
                                     key={index}
                                     initial="hidden"
                                     whileInView="visible"
@@ -248,7 +248,7 @@ const AboutPage: React.FC = () => {
                                     </div>
                                     <h3 className="text-2xl font-black text-brand-dark mb-4">{value.title}</h3>
                                     <p className="text-gray-500 leading-relaxed font-medium">{value.description}</p>
-                                </motion.div>
+                                </m.div>
                             );
                         })}
                     </div>
@@ -258,7 +258,7 @@ const AboutPage: React.FC = () => {
             {/* Founder's Quote */}
             <section className="py-32 bg-white overflow-hidden">
                 <div className="container mx-auto px-4 md:px-8">
-                    <motion.div
+                    <m.div
                         initial={{ opacity: 0, x: -50 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
@@ -284,7 +284,7 @@ const AboutPage: React.FC = () => {
                                 </div>
                             </div>
                         </div>
-                    </motion.div>
+                    </m.div>
                 </div>
             </section>
 
@@ -303,7 +303,7 @@ const AboutPage: React.FC = () => {
 
                         <div className="space-y-32">
                             {timeline.map((item: any, index: number) => (
-                                <motion.div
+                                <m.div
                                     key={index}
                                     initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
                                     whileInView={{ opacity: 1, x: 0 }}
@@ -327,7 +327,7 @@ const AboutPage: React.FC = () => {
                                         </div>
                                     </div>
                                     <div className="flex-1 hidden md:block"></div>
-                                </motion.div>
+                                </m.div>
                             ))}
                         </div>
                     </div>
@@ -345,7 +345,7 @@ const AboutPage: React.FC = () => {
                         {stats.map((stat: any, index: number) => {
                             const StatIcon = stat.icon || BookOpen;
                             return (
-                                <motion.div
+                                <m.div
                                     key={index}
                                     initial={{ opacity: 0, scale: 0.5 }}
                                     whileInView={{ opacity: 1, scale: 1 }}
@@ -364,7 +364,7 @@ const AboutPage: React.FC = () => {
                                             {stat.label}
                                         </div>
                                     </div>
-                                </motion.div>
+                                </m.div>
                             );
                         })}
                     </div>
@@ -419,7 +419,7 @@ const AboutPage: React.FC = () => {
             {/* Premium CTA */}
             <section className="py-32 bg-brand-light relative overflow-hidden">
                 <div className="container mx-auto px-4 md:px-8 text-center relative z-10">
-                    <motion.div
+                    <m.div
                         initial={{ opacity: 0, y: 50 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -447,7 +447,7 @@ const AboutPage: React.FC = () => {
                                 Ver Nossos Serviços
                             </button>
                         </div>
-                    </motion.div>
+                    </m.div>
                 </div>
             </section>
         </div>

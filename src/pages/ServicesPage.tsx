@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Pencil, Palette, Shield, Megaphone, Printer, Check, ArrowRight, Loader2, Zap, Award, Search, FileText, CloudUpload, Sparkles, MessageSquare } from 'lucide-react';
-import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { m, AnimatePresence, Variants } from 'framer-motion';
 import { ViewState, EditorialService } from '../types';
 import { getEditorialServices, getSiteContent } from '../services/dataService';
 import { ServiceCardSkeleton } from '../components/SkeletonLoader';
@@ -137,36 +137,36 @@ const ServicesPage: React.FC = () => {
             <section className="relative bg-brand-dark text-white py-24 md:py-32 overflow-hidden border-b border-white/5">
                 {/* Modern Dynamic Background Elements */}
                 <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-brand-primary/10 to-transparent pointer-events-none"></div>
-                <motion.div
+                <m.div
                     initial={{ opacity: 0, rotate: -45 }}
                     animate={{ opacity: 1, rotate: -45 }}
                     transition={{ duration: 2 }}
                     className="absolute -top-40 -right-20 w-[600px] h-[600px] bg-brand-primary/5 rounded-[100px] blur-[100px] pointer-events-none"
-                ></motion.div>
+                ></m.div>
 
                 <div className="container mx-auto px-8 relative z-10">
-                    <motion.div
+                    <m.div
                         initial="hidden"
                         animate="visible"
                         variants={containerVariants}
                         className="max-w-4xl"
                     >
-                        <motion.div variants={itemVariants} className="flex items-center gap-2 text-sm text-brand-primary uppercase tracking-[0.3em] font-black mb-8">
+                        <m.div variants={itemVariants} className="flex items-center gap-2 text-sm text-brand-primary uppercase tracking-[0.3em] font-black mb-8">
                             <button onClick={() => navigate('/')} className="hover:text-white transition-colors">Início</button>
                             <span>/</span>
                             <span className="text-white">Serviços</span>
-                        </motion.div>
+                        </m.div>
 
-                        <motion.h1 variants={itemVariants} className="text-5xl md:text-8xl font-black tracking-tighter mb-10 leading-[0.9]">
+                        <m.h1 variants={itemVariants} className="text-5xl md:text-8xl font-black tracking-tighter mb-10 leading-[0.9]">
                             {siteContent['hero.title'] || "Excelência"} <br />
                             <span className="text-brand-primary italic font-serif font-normal">{siteContent['hero.subtitle'] || "Editorial"}</span>
-                        </motion.h1>
+                        </m.h1>
 
-                        <motion.p variants={itemVariants} className="text-xl md:text-2xl text-gray-400 leading-relaxed font-medium mb-12 max-w-2xl">
+                        <m.p variants={itemVariants} className="text-xl md:text-2xl text-gray-400 leading-relaxed font-medium mb-12 max-w-2xl">
                             {siteContent['hero.description'] || "Transformamos manuscritos em obras publicadas com o rigor e a qualidade que o mercado literário exige."}
-                        </motion.p>
+                        </m.p>
 
-                        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-6">
+                        <m.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-6">
                             <button
                                 onClick={() => navigate('/contacto')}
                                 className="bg-brand-primary text-white px-12 py-6 rounded-2xl font-black uppercase tracking-[0.2em] hover:bg-white hover:text-brand-dark transition-all duration-300 shadow-2xl flex items-center gap-4 group w-full sm:w-auto justify-center"
@@ -185,8 +185,8 @@ const ServicesPage: React.FC = () => {
                                 </div>
                             </div>
                             <span className="text-sm text-gray-500 font-bold uppercase tracking-widest">Autores Satisfeitos</span>
-                        </motion.div>
-                    </motion.div>
+                        </m.div>
+                    </m.div>
                 </div>
             </section>
 
@@ -197,24 +197,24 @@ const ServicesPage: React.FC = () => {
                 <div className="absolute bottom-0 left-0 w-96 h-96 bg-brand-primary/5 rounded-full blur-[100px] -z-10 -translate-x-1/2 translate-y-1/2"></div>
 
                 <div className="container mx-auto px-8">
-                    <motion.div
+                    <m.div
                         initial="hidden"
                         whileInView="visible"
                         viewport={{ once: true }}
                         variants={containerVariants}
                         className="text-center max-w-3xl mx-auto mb-24"
                     >
-                        <motion.div variants={itemVariants} className="inline-flex items-center gap-3 px-6 py-2.5 bg-brand-primary/10 rounded-full mb-8">
+                        <m.div variants={itemVariants} className="inline-flex items-center gap-3 px-6 py-2.5 bg-brand-primary/10 rounded-full mb-8">
                             <Sparkles className="w-4 h-4 text-brand-primary" />
                             <span className="text-brand-primary font-black tracking-[0.2em] uppercase text-[10px]">Estratégia & Sucesso</span>
-                        </motion.div>
-                        <motion.h2 variants={itemVariants} className="text-4xl md:text-7xl font-black text-brand-dark tracking-tighter mb-8 leading-none">
+                        </m.div>
+                        <m.h2 variants={itemVariants} className="text-4xl md:text-7xl font-black text-brand-dark tracking-tighter mb-8 leading-none">
                             Soluções <span className="text-brand-primary italic font-serif font-normal">Premium</span>
-                        </motion.h2>
-                        <motion.p variants={itemVariants} className="text-xl text-gray-500 font-medium leading-relaxed">
+                        </m.h2>
+                        <m.p variants={itemVariants} className="text-xl text-gray-500 font-medium leading-relaxed">
                             Cuidamos de cada detalhe técnico da sua publicação, para que você possa focar no que realmente importa: a sua história.
-                        </motion.p>
-                    </motion.div>
+                        </m.p>
+                    </m.div>
 
                     <AnimatePresence mode="wait">
                         {isLoading ? (
@@ -222,7 +222,7 @@ const ServicesPage: React.FC = () => {
                                 {[1, 2, 3].map(i => <ServiceCardSkeleton key={i} />)}
                             </div>
                         ) : (
-                            <motion.div
+                            <m.div
                                 initial="hidden"
                                 whileInView="visible"
                                 viewport={{ once: true }}
@@ -232,7 +232,7 @@ const ServicesPage: React.FC = () => {
                                 {services.map((service, index) => {
                                     const Icon = (service as any).icon || getIcon(service.title);
                                     return (
-                                        <motion.div
+                                        <m.div
                                             key={service.id || index}
                                             variants={itemVariants}
                                             className="bg-white rounded-[3rem] p-12 border border-gray-100 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_40px_80px_-20px_rgba(196,160,82,0.15)] transition-all duration-500 group flex flex-col relative overflow-hidden"
@@ -253,7 +253,7 @@ const ServicesPage: React.FC = () => {
 
                                                 <div className="space-y-4 mb-12 flex-1">
                                                     {service.details.map((feature, idx) => (
-                                                        <motion.div
+                                                        <m.div
                                                             key={idx}
                                                             initial={{ opacity: 0, x: -10 }}
                                                             whileInView={{ opacity: 1, x: 0 }}
@@ -264,7 +264,7 @@ const ServicesPage: React.FC = () => {
                                                                 <Check className="w-3.5 h-3.5 text-brand-primary group-hover:text-white" />
                                                             </div>
                                                             <span className="text-gray-600 font-medium">{feature}</span>
-                                                        </motion.div>
+                                                        </m.div>
                                                     ))}
                                                 </div>
 
@@ -275,10 +275,10 @@ const ServicesPage: React.FC = () => {
                                                     Solicitar Agora
                                                 </button>
                                             </div>
-                                        </motion.div>
+                                        </m.div>
                                     );
                                 })}
-                            </motion.div>
+                            </m.div>
                         )}
                     </AnimatePresence>
                 </div>
@@ -287,27 +287,27 @@ const ServicesPage: React.FC = () => {
             {/* How It Works / Process */}
             <section className="py-24 md:py-32 bg-brand-light relative overflow-hidden">
                 <div className="container mx-auto px-8">
-                    <motion.div
+                    <m.div
                         initial="hidden"
                         whileInView="visible"
                         viewport={{ once: true }}
                         variants={containerVariants}
                         className="text-center mb-24"
                     >
-                        <motion.h2 variants={itemVariants} className="text-4xl md:text-6xl font-black text-brand-dark tracking-tighter mb-8 leading-none">
+                        <m.h2 variants={itemVariants} className="text-4xl md:text-6xl font-black text-brand-dark tracking-tighter mb-8 leading-none">
                             O Nosso <span className="text-brand-primary italic font-serif font-normal">Caminho</span> Juntos
-                        </motion.h2>
-                        <motion.p variants={itemVariants} className="text-xl text-gray-500 font-medium max-w-2xl mx-auto">
+                        </m.h2>
+                        <m.p variants={itemVariants} className="text-xl text-gray-500 font-medium max-w-2xl mx-auto">
                             Desde o primeiro contacto até à obra final, garantimos transparência e excelência em cada etapa.
-                        </motion.p>
-                    </motion.div>
+                        </m.p>
+                    </m.div>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 relative">
                         {/* Connecting Line (Desktop) */}
                         <div className="hidden lg:block absolute top-1/2 left-0 w-full h-0.5 bg-brand-primary/10 -translate-y-[4.5rem]"></div>
 
                         {processSteps.map((step, idx) => (
-                            <motion.div
+                            <m.div
                                 key={idx}
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 whileInView={{ opacity: 1, scale: 1 }}
@@ -323,7 +323,7 @@ const ServicesPage: React.FC = () => {
                                 </div>
                                 <h4 className="text-2xl font-black text-brand-dark mb-4 tracking-tighter">{step.title}</h4>
                                 <p className="text-gray-500 font-medium leading-relaxed">{step.description}</p>
-                            </motion.div>
+                            </m.div>
                         ))}
                     </div>
                 </div>
@@ -332,14 +332,14 @@ const ServicesPage: React.FC = () => {
             {/* CTA Section */}
             <section className="py-32 bg-brand-dark text-white relative overflow-hidden">
                 <div className="absolute inset-0 bg-brand-primary/5 pattern-grid-white opacity-10"></div>
-                <motion.div
+                <m.div
                     animate={{ y: [0, -20, 0], opacity: [0.1, 0.2, 0.1] }}
                     transition={{ duration: 5, repeat: Infinity }}
                     className="absolute -top-40 -right-40 w-96 h-96 bg-brand-primary/20 rounded-full blur-[100px]"
-                ></motion.div>
+                ></m.div>
 
                 <div className="container mx-auto px-8 text-center relative z-10">
-                    <motion.div
+                    <m.div
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -362,7 +362,7 @@ const ServicesPage: React.FC = () => {
                                 </span>
                             </button>
                         </div>
-                    </motion.div>
+                    </m.div>
                 </div>
             </section>
         </div>
