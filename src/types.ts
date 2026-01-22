@@ -77,15 +77,6 @@ export interface ChatMessage {
   isLoading?: boolean;
 }
 
-export interface PodcastEpisode {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  duration: string;
-  audioUrl: string;
-  imageUrl: string;
-}
 
 export interface EditorialService {
   id: string;

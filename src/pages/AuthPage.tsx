@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { login, signUp } from '../services/authService';
 import { User, Mail, Lock, ArrowRight, BookOpen, Check, Loader2 } from 'lucide-react';
 
@@ -9,14 +9,27 @@ interface AuthPageProps {
 
 const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
     const navigate = useNavigate();
-    const [isLogin, setIsLogin] = useState(true);
+    const [searchParams] = useSearchParams();
+    const initialMode = searchParams.get('mode');
+
+    const [isLogin, setIsLogin] = useState(initialMode !== 'register');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [connectionStatus, setConnectionStatus] = useState<'idle' | 'checking' | 'ok' | 'error'>('idle');
-    const mounted = React.useRef(true);
+    const mounted = useRef(true);
+
+    // Sync isLogin with URL mode if it changes
+    useEffect(() => {
+        const mode = searchParams.get('mode');
+        if (mode === 'register') {
+            setIsLogin(false);
+        } else if (mode === 'login') {
+            setIsLogin(true);
+        }
+    }, [searchParams]);
 
     const checkConnection = async () => {
         setConnectionStatus('checking');
@@ -69,6 +82,8 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
         return () => { mounted.current = false; };
     }, []);
 
+    const [success, setSuccess] = useState('');
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -87,10 +102,11 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
 
         setLoading(true);
         setError('');
+        setSuccess('');
 
         try {
             const timeoutPromise = new Promise((_, reject) => {
-                setTimeout(() => reject(new Error('O pedido expirou. Verifique a sua conexão.')), 25000);
+                setTimeout(() => reject(new Error('timeout')), 25000);
             });
 
             if (isLogin) {
@@ -110,17 +126,24 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
                 ]) as any;
 
                 if (user) {
-                    onLogin(user);
-                    navigate('/');
+                    setSuccess('Conta criada com sucesso! Por favor, verifique o seu e-mail para confirmar o registo antes de entrar.');
+                    setIsLogin(true);
                 }
             }
         } catch (err: any) {
             console.error("Auth error:", err);
-            // If it's a timeout error, give a specific helpful message
-            if (err.message?.includes('expirou')) {
+
+            const msg = err.message || '';
+            if (msg === 'timeout') {
                 setError('A conexão com o servidor demorou muito. Verifique a sua internet e tente novamente.');
+            } else if (msg.includes('Invalid login credentials') || msg.includes('Invalid log in')) {
+                setError('E-mail ou senha incorretos. Por favor, tente novamente.');
+            } else if (msg.includes('Email not confirmed')) {
+                setError('O seu e-mail ainda não foi confirmado. Verifique a sua caixa de entrada.');
+            } else if (msg.includes('User already registered')) {
+                setError('Este e-mail já está registado. Tente fazer login.');
             } else {
-                setError(err.message || 'Ocorreu um erro ao processar o seu pedido.');
+                setError(msg || 'Ocorreu um erro ao processar o seu pedido.');
             }
         } finally {
             if (mounted.current) {
@@ -185,21 +208,41 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
                             </p>
                         </div>
 
+                        {success && (
+                            <div className="p-4 bg-green-50 border-l-4 border-green-500 text-green-700 text-sm font-bold animate-fade-in">
+                                {success}
+                            </div>
+                        )}
+
                         {error && (
                             <div className="p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm font-bold animate-shake">
                                 {error}
                                 <div className="mt-2">
-                                    <button
-                                        type="button"
-                                        onClick={checkConnection}
-                                        disabled={connectionStatus === 'checking'}
-                                        className="text-xs underline hover:text-red-900 font-bold flex items-center gap-2"
-                                    >
-                                        {connectionStatus === 'checking' && <Loader2 className="w-3 h-3 animate-spin" />}
-                                        {connectionStatus === 'idle' && 'Testar minha conexão'}
-                                        {connectionStatus === 'ok' && 'Internet OK'}
-                                        {connectionStatus === 'error' && 'Sem Internet'}
-                                    </button>
+                                    <div className="flex gap-4 items-center">
+                                        <button
+                                            type="button"
+                                            onClick={checkConnection}
+                                            disabled={connectionStatus === 'checking'}
+                                            className="text-xs underline hover:text-red-900 font-bold flex items-center gap-2"
+                                        >
+                                            {connectionStatus === 'checking' && <Loader2 className="w-3 h-3 animate-spin" />}
+                                            {connectionStatus === 'idle' && 'Testar minha conexão'}
+                                            {connectionStatus === 'ok' && 'Internet OK'}
+                                            {connectionStatus === 'error' && 'Sem Internet'}
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                localStorage.clear();
+                                                window.location.reload();
+                                            }}
+                                            className="text-xs py-1 px-3 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 font-bold ml-auto"
+                                            title="Limpar memória do navegador e recarregar"
+                                        >
+                                            Resetar App
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         )}

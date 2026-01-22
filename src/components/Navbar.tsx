@@ -78,8 +78,8 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                         </>
                     ) : (
                         <>
-                            <button onClick={() => onNavigate('AUTH')} className="hover:text-brand-primary uppercase" title="Entrar na minha conta">Entrar</button>
-                            <button onClick={() => onNavigate('AUTH')} className="hover:text-brand-primary uppercase" title="Criar uma nova conta">Registar</button>
+                            <button onClick={() => onNavigate('/login?mode=login')} className="hover:text-brand-primary uppercase" title="Entrar na minha conta">Entrar</button>
+                            <button onClick={() => onNavigate('/login?mode=register')} className="hover:text-brand-primary uppercase" title="Criar uma nova conta">Registar</button>
                         </>
                     )}
                 </div>
@@ -118,7 +118,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                     <button
                         onClick={() => {
                             if (!user) {
-                                onNavigate('AUTH');
+                                onNavigate('/login?mode=login');
                             } else {
                                 const dashboardView = user.role === 'adm' ? 'ADMIN' :
                                     (user.role === 'autor' ? 'AUTHOR_DASHBOARD' : 'READER_DASHBOARD');
@@ -199,30 +199,32 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
             </div>
 
             {/* Search Bar Overlay */}
-            {isSearchOpen && (
-                <div className="bg-brand-light border-b border-gray-100 py-3 px-4 md:px-8 animate-in slide-in-from-top duration-300">
-                    <form onSubmit={handleSearch} className="container mx-auto max-w-4xl relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                        <input
-                            autoFocus
-                            type="text"
-                            placeholder="Pesquisar livros, autores, categorias..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="input-premium pl-12 pr-12 py-4"
-                        />
-                        <button
-                            type="button"
-                            onClick={() => setIsSearchOpen(false)}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-dark"
-                            title="Fechar pesquisa"
-                            aria-label="Fechar barra de pesquisa"
-                        >
-                            <X className="w-4 h-4" />
-                        </button>
-                    </form>
-                </div>
-            )}
+            {
+                isSearchOpen && (
+                    <div className="bg-brand-light border-b border-gray-100 py-3 px-4 md:px-8 animate-in slide-in-from-top duration-300">
+                        <form onSubmit={handleSearch} className="container mx-auto max-w-4xl relative">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                            <input
+                                autoFocus
+                                type="text"
+                                placeholder="Pesquisar livros, autores, categorias..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="input-premium pl-12 pr-12 py-4"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setIsSearchOpen(false)}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-dark"
+                                title="Fechar pesquisa"
+                                aria-label="Fechar barra de pesquisa"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        </form>
+                    </div>
+                )
+            }
 
             {/* Navigation Menu Area - Desktop */}
             <nav className="hidden md:flex bg-white py-4 px-8 justify-center border-b border-gray-50">
@@ -244,30 +246,32 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
             </nav>
 
             {/* Mobile Menu */}
-            {isMenuOpen && (
-                <div className="md:hidden bg-white border-b border-gray-100 animate-in slide-in-from-top duration-300">
-                    <ul className="flex flex-col py-4">
-                        {navLinks.map((link) => (
-                            <li key={link.path}>
-                                <button
-                                    onClick={() => {
-                                        setIsMenuOpen(false);
-                                        // Allow small interaction delay for menu animation if needed, but direct call is better
-                                        onNavigate(link.path);
-                                    }}
-                                    className={`w-full text-left px-8 py-3 text-[11px] font-bold uppercase tracking-[0.2em] ${(link.path === '/' && currentView === '/') || (link.path !== '/' && currentView?.startsWith(link.path))
-                                        ? 'text-brand-primary bg-brand-light'
-                                        : 'text-gray-500 hover:bg-gray-50'
-                                        }`}
-                                >
-                                    {link.name}
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
-        </header>
+            {
+                isMenuOpen && (
+                    <div className="md:hidden bg-white border-b border-gray-100 animate-in slide-in-from-top duration-300">
+                        <ul className="flex flex-col py-4">
+                            {navLinks.map((link) => (
+                                <li key={link.path}>
+                                    <button
+                                        onClick={() => {
+                                            setIsMenuOpen(false);
+                                            // Allow small interaction delay for menu animation if needed, but direct call is better
+                                            onNavigate(link.path);
+                                        }}
+                                        className={`w-full text-left px-8 py-3 text-[11px] font-bold uppercase tracking-[0.2em] ${(link.path === '/' && currentView === '/') || (link.path !== '/' && currentView?.startsWith(link.path))
+                                            ? 'text-brand-primary bg-brand-light'
+                                            : 'text-gray-500 hover:bg-gray-50'
+                                            }`}
+                                    >
+                                        {link.name}
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )
+            }
+        </header >
     );
 };
 

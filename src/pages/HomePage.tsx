@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, BookOpen, ArrowRight, Zap, Star, Trophy, Mail, Clock, Mic, PenTool, Users, CheckCircle, Loader2, ChevronUp } from 'lucide-react';
+import { Sparkles, BookOpen, ArrowRight, Zap, Star, Trophy, Mail, Clock, PenTool, Users, CheckCircle, Loader2, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
-import { Book, ViewState, PodcastEpisode, BlogPost } from '../types';
+import { Book, ViewState, BlogPost } from '../types';
 import BookCard from '../components/BookCard';
 import Countdown from '../components/Countdown';
 import { getPublicStats, getBlogPosts, getSiteContent, getTestimonials } from '../services/dataService';
-import { fetchPodcastEpisodes } from '../services/podcastService';
 import { BookCardSkeleton, PostCardSkeleton } from '../components/SkeletonLoader';
 
 interface HomePageProps {
@@ -21,7 +20,6 @@ interface HomePageProps {
 const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAddToCart, onToggleWishlist, onNavigate }) => {
     const [stats, setStats] = useState({ booksCount: 0, authorsCount: 0, readersCount: 0 });
     const [categories, setCategories] = useState<{ name: string; count: number; image?: string }[]>([]);
-    const [latestEpisode, setLatestEpisode] = useState<PodcastEpisode | null>(null);
     const [recentPosts, setRecentPosts] = useState<BlogPost[]>([]);
     const [siteContent, setSiteContent] = useState<any>({});
     const navigate = useNavigate();
@@ -49,16 +47,14 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
 
             // Fetch other data in parallel
             try {
-                const [s, p, b, content, t] = await Promise.all([
+                const [s, b, content, t] = await Promise.all([
                     getPublicStats(),
-                    fetchPodcastEpisodes(),
                     getBlogPosts(),
                     getSiteContent('home'),
                     getTestimonials()
                 ]);
 
                 setStats(s);
-                if (p && p.length > 0) setLatestEpisode(p[0]);
                 setRecentPosts(b ? b.slice(0, 3) : []);
                 setSiteContent(content || {});
                 setTestimonials(t || []);
@@ -178,7 +174,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                             </button>
                             {!upcomingLaunch && (
                                 <button
-                                    onClick={() => onNavigate('ABOUT')}
+                                    onClick={() => onNavigate('/sobre')}
                                     className="px-12 py-5 border-2 border-brand-dark text-brand-dark font-black hover:bg-brand-dark hover:text-white transition-all uppercase text-[12px] tracking-[0.2em] w-full sm:w-auto rounded-2xl"
                                 >
                                     Nossa História
@@ -384,52 +380,8 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
             >
                 <div className="container mx-auto px-4 md:px-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 md:gap-24">
-                        {/* Podcast Feature */}
+                        {/* Call to Authors */}
                         <motion.div variants={itemVariants} className="space-y-10">
-                            <div className="flex items-center gap-5">
-                                <div className="p-4 bg-brand-primary/10 rounded-3xl text-brand-primary shadow-lg shadow-brand-primary/5">
-                                    <Mic className="w-8 h-8" />
-                                </div>
-                                <h3 className="text-3xl md:text-5xl font-black text-brand-dark tracking-tighter">Cultura em Áudio</h3>
-                            </div>
-
-                            {isFetching ? (
-                                <div className="h-48 bg-white rounded-[2rem] border border-gray-100 flex items-center justify-center">
-                                    <Loader2 className="w-8 h-8 text-brand-primary animate-spin" />
-                                </div>
-                            ) : latestEpisode ? (
-                                <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl shadow-brand-dark/5 border border-gray-100 space-y-6">
-                                    <div className="flex flex-col md:flex-row gap-8 items-center">
-                                        <div className="w-40 h-40 rounded-3xl overflow-hidden shadow-xl shrink-0">
-                                            <img src={latestEpisode.imageUrl} alt={latestEpisode.title} loading="lazy" className="w-full h-full object-cover" />
-                                        </div>
-                                        <div className="flex-1 space-y-4 text-center md:text-left">
-                                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-primary/10 rounded-full">
-                                                <div className="w-1.5 h-1.5 bg-brand-primary rounded-full animate-pulse"></div>
-                                                <span className="text-[10px] font-black text-brand-primary uppercase tracking-widest">Último Episódio</span>
-                                            </div>
-                                            <h4 className="font-black text-brand-dark text-2xl tracking-tight leading-tight">{latestEpisode.title}</h4>
-                                            <p className="text-sm text-gray-600 line-clamp-2">{latestEpisode.description}</p>
-                                        </div>
-                                    </div>
-
-                                    {/* Audio Player */}
-                                    <audio
-                                        controls
-                                        className="w-full h-[54px] rounded-[12px]"
-                                        preload="metadata"
-                                    >
-                                        <source src={latestEpisode.audioUrl} type="audio/mpeg" />
-                                        O seu navegador não suporta o elemento de áudio.
-                                    </audio>
-                                </div>
-                            ) : (
-                                <div className="bg-white p-10 rounded-3xl border border-dashed border-gray-200 text-center">
-                                    <p className="text-gray-400 font-bold">O silêncio é de ouro. Novos episódios brevemente.</p>
-                                </div>
-                            )}
-
-                            {/* Call to Authors */}
                             <div className="bg-brand-dark p-10 md:p-12 rounded-[3rem] text-white relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 p-12 opacity-5 -translate-y-1/4 translate-x-1/4 group-hover:scale-110 transition-transform duration-1000">
                                     <PenTool className="w-64 h-64" />
@@ -437,7 +389,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                                 <div className="relative z-10 space-y-6">
                                     <h3 className="text-3xl md:text-5xl font-black tracking-tighter leading-none">És um Autor?</h3>
                                     <p className="text-white/60 text-lg max-w-sm font-medium leading-relaxed">Damos vida às tuas palavras. Explore os nossos serviços de edição e publicação de excelência.</p>
-                                    <button onClick={() => onNavigate('SERVICES')} className="px-10 py-5 bg-brand-primary text-white rounded-[1.5rem] font-black text-xs uppercase tracking-widest hover:brightness-110 shadow-xl shadow-brand-primary/20 transition-all active:scale-95">
+                                    <button onClick={() => onNavigate('/servicos')} className="px-10 py-5 bg-brand-primary text-white rounded-[1.5rem] font-black text-xs uppercase tracking-widest hover:brightness-110 shadow-xl shadow-brand-primary/20 transition-all active:scale-95">
                                         Publicar Conosco
                                     </button>
                                 </div>

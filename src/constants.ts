@@ -1,5 +1,5 @@
 
-import { Book, PodcastEpisode, BlogPost } from './types';
+import { Book, BlogPost } from './types';
 
 export const CATEGORIES = [
   "Todos",
@@ -72,26 +72,6 @@ export const BLOG_POSTS: BlogPost[] = [
   }
 ];
 
-export const PODCAST_EPISODES: PodcastEpisode[] = [
-  {
-    id: "1",
-    title: "Conversas sobre o Mayombe",
-    description: "Uma análise profunda sobre a obra de Pepetela e sua relevância hoje.",
-    date: "15 Mai 2024",
-    duration: "45:20",
-    audioUrl: "#",
-    imageUrl: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&q=80&w=600"
-  },
-  {
-    id: "2",
-    title: "Novos Talentos de Malanje",
-    description: "Entrevista exclusiva com os vencedores do prémio literário local.",
-    date: "02 Jun 2024",
-    duration: "38:15",
-    audioUrl: "#",
-    imageUrl: "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&q=80&w=600"
-  }
-];
 
 export const BOOKS: Book[] = [
   {
