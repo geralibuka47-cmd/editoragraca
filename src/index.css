@@ -14,8 +14,9 @@
     --color-brand-gray: #6B7280;
     /* Cinza Neutro */
 
-    --font-serif: "Cormorant Garamond", serif;
-    --font-sans: "Montserrat", sans-serif;
+    --font-serif: "Playfair Display", serif;
+    --font-body: "Lora", serif;
+    --font-sans: "Source Sans 3", sans-serif;
 }
 
 @layer base {
@@ -24,7 +25,8 @@
     }
 
     body {
-        @apply font-sans bg-brand-light text-brand-dark antialiased;
+        @apply font-sans bg-brand-light text-brand-dark antialiased selection:bg-brand-primary/20;
+        line-height: 1.6;
     }
 
     ::selection {
@@ -110,6 +112,10 @@
 
     .text-gradient-gold {
         @apply bg-gradient-to-br from-[#C5A059] via-[#E5C185] to-[#B18942] bg-clip-text text-transparent;
+    }
+
+    .text-reading {
+        @apply font-body leading-relaxed text-gray-700 text-lg;
     }
 
     .card-premium {

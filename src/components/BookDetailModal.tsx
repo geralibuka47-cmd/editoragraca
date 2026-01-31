@@ -192,7 +192,7 @@ const BookDetailModal: React.FC<BookDetailModalProps & { user?: UserType | null;
                                     <span>{book.format === 'digital' ? 'Download Imediato' : 'Disponível em Stock'}</span>
                                 </div>
 
-                                <p className="text-gray-500 text-sm md:text-lg leading-relaxed font-normal py-4 border-y border-gray-100">
+                                <p className="text-reading py-4 border-y border-gray-100">
                                     {book.description || "Uma obra literária excepcional que promete envolver o leitor do início ao fim."}
                                 </p>
 

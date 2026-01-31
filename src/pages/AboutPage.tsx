@@ -204,7 +204,7 @@ const AboutPage: React.FC = () => {
                                 <div className="space-y-6">
                                     <span className="text-brand-primary font-black uppercase tracking-[0.5em] text-[10px] block">{item.label}</span>
                                     <h2 className="text-3xl font-black text-brand-dark tracking-tighter uppercase leading-none">{item.title}</h2>
-                                    <p className="text-gray-500 font-bold text-base leading-relaxed opacity-70 group-hover:opacity-100 transition-opacity duration-700">{item.description}</p>
+                                    <p className="text-reading group-hover:opacity-100 transition-opacity duration-700">{item.description}</p>
                                 </div>
                             </m.div>
                         ))}
@@ -249,7 +249,7 @@ const AboutPage: React.FC = () => {
                                         <Icon className="w-8 h-8 md:w-10 md:h-10 text-brand-primary group-hover:text-white" />
                                     </div>
                                     <h3 className="text-xl md:text-2xl font-black text-brand-dark mb-4 md:mb-6 tracking-tighter uppercase leading-none">{value.title}</h3>
-                                    <p className="text-gray-500 font-bold text-sm md:text-base leading-relaxed opacity-80">{value.description}</p>
+                                    <p className="text-reading">{value.description}</p>
                                 </m.div>
                             );
                         })}

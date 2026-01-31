@@ -144,7 +144,7 @@ const BlogPage: React.FC<BlogPageProps> = ({ user }) => {
                                 {selectedPost.title}
                             </h1>
 
-                            <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed space-y-4 mb-8">
+                            <div className="text-reading space-y-4 mb-8">
                                 {selectedPost.content.split('\n').map((para, i) => (
                                     <p key={i}>{para}</p>
                                 ))}
@@ -330,7 +330,7 @@ const BlogPage: React.FC<BlogPageProps> = ({ user }) => {
                                     </h2>
 
                                     {/* Post Content Preview */}
-                                    <p className="text-gray-600 leading-relaxed line-clamp-3">
+                                    <p className="text-gray-500 leading-relaxed line-clamp-3 text-sm">
                                         {post.content.substring(0, 200)}...
                                     </p>
                                 </div>
