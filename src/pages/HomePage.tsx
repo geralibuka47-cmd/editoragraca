@@ -116,10 +116,6 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
         <div className="relative overflow-x-hidden bg-[#F8FAFC]">
             {/* Hero Section - OPUS Style */}
             <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-white pt-20">
-                {/* Immersive Background Elements - RETIRED per user feedback */}
-                {/* <div className="absolute inset-0 bg-gradient-to-br from-white via-white to-brand-primary/5 pointer-events-none"></div> */}
-                {/* <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_70%_30%,_rgba(196,160,82,0.03)_0%,_transparent_70%)] pointer-events-none"></div> */}
-
                 <div className="container mx-auto px-6 md:px-8 grid lg:grid-cols-2 lg:items-center gap-16 md:gap-32 py-12 md:py-20 relative z-20">
                     <m.div
                         initial="hidden"

@@ -83,7 +83,7 @@
     }
 
     .glass-premium {
-        @apply bg-white/80 backdrop-blur-xl border border-white/50 shadow-[0_8px_32px_rgba(0, 0, 0, 0.05)];
+        @apply bg-white/80 backdrop-blur-xl border border-white/50 shadow-xl;
     }
 
     .glass-dark {
