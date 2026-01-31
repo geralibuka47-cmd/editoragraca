@@ -113,240 +113,240 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
     };
 
     return (
-        <div className="relative overflow-x-hidden">
+        <div className="relative overflow-x-hidden bg-[#F8FAFC]">
             {/* Hero Section */}
-            <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-white">
-                {/* Modern Dynamic Background Elements */}
-                <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-brand-primary/5 to-transparent pointer-events-none"></div>
+            <section className="relative min-h-screen flex items-center overflow-hidden bg-brand-dark pt-20">
+                {/* Immersive Background Elements */}
+                <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_70%_30%,_rgba(196,160,82,0.1)_0%,_transparent_70%)] pointer-events-none"></div>
+                <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-brand-dark via-brand-dark/50 to-transparent z-10"></div>
+
                 <m.div
-                    initial={{ opacity: 0, rotate: -45 }}
-                    animate={{ opacity: 1, rotate: -45 }}
-                    transition={{ duration: 2 }}
-                    className="absolute -top-40 -right-20 w-[600px] h-[600px] bg-brand-primary/5 rounded-[100px] blur-[100px] pointer-events-none"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 2, ease: "easeOut" }}
+                    className="absolute -top-[10%] -right-[5%] w-[80%] aspect-square bg-[#C4A052]/5 rounded-full blur-[120px] pointer-events-none"
                 ></m.div>
 
-                <div className="container mx-auto px-4 md:px-8 grid lg:grid-cols-2 items-center gap-10 md:gap-20 py-10 md:py-20 relative z-10">
+                <div className="container mx-auto px-6 md:px-8 grid lg:grid-cols-2 items-center gap-16 md:gap-32 py-20 relative z-20">
                     <m.div
                         initial="hidden"
                         animate="visible"
                         variants={containerVariants}
-                        className="space-y-6 md:space-y-10 text-center lg:text-left"
+                        className="space-y-8 md:space-y-12 text-center lg:text-left"
                     >
-                        <m.div variants={itemVariants} className="inline-flex items-center gap-3 px-5 py-2.5 bg-brand-primary/10 rounded-full text-brand-primary font-bold tracking-[0.2em] uppercase text-[10px]">
+                        <m.div variants={itemVariants} className="inline-flex items-center gap-4 px-6 py-2.5 bg-white/5 backdrop-blur-md rounded-full border border-white/10 text-brand-primary font-black tracking-[0.4em] uppercase text-[10px] md:text-xs">
                             {upcomingLaunch ? <Clock className="w-4 h-4 animate-pulse" /> : <Sparkles className="w-4 h-4" />}
-                            <span>{upcomingLaunch ? 'Próximo Grande Lançamento' : 'Edições de Colecionador agora disponíveis'}</span>
+                            <span>{upcomingLaunch ? 'Brevemente: Obra Prima' : 'Legado Editorial de Elite'}</span>
                         </m.div>
 
-                        <m.h1 variants={itemVariants} className="text-5xl md:text-7xl lg:text-[6.5rem] font-black leading-[0.9] text-brand-dark tracking-tighter">
+                        <m.h1 variants={itemVariants} className="text-5xl md:text-[8rem] font-black leading-[0.85] text-white tracking-tighter">
                             {upcomingLaunch ? (
                                 <>
-                                    {upcomingLaunch.title} <br />
-                                    <span className="text-brand-primary italic font-serif font-normal text-[0.55em] block mt-4">de {upcomingLaunch.author}</span>
+                                    <span className="text-gradient-gold uppercase text-[0.6em] block tracking-normal mb-6">O Próximo</span>
+                                    <span className="italic font-serif font-normal">{upcomingLaunch.title}</span>
                                 </>
                             ) : (
                                 <>
-                                    {siteContent['hero.title'] || "Onde Cada Página"} <br />
-                                    <span className="text-brand-primary italic font-serif font-normal text-[0.85em]">{siteContent['hero.subtitle'] || "Ganha Vida"}</span>
+                                    {siteContent['hero.title'] || "Onde a Arte"} <br />
+                                    <span className="text-gradient-gold italic font-serif font-normal text-[0.85em] lowercase">{siteContent['hero.subtitle'] || "Encontra o Legado"}</span>
                                 </>
                             )}
                         </m.h1>
 
-                        <m.p variants={itemVariants} className="text-lg md:text-xl text-gray-500 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
+                        <m.p variants={itemVariants} className="text-xl md:text-2xl text-gray-400 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium opacity-80">
                             {upcomingLaunch
-                                ? (upcomingLaunch.description || '').slice(0, 180) + '...'
-                                : (siteContent['hero.description'] || "Descubra o catálogo da Editora Graça. Uma seleção rigorosa de literatura angolana e internacional, desenhada para leitores exigentes.")
+                                ? (upcomingLaunch.description || '').slice(0, 150) + '...'
+                                : (siteContent['hero.description'] || "Curadoria de excelência para leitores que exigem o extraordinário. Literatura angolana elevada ao patamar mundial.")
                             }
                         </m.p>
 
-                        {upcomingLaunch && upcomingLaunch.launchDate && (
-                            <m.div variants={itemVariants} className="py-4 flex justify-center lg:justify-start">
-                                <Countdown targetDate={upcomingLaunch.launchDate} />
-                            </m.div>
-                        )}
-
-                        <m.div variants={itemVariants} className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 md:gap-6 pt-4">
+                        <m.div variants={itemVariants} className="flex flex-col sm:flex-row justify-center lg:justify-start gap-6 pt-6">
                             <button
-                                className="btn-premium group w-full sm:w-auto justify-center py-5 px-10 text-sm shadow-2xl shadow-brand-primary/20"
+                                className="w-full sm:w-auto py-7 px-12 bg-white text-brand-dark rounded-[1.5rem] font-black uppercase text-[11px] tracking-[0.3em] hover:bg-brand-primary hover:text-white hover:scale-105 transition-all shadow-2xl flex items-center justify-center gap-4 group"
                                 onClick={() => upcomingLaunch ? onViewDetails(upcomingLaunch) : navigate('/livros')}
                             >
-                                {upcomingLaunch ? 'Pré-Encomendar Agora' : 'Explorar Catálogo'}
-                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                {upcomingLaunch ? 'Garantir Exemplar' : 'Explorar o Acervo'}
+                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                             </button>
                             {!upcomingLaunch && (
                                 <button
                                     onClick={() => onNavigate('/sobre')}
-                                    className="px-12 py-5 border-2 border-brand-dark text-brand-dark font-black hover:bg-brand-dark hover:text-white transition-all uppercase text-[12px] tracking-[0.2em] w-full sm:w-auto rounded-2xl"
+                                    className="w-full sm:w-auto py-7 px-12 glass-premium border border-white/10 text-white rounded-[1.5rem] font-black uppercase text-[11px] tracking-[0.3em] hover:bg-white/10 transition-all flex items-center justify-center"
                                 >
-                                    Nossa História
+                                    Nossa Essência
                                 </button>
                             )}
                         </m.div>
 
-                        {!upcomingLaunch && (
-                            <m.div variants={itemVariants} className="flex items-center justify-center lg:justify-start gap-8 md:gap-12 pt-10 border-t border-gray-100/50">
-                                <div className="flex flex-col">
-                                    <span className="text-3xl md:text-5xl font-black text-brand-dark tracking-tighter">
-                                        {stats.booksCount > 0 ? (
-                                            <m.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                                                {stats.booksCount}+
-                                            </m.span>
-                                        ) : '...'}
-                                    </span>
-                                    <span className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-black">Livros Publicados</span>
-                                </div>
-                                <div className="flex flex-col">
-                                    <span className="text-3xl md:text-5xl font-black text-brand-dark tracking-tighter">
-                                        {stats.readersCount > 0 ? (
-                                            <m.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                                                {stats.readersCount}+
-                                            </m.span>
-                                        ) : '100+'}
-                                    </span>
-                                    <span className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-black">Leitores</span>
-                                </div>
-                            </m.div>
-                        )}
+                        {/* High Impact Stats */}
+                        <m.div variants={itemVariants} className="flex items-center justify-center lg:justify-start gap-12 md:gap-20 pt-16 border-t border-white/5">
+                            <div className="flex flex-col">
+                                <span className="text-4xl md:text-6xl font-black text-white tracking-tighter">
+                                    {stats.booksCount > 0 ? (
+                                        <m.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                                            {stats.booksCount}<span className="text-brand-primary italic">+</span>
+                                        </m.span>
+                                    ) : '...'}
+                                </span>
+                                <span className="text-[10px] uppercase tracking-[0.4em] text-gray-500 font-black mt-2">Obras de Arte</span>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-4xl md:text-6xl font-black text-white tracking-tighter">
+                                    {stats.readersCount > 0 ? (
+                                        <m.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                                            {stats.readersCount}<span className="text-brand-primary italic">+</span>
+                                        </m.span>
+                                    ) : 'Mil+'}
+                                </span>
+                                <span className="text-[10px] uppercase tracking-[0.4em] text-gray-500 font-black mt-2">Leitores de Elite</span>
+                            </div>
+                        </m.div>
                     </m.div>
 
                     <m.div
                         initial={{ opacity: 0, scale: 0.9, x: 50 }}
                         animate={{ opacity: 1, scale: 1, x: 0 }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                        className="relative"
+                        transition={{ duration: 1, delay: 0.3 }}
+                        className="relative hidden lg:block"
                     >
-                        <div className="relative z-10 w-full aspect-[4/5] bg-brand-light rounded-[3rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.25)] overflow-hidden border-[12px] border-white group cursor-pointer" onClick={() => featuredBook && onViewDetails(featuredBook)}>
+                        <div className="relative z-10 w-full aspect-[4/5] bg-brand-dark rounded-[4rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] overflow-hidden border-[1px] border-white/10 group cursor-pointer" onClick={() => featuredBook && onViewDetails(featuredBook)}>
                             {featuredBook?.coverUrl ? (
                                 <img
                                     src={featuredBook.coverUrl}
                                     alt={featuredBook.title}
-                                    loading="lazy"
-                                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                                    loading="eager"
+                                    className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-110"
                                 />
                             ) : (
-                                <div className="flex flex-col items-center justify-center h-full p-20">
-                                    <BookOpen className="w-32 h-32 text-brand-primary/20" />
+                                <div className="flex flex-col items-center justify-center h-full bg-brand-light/5">
+                                    <BookOpen className="w-32 h-32 text-white/5" />
                                 </div>
                             )}
-                            <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-10">
-                                <span className="text-white font-black text-lg uppercase tracking-widest flex items-center gap-3">
-                                    Ver Detalhes <ArrowRight className="w-5 h-5" />
-                                </span>
+                            <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 flex items-end p-16">
+                                <div className="space-y-4 translate-y-8 group-hover:translate-y-0 transition-transform duration-700">
+                                    <h4 className="text-white font-black text-4xl uppercase leading-none tracking-tighter">{featuredBook?.title}</h4>
+                                    <p className="text-gradient-gold font-serif italic text-xl">Por {featuredBook?.author}</p>
+                                    <span className="inline-flex items-center gap-3 text-white font-black text-xs uppercase tracking-[0.3em] pt-4">
+                                        Explorar Obra <ArrowRight className="w-5 h-5" />
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Floating elements for depth */}
+                        {/* Floating Metadata Card */}
                         <m.div
                             animate={{ y: [0, -20, 0] }}
-                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                            className="absolute -top-12 -right-12 w-48 h-48 bg-brand-primary/20 rounded-full blur-3xl -z-10"
-                        ></m.div>
-
-                        <div className="absolute -bottom-8 -left-8 bg-white p-7 rounded-[2rem] shadow-2xl flex items-center gap-6 border border-gray-100 z-20 group hover:translate-y-[-5px] transition-all">
-                            <div className="w-16 h-16 bg-brand-primary flex items-center justify-center rounded-2xl text-white shadow-lg shadow-brand-primary/30 group-hover:rotate-12 transition-transform">
-                                {upcomingLaunch ? <Clock className="w-8 h-8" /> : <Zap className="w-8 h-8 fill-current" />}
+                            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                            className="absolute -bottom-12 -left-12 glass-premium p-8 rounded-[2.5rem] shadow-2xl border border-white/20 z-30 group"
+                        >
+                            <div className="flex items-center gap-6">
+                                <div className="w-20 h-20 bg-brand-primary text-white flex items-center justify-center rounded-[1.5rem] shadow-[0_10px_30px_rgba(196,160,82,0.4)] group-hover:rotate-12 transition-transform duration-500">
+                                    {upcomingLaunch ? <Clock className="w-10 h-10" /> : <Trophy className="w-10 h-10" />}
+                                </div>
+                                <div>
+                                    <h5 className="font-serif font-black text-3xl text-white italic leading-none">{upcomingLaunch ? 'Countdown' : 'Bestseller'}</h5>
+                                    <p className="text-[10px] uppercase tracking-[0.4em] text-brand-primary font-black pt-3">
+                                        {upcomingLaunch ? 'Lançamento Global' : 'Crítica Aclamada'}
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <h5 className="font-serif font-black text-2xl text-brand-dark italic leading-none">{upcomingLaunch ? 'Lançamento' : 'Novidade'}</h5>
-                                <p className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-black pt-2">
-                                    {upcomingLaunch ? 'Brevemente' : 'Acabado de Chegar'}
-                                </p>
-                            </div>
-                        </div>
+                        </m.div>
                     </m.div>
                 </div>
             </section>
 
-            {/* Categories Section */}
+            {/* Categories Section - Redesigned for Impact */}
             <m.section
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px" }}
                 variants={containerVariants}
-                className="py-12 md:py-32 bg-white relative overflow-hidden optimize-scroll"
+                className="py-24 md:py-48 bg-white relative overflow-hidden optimize-render px-6"
             >
-                {/* Decorative blob */}
-                <div className="absolute -left-20 top-40 w-80 h-80 bg-brand-primary/5 rounded-full blur-[80px]"></div>
-
-                <div className="container mx-auto px-4 md:px-8 relative z-10">
-                    <m.div variants={itemVariants} className="text-center mb-16 md:mb-24">
-                        <h2 className="text-4xl md:text-6xl font-black text-brand-dark tracking-tighter mb-4">
-                            Explore por <span className="text-brand-primary italic font-serif font-normal">Categorias</span>
+                <div className="container mx-auto relative z-10">
+                    <m.div variants={itemVariants} className="text-center mb-24 md:mb-32">
+                        <span className="text-brand-primary font-black text-xs uppercase tracking-[0.5em] mb-6 block">Curadoria Estruturada</span>
+                        <h2 className="text-5xl md:text-9xl font-black text-brand-dark tracking-tighter mb-10 uppercase leading-none">
+                            Universo <span className="text-gradient-gold italic font-serif lowercase">Literário</span>
                         </h2>
-                        <div className="w-24 h-1.5 bg-brand-primary mx-auto rounded-full"></div>
+                        <div className="w-24 h-2 bg-brand-primary mx-auto rounded-full"></div>
                     </m.div>
 
                     {categories.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
-                            {categories.map((cat, idx) => (
-                                <m.div
-                                    key={idx}
-                                    variants={itemVariants}
-                                    onClick={() => navigate('/livros')}
-                                    className="group relative h-[400px] rounded-[3rem] overflow-hidden bg-brand-dark flex items-end p-10 md:p-12 cursor-pointer shadow-2xl hover:shadow-brand-primary/20 transition-all border-4 border-white"
-                                >
-                                    {cat.image && (
-                                        <img src={cat.image} alt={cat.name} loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-110 transition-transform duration-1000" />
-                                    )}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent group-hover:from-brand-primary/90 group-hover:via-brand-primary/40 transition-all duration-700"></div>
-                                    <div className="relative z-10 space-y-4 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                                        <div className="text-white font-black text-4xl md:text-5xl leading-none tracking-tighter">{cat.name}</div>
-                                        <p className="text-white/70 text-sm font-bold uppercase tracking-widest">{cat.count} {cat.count === 1 ? 'Livro Disponível' : 'Livros Disponíveis'}</p>
-                                        <button className="text-white font-black text-[11px] uppercase tracking-[0.3em] flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-all delay-100">
-                                            Explorar Tudo <ArrowRight className="w-4 h-4" />
-                                        </button>
-                                    </div>
-                                </m.div>
-                            ))}
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12">
+                            {categories.map((cat, idx) => {
+                                const isWide = (idx % 5 === 0);
+                                return (
+                                    <m.div
+                                        key={idx}
+                                        variants={itemVariants}
+                                        onClick={() => navigate('/livros')}
+                                        className={`group relative h-[450px] md:h-[600px] rounded-[3.5rem] overflow-hidden bg-brand-dark p-12 md:p-16 flex items-end cursor-pointer shadow-2xl transition-all duration-700 ${isWide ? 'md:col-span-8' : 'md:col-span-4'}`}
+                                    >
+                                        {cat.image && (
+                                            <img src={cat.image} alt={cat.name} loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-40 grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000" />
+                                        )}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/20 to-transparent group-hover:from-brand-primary/80 transition-all duration-700"></div>
+                                        <div className="relative z-10 space-y-6 translate-y-8 group-hover:translate-y-0 transition-transform duration-700">
+                                            <div className="text-white font-black text-4xl md:text-6xl leading-none tracking-tighter uppercase">{cat.name}</div>
+                                            <div className="flex items-center gap-4">
+                                                <p className="text-white/60 text-xs font-black uppercase tracking-[0.3em]">{cat.count} Edições</p>
+                                                <div className="h-px w-12 bg-white/20"></div>
+                                            </div>
+                                            <button className="text-white font-black text-[11px] uppercase tracking-[0.4em] flex items-center gap-4 opacity-0 group-hover:opacity-100 transition-all delay-100 py-4 border-b border-white/0 group-hover:border-white/40">
+                                                Inspecionar <ArrowRight className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </m.div>
+                                );
+                            })}
                         </div>
                     ) : (
-                        <div className="text-center py-20">
+                        <div className="text-center py-32 bg-gray-50 rounded-[4rem] border border-gray-100">
                             {isFetching ? (
-                                <div className="flex flex-col items-center gap-4">
-                                    <Loader2 className="w-10 h-10 text-brand-primary animate-spin" />
-                                    <p className="text-gray-500 uppercase tracking-widest font-black text-[10px]">Organizando Prateleiras...</p>
-                                </div>
+                                <Loader2 className="w-16 h-16 text-brand-primary animate-spin mx-auto mb-6" />
                             ) : (
-                                <p className="text-gray-400 font-bold">Nenhuma categoria encontrada.</p>
+                                <p className="text-gray-400 font-black uppercase tracking-[0.4em] text-xs">Coleção sob curadoria</p>
                             )}
                         </div>
                     )}
                 </div>
             </m.section>
 
-            {/* New Arrivals Section */}
+            {/* New Arrivals Section - High Contrast */}
             <m.section
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px" }}
                 variants={containerVariants}
-                className="py-12 md:py-32 bg-brand-light relative optimize-scroll"
+                className="py-24 md:py-48 bg-brand-dark relative overflow-hidden optimize-render"
             >
-                <div className="container mx-auto px-4 md:px-8">
-                    <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-16 md:mb-24 gap-8 text-center md:text-left">
-                        <div className="space-y-5">
-                            <m.div variants={itemVariants} className="flex items-center justify-center md:justify-start gap-3 text-brand-primary font-black tracking-[0.3em] uppercase text-[10px]">
-                                <div className="w-12 h-1 bg-brand-primary rounded-full"></div>
-                                <span>Novidades</span>
+                <div className="absolute top-0 right-0 w-1/3 h-full bg-brand-primary/5 blur-[120px] rounded-full"></div>
+
+                <div className="container mx-auto px-6 md:px-8">
+                    <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-24 gap-8">
+                        <div className="space-y-6 text-center md:text-left">
+                            <m.div variants={itemVariants} className="flex items-center justify-center md:justify-start gap-4 text-brand-primary font-black tracking-[0.5em] uppercase text-[10px]">
+                                <div className="w-16 h-1 bg-brand-primary rounded-full"></div>
+                                <span>Recentemente Catalogados</span>
                             </m.div>
-                            <m.h2 variants={itemVariants} className="text-5xl md:text-7xl font-black text-brand-dark tracking-tighter leading-tight">
-                                Acabados de <br />
-                                <span className="text-brand-primary italic font-serif font-normal">Sair do Forno</span>
+                            <m.h2 variants={itemVariants} className="text-5xl md:text-9xl font-black text-white tracking-tighter leading-[0.85] uppercase">
+                                Novas <br />
+                                <span className="text-gradient-gold italic font-serif lowercase">Perspectivas</span>
                             </m.h2>
                         </div>
                         <m.button
                             variants={itemVariants}
                             onClick={() => navigate('/livros')}
-                            className="group flex items-center gap-5 font-black text-[12px] uppercase tracking-[0.2em] text-brand-dark hover:text-brand-primary transition-all bg-white px-8 py-4 rounded-2xl shadow-xl hover:shadow-brand-primary/10"
+                            className="group flex items-center gap-6 font-black text-[11px] uppercase tracking-[0.3em] text-white bg-white/5 border border-white/10 px-12 py-7 rounded-[2rem] hover:bg-brand-primary hover:border-brand-primary transition-all backdrop-blur-md"
                         >
-                            Ver Todo o Catálogo
-                            <span className="w-10 h-10 bg-brand-dark text-white rounded-full flex items-center justify-center group-hover:bg-brand-primary transition-all">
-                                <ArrowRight className="w-5 h-5" />
-                            </span>
+                            Ver Tudo
+                            <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
                         </m.button>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10">
-                        {loading || isFetching ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
+                        {(loading || isFetching) ? (
                             Array(4).fill(0).map((_, i) => <BookCardSkeleton key={i} />)
                         ) : (
                             books.filter(b => b.isNew || b.isBestseller).slice(0, 4).map(book => (
@@ -360,128 +360,116 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                                 </m.div>
                             ))
                         )}
-                        {!loading && !isFetching && books.length === 0 && (
-                            <div className="col-span-full py-24 text-center bg-white rounded-[3rem] border-2 border-dashed border-gray-100 px-8">
-                                <BookOpen className="w-20 h-20 text-gray-100 mx-auto mb-6" />
-                                <p className="text-gray-400 font-bold uppercase tracking-widest text-sm">Prateleiras Vigorosamente Vazias</p>
-                            </div>
-                        )}
                     </div>
                 </div>
             </m.section>
 
-            {/* Podcast & Blog Preview Section */}
+            {/* Premium Blog & Call to Authors */}
             <m.section
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={containerVariants}
-                className="py-24 bg-gray-50 overflow-hidden optimize-scroll"
+                className="py-24 md:py-48 bg-white overflow-hidden optimize-render px-6"
             >
-                <div className="container mx-auto px-4 md:px-8">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 md:gap-24">
-                        {/* Call to Authors */}
-                        <m.div variants={itemVariants} className="space-y-10">
-                            <div className="bg-brand-dark p-10 md:p-12 rounded-[3rem] text-white relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 p-12 opacity-5 -translate-y-1/4 translate-x-1/4 group-hover:scale-110 transition-transform duration-1000">
-                                    <PenTool className="w-64 h-64" />
-                                </div>
-                                <div className="relative z-10 space-y-6">
-                                    <h3 className="text-3xl md:text-5xl font-black tracking-tighter leading-none">És um Autor?</h3>
-                                    <p className="text-white/60 text-lg max-w-sm font-medium leading-relaxed">Damos vida às tuas palavras. Explore os nossos serviços de edição e publicação de excelência.</p>
-                                    <button onClick={() => onNavigate('/servicos')} className="px-10 py-5 bg-brand-primary text-white rounded-[1.5rem] font-black text-xs uppercase tracking-widest hover:brightness-110 shadow-xl shadow-brand-primary/20 transition-all active:scale-95">
-                                        Publicar Conosco
+                <div className="container mx-auto">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-24 items-center">
+                        {/* High End Call to Authors */}
+                        <m.div variants={itemVariants} className="lg:col-span-6">
+                            <div className="bg-brand-dark rounded-[4rem] p-16 md:p-24 text-white relative overflow-hidden group shadow-[0_50px_100px_-20px_rgba(0,0,0,0.3)]">
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-brand-primary/10 blur-[80px] rounded-full"></div>
+                                <div className="relative z-10 space-y-10">
+                                    <span className="text-brand-primary text-xs font-black uppercase tracking-[0.5em] block">Laboratório de Talentos</span>
+                                    <h3 className="text-5xl md:text-7xl font-black tracking-tighter leading-none uppercase">
+                                        Seu Nome na <br />
+                                        <span className="text-gradient-gold italic font-serif lowercase">História</span>
+                                    </h3>
+                                    <p className="text-gray-400 text-xl font-medium leading-relaxed max-w-md">
+                                        Oferecemos consultoria editorial de nível mundial para autores com visão. Transformamos manuscritos em legados.
+                                    </p>
+                                    <button onClick={() => onNavigate('/servicos')} className="group flex items-center gap-6 font-black text-[11px] uppercase tracking-[0.3em] text-brand-dark bg-white px-12 py-7 rounded-[2rem] hover:bg-brand-primary hover:text-white transition-all">
+                                        Edição de Elite
+                                        <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
                                     </button>
                                 </div>
                             </div>
                         </m.div>
 
-                        {/* Recent Blog Posts */}
-                        <m.div variants={itemVariants} className="space-y-10">
-                            <div className="flex items-center gap-5">
-                                <div className="p-4 bg-brand-primary/10 rounded-3xl text-brand-primary shadow-lg shadow-brand-primary/5">
-                                    <BookOpen className="w-8 h-8" />
-                                </div>
-                                <h3 className="text-3xl md:text-5xl font-black text-brand-dark tracking-tighter">Do Nosso Blog</h3>
+                        {/* Recent Blog Posts - Minimalist & Premium */}
+                        <m.div variants={itemVariants} className="lg:col-span-6 space-y-16">
+                            <div className="space-y-6">
+                                <span className="text-brand-primary text-xs font-black uppercase tracking-[0.5em] block">Crônica Contemporânea</span>
+                                <h3 className="text-5xl md:text-7xl font-black text-brand-dark tracking-tighter uppercase leading-none">Dialogo Editorial</h3>
                             </div>
 
-                            <div className="space-y-6">
+                            <div className="divide-y divide-gray-100">
                                 {isFetching ? (
                                     Array(3).fill(0).map((_, i) => (
-                                        <div key={i} className="h-24 bg-white rounded-2xl animate-pulse" />
+                                        <div key={i} className="py-10 bg-gray-50/50 animate-pulse rounded-3xl" />
                                     ))
-                                ) : recentPosts.length > 0 ? (
+                                ) : (
                                     recentPosts.map(post => (
-                                        <div key={post.id} onClick={() => navigate('/blog')} className="group flex gap-6 items-center bg-white p-5 rounded-3xl shadow-sm border border-gray-50 cursor-pointer hover:shadow-2xl hover:translate-x-2 transition-all">
-                                            <div className="w-24 h-24 rounded-2xl overflow-hidden shrink-0 shadow-md">
-                                                <img src={post.imageUrl} alt={post.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                        <div key={post.id} onClick={() => navigate('/blog')} className="group py-12 flex gap-10 items-start cursor-pointer hover:bg-gray-50 transition-all px-6 rounded-[2rem] -mx-6">
+                                            <div className="w-32 h-32 md:w-40 md:h-40 rounded-[2rem] overflow-hidden shrink-0 shadow-2xl transition-all duration-700 group-hover:scale-95">
+                                                <img src={post.imageUrl} alt={post.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1s]" />
                                             </div>
-                                            <div className="flex-1 space-y-2">
-                                                <h4 className="font-black text-brand-dark text-lg md:text-xl line-clamp-2 group-hover:text-brand-primary transition-colors tracking-tight leading-tight">{post.title}</h4>
-                                                <div className="flex items-center gap-2 text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                                                    <Clock className="w-3 h-3" />
-                                                    <span>{new Date(post.date).toLocaleDateString()}</span>
+                                            <div className="flex-1 space-y-4">
+                                                <div className="flex items-center gap-4 text-[10px] text-gray-400 font-black uppercase tracking-[0.3em]">
+                                                    <Clock className="w-3 h-3 text-brand-primary" />
+                                                    <span>{new Date(post.date).toLocaleDateString('pt-AO', { month: 'long', year: 'numeric' })}</span>
                                                 </div>
+                                                <h4 className="font-black text-brand-dark text-2xl md:text-3xl line-clamp-2 uppercase tracking-tighter leading-none group-hover:text-brand-primary transition-colors">
+                                                    {post.title}
+                                                </h4>
+                                                <p className="text-gray-400 text-sm font-medium line-clamp-2 leading-relaxed opacity-0 group-hover:opacity-100 transition-all duration-500">
+                                                    Explore as nuances profundas desta narrativa exclusiva da Editora Graça.
+                                                </p>
                                             </div>
                                         </div>
                                     ))
-                                ) : (
-                                    <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-100">
-                                        <p className="text-gray-400 font-bold">Nenhum artigo publicado ainda.</p>
-                                    </div>
                                 )}
-                            </div>
-                            <div className="text-right">
-                                <button onClick={() => navigate('/blog')} className="text-sm font-black text-brand-primary hover:text-brand-dark transition-all inline-flex items-center gap-3 uppercase tracking-widest group">
-                                    Ver todas as novidades
-                                    <span className="w-10 h-10 border-2 border-brand-primary/20 rounded-full flex items-center justify-center group-hover:bg-brand-primary group-hover:text-white transition-all">
-                                        <ArrowRight className="w-4 h-4" />
-                                    </span>
-                                </button>
                             </div>
                         </m.div>
                     </div>
                 </div>
             </m.section>
 
-            {/* Testimonials Section */}
+            {/* Testimonials - Immersive Design */}
             {testimonials.length > 0 && (
                 <m.section
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true }}
                     variants={containerVariants}
-                    className="py-24 md:py-40 bg-white overflow-hidden optimize-scroll"
+                    className="py-24 md:py-48 bg-[#F8FAFC] overflow-hidden optimize-render"
                 >
-                    <div className="container mx-auto px-4 md:px-8">
-                        <m.div variants={itemVariants} className="text-center mb-24">
-                            <h2 className="text-5xl md:text-7xl font-black text-brand-dark tracking-tighter leading-tight">
-                                O que dizem os nossos <br />
-                                <span className="text-brand-primary italic font-serif font-normal">Autores e Leitores</span>
+                    <div className="container mx-auto px-6 md:px-8">
+                        <m.div variants={itemVariants} className="text-center mb-32">
+                            <span className="text-brand-primary text-xs font-black uppercase tracking-[0.5em] block mb-8">Vozes da Autoridade</span>
+                            <h2 className="text-5xl md:text-[8rem] font-black text-brand-dark tracking-tighter leading-[0.85] uppercase">
+                                Reverberação <br />
+                                <span className="text-gradient-gold italic font-serif lowercase">Eternizada</span>
                             </h2>
                         </m.div>
 
-                        <div className="grid md:grid-cols-3 gap-10 md:gap-14">
+                        <div className="grid md:grid-cols-3 gap-12 md:gap-16">
                             {testimonials.map((t, idx) => (
                                 <m.div
                                     key={t.id || idx}
                                     variants={itemVariants}
-                                    className="bg-brand-light p-12 rounded-[3.5rem] relative group border border-gray-100/50 shadow-2xl shadow-brand-dark/5 hover:translate-y-[-10px] transition-all duration-500"
+                                    className="glass-premium p-12 md:p-16 rounded-[4rem] relative group border border-white shadow-2xl hover:-translate-y-4 transition-all duration-700"
                                 >
-                                    <div className="absolute -top-6 left-12 w-12 h-12 bg-brand-primary rounded-2xl flex items-center justify-center text-white shadow-xl shadow-brand-primary/30">
-                                        <Star className="w-6 h-6 fill-current" />
+                                    <div className="absolute -top-8 left-16 w-20 h-20 bg-brand-dark text-brand-primary rounded-[1.5rem] flex items-center justify-center shadow-2xl border-4 border-white">
+                                        <Star className="w-8 h-8 fill-current" />
                                     </div>
-                                    <div className="flex gap-1 mb-8 text-yellow-400">
-                                        {[...Array(t.rating)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
-                                    </div>
-                                    <p className="text-gray-600 italic font-medium mb-10 text-lg leading-relaxed">"{t.content}"</p>
-                                    <div className="flex items-center gap-5 border-t border-gray-200/50 pt-10">
-                                        <div className="w-16 h-16 rounded-2xl overflow-hidden bg-gray-200 shadow-md">
-                                            {t.photoUrl ? <img src={t.photoUrl} alt={t.name} className="w-full h-full object-cover" /> : <Users className="w-full h-full p-4 text-gray-400" />}
+                                    <p className="text-gray-600 italic font-black text-2xl mb-12 leading-relaxed opacity-90 border-l-4 border-brand-primary/20 pl-8">"{t.content}"</p>
+                                    <div className="flex items-center gap-6">
+                                        <div className="w-20 h-20 rounded-[1.5rem] overflow-hidden bg-brand-dark shadow-2xl grayscale group-hover:grayscale-0 transition-all duration-700">
+                                            {t.photoUrl ? <img src={t.photoUrl} alt={t.name} className="w-full h-full object-cover" /> : <Users className="w-full h-full p-6 text-white/10" />}
                                         </div>
                                         <div>
-                                            <h4 className="font-black text-brand-dark text-xl tracking-tight">{t.name}</h4>
-                                            <p className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-black">{t.role}</p>
+                                            <h4 className="font-black text-brand-dark text-2xl tracking-tighter uppercase">{t.name}</h4>
+                                            <p className="text-[10px] uppercase tracking-[0.4em] text-brand-primary font-black mt-2">{t.role}</p>
                                         </div>
                                     </div>
                                 </m.div>
@@ -491,94 +479,70 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                 </m.section>
             )}
 
-            {/* Newsletter Section with Premium Glassmorphism */}
+            {/* Newsletter - Closing with Elegance */}
             <m.section
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
-                className="bg-brand-dark py-32 px-4 overflow-hidden relative"
+                className="bg-brand-dark py-32 md:py-64 px-6 overflow-hidden relative"
             >
-                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-brand-primary/20 via-transparent to-transparent"></div>
-                <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-brand-primary/10 rounded-full blur-[120px]"></div>
+                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_rgba(196,160,82,0.1)_0%,_transparent_70%)]"></div>
 
                 <div className="container mx-auto relative z-10 text-center">
-                    <div className="max-w-3xl mx-auto space-y-12">
+                    <div className="max-w-4xl mx-auto space-y-16">
                         <m.div
                             initial={{ y: 20, opacity: 0 }}
                             whileInView={{ y: 0, opacity: 1 }}
-                            transition={{ duration: 0.6 }}
-                            className="w-24 h-24 bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2.5rem] flex items-center justify-center text-brand-primary mx-auto rotate-12 shadow-2xl"
+                            transition={{ duration: 1 }}
+                            className="w-24 h-24 glass-premium rounded-[2.5rem] flex items-center justify-center text-brand-primary mx-auto shadow-[0_20px_50px_rgba(196,160,82,0.2)] border border-white/5"
                         >
                             <Mail className="w-10 h-10" />
                         </m.div>
 
-                        <m.div
-                            initial={{ y: 20, opacity: 0 }}
-                            whileInView={{ y: 0, opacity: 1 }}
-                            transition={{ duration: 0.6, delay: 0.1 }}
-                            className="space-y-6"
-                        >
-                            <h2 className="text-4xl md:text-7xl font-black text-white tracking-tighter leading-none">
-                                {siteContent['newsletter.title'] || "Fique por Dentro"}
+                        <div className="space-y-8">
+                            <h2 className="text-5xl md:text-[7rem] font-black text-white tracking-tighter leading-none uppercase">
+                                Convite ao <br />
+                                <span className="text-gradient-gold italic font-serif lowercase">Inesquecível</span>
                             </h2>
-                            <p className="text-xl text-gray-400 font-medium max-w-2xl mx-auto leading-relaxed">
-                                {siteContent['newsletter.description'] || "Subscreva a nossa newsletter e receba novidades literárias, convites para lançamentos e ofertas exclusivas."}
+                            <p className="text-2xl text-gray-400 font-medium max-w-2xl mx-auto leading-relaxed opacity-80">
+                                Seja o primeiro a acessar lançamentos exclusivos e insights editoriais de elite.
                             </p>
-                        </m.div>
+                        </div>
 
                         <m.form
                             initial={{ y: 20, opacity: 0 }}
                             whileInView={{ y: 0, opacity: 1 }}
-                            transition={{ duration: 0.6, delay: 0.2 }}
-                            className="flex flex-col md:flex-row gap-5 max-w-2xl mx-auto bg-white/5 backdrop-blur-md p-3 rounded-[2rem] border border-white/10"
+                            transition={{ duration: 1, delay: 0.2 }}
+                            className="flex flex-col md:flex-row gap-6 max-w-2xl mx-auto glass-premium p-4 md:p-6 rounded-[3rem] border border-white/10 shadow-2xl"
                             onSubmit={handleSubscribe}
                         >
-                            <div className="flex-1">
-                                <input
-                                    type="email"
-                                    required
-                                    placeholder="O seu melhor email"
-                                    className="w-full bg-transparent border-0 px-8 py-5 text-white placeholder-gray-500 focus:ring-0 text-lg font-medium"
-                                    value={newsletterEmail}
-                                    onChange={(e) => setNewsletterEmail(e.target.value)}
-                                    disabled={isSubscribing || isSubscribed}
-                                />
-                            </div>
+                            <input
+                                type="email"
+                                required
+                                placeholder="Seu email de prestígio"
+                                className="flex-1 bg-transparent border-0 px-8 py-5 text-white focus:ring-0 text-xl font-medium placeholder:text-gray-600"
+                                value={newsletterEmail}
+                                onChange={(e) => setNewsletterEmail(e.target.value)}
+                            />
                             <button
                                 type="submit"
-                                disabled={isSubscribing || isSubscribed}
-                                className="px-10 py-5 bg-brand-primary text-white rounded-[1.5rem] font-black text-xs uppercase tracking-[0.2em] shadow-2xl shadow-brand-primary/40 hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 min-w-[200px]"
+                                className="px-12 py-5 bg-brand-primary text-white rounded-[1.5rem] font-black text-[11px] uppercase tracking-[0.4em] shadow-2xl hover:bg-white hover:text-brand-dark hover:scale-105 active:scale-95 transition-all duration-500"
+                                disabled={isSubscribing}
                             >
-                                {isSubscribing ? (
-                                    <Loader2 className="w-6 h-6 animate-spin mx-auto" />
-                                ) : isSubscribed ? (
-                                    <div className="flex items-center justify-center gap-3">
-                                        <CheckCircle className="w-6 h-6" />
-                                        <span>Subscrito!</span>
-                                    </div>
-                                ) : (
-                                    <span>Subscrever</span>
-                                )}
+                                {isSubscribing ? 'Codificando...' : 'Filiar-se'}
                             </button>
                         </m.form>
-
-                        <p className="text-sm text-gray-500 font-medium tracking-wide">
-                            Respeitamos a sua privacidade. Cancele quando quiser.
-                        </p>
                     </div>
                 </div>
 
-                {/* Back to Top Floating Button - Functional */}
+                {/* Back to Top - Premium Button */}
                 <m.button
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
+                    initial={{ opacity: 0, y: 100 }}
+                    animate={{ opacity: 1, y: 0 }}
                     onClick={scrollToTop}
-                    className="fixed bottom-10 right-10 w-16 h-16 bg-brand-primary text-white rounded-full shadow-2xl z-50 flex items-center justify-center group border-4 border-white"
-                    title="Voltar ao Topo"
+                    className="fixed bottom-12 right-12 w-20 h-20 bg-brand-primary text-white rounded-full shadow-[0_20px_50px_rgba(196,160,82,0.4)] z-50 flex items-center justify-center group hover:bg-white hover:text-brand-dark transition-all duration-700 border-4 border-brand-dark"
                 >
-                    <ChevronUp className="w-7 h-7 group-hover:-translate-y-1 transition-transform" />
+                    <ChevronUp className="w-8 h-8 group-hover:-translate-y-2 transition-transform duration-500" />
                 </m.button>
             </m.section>
         </div>

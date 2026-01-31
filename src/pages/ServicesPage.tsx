@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Pencil, Palette, Shield, Megaphone, Printer, Check, ArrowRight, Loader2, Zap, Award, Search, FileText, CloudUpload, Sparkles, MessageSquare } from 'lucide-react';
+import { BookOpen, Pencil, Palette, Shield, Megaphone, Printer, Check, ArrowRight, Loader2, Zap, Award, Search, FileText, CloudUpload, Sparkles, MessageSquare, Trophy } from 'lucide-react';
 import { m, AnimatePresence, Variants } from 'framer-motion';
 import { ViewState, EditorialService } from '../types';
 import { getEditorialServices, getSiteContent } from '../services/dataService';
@@ -129,96 +129,75 @@ const ServicesPage: React.FC = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-brand-light">
+        <div className="min-h-screen bg-[#F8FAFC] overflow-x-hidden">
             {/* Nav Padding Spacer */}
-            <div className="h-20 bg-brand-dark"></div>
+            <div className="h-[120px] lg:h-[128px] bg-brand-dark"></div>
 
-            {/* Hero Section */}
-            <section className="relative bg-brand-dark text-white py-24 md:py-32 overflow-hidden border-b border-white/5">
-                {/* Modern Dynamic Background Elements */}
-                <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-brand-primary/10 to-transparent pointer-events-none"></div>
+            {/* Hero Section - Deep Immersive */}
+            <section className="relative bg-brand-dark text-white pt-24 pb-48 md:pt-40 md:pb-72 overflow-hidden">
+                {/* Immersive Background Elements */}
                 <m.div
-                    initial={{ opacity: 0, rotate: -45 }}
-                    animate={{ opacity: 1, rotate: -45 }}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 2 }}
-                    className="absolute -top-40 -right-20 w-[600px] h-[600px] bg-brand-primary/5 rounded-[100px] blur-[100px] pointer-events-none"
+                    className="absolute top-0 right-0 w-[80%] aspect-square bg-brand-primary/10 blur-[150px] rounded-full -translate-y-1/2 translate-x-1/4"
                 ></m.div>
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,_rgba(196,160,82,0.05)_0%,_transparent_70%)]"></div>
 
-                <div className="container mx-auto px-8 relative z-10">
+                <div className="container mx-auto px-6 md:px-8 relative z-10 text-center lg:text-left">
                     <m.div
                         initial="hidden"
                         animate="visible"
                         variants={containerVariants}
-                        className="max-w-4xl"
+                        className="max-w-5xl"
                     >
-                        <m.div variants={itemVariants} className="flex items-center gap-2 text-sm text-brand-primary uppercase tracking-[0.3em] font-black mb-8">
-                            <button onClick={() => navigate('/')} className="hover:text-white transition-colors">Início</button>
-                            <span>/</span>
-                            <span className="text-white">Serviços</span>
+                        <m.div variants={itemVariants} className="inline-flex items-center gap-4 px-6 py-2.5 bg-white/5 backdrop-blur-xl rounded-full border border-white/10 text-brand-primary font-black tracking-[0.4em] uppercase text-[10px] md:text-xs mb-12">
+                            <Sparkles className="w-4 h-4" />
+                            <span>Excelência Editorial Angolana</span>
                         </m.div>
 
-                        <m.h1 variants={itemVariants} className="text-5xl md:text-8xl font-black tracking-tighter mb-10 leading-[0.9]">
-                            {siteContent['hero.title'] || "Excelência"} <br />
-                            <span className="text-brand-primary italic font-serif font-normal">{siteContent['hero.subtitle'] || "Editorial"}</span>
+                        <m.h1 variants={itemVariants} className="text-5xl md:text-[9rem] font-black tracking-tighter mb-12 leading-[0.85] uppercase">
+                            {siteContent['hero.title'] || "Padrão"} <br />
+                            <span className="text-gradient-gold italic font-serif lowercase font-normal">{siteContent['hero.subtitle'] || "de Ouro"}</span>
                         </m.h1>
 
-                        <m.p variants={itemVariants} className="text-xl md:text-2xl text-gray-400 leading-relaxed font-medium mb-12 max-w-2xl">
-                            {siteContent['hero.description'] || "Transformamos manuscritos em obras publicadas com o rigor e a qualidade que o mercado literário exige."}
+                        <m.p variants={itemVariants} className="text-xl md:text-3xl text-gray-400 font-medium leading-relaxed max-w-2xl mx-auto lg:mx-0 opacity-80 mb-20">
+                            {siteContent['hero.description'] || "Consultoria editorial de elite para autores que buscam transformar manuscritos em legados literários imperecíveis."}
                         </m.p>
 
-                        <m.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-6">
+                        <m.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-10">
                             <button
                                 onClick={() => navigate('/contacto')}
-                                className="bg-brand-primary text-white px-12 py-6 rounded-2xl font-black uppercase tracking-[0.2em] hover:bg-white hover:text-brand-dark transition-all duration-300 shadow-2xl flex items-center gap-4 group w-full sm:w-auto justify-center"
+                                className="w-full sm:w-auto px-16 py-8 bg-white text-brand-dark rounded-[1.5rem] font-black uppercase tracking-[0.4em] text-[11px] hover:bg-brand-primary hover:text-white hover:scale-105 active:scale-95 transition-all shadow-2xl flex items-center justify-center gap-6 group"
                             >
-                                Solicitar Orçamento
+                                Agendar Auditoria
                                 <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
                             </button>
-                            <div className="flex -space-x-3">
-                                {[1, 2, 3, 4].map((i) => (
-                                    <div key={i} className="w-12 h-12 rounded-full border-4 border-brand-dark bg-gray-700 flex items-center justify-center overflow-hidden">
-                                        <img src={`https://i.pravatar.cc/100?img=${i + 10}`} alt="User" />
-                                    </div>
-                                ))}
-                                <div className="w-12 h-12 rounded-full border-4 border-brand-dark bg-brand-primary flex items-center justify-center text-[10px] font-black">
-                                    +500
+
+                            <div className="flex items-center gap-6 py-4 px-8 glass-premium rounded-[2rem] border border-white/10">
+                                <div className="flex -space-x-4">
+                                    {[21, 22, 23, 24].map((i) => (
+                                        <div key={i} className="w-14 h-14 rounded-2xl border-4 border-brand-dark bg-gray-800 overflow-hidden shadow-2xl">
+                                            <img src={`https://i.pravatar.cc/100?img=${i}`} alt="Autor" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" />
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="text-left">
+                                    <span className="text-xs font-black text-white uppercase tracking-[0.2em] block">Comunidade de Elite</span>
+                                    <span className="text-[10px] font-bold text-brand-primary uppercase tracking-[0.2em]">Autores Aclamados</span>
                                 </div>
                             </div>
-                            <span className="text-sm text-gray-500 font-bold uppercase tracking-widest">Autores Satisfeitos</span>
                         </m.div>
                     </m.div>
                 </div>
             </section>
 
-            {/* Services Grid */}
-            <section className="py-24 md:py-32 bg-white relative">
-                {/* Decorative Elements */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-brand-primary/5 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2"></div>
-                <div className="absolute bottom-0 left-0 w-96 h-96 bg-brand-primary/5 rounded-full blur-[100px] -z-10 -translate-x-1/2 translate-y-1/2"></div>
-
-                <div className="container mx-auto px-8">
-                    <m.div
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true }}
-                        variants={containerVariants}
-                        className="text-center max-w-3xl mx-auto mb-24"
-                    >
-                        <m.div variants={itemVariants} className="inline-flex items-center gap-3 px-6 py-2.5 bg-brand-primary/10 rounded-full mb-8">
-                            <Sparkles className="w-4 h-4 text-brand-primary" />
-                            <span className="text-brand-primary font-black tracking-[0.2em] uppercase text-[10px]">Estratégia & Sucesso</span>
-                        </m.div>
-                        <m.h2 variants={itemVariants} className="text-4xl md:text-7xl font-black text-brand-dark tracking-tighter mb-8 leading-none">
-                            Soluções <span className="text-brand-primary italic font-serif font-normal">Premium</span>
-                        </m.h2>
-                        <m.p variants={itemVariants} className="text-xl text-gray-500 font-medium leading-relaxed">
-                            Cuidamos de cada detalhe técnico da sua publicação, para que você possa focar no que realmente importa: a sua história.
-                        </m.p>
-                    </m.div>
-
+            {/* Services Grid - High End Cards */}
+            <section className="py-24 md:py-48 -mt-32 md:-mt-48 relative z-20 optimize-render">
+                <div className="container mx-auto px-6 md:px-8">
                     <AnimatePresence mode="wait">
                         {isLoading ? (
-                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-12 md:gap-16">
                                 {[1, 2, 3].map(i => <ServiceCardSkeleton key={i} />)}
                             </div>
                         ) : (
@@ -227,7 +206,7 @@ const ServicesPage: React.FC = () => {
                                 whileInView="visible"
                                 viewport={{ once: true }}
                                 variants={containerVariants}
-                                className="grid md:grid-cols-2 lg:grid-cols-3 gap-10"
+                                className="grid md:grid-cols-2 lg:grid-cols-3 gap-12 md:gap-16"
                             >
                                 {services.map((service, index) => {
                                     const Icon = (service as any).icon || getIcon(service.title);
@@ -235,44 +214,45 @@ const ServicesPage: React.FC = () => {
                                         <m.div
                                             key={service.id || index}
                                             variants={itemVariants}
-                                            className="bg-white rounded-[3rem] p-12 border border-gray-100 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_40px_80px_-20px_rgba(196,160,82,0.15)] transition-all duration-500 group flex flex-col relative overflow-hidden"
+                                            className="glass-premium rounded-[4rem] p-12 md:p-16 border border-white shadow-2xl hover:-translate-y-4 transition-all duration-700 group flex flex-col relative overflow-hidden"
                                         >
-                                            {/* Hover Gradient Background */}
-                                            <div className="absolute inset-0 bg-gradient-to-br from-brand-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                                            {/* Decorative element */}
+                                            <div className="absolute top-0 right-0 w-32 h-32 bg-brand-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
 
                                             <div className="relative z-10 flex-1 flex flex-col">
-                                                <div className="w-20 h-20 bg-brand-primary/5 rounded-3xl flex items-center justify-center mb-10 group-hover:bg-brand-primary group-hover:rotate-6 transition-all duration-500 shadow-xl shadow-brand-primary/5">
-                                                    <Icon className="w-10 h-10 text-brand-primary group-hover:text-white transition-colors" />
+                                                <div className="w-24 h-24 bg-brand-dark text-brand-primary rounded-[2rem] flex items-center justify-center mb-12 shadow-[0_20px_40px_rgba(0,0,0,0.1)] group-hover:bg-brand-primary group-hover:text-white transition-all duration-500 group-hover:rotate-6">
+                                                    <Icon className="w-10 h-10" />
                                                 </div>
 
-                                                <h3 className="text-3xl font-black text-brand-dark mb-4 tracking-tighter group-hover:text-brand-primary transition-colors">{service.title}</h3>
-                                                <div className="text-2xl font-black text-brand-primary mb-10 pb-10 border-b border-gray-100 flex items-baseline gap-2">
-                                                    <span className="text-sm uppercase tracking-widest text-gray-400 font-bold">Investimento:</span>
-                                                    {service.price}
+                                                <h3 className="text-4xl font-black text-brand-dark mb-6 tracking-tighter uppercase leading-none">{service.title}</h3>
+
+                                                <div className="mb-12 pb-12 border-b border-gray-100/50">
+                                                    <span className="text-[10px] uppercase tracking-[0.4em] text-gray-400 font-black block mb-4">Investimento de Prestígio</span>
+                                                    <div className="text-3xl font-black text-brand-primary flex items-baseline gap-2">
+                                                        {service.price}
+                                                        <span className="text-xs text-gray-400 font-medium">/projeto</span>
+                                                    </div>
                                                 </div>
 
-                                                <div className="space-y-4 mb-12 flex-1">
+                                                <div className="space-y-6 mb-16 flex-1">
                                                     {service.details.map((feature, idx) => (
-                                                        <m.div
-                                                            key={idx}
-                                                            initial={{ opacity: 0, x: -10 }}
-                                                            whileInView={{ opacity: 1, x: 0 }}
-                                                            transition={{ delay: 0.1 * idx }}
-                                                            className="flex items-start gap-4"
-                                                        >
-                                                            <div className="w-6 h-6 bg-brand-primary/10 rounded-full flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-brand-primary group-hover:scale-110 transition-all duration-300">
-                                                                <Check className="w-3.5 h-3.5 text-brand-primary group-hover:text-white" />
+                                                        <div key={idx} className="flex items-start gap-5">
+                                                            <div className="w-7 h-7 bg-brand-primary/10 rounded-xl flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-brand-primary transition-colors duration-500">
+                                                                <Check className="w-4 h-4 text-brand-primary group-hover:text-white" />
                                                             </div>
-                                                            <span className="text-gray-600 font-medium">{feature}</span>
-                                                        </m.div>
+                                                            <span className="text-gray-500 font-bold text-base leading-relaxed">{feature}</span>
+                                                        </div>
                                                     ))}
                                                 </div>
 
                                                 <button
                                                     onClick={() => navigate('/contacto')}
-                                                    className="w-full px-10 py-6 bg-brand-dark text-white rounded-2xl font-black hover:bg-brand-primary transition-all duration-300 uppercase text-xs tracking-[0.3em] shadow-xl hover:-translate-y-1 active:translate-y-0"
+                                                    className="w-full py-7 bg-brand-dark text-white rounded-[1.5rem] font-black uppercase text-[11px] tracking-[0.4em] hover:bg-brand-primary transition-all shadow-2xl group/btn overflow-hidden relative"
                                                 >
-                                                    Solicitar Agora
+                                                    <span className="relative z-10 flex items-center justify-center gap-4">
+                                                        Solicitar Curadoria
+                                                        <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-2 transition-transform" />
+                                                    </span>
                                                 </button>
                                             </div>
                                         </m.div>
@@ -284,83 +264,109 @@ const ServicesPage: React.FC = () => {
                 </div>
             </section>
 
-            {/* How It Works / Process */}
-            <section className="py-24 md:py-32 bg-brand-light relative overflow-hidden">
-                <div className="container mx-auto px-8">
+            {/* Methodology Section - Scientific & Artistic */}
+            <section className="py-24 md:py-48 bg-white relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-[#F8FAFC] to-transparent"></div>
+
+                <div className="container mx-auto px-6 md:px-8 relative z-10">
                     <m.div
                         initial="hidden"
                         whileInView="visible"
                         viewport={{ once: true }}
                         variants={containerVariants}
-                        className="text-center mb-24"
+                        className="text-center mb-32"
                     >
-                        <m.h2 variants={itemVariants} className="text-4xl md:text-6xl font-black text-brand-dark tracking-tighter mb-8 leading-none">
-                            O Nosso <span className="text-brand-primary italic font-serif font-normal">Caminho</span> Juntos
+                        <span className="text-brand-primary font-black text-xs uppercase tracking-[0.5em] mb-8 block">Processo de Alta Performance</span>
+                        <m.h2 variants={itemVariants} className="text-5xl md:text-[8rem] font-black text-brand-dark tracking-tighter mb-10 leading-[0.85] uppercase">
+                            Arquitetura <br />
+                            <span className="text-gradient-gold italic font-serif lowercase font-normal">do Legado</span>
                         </m.h2>
-                        <m.p variants={itemVariants} className="text-xl text-gray-500 font-medium max-w-2xl mx-auto">
-                            Desde o primeiro contacto até à obra final, garantimos transparência e excelência em cada etapa.
-                        </m.p>
+                        <div className="w-32 h-2 bg-brand-primary mx-auto rounded-full"></div>
                     </m.div>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 relative">
-                        {/* Connecting Line (Desktop) */}
-                        <div className="hidden lg:block absolute top-1/2 left-0 w-full h-0.5 bg-brand-primary/10 -translate-y-[4.5rem]"></div>
-
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 relative">
                         {processSteps.map((step, idx) => (
                             <m.div
                                 key={idx}
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 whileInView={{ opacity: 1, scale: 1 }}
                                 viewport={{ once: true }}
-                                transition={{ delay: idx * 0.15 }}
-                                className="relative z-10 text-center group"
+                                transition={{ delay: idx * 0.2, duration: 0.8 }}
+                                className="group p-10 rounded-[3rem] hover:bg-gray-50 transition-all duration-700 border border-transparent hover:border-gray-100"
                             >
-                                <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl border-4 border-white group-hover:border-brand-primary transition-all duration-500 relative">
-                                    <step.icon className="w-10 h-10 text-brand-primary group-hover:scale-110 transition-transform" />
-                                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-brand-dark text-white rounded-full flex items-center justify-center text-xs font-black ring-4 ring-brand-light">
-                                        {idx + 1}
+                                <div className="mb-12 relative inline-block">
+                                    <div className="w-28 h-28 bg-brand-dark text-brand-primary rounded-[2.5rem] flex items-center justify-center shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-700">
+                                        <step.icon className="w-12 h-12" />
+                                    </div>
+                                    <div className="absolute -bottom-4 -right-4 w-12 h-12 bg-brand-primary text-white rounded-2xl flex items-center justify-center text-sm font-black shadow-2xl border-4 border-white">
+                                        0{idx + 1}
                                     </div>
                                 </div>
-                                <h4 className="text-2xl font-black text-brand-dark mb-4 tracking-tighter">{step.title}</h4>
-                                <p className="text-gray-500 font-medium leading-relaxed">{step.description}</p>
+                                <h4 className="text-3xl font-black text-brand-dark mb-6 tracking-tighter uppercase leading-none">{step.title}</h4>
+                                <p className="text-gray-500 font-bold text-base leading-relaxed opacity-70 group-hover:opacity-100 transition-opacity duration-500">
+                                    {step.description}
+                                </p>
                             </m.div>
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* CTA Section */}
-            <section className="py-32 bg-brand-dark text-white relative overflow-hidden">
-                <div className="absolute inset-0 bg-brand-primary/5 pattern-grid-white opacity-10"></div>
-                <m.div
-                    animate={{ y: [0, -20, 0], opacity: [0.1, 0.2, 0.1] }}
-                    transition={{ duration: 5, repeat: Infinity }}
-                    className="absolute -top-40 -right-40 w-96 h-96 bg-brand-primary/20 rounded-full blur-[100px]"
-                ></m.div>
-
-                <div className="container mx-auto px-8 text-center relative z-10">
+            {/* Testimonials Snippet - Reused from Home for consistency */}
+            <section className="py-24 md:py-48 bg-[#F8FAFC]">
+                <div className="container mx-auto px-6 md:px-8 text-center">
                     <m.div
-                        initial={{ opacity: 0, y: 30 }}
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        className="max-w-4xl mx-auto space-y-12"
+                    >
+                        <Trophy className="w-20 h-20 text-brand-primary mx-auto opacity-20" />
+                        <h2 className="text-4xl md:text-6xl font-black text-brand-dark tracking-tighter uppercase leading-none italic font-serif">
+                            "A Editora Graça não apenas publica livros; <br />
+                            <span className="text-brand-primary not-italic font-sans">Eternaiza Pensamentos.</span>"
+                        </h2>
+                        <div className="flex items-center justify-center gap-4">
+                            <div className="w-16 h-px bg-gray-200"></div>
+                            <span className="text-[10px] uppercase tracking-[0.5em] text-gray-400 font-black">Crítica Literária Nacional</span>
+                            <div className="w-16 h-px bg-gray-200"></div>
+                        </div>
+                    </m.div>
+                </div>
+            </section>
+
+            {/* Final High-Impact CTA */}
+            <section className="py-32 md:py-64 bg-brand-dark text-white relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_rgba(196,160,82,0.1)_0%,_transparent_70%)]"></div>
+
+                <div className="container mx-auto px-6 md:px-8 text-center relative z-10">
+                    <m.div
+                        initial={{ opacity: 0, y: 50 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="max-w-4xl mx-auto"
+                        transition={{ duration: 1 }}
+                        className="max-w-6xl mx-auto"
                     >
-                        <h2 className="text-5xl md:text-7xl font-black tracking-tighter mb-10 leading-none">
-                            Transforme o seu <span className="text-brand-primary italic font-serif font-normal">Sonho</span> <br /> em Realidade Profissional
+                        <span className="text-brand-primary font-black text-xs uppercase tracking-[0.5em] mb-12 block">Chamada para Autores Visionários</span>
+                        <h2 className="text-5xl md:text-[9rem] font-black tracking-tighter mb-16 leading-[0.85] uppercase">
+                            Pronto para o <br />
+                            <span className="text-gradient-gold italic font-serif lowercase font-normal">Próximo Nível?</span>
                         </h2>
-                        <p className="text-xl md:text-2xl text-white/60 mb-16 max-w-2xl mx-auto font-medium leading-relaxed italic">
-                            "A sua história merece ser contada com toda a dignidade e perfeição que a excelência editorial pode oferecer."
-                        </p>
-                        <div className="flex flex-col sm:flex-row justify-center gap-6">
+
+                        <div className="flex flex-col md:flex-row items-center justify-center gap-10">
                             <button
                                 onClick={() => navigate('/contacto')}
-                                className="px-16 py-8 bg-brand-primary text-white font-black rounded-[2rem] hover:bg-white hover:text-brand-dark transition-all duration-500 text-sm uppercase tracking-[0.3em] shadow-[0_20px_50px_rgba(196,160,82,0.3)] hover:scale-105 active:scale-95 group"
+                                className="w-full md:w-auto px-20 py-10 bg-white text-brand-dark font-black rounded-[2rem] hover:bg-brand-primary hover:text-white hover:scale-105 active:scale-95 transition-all text-xs uppercase tracking-[0.4em] shadow-2xl flex items-center justify-center gap-6 group"
                             >
-                                <span className="flex items-center gap-4">
-                                    Conversar com a Equipa
-                                    <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
-                                </span>
+                                Iniciar Consultoria de Elite
+                                <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
                             </button>
+
+                            <div className="flex items-center gap-6 text-left border-l border-white/10 pl-10 h-20">
+                                <div>
+                                    <p className="text-3xl font-black text-white leading-none">Angola</p>
+                                    <p className="text-[10px] uppercase tracking-[0.3em] text-gray-500 font-black mt-2">Sede Global</p>
+                                </div>
+                            </div>
                         </div>
                     </m.div>
                 </div>

@@ -54,10 +54,22 @@
     }
 }
 
-/* Custom Utilities Inspired by Booksell */
 @layer components {
     .btn-premium {
-        @apply flex items-center justify-center gap-2 px-8 py-4 bg-brand-primary text-white font-black rounded-2xl hover:bg-brand-dark hover:scale-105 active:scale-95 transition-all shadow-xl shadow-brand-primary/20 uppercase text-xs tracking-widest;
+        @apply flex items-center justify-center gap-2 px-8 py-4 bg-brand-primary text-white font-black rounded-2xl hover:bg-brand-dark hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-brand-primary/20 uppercase text-xs tracking-widest relative overflow-hidden;
+    }
+
+    .btn-premium::after {
+        content: '';
+        @apply absolute inset-0 bg-white/10 opacity-0 hover:opacity-100 transition-opacity;
+    }
+
+    .glass-premium {
+        @apply bg-white/80 backdrop-blur-xl border border-white/20 shadow-2xl;
+    }
+
+    .glass-dark {
+        @apply bg-brand-dark/80 backdrop-blur-xl border border-white/10 shadow-2xl;
     }
 
     .input-premium {
@@ -77,13 +89,24 @@
     }
 
     .section-bg-dark {
-        @apply bg-brand-dark text-white py-16;
+        @apply bg-brand-dark text-white py-16 px-4 md:px-8 relative overflow-hidden;
     }
 
-    /* Performance optimization for heavy sections */
-    .optimize-render {
-        content-visibility: auto;
-        contain-intrinsic-size: 1px 500px;
+    .text-gradient-gold {
+        @apply bg-gradient-to-br from-[#C5A059] via-[#E5C185] to-[#B18942] bg-clip-text text-transparent;
+    }
+
+    .card-premium {
+        @apply bg-white rounded-[2rem] p-8 shadow-2xl shadow-gray-200/50 border border-gray-50 hover:border-brand-primary/20 transition-all duration-500;
+    }
+
+    .hover-lift {
+        @apply hover:-translate-y-2 hover:shadow-2xl transition-all duration-300;
+    }
+
+    /* Loading Skeleton */
+    .skeleton {
+        @apply bg-gray-200 animate-pulse rounded-lg;
     }
 }
 
@@ -100,8 +123,24 @@
     }
 }
 
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
 .animate-fade-in {
-    animation: fadeIn 0.5s ease-out forwards;
+    animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-in-right {
+    animation: slideInRight 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .animate-shake {
@@ -132,17 +171,27 @@
     }
 }
 
+/* Custom Scrollbar Premium */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    @apply bg-brand-primary/20 hover:bg-brand-primary/50 transition-colors rounded-full;
+}
 
 /* Performance Optimizations */
-.optimize-scroll {
+.optimize-render {
     content-visibility: auto;
-    contain-intrinsic-size: 1px 500px;
+    contain-intrinsic-size: 1px 1000px;
 }
 
 .gpu-accelerated {
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    perspective: 1000px;
+    @apply transform-gpu backface-hidden;
     will-change: transform, opacity;
 }
 

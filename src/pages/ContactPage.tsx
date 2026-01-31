@@ -167,150 +167,145 @@ const ContactPage: React.FC = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-brand-light">
+        <div className="min-h-screen bg-[#F8FAFC]">
+            {/* Nav Padding Spacer */}
+            <div className="h-[120px] lg:h-[128px] bg-brand-dark"></div>
+
             {/* Hero */}
-            <section className="bg-brand-dark text-white py-12 md:py-16">
-                <div className="container mx-auto px-4 md:px-8">
-                    <div className="flex items-center justify-center md:justify-start gap-2 text-[10px] md:text-sm text-brand-primary uppercase tracking-widest font-bold mb-6">
-                        <button onClick={() => navigate('/')} className="hover:underline">Início</button>
-                        <span>/</span>
-                        <span>Contacto</span>
+            <section className="relative bg-brand-dark text-white pt-24 pb-48 overflow-hidden">
+                <div className="absolute top-0 right-0 w-1/2 h-full bg-brand-primary/5 blur-[120px] rounded-full"></div>
+                <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-brand-primary/20 to-transparent"></div>
+
+                <div className="container mx-auto px-6 md:px-8 relative z-10">
+                    <div className="flex items-center gap-3 text-brand-primary uppercase tracking-[0.4em] font-black text-[10px] md:text-xs mb-10">
+                        <button onClick={() => navigate('/')} className="hover:text-white transition-colors">Início</button>
+                        <span className="text-gray-700">/</span>
+                        <span className="text-white">Conexão Literária</span>
                     </div>
 
-                    <div className="max-w-3xl text-center md:text-left">
-                        <h1 className="text-4xl md:text-6xl font-black tracking-tighter mb-4 md:mb-6 leading-tight">
-                            Entre em <span className="text-brand-primary italic font-serif font-normal">Contacto</span>
+                    <div className="max-w-4xl">
+                        <h1 className="text-5xl md:text-[8rem] font-black tracking-tighter mb-10 leading-[0.85]">
+                            Vamos <span className="text-gradient-gold italic font-serif font-normal">Conversar</span>
                         </h1>
-                        <p className="text-lg md:text-xl text-gray-300 font-medium">
-                            Estamos prontos para atender suas dúvidas e receber seu manuscrito.
+                        <p className="text-xl md:text-3xl text-gray-400 font-medium leading-relaxed max-w-2xl opacity-80">
+                            Estamos prontos para ouvir sua história e elevar sua obra ao patamar que ela merece.
                         </p>
                     </div>
                 </div>
             </section>
 
             {/* Main Content */}
-            <section className="py-12 md:py-24">
+            <section className="py-24 md:py-32 -mt-32 relative z-20 optimize-render">
                 <div className="container mx-auto px-4 md:px-8">
                     <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
                         {/* Contact Form */}
                         <div className="lg:col-span-3">
-                            <div className="bg-white rounded-3xl shadow-xl p-6 md:p-12">
-                                <div className="mb-8">
-                                    <h2 className="text-2xl md:text-3xl font-black text-brand-dark tracking-tighter mb-4">
-                                        Envie-nos uma Mensagem
+                            <div className="glass-premium rounded-[3.5rem] p-10 md:p-16 border border-white/40 shadow-2xl shadow-brand-dark/5">
+                                <div className="mb-12">
+                                    <h2 className="text-3xl font-black text-brand-dark tracking-tighter mb-4 uppercase">
+                                        Expanda seu <span className="text-gradient-gold italic font-serif lowercase">Legado</span>
                                     </h2>
-                                    <p className="text-sm md:text-base text-gray-600">
-                                        Preencha o formulário abaixo e responderemos o mais breve possível.
+                                    <p className="text-gray-500 font-bold text-sm opacity-80">
+                                        Preencha os detalhes e nossa equipa de consultoria entrará em contacto.
                                     </p>
                                 </div>
 
                                 {formStatus === 'success' && (
-                                    <div className="mb-6 p-6 bg-green-50 border border-green-200 rounded-xl flex items-center gap-4 animate-fade-in">
-                                        <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0" />
+                                    <div className="mb-8 p-8 bg-brand-primary/10 rounded-3xl flex items-center gap-6 animate-fade-in border border-brand-primary/20">
+                                        <CheckCircle className="w-8 h-8 text-brand-primary flex-shrink-0" />
                                         <div>
-                                            <h3 className="font-bold text-green-900">Mensagem Enviada!</h3>
-                                            <p className="text-sm text-green-700">Entraremos em contacto em breve.</p>
+                                            <h3 className="font-black text-brand-dark uppercase tracking-tight">Sinal Enviado!</h3>
+                                            <p className="text-sm text-gray-500 font-bold">Nossa equipa já está a analisar o seu pedido.</p>
                                         </div>
                                     </div>
                                 )}
 
-                                <form onSubmit={handleSubmit} className="space-y-6">
-                                    <div className="form-group-premium">
-                                        <label htmlFor="name" className="label-premium">
-                                            Nome Completo *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="name"
-                                            name="name"
-                                            value={formData.name}
-                                            onChange={handleChange}
-                                            className={`input-premium ${errors.name ? 'input-error-premium' : ''}`}
-                                            placeholder="Seu nome completo"
-                                        />
-                                        {errors.name && <p className="error-text-premium">{errors.name}</p>}
+                                <form onSubmit={handleSubmit} className="space-y-8">
+                                    <div className="grid md:grid-cols-2 gap-8">
+                                        <div className="space-y-3">
+                                            <label htmlFor="name" className="text-[10px] uppercase tracking-[0.3em] font-black text-gray-400 ml-4">Nome de Autor</label>
+                                            <input
+                                                type="text"
+                                                id="name"
+                                                name="name"
+                                                value={formData.name}
+                                                onChange={handleChange}
+                                                className={`w-full bg-gray-50/50 border-2 ${errors.name ? 'border-red-200' : 'border-transparent'} focus:border-brand-primary/30 focus:bg-white rounded-2xl px-6 py-5 text-brand-dark font-bold transition-all outline-none`}
+                                                placeholder="Como gostaria de ser chamado?"
+                                            />
+                                        </div>
+                                        <div className="space-y-3">
+                                            <label htmlFor="email" className="text-[10px] uppercase tracking-[0.3em] font-black text-gray-400 ml-4">Canal Digital</label>
+                                            <input
+                                                type="email"
+                                                id="email"
+                                                name="email"
+                                                value={formData.email}
+                                                onChange={handleChange}
+                                                className={`w-full bg-gray-50/50 border-2 ${errors.email ? 'border-red-200' : 'border-transparent'} focus:border-brand-primary/30 focus:bg-white rounded-2xl px-6 py-5 text-brand-dark font-bold transition-all outline-none`}
+                                                placeholder="autor@exemplo.com"
+                                            />
+                                        </div>
                                     </div>
 
-                                    <div className="form-group-premium">
-                                        <label htmlFor="email" className="label-premium">
-                                            Email *
-                                        </label>
-                                        <input
-                                            type="email"
-                                            id="email"
-                                            name="email"
-                                            value={formData.email}
-                                            onChange={handleChange}
-                                            className={`input-premium ${errors.email ? 'input-error-premium' : ''}`}
-                                            placeholder="seu.email@exemplo.com"
-                                        />
-                                        {errors.email && <p className="error-text-premium">{errors.email}</p>}
-                                    </div>
-
-                                    <div className="form-group-premium">
-                                        <label htmlFor="subject" className="label-premium">
-                                            Assunto *
-                                        </label>
+                                    <div className="space-y-3">
+                                        <label htmlFor="subject" className="text-[10px] uppercase tracking-[0.3em] font-black text-gray-400 ml-4">Tema do Diálogo</label>
                                         <select
                                             id="subject"
                                             name="subject"
                                             value={formData.subject}
                                             onChange={handleChange}
-                                            className={`input-premium ${errors.subject ? 'input-error-premium' : ''}`}
+                                            className="w-full bg-gray-50/50 border-2 border-transparent focus:border-brand-primary/30 focus:bg-white rounded-2xl px-6 py-5 text-brand-dark font-bold transition-all outline-none appearance-none"
                                             title="Assunto"
                                         >
-                                            <option value="">Selecione um assunto</option>
-                                            <option value="manuscrito">Submissão de Manuscrito</option>
-                                            <option value="servicos">Orçamento de Serviços</option>
-                                            <option value="compra">Compra de Livros</option>
-                                            <option value="parceria">Parceria / Colaboração</option>
-                                            <option value="outro">Outro</option>
+                                            <option value="">O que deseja partilhar?</option>
+                                            <option value="manuscrito">Apresentação de Manuscrito</option>
+                                            <option value="servicos">Consultoria Editorial de Elite</option>
+                                            <option value="compra">Aquisição Corporativa</option>
+                                            <option value="parceria">Aliança Estratégica</option>
+                                            <option value="outro">Outras Aspirações</option>
                                         </select>
-                                        {errors.subject && <p className="error-text-premium">{errors.subject}</p>}
                                     </div>
 
-                                    <div className="form-group-premium">
-                                        <label htmlFor="message" className="label-premium">
-                                            Mensagem *
-                                        </label>
+                                    <div className="space-y-3">
+                                        <label htmlFor="message" className="text-[10px] uppercase tracking-[0.3em] font-black text-gray-400 ml-4">A sua Narrativa</label>
                                         <textarea
                                             id="message"
                                             name="message"
                                             value={formData.message}
                                             onChange={handleChange}
-                                            rows={6}
-                                            className={`input-premium resize-none h-32 ${errors.message ? 'input-error-premium' : ''}`}
-                                            placeholder="Escreva sua mensagem aqui..."
+                                            rows={5}
+                                            className="w-full bg-gray-50/50 border-2 border-transparent focus:border-brand-primary/30 focus:bg-white rounded-2xl px-6 py-5 text-brand-dark font-bold transition-all outline-none resize-none"
+                                            placeholder="Descreva seu projeto ou necessidade..."
                                         />
-                                        {errors.message && <p className="error-text-premium">{errors.message}</p>}
                                     </div>
 
                                     <button
                                         type="submit"
-                                        disabled={formStatus === 'success' || formStatus === 'error'} // or while loading if added
-                                        className="w-full btn-premium py-5 text-lg rounded-2xl shadow-xl shadow-brand-primary/20 disabled:opacity-50"
+                                        disabled={formStatus === 'success'}
+                                        className="w-full py-7 bg-brand-dark text-white rounded-[1.5rem] font-black uppercase text-[11px] tracking-[0.3em] hover:bg-brand-primary hover:scale-[1.02] transition-all shadow-2xl shadow-brand-dark/10 flex items-center justify-center gap-4 group"
                                     >
-                                        <Send className="w-5 h-5" />
-                                        <span>Enviar Mensagem</span>
+                                        <span>Consolidar Mensagem</span>
+                                        <Send className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                                     </button>
                                 </form>
                             </div>
                         </div>
 
                         {/* Contact Info */}
-                        <div className="lg:col-span-2 space-y-6">
+                        <div className="lg:col-span-2 space-y-8">
                             {contactInfo.map((info, index) => {
                                 const Icon = info.icon;
                                 return (
-                                    <div key={index} className="bg-white rounded-2xl shadow-lg p-5 md:p-6 hover:shadow-xl transition-all">
-                                        <div className="flex items-start gap-4">
-                                            <div className="w-10 h-10 md:w-12 md:h-12 bg-brand-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                                                <Icon className="w-5 h-5 md:w-6 md:h-6 text-brand-primary" />
+                                    <div key={index} className="glass-premium rounded-[2.5rem] p-8 md:p-10 border border-white/40 shadow-xl shadow-brand-dark/5 hover:-translate-y-1 transition-all duration-500 group">
+                                        <div className="flex items-start gap-6">
+                                            <div className="w-16 h-16 bg-brand-primary/10 rounded-[1.5rem] flex items-center justify-center flex-shrink-0 group-hover:bg-brand-primary transition-all duration-500">
+                                                <Icon className="w-7 h-7 text-brand-primary group-hover:text-white" />
                                             </div>
                                             <div>
-                                                <h3 className="font-bold text-brand-dark mb-2 text-sm md:text-base">{info.title}</h3>
+                                                <h3 className="text-xs font-black uppercase tracking-[0.3em] text-gray-400 mb-2">{info.title}</h3>
                                                 {info.lines.map((line, lineIndex) => (
-                                                    <p key={lineIndex} className="text-gray-600 text-[13px] md:text-sm leading-relaxed">
+                                                    <p key={lineIndex} className="text-brand-dark font-black text-lg md:text-xl leading-tight">
                                                         {line}
                                                     </p>
                                                 ))}
@@ -321,33 +316,24 @@ const ContactPage: React.FC = () => {
                             })}
 
                             {/* Social Media */}
-                            <div className="bg-brand-dark rounded-2xl shadow-lg p-6 text-white">
-                                <h3 className="font-bold mb-4">Siga-nos nas Redes Sociais</h3>
-                                <div className="flex gap-3">
-                                    <a
-                                        href="#"
-                                        className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center hover:bg-brand-primary transition-all"
-                                        title="Facebook"
-                                        aria-label="Seguir no Facebook"
-                                    >
-                                        <Facebook className="w-5 h-5" />
-                                    </a>
-                                    <a
-                                        href="#"
-                                        className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center hover:bg-brand-primary transition-all"
-                                        title="Instagram"
-                                        aria-label="Seguir no Instagram"
-                                    >
-                                        <Instagram className="w-5 h-5" />
-                                    </a>
-                                    <a
-                                        href="#"
-                                        className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center hover:bg-brand-primary transition-all"
-                                        title="Twitter"
-                                        aria-label="Seguir no Twitter"
-                                    >
-                                        <Twitter className="w-5 h-5" />
-                                    </a>
+                            <div className="bg-brand-dark rounded-[2.5rem] p-10 text-white relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-brand-primary/10 blur-[60px] rounded-full"></div>
+                                <h3 className="text-xs font-black uppercase tracking-[0.3em] text-brand-primary mb-8 relative z-10">Conexão Digital</h3>
+                                <div className="flex gap-4 relative z-10">
+                                    {[
+                                        { icon: Facebook, label: 'Facebook' },
+                                        { icon: Instagram, label: 'Instagram' },
+                                        { icon: X, label: 'Twitter' }
+                                    ].map((social, i) => (
+                                        <a
+                                            key={i}
+                                            href="#"
+                                            className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center hover:bg-brand-primary transition-all duration-500 hover:-translate-y-2 border border-white/10"
+                                            title={social.label}
+                                        >
+                                            <social.icon className="w-6 h-6" />
+                                        </a>
+                                    ))}
                                 </div>
                             </div>
                         </div>
@@ -355,48 +341,41 @@ const ContactPage: React.FC = () => {
                 </div>
             </section>
 
-            {/* Map */}
-            <section className="pb-16 md:pb-24">
-                <div className="container mx-auto px-4 md:px-8">
-                    <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
-                        <div className="aspect-video bg-gray-200 flex items-center justify-center p-6">
-                            <div className="text-center space-y-4">
-                                <MapPin className="w-12 h-12 md:w-16 md:h-16 text-brand-primary mx-auto" />
-                                <div>
-                                    <h3 className="text-lg md:text-xl font-bold text-brand-dark mb-2">Nossa Localização</h3>
-                                    <p className="text-sm md:text-base text-gray-600 text-balance">Malanje, Bairro Voanvala, Rua 5, Casa n.º 77</p>
-                                    <p className="text-[10px] md:text-sm text-gray-500 mt-4">
-                                        (Mapa do Google Maps será integrado em breve)
-                                    </p>
-                                </div>
+            {/* Map - Premium Version */}
+            <section className="pb-24 md:pb-48">
+                <div className="container mx-auto px-6 md:px-8">
+                    <div className="relative group overflow-hidden rounded-[4rem] border border-gray-100 shadow-2xl">
+                        <div className="aspect-[21/9] bg-gray-100 flex items-center justify-center">
+                            <div className="text-center relative z-10">
+                                <MapPin className="w-20 h-20 text-brand-primary mx-auto mb-8 animate-bounce" />
+                                <h3 className="text-3xl font-black text-brand-dark tracking-tighter uppercase mb-4">Malanje, Angola</h3>
+                                <p className="text-gray-400 font-bold uppercase tracking-[0.3em] text-xs">A Sede da Inspiração</p>
                             </div>
+                            <div className="absolute inset-0 bg-brand-primary/5 opacity-50"></div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* Team Integration */}
-            <section className="py-24 bg-white border-t border-gray-100">
-                <div className="container mx-auto px-4 md:px-8">
-                    <div className="text-center mb-16">
-                        <span className="text-brand-primary font-black text-xs uppercase tracking-[0.3em] mb-4 block">A Nossa Gente</span>
-                        <h2 className="text-4xl md:text-6xl font-black text-brand-dark tracking-tighter leading-tight">
-                            Conheça a <span className="text-brand-primary italic font-serif font-normal">Equipa</span>
+            {/* Team Section - Revamped */}
+            <section className="py-24 md:py-48 bg-white border-t border-gray-100 relative overflow-hidden">
+                <div className="container mx-auto px-6 md:px-8">
+                    <div className="text-center mb-24">
+                        <h2 className="text-4xl md:text-8xl font-black text-brand-dark tracking-tighter uppercase mb-8">
+                            A Mente por trás da <br />
+                            <span className="text-gradient-gold italic font-serif lowercase">excelência</span>
                         </h2>
-                        <p className="text-lg text-gray-600 mt-6 max-w-2xl mx-auto font-medium">
-                            Conheça os profissionais apaixonados que tornam todos os projetos literários possíveis.
-                        </p>
+                        <div className="w-24 h-2 bg-brand-primary mx-auto rounded-full"></div>
                     </div>
 
-                    {/* Department Filter */}
-                    <div className="flex flex-wrap gap-2 md:gap-3 justify-center mb-16">
+                    <div className="flex flex-wrap gap-4 justify-center mb-20">
                         {departments.map(dept => (
                             <button
                                 key={dept}
                                 onClick={() => setSelectedDepartment(dept)}
-                                className={`px-4 md:px-6 py-2 md:py-3 rounded-xl font-bold text-[10px] md:text-xs uppercase tracking-widest transition-all border-2 ${selectedDepartment === dept
-                                    ? 'bg-brand-primary border-brand-primary text-white shadow-lg'
-                                    : 'bg-white border-gray-100 text-gray-500 hover:border-brand-primary hover:text-brand-primary'
+                                className={`px-10 py-5 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all border-2 ${selectedDepartment === dept
+                                    ? 'bg-brand-dark border-brand-dark text-white shadow-2xl'
+                                    : 'bg-gray-50 border-transparent text-gray-400 hover:border-brand-primary/30 hover:text-brand-primary'
                                     }`}
                             >
                                 {dept}
@@ -405,39 +384,33 @@ const ContactPage: React.FC = () => {
                     </div>
 
                     {isLoadingTeam ? (
-                        <div className="flex justify-center py-20">
+                        <div className="flex justify-center py-32">
                             <Loader2 className="w-12 h-12 text-brand-primary animate-spin" />
                         </div>
                     ) : (
-                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-12">
                             {filteredMembers.map((member: TeamMember) => (
                                 <div
                                     key={member.id}
-                                    className="bg-brand-light/50 rounded-[2rem] shadow-sm overflow-hidden hover:shadow-xl transition-all duration-500 group cursor-pointer border border-gray-100 flex flex-col"
+                                    className="group relative cursor-pointer"
                                     onClick={() => setSelectedMember(member)}
                                 >
-                                    <div className="aspect-square overflow-hidden bg-gray-50 relative">
+                                    <div className="aspect-[4/5] rounded-[3rem] overflow-hidden bg-gray-100 relative mb-8 shadow-2xl shadow-brand-dark/5 transition-all duration-700 group-hover:-translate-y-4">
                                         <img
                                             src={member.photoUrl}
                                             alt={member.name}
-                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                            className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                                         />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                                    </div>
-                                    <div className="p-8 text-center flex-1 flex flex-col">
-                                        <div className="mb-4">
-                                            <span className="px-3 py-1 bg-brand-primary/10 text-brand-primary text-[9px] font-black uppercase tracking-widest rounded-full">
+                                        <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                                        <div className="absolute bottom-10 left-10 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
+                                            <span className="px-4 py-2 bg-brand-primary text-white text-[9px] font-black uppercase tracking-widest rounded-xl">
                                                 {member.department}
                                             </span>
                                         </div>
-                                        <h3 className="text-2xl font-black text-brand-dark mb-1 tracking-tighter group-hover:text-brand-primary transition-colors">{member.name}</h3>
-                                        <p className="text-brand-primary font-serif font-bold italic mb-4 text-base">{member.role}</p>
-                                        <p className="text-gray-600 leading-relaxed line-clamp-2 text-sm font-medium mb-6 flex-1">{member.bio}</p>
-                                        <div className="mt-auto">
-                                            <button className="text-brand-primary font-black text-[10px] uppercase tracking-widest border-b-2 border-brand-primary pb-0.5 hover:text-brand-dark hover:border-brand-dark transition-all">
-                                                Ver Perfil
-                                            </button>
-                                        </div>
+                                    </div>
+                                    <div className="text-center px-4">
+                                        <h3 className="text-3xl font-black text-brand-dark tracking-tighter mb-2 uppercase group-hover:text-brand-primary transition-colors">{member.name}</h3>
+                                        <p className="text-gradient-gold font-serif font-black italic text-lg">{member.role}</p>
                                     </div>
                                 </div>
                             ))}
@@ -446,48 +419,46 @@ const ContactPage: React.FC = () => {
                 </div>
             </section>
 
-            {/* Team Member Modal */}
+            {/* Team Modal - Premium */}
             {selectedMember && (
                 <div
-                    className="fixed inset-0 bg-brand-dark/90 z-[100] flex items-center justify-center p-4 animate-fade-in backdrop-blur-md"
+                    className="fixed inset-0 bg-brand-dark/95 z-[100] flex items-center justify-center p-6 backdrop-blur-xl transition-all duration-500"
                     onClick={() => setSelectedMember(null)}
                 >
                     <div
-                        className="bg-white rounded-[2.5rem] max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative"
+                        className="bg-white rounded-[4rem] max-w-5xl w-full max-h-[90vh] overflow-hidden shadow-[0_0_100px_rgba(196,160,82,0.2)] relative flex flex-col md:flex-row"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <button
                             onClick={() => setSelectedMember(null)}
-                            className="absolute top-6 right-6 w-12 h-12 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all z-20 shadow-lg text-brand-dark border border-gray-100"
+                            className="absolute top-10 right-10 w-16 h-16 bg-brand-dark text-white rounded-full flex items-center justify-center hover:bg-brand-primary transition-all z-20 border-4 border-white shadow-2xl"
                             title="Fechar"
-                            aria-label="Fechar detalhes do membro"
                         >
-                            <X className="w-6 h-6" />
+                            <X className="w-8 h-8" />
                         </button>
 
-                        <div className="flex flex-col md:flex-row">
-                            <div className="w-full md:w-1/2 aspect-square md:aspect-auto overflow-hidden bg-gray-100">
-                                <img
-                                    src={selectedMember.photoUrl}
-                                    alt={selectedMember.name}
-                                    className="w-full h-full object-cover"
-                                />
-                            </div>
+                        <div className="w-full md:w-[45%] aspect-square md:aspect-auto">
+                            <img
+                                src={selectedMember.photoUrl}
+                                alt={selectedMember.name}
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
 
-                            <div className="p-8 md:p-16 w-full md:w-1/2 flex flex-col justify-center">
-                                <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-brand-primary/10 rounded-full mb-8">
-                                    <Users className="w-4 h-4 text-brand-primary" />
-                                    <span className="text-brand-primary font-black text-[10px] uppercase tracking-widest">
-                                        {selectedMember.department}
-                                    </span>
-                                </div>
+                        <div className="flex-1 p-12 md:p-20 flex flex-col justify-center relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-brand-primary/5 blur-[80px] rounded-full"></div>
 
-                                <h2 className="text-4xl font-black text-brand-dark mb-4 tracking-tighter leading-none">{selectedMember.name}</h2>
-                                <p className="text-xl text-brand-primary font-serif font-bold italic mb-10">{selectedMember.role}</p>
+                            <div className="relative z-10">
+                                <span className="inline-block px-6 py-2.5 bg-brand-primary/10 text-brand-primary text-[10px] font-black uppercase tracking-[0.3em] rounded-full mb-10">
+                                    {selectedMember.department}
+                                </span>
 
-                                <div className="w-12 h-1 bg-brand-primary/20 mb-10"></div>
+                                <h2 className="text-5xl md:text-7xl font-black text-brand-dark mb-4 tracking-tighter uppercase leading-none">{selectedMember.name}</h2>
+                                <p className="text-2xl text-gradient-gold font-serif font-black italic mb-12">{selectedMember.role}</p>
 
-                                <p className="text-gray-600 leading-relaxed text-lg font-medium italic">
+                                <div className="w-20 h-2 bg-brand-primary/20 mb-12 rounded-full"></div>
+
+                                <p className="text-gray-500 leading-relaxed text-xl font-medium italic opacity-90 border-l-4 border-brand-primary/20 pl-8">
                                     "{selectedMember.bio}"
                                 </p>
                             </div>

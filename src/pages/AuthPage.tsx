@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { motion as m } from 'framer-motion';
 import { login, signUp } from '../services/authService';
 import { User, Mail, Lock, ArrowRight, BookOpen, Check, Loader2 } from 'lucide-react';
 
@@ -160,123 +161,180 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
     };
 
     return (
-        <div className="min-h-[80vh] flex items-center justify-center p-6 bg-brand-light">
-            <div className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row animate-fade-in relative">
-                <div className="absolute top-8 left-8 z-20">
-                    <button onClick={() => navigate('/')} className="text-brand-dark/40 hover:text-brand-primary transition-colors flex items-center gap-2 font-bold text-[10px] uppercase tracking-widest">
-                        Voltar ao Início
-                    </button>
+        <div className="min-h-screen flex items-center justify-center p-4 md:p-10 bg-[#F8FAFC] relative overflow-hidden">
+            {/* Background Decorative Elements */}
+            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top_right,_rgba(196,160,82,0.05)_0%,_transparent_50%)]"></div>
+            <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_bottom_left,_rgba(59,130,246,0.03)_0%,_transparent_40%)]"></div>
+
+            <m.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="w-full max-w-6xl glass-premium rounded-[4rem] shadow-2xl overflow-hidden flex flex-col lg:flex-row shadow-brand-dark/5 border border-white relative z-10"
+            >
+                {/* Back Link */}
+                <div className="absolute top-10 left-10 z-[60]">
+                    <m.button
+                        whileHover={{ x: -10 }}
+                        onClick={() => navigate('/')}
+                        className="text-brand-dark hover:text-brand-primary transition-all flex items-center gap-3 font-black text-[10px] uppercase tracking-[0.3em] bg-white/50 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/20 shadow-sm"
+                        title="Retornar ao Início"
+                        aria-label="Retornar ao Início"
+                    >
+                        <ArrowRight className="w-4 h-4 rotate-180" />
+                        <span>Retornar ao Início</span>
+                    </m.button>
                 </div>
 
-                {/* Left Side: Visual/Message */}
-                <div className="md:w-1/2 bg-brand-dark p-8 md:p-16 flex flex-col justify-center relative overflow-hidden text-white">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-brand-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-brand-primary/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+                {/* Left Side: Cinematic Narrative */}
+                <div className="lg:w-[45%] bg-brand-dark p-12 md:p-24 flex flex-col justify-center relative overflow-hidden text-white min-h-[400px]">
+                    <div className="absolute top-0 right-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center opacity-10 grayscale"></div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-brand-dark via-brand-dark/90 to-brand-primary/20"></div>
 
-                    <div className="relative z-10 space-y-6 md:space-y-8">
-                        <div className="w-12 h-12 md:w-16 md:h-16 bg-brand-primary/20 backdrop-blur-sm rounded-2xl flex items-center justify-center text-brand-primary">
-                            <BookOpen className="w-6 h-6 md:w-8 md:h-8" />
+                    <div className="relative z-10 space-y-12">
+                        <m.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="w-20 h-20 bg-brand-primary/20 backdrop-blur-xl rounded-[2rem] flex items-center justify-center text-brand-primary border border-white/10 shadow-2xl"
+                        >
+                            <BookOpen className="w-10 h-10" />
+                        </m.div>
+
+                        <div className="space-y-6">
+                            <m.h1
+                                initial={{ opacity: 0, x: -30 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.2 }}
+                                className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.9] uppercase"
+                            >
+                                Junte-se ao Nosso <br />
+                                <span className="text-gradient-gold italic font-serif font-normal lowercase">Legado Literário</span>
+                            </m.h1>
+
+                            <m.p
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.4 }}
+                                className="text-gray-400 text-lg md:text-xl font-medium leading-relaxed max-w-sm opacity-80"
+                            >
+                                Entre na casa da literatura angolana e eternize a sua paixão pela leitura e escrita.
+                            </m.p>
                         </div>
 
-                        <h1 className="text-3xl md:text-5xl font-black tracking-tighter leading-tight md:leading-none">
-                            Seja Bem-vindo à <span className="text-brand-primary italic font-serif font-normal">Nossa Família</span>
-                        </h1>
-
-                        <p className="text-gray-400 text-base md:text-lg font-medium leading-relaxed">
-                            Crie uma conta para gerir os seus pedidos, guardar favoritos e ter acesso a edições exclusivas.
-                        </p>
-
-                        <ul className="space-y-3 md:space-y-4 pt-2 md:pt-4">
-                            <li className="flex items-center gap-3 text-xs md:text-sm font-bold text-white/80">
-                                <div className="w-4 h-4 md:w-5 md:h-5 bg-brand-primary rounded-full flex items-center justify-center shrink-0">
-                                    <Check className="w-2 h-2 md:w-3 md:h-3 text-white" />
+                        <m.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.6 }}
+                            className="space-y-6"
+                        >
+                            {[
+                                'Acesso a edições limitadas e raras',
+                                'Gestão simplificada de encomendas',
+                                'Comunidade exclusiva de autores'
+                            ].map((item, i) => (
+                                <div key={i} className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/50">
+                                    <div className="w-6 h-6 bg-brand-primary/20 rounded-lg flex items-center justify-center border border-brand-primary/20">
+                                        <Check className="w-3 h-3 text-brand-primary" />
+                                    </div>
+                                    {item}
                                 </div>
-                                Acompanhamento de pedidos
-                            </li>
-                            <li className="flex items-center gap-3 text-xs md:text-sm font-bold text-white/80">
-                                <div className="w-4 h-4 md:w-5 md:h-5 bg-brand-primary rounded-full flex items-center justify-center shrink-0">
-                                    <Check className="w-2 h-2 md:w-3 md:h-3 text-white" />
-                                </div>
-                                Lista de desejos personalizada
-                            </li>
-                        </ul>
+                            ))}
+                        </m.div>
                     </div>
                 </div>
 
-                {/* Right Side: Form */}
-                <div className="md:w-1/2 p-8 md:p-20 flex flex-col justify-center">
-                    <div className="max-w-md mx-auto w-full space-y-8 md:space-y-10">
+                {/* Right Side: Sophisticated Form Area */}
+                <div className="lg:w-[55%] p-10 md:p-24 flex flex-col justify-center bg-white relative">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-brand-primary/5 blur-[100px] rounded-full"></div>
+
+                    <div className="max-w-md mx-auto w-full space-y-12 relative z-10">
                         <div className="text-center md:text-left">
-                            <h2 className="text-4xl font-black text-brand-dark tracking-tighter">
-                                {isLogin ? 'Iniciar Sessão' : 'Criar Nova Conta'}
+                            <m.span
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="inline-block px-5 py-2 bg-brand-primary/10 text-brand-primary text-[10px] font-black uppercase tracking-[0.4em] rounded-full mb-8 shadow-sm"
+                            >
+                                {isLogin ? 'Retorno de Elite' : 'Novo Horizonte'}
+                            </m.span>
+                            <h2 className="text-5xl md:text-6xl font-black text-brand-dark tracking-tighter leading-tight mb-4 uppercase">
+                                {isLogin ? 'Bem-vindo de Volta' : 'Começar Jornada'}
                             </h2>
-                            <p className="text-gray-500 font-medium pt-2">
-                                {isLogin ? 'Bem-vindo de volta! Introduza os seus dados.' : 'Junte-se a nós para uma experiência literária única.'}
+                            <p className="text-gray-400 font-bold text-lg leading-relaxed">
+                                {isLogin ? 'O seu lugar no universo literário aguarda.' : 'Crie a sua identidade na Editora Graça.'}
                             </p>
                         </div>
 
                         {success && (
-                            <div className="p-4 bg-green-50 border-l-4 border-green-500 text-green-700 text-sm font-bold animate-fade-in">
-                                {success}
-                            </div>
+                            <m.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                className="p-8 bg-green-50 border border-green-100 rounded-[2.5rem] text-green-700 text-sm font-bold flex items-center gap-6 shadow-xl shadow-green-500/5"
+                            >
+                                <div className="w-12 h-12 bg-green-500 rounded-2xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-green-500/20">
+                                    <Check className="w-6 h-6" />
+                                </div>
+                                <p className="leading-relaxed">{success}</p>
+                            </m.div>
                         )}
 
                         {error && (
-                            <div className="p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm font-bold animate-shake">
-                                {error}
-                                <div className="mt-2">
-                                    <div className="flex gap-4 items-center">
-                                        <button
-                                            type="button"
-                                            onClick={checkConnection}
-                                            disabled={connectionStatus === 'checking'}
-                                            className="text-xs underline hover:text-red-900 font-bold flex items-center gap-2"
-                                        >
-                                            {connectionStatus === 'checking' && <Loader2 className="w-3 h-3 animate-spin" />}
-                                            {connectionStatus === 'idle' && 'Testar minha conexão'}
-                                            {connectionStatus === 'ok' && 'Internet OK'}
-                                            {connectionStatus === 'error' && 'Sem Internet'}
-                                        </button>
+                            <m.div
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                className="p-8 bg-red-50 border border-red-100 rounded-[2.5rem] space-y-6 shadow-xl shadow-red-500/5"
+                            >
+                                <p className="text-red-700 text-sm font-black tracking-tight leading-relaxed">{error}</p>
+                                <div className="flex gap-4 items-center pt-6 border-t border-red-100">
+                                    <button
+                                        type="button"
+                                        onClick={checkConnection}
+                                        disabled={connectionStatus === 'checking'}
+                                        className="text-[10px] uppercase tracking-[0.3em] text-red-400 hover:text-red-700 font-black flex items-center gap-3 transition-colors"
+                                        title="Diagnóstico de Rede"
+                                        aria-label="Diagnóstico de Rede"
+                                    >
+                                        {connectionStatus === 'checking' ? <Loader2 className="w-4 h-4 animate-spin" /> : <div className="w-2 h-2 rounded-full bg-red-400 shadow-[0_0_8px_rgba(239,68,68,0.5)]"></div>}
+                                        Diagnóstico
+                                    </button>
 
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                localStorage.clear();
-                                                window.location.reload();
-                                            }}
-                                            className="text-xs py-1 px-3 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 font-bold ml-auto"
-                                            title="Limpar memória do navegador e recarregar"
-                                        >
-                                            Resetar App
-                                        </button>
-                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            localStorage.clear();
+                                            window.location.reload();
+                                        }}
+                                        className="text-[10px] uppercase tracking-[0.3em] px-5 py-2.5 bg-red-100 text-red-700 rounded-xl hover:bg-red-200 font-black ml-auto transition-all active:scale-95"
+                                        title="Resetar App"
+                                        aria-label="Resetar App"
+                                    >
+                                        Reset Sistema
+                                    </button>
                                 </div>
-                            </div>
+                            </m.div>
                         )}
 
-                        <form onSubmit={handleSubmit} className="space-y-6">
+                        <form onSubmit={handleSubmit} className="space-y-8">
                             {!isLogin && (
-                                <div className="form-group-premium">
-                                    <label htmlFor="name" className="label-premium">Nome Completo</label>
+                                <div className="space-y-4">
+                                    <label htmlFor="name" className="text-[10px] uppercase tracking-[0.4em] font-black text-gray-400 ml-6">Identidade Literária</label>
                                     <div className="relative group">
-                                        <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-brand-primary transition-colors" />
+                                        <User className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-brand-primary transition-all duration-500" />
                                         <input
                                             id="name"
                                             type="text"
                                             required
-                                            placeholder="Ex: João Silva"
+                                            placeholder="Seu nome completo"
                                             value={name}
                                             onChange={(e) => setName(e.target.value)}
-                                            className="input-premium pl-12"
+                                            className="w-full bg-gray-50 border-2 border-transparent focus:border-brand-primary/20 focus:bg-white rounded-[2rem] px-16 py-6 text-brand-dark font-black tracking-tight transition-all outline-none shadow-sm"
                                         />
                                     </div>
                                 </div>
                             )}
 
-                            <div className="form-group-premium">
-                                <label htmlFor="email" className="label-premium">Endereço de E-mail</label>
+                            <div className="space-y-4">
+                                <label htmlFor="email" className="text-[10px] uppercase tracking-[0.4em] font-black text-gray-400 ml-6">Canal Digital (E-mail)</label>
                                 <div className="relative group">
-                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-brand-primary transition-colors" />
+                                    <Mail className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-brand-primary transition-all duration-500" />
                                     <input
                                         id="email"
                                         type="email"
@@ -284,15 +342,15 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
                                         placeholder="seu@email.com"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="input-premium pl-12"
+                                        className="w-full bg-gray-50 border-2 border-transparent focus:border-brand-primary/20 focus:bg-white rounded-[2rem] px-16 py-6 text-brand-dark font-black tracking-tight transition-all outline-none shadow-sm"
                                     />
                                 </div>
                             </div>
 
-                            <div className="form-group-premium">
-                                <label htmlFor="password" className="label-premium">Sua Senha</label>
+                            <div className="space-y-4">
+                                <label htmlFor="password" className="text-[10px] uppercase tracking-[0.4em] font-black text-gray-400 ml-6">Chave de Acesso</label>
                                 <div className="relative group">
-                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-brand-primary transition-colors" />
+                                    <Lock className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-brand-primary transition-all duration-500" />
                                     <input
                                         id="password"
                                         type="password"
@@ -300,15 +358,19 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
                                         placeholder="••••••••"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="input-premium pl-12"
+                                        className="w-full bg-gray-50 border-2 border-transparent focus:border-brand-primary/20 focus:bg-white rounded-[2rem] px-16 py-6 text-brand-dark font-black tracking-tight transition-all outline-none shadow-sm"
                                     />
                                 </div>
                             </div>
 
-                            <button
+                            <m.button
+                                whileHover={{ scale: 1.02, y: -2 }}
+                                whileTap={{ scale: 0.98 }}
                                 type="submit"
                                 disabled={loading}
-                                className="w-full btn-premium py-5 text-lg rounded-2xl shadow-xl shadow-brand-primary/20 disabled:opacity-50"
+                                className="w-full py-7 bg-brand-dark text-white rounded-[2rem] font-black uppercase text-[11px] tracking-[0.5em] hover:bg-brand-primary transition-all shadow-2xl shadow-brand-dark/20 flex items-center justify-center gap-4 group"
+                                title={isLogin ? 'Entrar Agora' : 'Finalizar Registo'}
+                                aria-label={isLogin ? 'Entrar Agora' : 'Finalizar Registo'}
                             >
                                 {loading ? (
                                     <>
@@ -317,27 +379,30 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
                                     </>
                                 ) : (
                                     <>
-                                        <span>{isLogin ? 'Entrar Agora' : 'Finalizar Registo'}</span>
-                                        <ArrowRight className="w-6 h-6" />
+                                        <span>{isLogin ? 'Aceder à Casa' : 'Eternizar Membro'}</span>
+                                        <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
                                     </>
                                 )}
-                            </button>
+                            </m.button>
                         </form>
 
-                        <div className="text-center">
-                            <p className="text-gray-500 font-medium">
-                                {isLogin ? 'Ainda não tem conta?' : 'Já possui uma conta?'}
+                        <div className="text-center pt-10 border-t border-gray-50">
+                            <p className="text-gray-400 font-black text-[10px] uppercase tracking-[0.3em] leading-loose">
+                                {isLogin ? 'Ainda não faz parte da família?' : 'Já possui autorização de acesso?'}
+                                <br />
                                 <button
                                     onClick={() => setIsLogin(!isLogin)}
-                                    className="text-brand-primary font-black ml-2 hover:underline tracking-tight"
+                                    className="text-brand-primary font-black mt-2 hover:scale-110 mb-[-4px] transition-transform inline-block border-b-2 border-brand-primary/20 hover:border-brand-primary pb-1"
+                                    title={isLogin ? 'Mudar para Registo' : 'Mudar para Login'}
+                                    aria-label={isLogin ? 'Mudar para Registo' : 'Mudar para Login'}
                                 >
-                                    {isLogin ? 'Crie uma aqui' : 'Inicie sessão'}
+                                    {isLogin ? 'Manifeste o seu Interesse' : 'Autentique-se'}
                                 </button>
                             </p>
                         </div>
                     </div>
                 </div>
-            </div>
+            </m.div>
         </div>
     );
 };

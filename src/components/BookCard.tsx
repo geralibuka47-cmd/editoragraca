@@ -1,7 +1,7 @@
 import React from 'react';
-import { ShoppingCart, Heart, Eye } from 'lucide-react';
-
+import { ShoppingCart, Heart, Eye, ArrowRight, Book as BookIcon } from 'lucide-react';
 import { Book } from '../types';
+import { optimizeImageUrl } from '../components/OptimizedImage';
 
 interface BookCardProps {
     book: Book;
@@ -10,125 +10,110 @@ interface BookCardProps {
     onViewDetails: (book: any) => void;
 }
 
-import { optimizeImageUrl } from '../components/OptimizedImage';
-
 const BookCard: React.FC<BookCardProps> = ({ book, onAddToCart, onToggleWishlist, onViewDetails }) => {
     return (
-        <div className="group relative bg-white rounded-2xl overflow-hidden border border-gray-100 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2">
-            {/* Badges */}
-            <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
+        <div className="card-premium group h-full flex flex-col hover-lift">
+            {/* Badges Overlay */}
+            <div className="absolute top-4 left-4 z-20 flex flex-wrap gap-2 pointer-events-none">
                 {book.isBestseller && (
-                    <span className="bg-brand-primary text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">
+                    <span className="bg-brand-primary text-white text-[8px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest shadow-lg animate-pulse">
                         Best Seller
                     </span>
                 )}
                 {book.isNew && (
-                    <span className="bg-brand-dark text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">
-                        Novidade
+                    <span className="bg-brand-dark text-white text-[8px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest shadow-lg">
+                        Novo
                     </span>
                 )}
                 {book.format === 'digital' && (
-                    <span className="bg-blue-600 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">
+                    <span className="bg-blue-600/90 backdrop-blur-md text-white text-[8px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest shadow-lg">
                         Digital
-                    </span>
-                )}
-                {book.price === 0 && (
-                    <span className="bg-green-500 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">
-                        Grátis
                     </span>
                 )}
             </div>
 
             {/* Image Area */}
-            <div className="relative aspect-[3/4] bg-brand-light flex items-center justify-center overflow-hidden">
+            <div className="relative aspect-[3/4.2] rounded-2xl overflow-hidden bg-[#F1F5F9]">
                 {book.coverUrl ? (
                     <img
-                        src={optimizeImageUrl(book.coverUrl, 400, 533)}
+                        src={optimizeImageUrl(book.coverUrl, 400, 560)}
                         alt={book.title}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 cursor-pointer"
+                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 cursor-pointer"
                         loading="lazy"
                         onClick={() => onViewDetails(book)}
                     />
                 ) : (
                     <div
-                        className="w-full h-full p-8 flex items-center justify-center cursor-pointer"
+                        className="w-full h-full p-8 flex items-center justify-center cursor-pointer bg-gradient-to-br from-gray-50 to-gray-100"
                         onClick={() => onViewDetails(book)}
                     >
-                        <div className="w-full h-full bg-white/40 border border-brand-primary/10 rounded shadow-md transform group-hover:rotate-3 transition-transform duration-500 flex items-center justify-center">
-                            <div className="text-center p-4">
-                                <p className="font-serif font-bold text-brand-dark group-hover:text-brand-primary transition-colors leading-tight">{book.title}</p>
-                                <div className="w-8 h-0.5 bg-brand-primary mx-auto mt-2"></div>
-                            </div>
-                        </div>
+                        <BookIcon className="w-16 h-16 text-gray-200" />
                     </div>
                 )}
 
-                {/* Action Overlay */}
-                <div className="absolute inset-0 bg-brand-dark/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
+                {/* Glass Action Overlay */}
+                <div className="absolute inset-x-0 bottom-4 flex justify-center gap-3 px-4 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 z-30">
                     <button
-                        onClick={() => onToggleWishlist(book)}
-                        className="p-3 bg-white rounded-full text-brand-dark hover:bg-brand-primary hover:text-white transition-all transform translate-y-4 group-hover:translate-y-0 duration-300"
-                        title="Adicionar à Wishlist"
+                        onClick={(e) => { e.stopPropagation(); onToggleWishlist(book); }}
+                        className="w-12 h-12 glass-premium rounded-xl text-brand-dark hover:bg-brand-primary hover:text-white transition-all flex items-center justify-center shadow-xl active:scale-90"
+                        title="Favorito"
                     >
-                        <Heart className="w-4 h-4" />
+                        <Heart className="w-5 h-5" />
                     </button>
                     <button
-                        onClick={() => onViewDetails(book)}
-                        className="p-3 bg-white rounded-full text-brand-dark hover:bg-brand-primary hover:text-white transition-all transform translate-y-4 group-hover:translate-y-0 duration-500"
+                        onClick={(e) => { e.stopPropagation(); onViewDetails(book); }}
+                        className="w-12 h-12 glass-premium rounded-xl text-brand-dark hover:bg-brand-primary hover:text-white transition-all flex items-center justify-center shadow-xl active:scale-90"
                         title="Ver Detalhes"
                     >
-                        <Eye className="w-4 h-4" />
+                        <Eye className="w-5 h-5" />
                     </button>
                     <button
-                        onClick={() => onAddToCart(book)}
-                        className="p-3 bg-brand-primary rounded-full text-white hover:bg-brand-dark transition-all transform translate-y-4 group-hover:translate-y-0 duration-700 shadow-xl"
-                        title="Adicionar ao Carrinho"
+                        onClick={(e) => { e.stopPropagation(); onAddToCart(book); }}
+                        className="w-12 h-12 bg-brand-primary rounded-xl text-white hover:bg-brand-dark transition-all flex items-center justify-center shadow-xl shadow-brand-primary/30 active:scale-90"
+                        title="Carrinho"
                     >
-                        <ShoppingCart className="w-4 h-4" />
+                        <ShoppingCart className="w-5 h-5" />
                     </button>
                 </div>
             </div>
 
             {/* Content Area */}
-            <div className="p-6 space-y-2">
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{book.genre}</p>
-                <h3
-                    className="font-serif text-lg font-bold text-brand-dark line-clamp-1 group-hover:text-brand-primary transition-colors cursor-pointer"
-                    onClick={() => onViewDetails(book)}
-                >
-                    {book.title}
-                </h3>
-                <p className="text-sm text-gray-500 font-medium italic">{book.author}</p>
+            <div className="p-5 flex-1 flex flex-col">
+                <div className="mb-2">
+                    <p className="text-[9px] font-black text-brand-primary/50 uppercase tracking-[0.2em] mb-1">{book.genre || 'Literatura'}</p>
+                    <h3
+                        className="font-serif text-lg font-black text-brand-dark line-clamp-2 leading-tight group-hover:text-brand-primary transition-colors cursor-pointer min-h-[3rem]"
+                        onClick={() => onViewDetails(book)}
+                    >
+                        {book.title}
+                    </h3>
+                </div>
 
-                <div className="flex justify-between items-center pt-4 border-t border-gray-50 mt-4">
-                    <div className="flex flex-col">
-                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Preço</span>
-                        <span className="text-xl font-black text-brand-dark">
-                            {book.price === 0 ? 'GRATUITO' : `${book.price.toLocaleString()} Kz`}
-                        </span>
+                <p className="text-xs text-gray-400 font-bold mb-4 italic">por {book.author}</p>
+
+                <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p className="text-[8px] font-black text-gray-300 uppercase tracking-widest mb-0.5">Investimento</p>
+                        <p className="text-xl font-black text-brand-dark tracking-tighter">
+                            {book.price === 0 ? (
+                                <span className="text-green-600">GRÁTIS</span>
+                            ) : (
+                                <span>{book.price.toLocaleString()}<span className="text-[10px] ml-1">Kz</span></span>
+                            )}
+                        </p>
                     </div>
-                    {book.price === 0 && book.format === 'digital' ? (
-                        <button
-                            onClick={() => onViewDetails(book)}
-                            className="text-green-600 font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:gap-3 transition-all"
-                        >
-                            Baixar <ArrowRight className="w-3 h-3" />
-                        </button>
-                    ) : (
-                        <button
-                            onClick={() => onAddToCart(book)}
-                            className="text-brand-primary font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:gap-3 transition-all"
-                        >
-                            Comprar <ArrowRight className="w-3 h-3" />
-                        </button>
-                    )}
+
+                    <button
+                        onClick={() => onViewDetails(book)}
+                        title="Ver Detalhes do Livro"
+                        className="w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center text-gray-400 hover:bg-brand-primary hover:border-brand-primary hover:text-white transition-all active:scale-90 group/btn shadow-sm"
+                    >
+                        <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-0.5" />
+                    </button>
                 </div>
             </div>
         </div>
     );
 };
-
-// Internal Import for the Arrow icon used in the component
-import { ArrowRight } from 'lucide-react';
 
 export default BookCard;

@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Loader2, Save, X } from 'lucide-react';
+import { motion as m, AnimatePresence } from 'framer-motion';
+import { Plus, Edit, Trash2, Loader2, Save, X, Search, Briefcase, DollarSign, Hash, List, Tag } from 'lucide-react';
+import { useToast } from '../Toast';
 
 const AdminServicesTab: React.FC = () => {
+    const { showToast } = useToast();
     const [editorialServices, setEditorialServices] = useState<any[]>([]);
+    const [filteredServices, setFilteredServices] = useState<any[]>([]);
+    const [searchQuery, setSearchQuery] = useState('');
     const [isLoadingServices, setIsLoadingServices] = useState(true);
     const [showServiceModal, setShowServiceModal] = useState(false);
     const [serviceForm, setServiceForm] = useState<any>({ title: '', price: '', details: [], order: 0 });
     const [isSavingService, setIsSavingService] = useState(false);
+    const [serviceErrors, setServiceErrors] = useState<Record<string, string>>({});
 
     const fetchServices = async () => {
         setIsLoadingServices(true);
@@ -14,6 +20,7 @@ const AdminServicesTab: React.FC = () => {
             const { getEditorialServices } = await import('../../services/dataService');
             const data = await getEditorialServices();
             setEditorialServices(data);
+            setFilteredServices(data);
         } catch (error) {
             console.error('Erro ao buscar serviços editoriais:', error);
         } finally {
@@ -25,11 +32,20 @@ const AdminServicesTab: React.FC = () => {
         fetchServices();
     }, []);
 
+    useEffect(() => {
+        const query = searchQuery.toLowerCase();
+        setFilteredServices(
+            editorialServices.filter(s =>
+                s.title?.toLowerCase().includes(query) ||
+                s.details?.some((d: string) => d.toLowerCase().includes(query))
+            )
+        );
+    }, [searchQuery, editorialServices]);
+
     const handleSaveService = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!serviceForm.title.trim()) {
-            alert('O título do serviço é obrigatório.');
             return;
         }
 
@@ -48,12 +64,13 @@ const AdminServicesTab: React.FC = () => {
             };
 
             await saveEditorialService(sanitizedService);
-            alert('Serviço guardado com sucesso!');
             setShowServiceModal(false);
             fetchServices();
-        } catch (error) {
+            showToast('Serviço salvo com sucesso!', 'success');
+        } catch (error: any) {
             console.error('Erro ao salvar serviço:', error);
-            alert('Erro ao salvar serviço. Verifique se os dados estão corretos.');
+            setServiceErrors({ form: error.message || 'Erro ao salvar serviço.' });
+            showToast('Erro ao salvar serviço.', 'error');
         } finally {
             setIsSavingService(false);
         }
@@ -64,185 +81,273 @@ const AdminServicesTab: React.FC = () => {
         try {
             const { deleteEditorialService } = await import('../../services/dataService');
             await deleteEditorialService(id);
-            alert('Serviço eliminado.');
             fetchServices();
+            showToast('Serviço eliminado com sucesso!', 'success');
         } catch (error) {
             console.error('Erro ao eliminar serviço:', error);
-            alert('Erro ao eliminar serviço.');
+            showToast('Erro ao eliminar serviço.', 'error');
         }
     };
 
     return (
-        <div>
-            <div className="flex justify-between items-center mb-8">
-                <h2 className="text-2xl md:text-3xl font-black text-brand-dark">Gestão de Serviços Editoriais</h2>
-                <button
-                    onClick={() => {
-                        setServiceForm({ title: '', price: '', details: [], order: 0 });
-                        setShowServiceModal(true);
-                    }}
-                    title="Adicionar novo serviço"
-                    aria-label="Adicionar novo serviço"
-                    className="btn-premium py-3 px-6 text-sm"
-                >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Novo Serviço
-                </button>
+        <div className="space-y-10">
+            <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-8">
+                <div>
+                    <h2 className="text-4xl font-black text-brand-dark tracking-tighter uppercase mb-2">Serviços <span className="text-brand-primary lowercase italic font-serif">Premium</span></h2>
+                    <p className="text-gray-400 font-bold text-sm">Configuração do catálogo de soluções editoriais.</p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center gap-4 w-full xl:w-auto">
+                    <div className="relative group w-full sm:w-80">
+                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-brand-primary transition-colors" />
+                        <input
+                            type="text"
+                            placeholder="Pesquisar serviços..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-12 pr-6 py-4 bg-gray-50 border-2 border-transparent focus:border-brand-primary/20 focus:bg-white rounded-[1.5rem] text-[11px] font-black uppercase tracking-widest outline-none transition-all shadow-sm"
+                        />
+                    </div>
+
+                    <m.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => {
+                            setServiceForm({ title: '', price: '', details: [], order: 0 });
+                            setShowServiceModal(true);
+                        }}
+                        className="btn-premium py-4 px-8 text-[10px] w-full sm:w-auto shadow-xl shadow-brand-primary/20"
+                    >
+                        <Plus className="w-4 h-4 mr-2" />
+                        <span>Novo Serviço</span>
+                    </m.button>
+                </div>
             </div>
-            <div className="bg-white rounded-2xl shadow-lg overflow-hidden overflow-x-auto">
-                <table className="w-full min-w-[800px]">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-brand-dark uppercase tracking-wider">Serviço</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-brand-dark uppercase tracking-wider">Detalhes</th>
-                            <th className="px-6 py-4 text-right text-xs font-bold text-brand-dark uppercase tracking-wider">Preço</th>
-                            <th className="px-6 py-4 text-right text-xs font-bold text-brand-dark uppercase tracking-wider">Ordem</th>
-                            <th className="px-6 py-4 text-right text-xs font-bold text-brand-dark uppercase tracking-wider">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                        {isLoadingServices ? (
-                            <tr>
-                                <td colSpan={5} className="px-6 py-12 text-center text-gray-500 italic">Carregando serviços...</td>
+
+            <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-brand-dark/5 border border-gray-100 overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full min-w-[900px]">
+                        <thead>
+                            <tr className="bg-gray-50/50">
+                                <th className="px-8 py-6 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Serviço / Título</th>
+                                <th className="px-8 py-6 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Principais Detalhes</th>
+                                <th className="px-8 py-6 text-right text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Investimento</th>
+                                <th className="px-8 py-6 text-right text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Ordem</th>
+                                <th className="px-8 py-6 text-center text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Ações</th>
                             </tr>
-                        ) : editorialServices.length > 0 ? (
-                            editorialServices.map((service) => (
-                                <tr key={service.id} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 font-bold text-brand-dark">{service.title}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-600">
-                                        <ul className="list-disc pl-4 text-xs space-y-1">
-                                            {service.details.map((d: string, i: number) => (
-                                                <li key={i}>{d}</li>
-                                            ))}
-                                        </ul>
-                                    </td>
-                                    <td className="px-6 py-4 text-right font-bold text-brand-primary">
-                                        {typeof service.price === 'number' ? `${service.price.toLocaleString()} Kz` : service.price}
-                                    </td>
-                                    <td className="px-6 py-4 text-right text-sm text-gray-600">{service.order}</td>
-                                    <td className="px-6 py-4 text-right">
-                                        <div className="flex items-center justify-end gap-2">
-                                            <button
-                                                onClick={() => {
-                                                    setServiceForm(service);
-                                                    setShowServiceModal(true);
-                                                }}
-                                                title="Editar serviço"
-                                                aria-label="Editar serviço"
-                                                className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 flex items-center justify-center transition-all"
-                                            >
-                                                <Edit className="w-4 h-4" />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDeleteService(service.id)}
-                                                title="Eliminar serviço"
-                                                aria-label="Eliminar serviço"
-                                                className="w-8 h-8 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 flex items-center justify-center transition-all"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan={5} className="px-6 py-12 text-center text-gray-500 italic">Nenhum serviço encontrado.</td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody className="divide-y divide-gray-50">
+                            <AnimatePresence mode="popLayout">
+                                {isLoadingServices ? (
+                                    [1, 2, 3].map(i => (
+                                        <tr key={i} className="animate-pulse">
+                                            <td colSpan={5} className="px-8 py-6">
+                                                <div className="h-4 bg-gray-100 rounded-full w-full"></div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : filteredServices.length > 0 ? (
+                                    filteredServices.map((service) => (
+                                        <m.tr
+                                            key={service.id}
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            className="hover:bg-gray-50/50 transition-colors group text-sm"
+                                        >
+                                            <td className="px-8 py-6">
+                                                <span className="font-black text-brand-dark tracking-tight">{service.title}</span>
+                                            </td>
+                                            <td className="px-8 py-6">
+                                                <div className="flex flex-wrap gap-2">
+                                                    {service.details.slice(0, 2).map((d: string, i: number) => (
+                                                        <span key={i} className="px-2 py-1 bg-gray-100 text-[9px] font-bold text-gray-500 rounded-md whitespace-nowrap">
+                                                            {d}
+                                                        </span>
+                                                    ))}
+                                                    {service.details.length > 2 && (
+                                                        <span className="px-2 py-1 bg-brand-primary/10 text-brand-primary text-[9px] font-black rounded-md">
+                                                            +{service.details.length - 2}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-6 text-right font-black text-brand-primary">
+                                                {typeof service.price === 'number' ? `${service.price.toLocaleString()} Kz` : service.price}
+                                            </td>
+                                            <td className="px-8 py-6 text-right font-black text-gray-300">
+                                                #{service.order}
+                                            </td>
+                                            <td className="px-8 py-6">
+                                                <div className="flex items-center justify-center gap-3">
+                                                    <m.button
+                                                        whileHover={{ scale: 1.1, y: -2 }}
+                                                        whileTap={{ scale: 0.9 }}
+                                                        onClick={() => {
+                                                            setServiceForm(service);
+                                                            setShowServiceModal(true);
+                                                        }}
+                                                        className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white flex items-center justify-center transition-all shadow-sm"
+                                                        title="Editar serviço"
+                                                    >
+                                                        <Edit className="w-4 h-4" />
+                                                    </m.button>
+                                                    <m.button
+                                                        whileHover={{ scale: 1.1, y: -2 }}
+                                                        whileTap={{ scale: 0.9 }}
+                                                        onClick={() => handleDeleteService(service.id)}
+                                                        className="w-10 h-10 bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white flex items-center justify-center transition-all shadow-sm"
+                                                        title="Eliminar serviço"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </m.button>
+                                                </div>
+                                            </td>
+                                        </m.tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan={5} className="px-8 py-32 text-center">
+                                            <div className="flex flex-col items-center gap-4 opacity-20 grayscale">
+                                                <Briefcase className="w-16 h-16" />
+                                                <p className="font-black uppercase tracking-[0.3em] text-[10px]">Nenhum serviço disponível.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )}
+                            </AnimatePresence>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             {/* Service Modal */}
-            {showServiceModal && (
-                <div className="fixed inset-0 bg-brand-dark/90 backdrop-blur-sm z-50 flex items-center justify-center p-8">
-                    <div className="bg-white rounded-[32px] w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col animate-fade-in">
-                        <div className="p-8 border-b border-gray-100 bg-gray-50">
-                            <h2 className="text-2xl font-black text-brand-dark">{serviceForm.id ? 'Editar Serviço' : 'Novo Serviço'}</h2>
-                        </div>
-                        <form onSubmit={handleSaveService} className="flex-1 overflow-y-auto p-8 space-y-6">
-                            <div className="form-group-premium">
-                                <label className="label-premium">Título do Serviço</label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={serviceForm.title}
-                                    onChange={(e) => setServiceForm({ ...serviceForm, title: e.target.value })}
-                                    className="input-premium font-bold"
-                                    placeholder="Ex: Revisão Literária"
-                                />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="form-group-premium">
-                                    <label htmlFor="service-price" className="label-premium">Preço Estimado</label>
-                                    <input
-                                        id="service-price"
-                                        required
-                                        type="text"
-                                        title="Preço do serviço"
-                                        value={serviceForm.price}
-                                        onChange={(e) => setServiceForm({ ...serviceForm, price: e.target.value })}
-                                        placeholder="Ex: 50.000 Kz"
-                                        className="input-premium"
-                                    />
+            <AnimatePresence>
+                {showServiceModal && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                        <m.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setShowServiceModal(false)}
+                            className="absolute inset-0 bg-brand-dark/40 backdrop-blur-xl"
+                        />
+                        <m.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            className="bg-white rounded-[3rem] w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl relative z-20 border border-white/20 flex flex-col"
+                        >
+                            <div className="p-10 border-b border-gray-100 flex items-center justify-between">
+                                <div>
+                                    <h3 className="text-3xl font-black text-brand-dark tracking-tighter uppercase mb-1">{serviceForm.id ? 'Editar Serviço' : 'Novo Serviço'}</h3>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-brand-primary">Configuração de oferta</p>
                                 </div>
-                                <div className="form-group-premium">
-                                    <label htmlFor="service-order" className="label-premium">Ordem</label>
-                                    <input
-                                        id="service-order"
-                                        type="number"
-                                        title="Ordem de exibição"
-                                        placeholder="0"
-                                        value={serviceForm.order}
-                                        onChange={(e) => setServiceForm({ ...serviceForm, order: parseInt(e.target.value) })}
-                                        className="input-premium"
-                                    />
+                                <m.button
+                                    whileHover={{ rotate: 90, scale: 1.1 }}
+                                    whileTap={{ scale: 0.9 }}
+                                    onClick={() => setShowServiceModal(false)}
+                                    className="w-12 h-12 flex items-center justify-center bg-gray-50 text-gray-400 hover:text-brand-dark rounded-full transition-all"
+                                    title="Fechar"
+                                >
+                                    <X className="w-6 h-6" />
+                                </m.button>
+                            </div>
+
+                            <form onSubmit={handleSaveService} className="flex-1 overflow-y-auto p-10 space-y-8">
+                                <div className="space-y-2">
+                                    <label htmlFor="service-title" className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Título do Serviço</label>
+                                    <div className="relative">
+                                        <Tag className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                                        <input
+                                            id="service-title"
+                                            type="text"
+                                            required
+                                            value={serviceForm.title}
+                                            onChange={(e) => setServiceForm({ ...serviceForm, title: e.target.value })}
+                                            className="w-full pl-12 pr-6 py-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-primary/20 focus:bg-white outline-none transition-all font-black text-brand-dark"
+                                            placeholder="Ex: Consultoria Editorial Completa"
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="form-group-premium">
-                                <label htmlFor="service-details" className="label-premium">Detalhes (um por linha)</label>
-                                <textarea
-                                    id="service-details"
-                                    required
-                                    title="Detalhes do serviço"
-                                    value={serviceForm.details.join('\n')}
-                                    onChange={(e) => setServiceForm({ ...serviceForm, details: e.target.value.split('\n') })}
-                                    placeholder="Detalhe 1&#10;Detalhe 2..."
-                                    className="input-premium h-32 resize-none"
-                                />
-                            </div>
-                        </form>
-                        <div className="p-8 border-t border-gray-100 flex gap-4 bg-gray-50/50">
-                            <button
-                                type="button"
-                                onClick={() => setShowServiceModal(false)}
-                                className="flex-1 px-8 py-4 border-2 border-brand-dark text-brand-dark rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-brand-dark hover:text-white transition-all flex items-center justify-center gap-2"
-                            >
-                                <X className="w-4 h-4" />
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={handleSaveService}
-                                disabled={isSavingService}
-                                className="flex-1 btn-premium py-4"
-                            >
-                                {isSavingService ? (
-                                    <>
+
+                                <div className="grid md:grid-cols-2 gap-8">
+                                    <div className="space-y-2">
+                                        <label htmlFor="service-price" className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Investimento Estimado</label>
+                                        <div className="relative">
+                                            <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                                            <input
+                                                id="service-price"
+                                                type="text"
+                                                required
+                                                value={serviceForm.price}
+                                                onChange={(e) => setServiceForm({ ...serviceForm, price: e.target.value })}
+                                                className="w-full pl-12 pr-6 py-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-primary/20 focus:bg-white outline-none transition-all font-bold"
+                                                placeholder="Ex: Sob Consulta ou 50.000 Kz"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label htmlFor="service-order" className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Ordem de Exibição</label>
+                                        <div className="relative">
+                                            <Hash className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                                            <input
+                                                id="service-order"
+                                                type="number"
+                                                required
+                                                value={serviceForm.order}
+                                                onChange={(e) => setServiceForm({ ...serviceForm, order: parseInt(e.target.value) })}
+                                                className="w-full pl-12 pr-6 py-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-primary/20 focus:bg-white outline-none transition-all font-bold"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label htmlFor="service-details" className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Recursos inclusos (um por linha)</label>
+                                    <div className="relative">
+                                        <List className="absolute left-4 top-6 w-4 h-4 text-gray-300" />
+                                        <textarea
+                                            id="service-details"
+                                            required
+                                            value={serviceForm.details.join('\n')}
+                                            onChange={(e) => setServiceForm({ ...serviceForm, details: e.target.value.split('\n') })}
+                                            className="w-full pl-12 pr-6 py-6 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-primary/20 focus:bg-white outline-none transition-all h-40 resize-none font-medium text-gray-600"
+                                            placeholder="Ex:&#10;Revisão Gramatical&#10;Projeto Gráfico&#10;Distribuição Digital"
+                                        />
+                                    </div>
+                                </div>
+                            </form>
+
+                            <div className="p-10 border-t border-gray-100 bg-gray-50/50 flex gap-6">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowServiceModal(false)}
+                                    className="flex-1 px-8 py-5 border-2 border-gray-100 text-gray-400 rounded-[1.5rem] font-black text-[10px] uppercase tracking-widest hover:border-gray-200 hover:text-brand-dark transition-all flex items-center justify-center gap-2"
+                                >
+                                    Cancelar
+                                </button>
+                                <m.button
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    onClick={handleSaveService}
+                                    disabled={isSavingService}
+                                    className="flex-2 btn-premium py-5 px-12 text-[10px] shadow-xl shadow-brand-primary/20"
+                                >
+                                    {isSavingService ? (
                                         <Loader2 className="w-4 h-4 animate-spin" />
-                                        <span>Salvando...</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Save className="w-4 h-4" />
-                                        <span>Salvar Serviço</span>
-                                    </>
-                                )}
-                            </button>
-                        </div>
+                                    ) : (
+                                        <>
+                                            <Save className="w-4 h-4 mr-2" />
+                                            <span>Salvar Serviço</span>
+                                        </>
+                                    )}
+                                </m.button>
+                            </div>
+                        </m.div>
                     </div>
-                </div>
-            )}
+                )}
+            </AnimatePresence>
         </div>
     );
 };

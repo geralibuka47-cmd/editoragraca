@@ -113,79 +113,81 @@ const AboutPage: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-white overflow-x-hidden">
-            {/* Premium Hero Section */}
-            <section className="relative min-h-[80vh] flex items-center bg-brand-dark text-white py-20 overflow-hidden">
-                {/* Visual Elements */}
-                <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-brand-primary/10 to-transparent"></div>
-                <m.div
-                    initial={{ opacity: 0, rotate: -30 }}
-                    animate={{ opacity: 1, rotate: -30 }}
-                    transition={{ duration: 2 }}
-                    className="absolute -top-40 -right-20 w-[600px] h-[600px] bg-brand-primary/5 rounded-[100px] blur-[120px]"
-                ></m.div>
-                <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-brand-primary/30 to-transparent"></div>
+        <div className="min-h-screen bg-[#F8FAFC] overflow-x-hidden">
+            {/* Nav Padding Spacer */}
+            <div className="h-[120px] lg:h-[128px] bg-brand-dark"></div>
 
-                <div className="container mx-auto px-4 md:px-8 relative z-10">
+            {/* Premium Hero Section - Ultra Deep Immersive */}
+            <section className="relative min-h-screen flex items-center bg-brand-dark text-white pt-24 pb-48 md:pb-64 overflow-hidden">
+                {/* Visual Elements */}
+                <m.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 2 }}
+                    className="absolute top-0 right-0 w-[90%] aspect-square bg-[#C4A052]/5 blur-[150px] rounded-full -translate-y-1/2 translate-x-1/4"
+                ></m.div>
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,_rgba(196,160,82,0.1)_0%,_transparent_70%)]"></div>
+
+                <div className="container mx-auto px-6 md:px-8 relative z-10 text-center lg:text-left">
                     <m.div
                         initial="hidden"
                         animate="visible"
                         variants={containerVariants}
-                        className="max-w-5xl"
+                        className="max-w-6xl"
                     >
-                        <m.div variants={itemVariants} className="flex items-center gap-3 text-brand-primary uppercase tracking-[0.4em] font-black text-[10px] md:text-sm mb-10">
-                            <div className="w-12 h-px bg-brand-primary"></div>
-                            <span>Sobre a Editora Graça</span>
+                        <m.div variants={itemVariants} className="inline-flex items-center gap-4 px-6 py-2.5 bg-white/5 backdrop-blur-xl rounded-full border border-white/10 text-brand-primary font-black text-[10px] md:text-xs uppercase tracking-[0.5em] mb-12">
+                            <Sparkles className="w-4 h-4" />
+                            <span>Vanguardismo Literário Angolano</span>
                         </m.div>
 
-                        <m.h1 variants={itemVariants} className="text-5xl md:text-[8rem] font-black tracking-tighter mb-10 leading-[0.85]">
-                            Onde Cada Página <br />
-                            <span className="text-brand-primary italic font-serif font-normal">Cria Futuro</span>
+                        <m.h1 variants={itemVariants} className="text-6xl md:text-[10rem] font-black tracking-tighter mb-12 leading-[0.85] uppercase">
+                            Onde a Arte <br />
+                            <span className="text-gradient-gold italic font-serif lowercase font-normal">Se Eterniza</span>
                         </m.h1>
 
-                        <m.p variants={itemVariants} className="text-xl md:text-3xl text-gray-400 leading-relaxed font-medium max-w-3xl mb-12">
-                            Transformamos manuscritos em legados. Uma casa editorial angolana comprometida com a <span className="text-white">excelência literária</span> e o impacto cultural.
+                        <m.p variants={itemVariants} className="text-xl md:text-4xl text-gray-400 font-medium leading-relaxed max-w-4xl mx-auto lg:mx-0 mb-20 opacity-90">
+                            Uma casa editorial de elite comprometida com a sofisticação intelectual e a preservação do <span className="text-white">património cultural</span> através da curadoria literária de alta performance.
                         </m.p>
 
-                        <m.div variants={itemVariants} className="flex flex-wrap gap-6">
+                        <m.div variants={itemVariants} className="flex flex-wrap justify-center lg:justify-start gap-12 items-center">
                             <div className="flex -space-x-4">
-                                {[1, 2, 3, 4].map(i => (
-                                    <div key={i} className="w-14 h-14 rounded-full border-4 border-brand-dark bg-gray-800 flex items-center justify-center overflow-hidden">
-                                        <Users className="w-6 h-6 text-gray-500" />
+                                {[26, 27, 28, 29].map(i => (
+                                    <div key={i} className="w-20 h-20 rounded-2xl border-4 border-brand-dark bg-gray-800 overflow-hidden shadow-2xl grayscale hover:grayscale-0 transition-all duration-700">
+                                        <img src={`https://i.pravatar.cc/100?img=${i}`} alt="Autor de Elite" className="w-full h-full object-cover" />
                                     </div>
                                 ))}
                             </div>
-                            <div className="flex flex-col justify-center">
-                                <span className="text-white font-black text-lg">Comunidade de Autores</span>
-                                <span className="text-brand-primary text-xs font-bold uppercase tracking-widest">+100 Escritores Parceiros</span>
+                            <div className="text-left py-2 px-6 border-l border-white/10">
+                                <span className="text-white font-black text-2xl tracking-tighter block">Ecossistema de Elite</span>
+                                <span className="text-brand-primary text-[10px] font-black uppercase tracking-[0.4em]">Propulsão Literária Mundial</span>
                             </div>
                         </m.div>
                     </m.div>
                 </div>
             </section>
 
-            {/* Mission/Vision/Purpose Grid */}
-            <section className="py-32 bg-white relative">
-                <div className="container mx-auto px-4 md:px-8">
-                    <div className="grid lg:grid-cols-3 gap-10 md:gap-16">
+            {/* Mission/Vision/Purpose Grid - Redesigned for Impact */}
+            <section className="py-24 md:py-48 -mt-32 md:-mt-48 relative z-20 optimize-render">
+                <div className="container mx-auto px-6 md:px-8">
+                    <div className="grid lg:grid-cols-3 gap-12 md:gap-16">
                         {[
                             {
                                 icon: Target,
-                                label: 'Missão',
-                                title: 'Democratizar o Acesso',
-                                description: 'Tornar a literatura de qualidade acessível a todos os angolanos, independentemente da sua localização.'
+                                label: 'Filosofia Principal',
+                                title: 'Rigor & Estética',
+                                description: 'Cada obra é submetida a uma auditoria editorial implacável para garantir o status de obra-prima.'
                             },
                             {
                                 icon: Sparkles,
-                                label: 'Propósito',
-                                title: 'Inovação Literária',
-                                description: 'Unir o design editorial moderno à profundidade das narrativas tradicionais angolanas.'
+                                label: 'Visão Futurista',
+                                title: 'Inovação Nativa',
+                                description: 'Lideramos a evolução da narrativa em Angola, mesclando tradição impressa com tecnologia imersiva.'
                             },
                             {
                                 icon: Zap,
-                                label: 'Impacto',
-                                title: 'Transformação Social',
-                                description: 'Usar a palavra escrita como motor de mudança intelectual e preservação da memória colectiva.'
+                                label: 'Impacto Cultural',
+                                title: 'Legado Atemporal',
+                                description: 'Construímos o cânone literário do futuro, dando voz aos pensadores que definem o nosso tempo.'
                             }
                         ].map((item, i) => (
                             <m.div
@@ -194,15 +196,15 @@ const AboutPage: React.FC = () => {
                                 whileInView="visible"
                                 viewport={{ once: true }}
                                 variants={itemVariants}
-                                className="group space-y-8"
+                                className="glass-premium p-16 rounded-[4rem] border border-white shadow-2xl hover:-translate-y-4 transition-all duration-700 group flex flex-col items-center text-center"
                             >
-                                <div className="w-20 h-20 bg-brand-light rounded-[2.5rem] flex items-center justify-center text-brand-primary group-hover:bg-brand-primary group-hover:text-white transition-all duration-500 group-hover:rotate-6">
-                                    <item.icon className="w-10 h-10" />
+                                <div className="w-24 h-24 bg-brand-dark text-brand-primary rounded-[2rem] flex items-center justify-center mb-12 group-hover:bg-brand-primary group-hover:text-white transition-all duration-500 group-hover:rotate-12 shadow-2xl">
+                                    <item.icon className="w-12 h-12" />
                                 </div>
-                                <div className="space-y-4">
-                                    <span className="text-brand-primary font-black uppercase tracking-[0.3em] text-[10px]">{item.label}</span>
-                                    <h2 className="text-3xl font-black text-brand-dark tracking-tight">{item.title}</h2>
-                                    <p className="text-gray-500 leading-relaxed text-lg">{item.description}</p>
+                                <div className="space-y-6">
+                                    <span className="text-brand-primary font-black uppercase tracking-[0.5em] text-[10px] block">{item.label}</span>
+                                    <h2 className="text-3xl font-black text-brand-dark tracking-tighter uppercase leading-none">{item.title}</h2>
+                                    <p className="text-gray-500 font-bold text-base leading-relaxed opacity-70 group-hover:opacity-100 transition-opacity duration-700">{item.description}</p>
                                 </div>
                             </m.div>
                         ))}
@@ -210,44 +212,44 @@ const AboutPage: React.FC = () => {
                 </div>
             </section>
 
-            {/* Values Section with Premium Cards */}
-            <section className="py-32 bg-brand-light relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-white to-transparent"></div>
+            {/* Values Section - Premium Design */}
+            <section className="py-32 md:py-64 bg-white relative overflow-hidden">
+                <m.div
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    className="absolute -left-20 top-40 w-80 h-80 bg-brand-primary/5 rounded-full blur-[100px]"
+                ></m.div>
 
-                <div className="container mx-auto px-4 md:px-8 relative z-10">
+                <div className="container mx-auto px-6 md:px-8 relative z-10">
                     <m.div
                         initial="hidden"
                         whileInView="visible"
                         viewport={{ once: true }}
                         variants={containerVariants}
-                        className="text-center max-w-4xl mx-auto mb-24"
+                        className="text-center max-w-5xl mx-auto mb-32"
                     >
-                        <m.h2 variants={itemVariants} className="text-4xl md:text-7xl font-black text-brand-dark tracking-tighter mb-8">
-                            Os Valores que <br />
-                            <span className="text-brand-primary italic font-serif font-normal">Nos Movem</span>
+                        <span className="text-brand-primary font-black text-xs uppercase tracking-[0.5em] mb-8 block">Nossa Bússola Ética</span>
+                        <m.h2 variants={itemVariants} className="text-5xl md:text-[8rem] font-black text-brand-dark tracking-tighter mb-10 uppercase leading-[0.85]">
+                            Pilares de <br />
+                            <span className="text-gradient-gold italic font-serif font-normal lowercase">Prestígio</span>
                         </m.h2>
-                        <m.p variants={itemVariants} className="text-xl text-gray-500 font-medium">
-                            Na Editora Graça, cada detalhe é pautado por princípios que garantem a excelência da sua obra.
-                        </m.p>
+                        <div className="w-32 h-2 bg-brand-primary mx-auto rounded-full"></div>
                     </m.div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
                         {values.map((value: any, index: number) => {
                             const Icon = iconMap[value.icon] || BookOpen;
                             return (
                                 <m.div
                                     key={index}
-                                    initial="hidden"
-                                    whileInView="visible"
-                                    viewport={{ once: true }}
                                     variants={itemVariants}
-                                    className="bg-white p-10 rounded-[3rem] border-2 border-transparent hover:border-brand-primary/20 shadow-2xl shadow-brand-dark/5 hover:shadow-brand-primary/10 transition-all duration-500 group"
+                                    className="p-12 rounded-[3.5rem] border border-gray-100 hover:border-brand-primary/40 hover:bg-gray-50 transition-all duration-700 group flex flex-col items-center text-center"
                                 >
-                                    <div className="w-20 h-20 bg-gray-50 rounded-3xl flex items-center justify-center mb-10 group-hover:bg-brand-primary transition-all duration-500 group-hover:scale-110">
-                                        <Icon className="w-10 h-10 text-brand-primary group-hover:text-white transition-colors" />
+                                    <div className="w-20 h-20 bg-gray-50 rounded-[1.5rem] flex items-center justify-center mb-10 group-hover:bg-brand-primary transition-all duration-500 shadow-xl border border-gray-100/50">
+                                        <Icon className="w-10 h-10 text-brand-primary group-hover:text-white" />
                                     </div>
-                                    <h3 className="text-2xl font-black text-brand-dark mb-4">{value.title}</h3>
-                                    <p className="text-gray-500 leading-relaxed font-medium">{value.description}</p>
+                                    <h3 className="text-2xl font-black text-brand-dark mb-6 tracking-tighter uppercase leading-none">{value.title}</h3>
+                                    <p className="text-gray-500 font-bold text-base leading-relaxed opacity-80">{value.description}</p>
                                 </m.div>
                             );
                         })}
@@ -255,114 +257,138 @@ const AboutPage: React.FC = () => {
                 </div>
             </section>
 
-            {/* Founder's Quote */}
-            <section className="py-32 bg-white overflow-hidden">
-                <div className="container mx-auto px-4 md:px-8">
-                    <m.div
-                        initial={{ opacity: 0, x: -50 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        className="relative bg-brand-dark rounded-[4rem] p-12 md:p-24 overflow-hidden"
-                    >
-                        <div className="absolute top-0 right-0 w-1/3 h-full bg-brand-primary/10 -skew-x-12 translate-x-20"></div>
-                        <Quote className="absolute top-10 left-10 w-32 h-32 text-white/5" />
+            {/* Founder's Master Quote - Cinematic Design */}
+            <section className="py-32 md:py-64 bg-brand-dark relative overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(196,160,82,0.1)_0%,_transparent_100%)]"></div>
 
-                        <div className="relative z-10 grid md:grid-cols-2 gap-16 items-center">
-                            <div className="space-y-10">
-                                <h3 className="text-4xl md:text-5xl font-black text-white tracking-tight leading-tight italic font-serif">
-                                    "Acreditamos que todo autor angolano merece um palco à altura do seu talento."
+                <div className="container mx-auto px-6 md:px-8">
+                    <m.div
+                        initial={{ opacity: 0, y: 50 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1 }}
+                        className="relative glass-premium p-12 md:p-32 rounded-[5rem] border border-white/5 overflow-hidden"
+                    >
+                        <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/5 to-transparent"></div>
+                        <Quote className="absolute top-16 left-16 w-32 h-32 text-white/5 opacity-10" />
+
+                        <div className="grid lg:grid-cols-2 gap-24 items-center relative z-10">
+                            <div className="space-y-16">
+                                <h3 className="text-5xl md:text-[5rem] font-black text-white tracking-tighter leading-[0.9] font-serif italic">
+                                    "Acreditamos que o talento angolano não merece apenas uma voz; merece um <span className="text-gradient-gold">palco mundial</span> de magnitude absoluta."
                                 </h3>
-                                <div className="space-y-2">
-                                    <p className="text-brand-primary font-black text-xl uppercase tracking-widest">Nilton Graça</p>
-                                    <p className="text-gray-400 font-bold uppercase tracking-[0.3em] text-[10px]">Fundador & Designer Literário</p>
+
+                                <div className="flex items-center gap-10">
+                                    <div className="w-24 h-[2px] bg-brand-primary rounded-full"></div>
+                                    <div>
+                                        <p className="text-white font-black text-4xl tracking-tighter uppercase">Nilton Graça</p>
+                                        <p className="text-brand-primary text-[11px] font-black uppercase tracking-[0.5em] mt-2">Visionário & Mentor Editorial</p>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="relative">
-                                <div className="aspect-square bg-brand-primary rounded-full blur-[80px] absolute inset-0 opacity-20"></div>
-                                <div className="relative z-10 border-8 border-white/5 rounded-[3rem] overflow-hidden aspect-[4/5] bg-gray-900 flex items-center justify-center">
-                                    <Users className="w-32 h-32 text-white/10" />
-                                </div>
+
+                            <div className="relative group cursor-none">
+                                <m.div
+                                    animate={{
+                                        scale: [1, 1.05, 1],
+                                        rotate: [0, 2, 0]
+                                    }}
+                                    transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+                                    className="relative z-10 aspect-square lg:aspect-[4/5] bg-gray-900 rounded-[4rem] border border-white/10 flex items-center justify-center overflow-hidden shadow-2xl group-hover:border-brand-primary/50 transition-colors"
+                                >
+                                    <div className="absolute inset-0 bg-brand-primary/10 mix-blend-overlay"></div>
+                                    <Users className="w-48 h-48 text-white/5 group-hover:scale-110 transition-transform duration-1000" />
+                                    <div className="absolute inset-x-0 bottom-0 p-12 bg-gradient-to-t from-brand-dark to-transparent">
+                                        <p className="text-white/60 font-black text-[10px] uppercase tracking-[0.4em] text-center">Essência do Autor</p>
+                                    </div>
+                                </m.div>
+                                {/* Floating elements */}
+                                <div className="absolute -top-12 -right-12 w-48 h-48 bg-brand-primary/20 blur-[60px] rounded-full group-hover:bg-brand-primary/40 transition-all"></div>
                             </div>
                         </div>
                     </m.div>
                 </div>
             </section>
 
-            {/* Enhanced Timeline */}
-            <section className="py-32 bg-brand-light">
-                <div className="container mx-auto px-4 md:px-8">
-                    <div className="text-center mb-24">
-                        <h2 className="text-4xl md:text-7xl font-black text-brand-dark tracking-tighter mb-8">
-                            Nossa <span className="text-brand-primary italic font-serif font-normal">Jornada</span>
-                        </h2>
+            {/* Timeline - Sophisticated Visual Narrative */}
+            <section className="py-32 md:py-64 bg-white relative">
+                <div className="container mx-auto px-6 md:px-8">
+                    <m.div
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        variants={containerVariants}
+                        className="text-center mb-48"
+                    >
+                        <span className="text-brand-primary font-black text-xs uppercase tracking-[0.5em] mb-8 block">A Jornada do Sucesso</span>
+                        <m.h2 variants={itemVariants} className="text-5xl md:text-[8rem] font-black text-brand-dark tracking-tighter mb-10 uppercase leading-[0.85]">
+                            Evolução do <br />
+                            <span className="text-gradient-gold italic font-serif font-normal lowercase">Impossível</span>
+                        </m.h2>
                         <div className="w-32 h-2 bg-brand-primary mx-auto rounded-full"></div>
-                    </div>
+                    </m.div>
 
-                    <div className="max-w-6xl mx-auto relative px-4">
-                        <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-brand-primary via-brand-primary/20 to-transparent -translate-x-1/2"></div>
+                    <div className="max-w-6xl mx-auto space-y-40 relative">
+                        {/* Central Line */}
+                        <div className="absolute left-[50%] top-0 bottom-0 w-[1px] bg-gray-100 hidden md:block"></div>
 
-                        <div className="space-y-32">
-                            {timeline.map((item: any, index: number) => (
-                                <m.div
-                                    key={index}
-                                    initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
-                                    whileInView={{ opacity: 1, x: 0 }}
-                                    viewport={{ once: true, margin: "-100px" }}
-                                    transition={{ duration: 0.8 }}
-                                    className={`relative flex flex-col md:flex-row items-start gap-12 ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}
-                                >
-                                    {/* Year Badge */}
-                                    <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 w-24 h-24 bg-white border-8 border-brand-light rounded-full items-center justify-center z-20 shadow-xl group">
-                                        <div className="w-16 h-16 bg-brand-dark text-brand-primary rounded-full flex items-center justify-center font-black text-xl group-hover:bg-brand-primary group-hover:text-white transition-all duration-500">
-                                            {item.year.slice(2)}
-                                        </div>
+                        {timeline.map((item: any, index: number) => (
+                            <m.div
+                                key={index}
+                                initial={{ opacity: 0, y: 50 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                className={`flex flex-col md:flex-row gap-20 items-center relative ${index % 2 === 0 ? '' : 'md:flex-row-reverse'}`}
+                            >
+                                <div className={`flex-1 ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'}`}>
+                                    <m.span
+                                        initial={{ opacity: 0, scale: 0.5 }}
+                                        whileInView={{ opacity: 0.2, scale: 1 }}
+                                        className="text-brand-primary text-[8rem] md:text-[12rem] font-black leading-none block mb-0 md:-mb-12"
+                                    >
+                                        {item.date?.slice(-2) || item.year?.slice(-2)}
+                                    </m.span>
+                                    <div className="relative z-10">
+                                        <h3 className="text-4xl font-black text-brand-dark mb-6 uppercase tracking-tighter">{item.title}</h3>
+                                        <p className="text-gray-500 font-bold text-lg leading-relaxed max-w-lg mx-auto md:mx-0 ${index % 2 === 0 ? 'md:ml-auto' : ''}">
+                                            {item.description}
+                                        </p>
                                     </div>
-
-                                    {/* Content Card */}
-                                    <div className={`flex-1 w-full ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'}`}>
-                                        <div className="bg-white p-12 rounded-[3.5rem] shadow-2xl shadow-brand-dark/5 hover:scale-105 transition-all duration-500 border border-gray-50">
-                                            <span className="text-brand-primary font-black text-5xl opacity-20 block mb-6">{item.year}</span>
-                                            <h3 className="text-3xl font-black text-brand-dark mb-6">{item.title}</h3>
-                                            <p className="text-gray-500 text-lg leading-relaxed font-medium">{item.description}</p>
-                                        </div>
+                                </div>
+                                <div className="w-10 h-10 rounded-[1.5rem] bg-brand-dark border-4 border-brand-primary shadow-[0_0_40px_rgba(196,160,82,0.4)] shrink-0 z-20 hidden md:block group-hover:rotate-45 transition-transform duration-500"></div>
+                                <div className="flex-1 hidden md:block px-12">
+                                    <div className="w-full h-px bg-gray-100 relative">
+                                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-gray-200 rounded-full"></div>
                                     </div>
-                                    <div className="flex-1 hidden md:block"></div>
-                                </m.div>
-                            ))}
-                        </div>
+                                </div>
+                            </m.div>
+                        ))}
                     </div>
                 </div>
             </section>
 
-            {/* Stats - Dynamic Counter Style */}
-            <section className="py-32 bg-brand-dark text-white relative overflow-hidden">
-                <div className="absolute inset-0 opacity-10">
-                    <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,_white_1px,_transparent_1px)] bg-[length:40px_40px]"></div>
-                </div>
+            {/* High impact Stats - Power Grid */}
+            <section className="py-32 md:py-64 bg-brand-dark text-white relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_70%_30%,_rgba(196,160,82,0.05)_0%,_transparent_70%)]"></div>
 
-                <div className="container mx-auto px-4 md:px-8 relative z-10">
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-12 md:gap-24">
+                <div className="container mx-auto px-6 md:px-8 relative z-10">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-16 md:gap-32">
                         {stats.map((stat: any, index: number) => {
                             const StatIcon = stat.icon || BookOpen;
                             return (
                                 <m.div
                                     key={index}
-                                    initial={{ opacity: 0, scale: 0.5 }}
-                                    whileInView={{ opacity: 1, scale: 1 }}
-                                    viewport={{ once: true }}
-                                    transition={{ delay: index * 0.1 }}
-                                    className="text-center space-y-6 group"
+                                    variants={itemVariants}
+                                    className="text-center group"
                                 >
-                                    <div className="w-20 h-20 bg-brand-primary/20 rounded-3xl flex items-center justify-center mx-auto group-hover:scale-125 transition-transform duration-500">
-                                        <StatIcon className="w-10 h-10 text-brand-primary" />
+                                    <div className="w-24 h-24 glass-premium rounded-[2rem] flex items-center justify-center mx-auto mb-10 group-hover:bg-brand-primary group-hover:scale-110 transition-all duration-700 shadow-2xl border border-white/5">
+                                        <StatIcon className="w-12 h-12 text-brand-primary group-hover:text-white" />
                                     </div>
-                                    <div className="space-y-2">
-                                        <div className="text-5xl md:text-8xl font-black text-white tracking-tighter">
-                                            {stat.number}
-                                        </div>
-                                        <div className="text-xs md:text-sm uppercase tracking-[0.4em] text-brand-primary font-black">
-                                            {stat.label}
-                                        </div>
+                                    <div className="text-6xl md:text-[9rem] font-black text-white tracking-tighter mb-6 leading-none group-hover:text-gradient-gold transition-all">
+                                        {stat.number}
+                                    </div>
+                                    <div className="text-[12px] font-black uppercase tracking-[0.5em] text-gray-500 group-hover:text-brand-primary transition-colors">
+                                        {stat.label}
                                     </div>
                                 </m.div>
                             );
@@ -371,81 +397,41 @@ const AboutPage: React.FC = () => {
                 </div>
             </section>
 
-            {/* Contact Info - Minimalist Premium */}
-            <section className="py-32 bg-white">
-                <div className="container mx-auto px-4 md:px-8">
-                    <div className="grid lg:grid-cols-2 gap-24 items-center">
-                        <div className="space-y-12">
-                            <h2 className="text-4xl md:text-7xl font-black text-brand-dark tracking-tighter">
-                                Onde as Ideias <br />
-                                <span className="text-brand-primary italic font-serif font-normal">Se Encontram</span>
-                            </h2>
-                            <p className="text-xl text-gray-500 font-medium leading-relaxed">
-                                Estamos localizados no coração de Malanje, prontos para receber o seu manuscrito ou discutir a sua próxima leitura.
-                            </p>
-
-                            <div className="space-y-10">
-                                {[
-                                    { icon: MapPin, title: 'Sede Social', content: 'Malanje, Bairro Voanvala, Rua 5, Casa n.º 77, Angola' },
-                                    { icon: Phone, title: 'Linha Direta', content: '+244 973 038 386' },
-                                    { icon: Mail, title: 'Email Geral', content: 'geraleditoragraca@gmail.com' }
-                                ].map((item, i) => (
-                                    <div key={i} className="flex gap-8 group">
-                                        <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-brand-primary transition-colors duration-500">
-                                            <item.icon className="w-7 h-7 text-brand-primary group-hover:text-white" />
-                                        </div>
-                                        <div className="space-y-1">
-                                            <h4 className="text-xs font-black uppercase tracking-widest text-brand-dark">{item.title}</h4>
-                                            <p className="text-lg text-gray-500 font-medium">{item.content}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="relative group">
-                            <div className="absolute inset-0 bg-brand-primary rounded-[4rem] rotate-3 opacity-10 group-hover:rotate-6 transition-transform duration-700"></div>
-                            <div className="relative z-10 aspect-square bg-brand-dark rounded-[4rem] overflow-hidden p-2">
-                                <div className="w-full h-full rounded-[3.5rem] bg-gray-900 border-4 border-white/5 flex items-center justify-center">
-                                    <MapPin className="w-24 h-24 text-brand-primary/20 animate-bounce" />
-                                </div>
-                            </div>
-                            <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-brand-primary rounded-full blur-[80px] opacity-20"></div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Premium CTA */}
-            <section className="py-32 bg-brand-light relative overflow-hidden">
-                <div className="container mx-auto px-4 md:px-8 text-center relative z-10">
+            {/* Final Artistic CTA */}
+            <section className="py-32 md:py-64 bg-white relative">
+                <div className="container mx-auto px-6 md:px-8 text-center relative z-10">
                     <m.div
-                        initial={{ opacity: 0, y: 50 }}
-                        whileInView={{ opacity: 1, y: 0 }}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
-                        className="max-w-4xl mx-auto space-y-12"
+                        transition={{ duration: 1 }}
+                        className="max-w-6xl mx-auto space-y-20"
                     >
-                        <h2 className="text-4xl md:text-8xl font-black text-brand-dark tracking-tighter leading-[0.9]">
-                            Escreva o Próximo <br />
-                            <span className="text-brand-primary italic font-serif font-normal">Capítulo Connosco</span>
+                        <h2 className="text-6xl md:text-[10rem] font-black text-brand-dark tracking-tighter leading-[0.85] uppercase">
+                            Vamos Criar <br />
+                            <span className="text-gradient-gold italic font-serif lowercase font-normal">Sua História?</span>
                         </h2>
-                        <p className="text-xl md:text-2xl text-gray-600 font-medium">
-                            Seja através de uma parceria ou da publicação do seu primeiro livro, <br className="hidden md:block" /> estamos aqui para tornar a sua visão realidade.
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-6 justify-center">
+
+                        <div className="flex flex-col sm:flex-row gap-10 justify-center items-center">
                             <button
                                 onClick={() => navigate('/contacto')}
-                                className="px-12 py-6 bg-brand-primary text-white font-black rounded-2xl hover:scale-105 active:scale-95 transition-all uppercase tracking-widest text-xs shadow-2xl shadow-brand-primary/30"
+                                className="w-full sm:w-auto px-20 py-10 bg-brand-dark text-white font-black rounded-[2rem] hover:bg-brand-primary hover:scale-105 active:scale-95 transition-all text-xs uppercase tracking-[0.5em] shadow-2xl flex items-center justify-center gap-6 group"
                             >
-                                Iniciar Projecto
-                                <ArrowRight className="w-5 h-5 inline-block ml-3" />
+                                Iniciar Parceria de Elite
+                                <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
                             </button>
+
                             <button
-                                onClick={() => navigate('/servicos')}
-                                className="px-12 py-6 bg-brand-dark text-white font-black rounded-2xl hover:scale-105 active:scale-95 transition-all uppercase tracking-widest text-xs shadow-2xl shadow-brand-dark/30"
+                                onClick={() => navigate('/livros')}
+                                className="w-full sm:w-auto px-20 py-10 glass-premium border border-gray-100 text-brand-dark font-black rounded-[2rem] hover:bg-gray-50 hover:scale-105 active:scale-95 transition-all text-xs uppercase tracking-[0.5em] flex items-center justify-center gap-6"
                             >
-                                Ver Nossos Serviços
+                                Ver Curadoria Atual
+                                <BookOpen className="w-6 h-6" />
                             </button>
+                        </div>
+
+                        <div className="pt-20 border-t border-gray-100">
+                            <p className="text-gray-400 font-serif italic text-2xl">"Editora Graça: Onde cada página é um legado eternizado."</p>
                         </div>
                     </m.div>
                 </div>

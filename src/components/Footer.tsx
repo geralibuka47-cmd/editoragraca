@@ -9,72 +9,125 @@ interface FooterProps {
 
 const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
     return (
-        <footer className="bg-brand-black text-white pt-20 pb-10">
-            <div className="container mx-auto px-8 grid md:grid-cols-4 gap-12 border-b border-white/5 pb-16 mb-10">
-                <div className="space-y-6">
-                    <div className="flex flex-col">
-                        <img src={logo} alt="Editora Graça" className="h-12 w-auto object-contain brightness-0 invert" />
+        <footer className="bg-brand-dark text-white pt-24 pb-12 relative overflow-hidden">
+            {/* Background Decorations */}
+            <div className="absolute bottom-0 right-0 w-96 h-96 bg-brand-primary/5 blur-[100px] rounded-full -mb-48 -mr-48"></div>
+            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+
+            <div className="container mx-auto px-6 md:px-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-20">
+                    <div className="space-y-8">
+                        <div className="flex flex-col">
+                            <img src={logo} alt="Editora Graça" className="h-14 w-auto object-contain brightness-0 invert mb-2" />
+                            <div className="w-12 h-1 bg-brand-primary rounded-full"></div>
+                        </div>
+                        <p className="text-gray-400 text-lg leading-relaxed font-medium">
+                            Dedicados à publicação de obras literárias de excelência. Fomentando a cultura e o conhecimento através das letras.
+                        </p>
+                        <div className="flex gap-4">
+                            {[
+                                { Icon: Facebook, label: 'Facebook' },
+                                { Icon: Instagram, label: 'Instagram' },
+                                { Icon: Twitter, label: 'Twitter' }
+                            ].map(({ Icon, label }) => (
+                                <a
+                                    key={label}
+                                    href="#"
+                                    className="w-12 h-12 glass-premium rounded-2xl flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all duration-500 group shadow-lg"
+                                    title={label}
+                                    aria-label={`Seguir no ${label}`}
+                                >
+                                    <Icon className="w-5 h-5 transition-transform group-hover:scale-110" />
+                                </a>
+                            ))}
+                        </div>
                     </div>
-                    <p className="text-gray-400 text-sm leading-relaxed font-medium">
-                        Dedicados à publicação de obras literárias de excelência em Angola. Fomentando a cultura e o conhecimento através das letras.
-                    </p>
-                    <div className="flex gap-4">
-                        <a href="#" className="p-2 bg-white/5 rounded-full hover:bg-brand-primary transition-colors duration-300" title="Facebook" aria-label="Seguir no Facebook">
-                            <Facebook className="w-4 h-4" />
-                        </a>
-                        <a href="#" className="p-2 bg-white/5 rounded-full hover:bg-brand-primary transition-colors duration-300" title="Instagram" aria-label="Seguir no Instagram">
-                            <Instagram className="w-4 h-4" />
-                        </a>
-                        <a href="#" className="p-2 bg-white/5 rounded-full hover:bg-brand-primary transition-colors duration-300" title="Twitter" aria-label="Seguir no Twitter">
-                            <Twitter className="w-4 h-4" />
-                        </a>
+
+                    <div>
+                        <h4 className="text-gradient-gold text-xl font-black mb-10 uppercase tracking-widest text-[11px]">Navegação Rápida</h4>
+                        <ul className="space-y-5">
+                            {[
+                                { label: 'Início', path: '/' },
+                                { label: 'Catálogo Literário', path: '/livros' },
+                                { label: 'Nossa Jornada', path: '/sobre' },
+                                { label: 'Artigos & Críticas', path: '/blog' },
+                                { label: 'Espaço do Autor', path: '/servicos' }
+                            ].map(item => (
+                                <li key={item.label}>
+                                    <button
+                                        onClick={() => onNavigate(item.path)}
+                                        className="text-gray-400 hover:text-white transition-all text-sm font-bold flex items-center gap-3 group"
+                                    >
+                                        <span className="w-0 h-0.5 bg-brand-primary group-hover:w-4 transition-all duration-300"></span>
+                                        {item.label}
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 className="text-gradient-gold text-xl font-black mb-10 uppercase tracking-widest text-[11px]">Legal & Suporte</h4>
+                        <ul className="space-y-5">
+                            {[
+                                { label: 'Termos de Serviço', path: '/servicos' },
+                                { label: 'Privacidade de Dados', path: '/servicos' },
+                                { label: 'Políticas de Envio', path: '/servicos' },
+                                { label: 'Dúvidas Frequentes', path: '/servicos' },
+                                { label: 'Seja um Franqueado', path: '/contacto' }
+                            ].map(item => (
+                                <li key={item.label}>
+                                    <button
+                                        onClick={() => onNavigate(item.path)}
+                                        className="text-gray-400 hover:text-white transition-all text-sm font-bold flex items-center gap-3 group"
+                                    >
+                                        <span className="w-0 h-0.5 bg-brand-primary group-hover:w-4 transition-all duration-300"></span>
+                                        {item.label}
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 className="text-gradient-gold text-xl font-black mb-10 uppercase tracking-widest text-[11px]">Sede Administrativa</h4>
+                        <ul className="space-y-8">
+                            <li className="flex gap-5 items-start">
+                                <div className="w-12 h-12 glass-premium rounded-2xl flex items-center justify-center shrink-0 text-brand-primary shadow-lg">
+                                    <MapPin className="w-5 h-5" />
+                                </div>
+                                <div className="text-sm font-bold text-gray-400 leading-relaxed">
+                                    Bairro Voanvala, Rua 5, <br />
+                                    Casa n.º 77, Malanje, Angola
+                                </div>
+                            </li>
+                            <li className="flex gap-5 items-center">
+                                <div className="w-12 h-12 glass-premium rounded-2xl flex items-center justify-center shrink-0 text-brand-primary shadow-lg">
+                                    <Phone className="w-5 h-5" />
+                                </div>
+                                <div className="text-sm font-bold text-gray-400">+244 973 038 386</div>
+                            </li>
+                            <li className="flex gap-5 items-center">
+                                <div className="w-12 h-12 glass-premium rounded-2xl flex items-center justify-center shrink-0 text-brand-primary shadow-lg">
+                                    <Mail className="w-5 h-5" />
+                                </div>
+                                <div className="text-sm font-bold text-gray-400 truncate">geraleditoragraca@gmail.com</div>
+                            </li>
+                        </ul>
                     </div>
                 </div>
 
-                <div>
-                    <h4 className="font-serif text-xl font-bold mb-8 text-brand-primary italic">Navegação</h4>
-                    <ul className="space-y-4 text-sm text-gray-400 font-medium">
-                        <li><button onClick={() => onNavigate('/')} className="hover:text-white transition-colors">Início</button></li>
-                        <li><button onClick={() => onNavigate('/livros')} className="hover:text-white transition-colors">Todos os Livros</button></li>
-                        <li><button onClick={() => onNavigate('/sobre')} className="hover:text-white transition-colors">Sobre a Editora</button></li>
-                        <li><button onClick={() => onNavigate('/blog')} className="hover:text-white transition-colors">Blog & Novidades</button></li>
-                    </ul>
-                </div>
+                <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
+                    <div className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500">
+                        © 2026 <span className="text-white">Editora Graça (SU), LDA</span>. Desenvolvido com excelência por ibuka47
+                    </div>
 
-                <div>
-                    <h4 className="font-serif text-xl font-bold mb-8 text-brand-primary italic">Informações</h4>
-                    <ul className="space-y-4 text-sm text-gray-400 font-medium">
-                        <li><button onClick={() => onNavigate('/servicos')} className="hover:text-white transition-colors">Termos e Condições</button></li>
-                        <li><button onClick={() => onNavigate('/servicos')} className="hover:text-white transition-colors">Política de Privacidade</button></li>
-                        <li><button onClick={() => onNavigate('/servicos')} className="hover:text-white transition-colors">Envios e Devoluções</button></li>
-                        <li><button onClick={() => onNavigate('/servicos')} className="hover:text-white transition-colors">Perguntas Frequentes</button></li>
-                        <li><button onClick={() => onNavigate('/contacto')} className="hover:text-white transition-colors">Trabalhe Connosco</button></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h4 className="font-serif text-xl font-bold mb-8 text-brand-primary italic">Atendimento</h4>
-                    <ul className="space-y-6 text-sm text-gray-400 font-medium">
-                        <li className="flex gap-4 items-start">
-                            <MapPin className="w-5 h-5 text-brand-primary shrink-0" />
-                            <span>Malanje, Bairro Voanvala, <br />Rua 5, Casa n.º 77, Angola</span>
-                        </li>
-                        <li className="flex gap-4 items-center">
-                            <Phone className="w-5 h-5 text-brand-primary shrink-0" />
-                            <span>+244 973 038 386</span>
-                        </li>
-                        <li className="flex gap-4 items-center">
-                            <Mail className="w-5 h-5 text-brand-primary shrink-0" />
-                            <span>geraleditoragraca@gmail.com</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <div className="container mx-auto px-4 md:px-8 flex flex-col md:flex-row justify-between items-center text-[10px] text-gray-500 font-bold uppercase tracking-widest gap-4 md:gap-0 mt-8">
-                <p className="text-center md:text-left leading-relaxed">© 2026 Editora Graça (SU), LDA. Todos os direitos reservados.</p>
-                <div className="flex gap-6">
-                    <span>Feito por ibuka47</span>
+                    <div className="flex gap-8 items-center">
+                        <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                            <span className="text-[9px] font-black uppercase tracking-widest text-gray-500">Sistemas Operacionais</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </footer>
