@@ -128,10 +128,10 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                             <span>{upcomingLaunch ? 'Brevemente' : 'Legado Editorial'}</span>
                         </m.div>
 
-                        <m.h1 variants={itemVariants} className="text-5xl md:text-7xl lg:text-[5rem] font-black leading-[1.05] text-brand-dark tracking-tight">
+                        <m.h1 variants={itemVariants} className="text-4xl md:text-5xl lg:text-6xl font-black leading-[1.1] text-brand-dark tracking-tight">
                             {upcomingLaunch ? (
                                 <>
-                                    <span className="text-gradient-gold uppercase text-[0.4em] block tracking-[0.2em] mb-4">O Próximo</span>
+                                    <span className="text-gradient-gold uppercase text-[0.4em] block tracking-[0.2em] mb-3">O Próximo</span>
                                     <span className="italic font-serif font-normal">{upcomingLaunch.title}</span>
                                 </>
                             ) : (
@@ -219,19 +219,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                             </div>
                         </div>
 
-                        {/* Floating Metadata Card - Discreet & Minimal - REQUEST 3 */}
-                        <m.div
-                            animate={{ y: [0, -5, 0] }}
-                            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                            className="absolute bottom-6 -left-6 bg-white/95 backdrop-blur-md p-3 pr-5 rounded-2xl shadow-lg border border-gray-100 z-30 group flex items-center gap-3"
-                        >
-                            <div className="w-8 h-8 bg-brand-dark/5 text-brand-primary flex items-center justify-center rounded-xl">
-                                {upcomingLaunch ? <Clock className="w-4 h-4" /> : <Trophy className="w-4 h-4" />}
-                            </div>
-                            <div>
-                                <h5 className="font-serif font-black text-sm text-brand-dark italic leading-none">{upcomingLaunch ? 'Countdown' : 'Bestseller'}</h5>
-                            </div>
-                        </m.div>
+
                     </m.div>
                 </div>
             </section>
