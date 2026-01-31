@@ -3,6 +3,7 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import { getAnalytics } from 'firebase/analytics';
+import { getPerformance } from 'firebase/performance';
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -20,10 +21,13 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 
-// Analytics (optional, only in production)
+// Analytics & Performance (only in production)
 let analytics;
+let performance;
+
 if (typeof window !== 'undefined' && import.meta.env.PROD) {
     analytics = getAnalytics(app);
+    performance = getPerformance(app);
 }
 
-export { analytics };
+export { analytics, performance };
