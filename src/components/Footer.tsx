@@ -19,7 +19,7 @@ const Footer: React.FC = () => {
                         </p>
                         <div className="flex gap-4">
                             {[Instagram, Facebook, Twitter, Linkedin].map((Icon, i) => (
-                                <a key={i} href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-primary transition-colors">
+                                <a key={i} href="#" aria-label={`Visitar nosso ${['Instagram', 'Facebook', 'Twitter', 'LinkedIn'][i]}`} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-primary transition-colors">
                                     <Icon className="w-4 h-4" />
                                 </a>
                             ))}

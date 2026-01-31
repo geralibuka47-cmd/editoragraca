@@ -126,6 +126,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                     <button
                         className="md:hidden p-2 text-brand-dark"
                         onClick={() => setIsMenuOpen(true)}
+                        aria-label="Abrir menu"
                     >
                         <Menu className="w-6 h-6" />
                     </button>
@@ -144,7 +145,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                     >
                         <div className="flex justify-between items-center mb-12">
                             <span className="font-serif font-black text-2xl text-brand-dark">MENU</span>
-                            <button onClick={() => setIsMenuOpen(false)} className="p-2 bg-gray-50 rounded-full">
+                            <button onClick={() => setIsMenuOpen(false)} className="p-2 bg-gray-50 rounded-full" aria-label="Fechar menu">
                                 <X className="w-6 h-6 text-brand-dark" />
                             </button>
                         </div>
