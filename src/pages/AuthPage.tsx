@@ -106,7 +106,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
 
         try {
             const timeoutPromise = new Promise((_, reject) => {
-                setTimeout(() => reject(new Error('timeout')), 25000);
+                setTimeout(() => reject(new Error('timeout')), 15000); // Reduced from 25s to 15s
             });
 
             if (isLogin) {
@@ -135,15 +135,19 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
 
             const msg = err.message || '';
             if (msg === 'timeout') {
-                setError('A conexão com o servidor demorou muito. Verifique a sua internet e tente novamente.');
+                setError('⏱️ A conexão com o servidor demorou muito. Isto pode indicar um problema com o Supabase. Verifique se o projeto está ativo e se as credenciais estão corretas.');
             } else if (msg.includes('Invalid login credentials') || msg.includes('Invalid log in')) {
-                setError('E-mail ou senha incorretos. Por favor, tente novamente.');
+                setError('🔒 E-mail ou senha incorretos. Por favor, tente novamente.');
             } else if (msg.includes('Email not confirmed')) {
-                setError('O seu e-mail ainda não foi confirmado. Verifique a sua caixa de entrada.');
+                setError('📧 O seu e-mail ainda não foi confirmado. Verifique a sua caixa de entrada.');
             } else if (msg.includes('User already registered')) {
-                setError('Este e-mail já está registado. Tente fazer login.');
+                setError('👤 Este e-mail já está registado. Tente fazer login.');
+            } else if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) {
+                setError('🌐 Erro de rede. Verifique sua conexão com a internet e tente novamente.');
+            } else if (err.status === 401 || msg.includes('401')) {
+                setError('🔐 Erro de autenticação (401). As credenciais do Supabase podem estar incorretas ou o projeto pode estar pausado. Contacte o administrador.');
             } else {
-                setError(msg || 'Ocorreu um erro ao processar o seu pedido.');
+                setError(`❌ ${msg || 'Ocorreu um erro ao processar o seu pedido. Tente novamente.'}`);
             }
         } finally {
             if (mounted.current) {

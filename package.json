@@ -6,13 +6,13 @@
     "scripts": {
         "dev": "vite",
         "build": "vite build",
-        "preview": "vite preview",
-        "setup:db": "node scripts/seed_supabase.mjs"
+        "preview": "vite preview"
     },
     "dependencies": {
-        "@supabase/supabase-js": "^2.90.1",
         "@tailwindcss/vite": "^4.1.18",
         "dotenv": "^17.2.3",
+        "firebase": "^12.8.0",
+        "firebase-admin": "^13.6.0",
         "framer-motion": "^12.0.1",
         "lucide-react": "^0.555.0",
         "react": "^19.2.1",

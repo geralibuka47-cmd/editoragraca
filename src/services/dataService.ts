@@ -1,11 +1,30 @@
-import { supabase } from "./supabase";
-import { Book, Order, User } from "../types";
+import {
+    collection,
+    doc,
+    getDoc,
+    getDocs,
+    setDoc,
+    addDoc,
+    updateDoc,
+    deleteDoc,
+    query,
+    where,
+    orderBy,
+    limit,
+    Timestamp,
+    Query,
+    DocumentData,
+    increment,
+    writeBatch
+} from 'firebase/firestore';
+import { db } from './firebase';
+import { Book, Order, User } from '../types';
 
-// Supabase Tables mapping (using clean snake_case names from schema)
-const TABLES = {
+// Firestore Collections
+const COLLECTIONS = {
     BOOKS: 'books',
     ORDERS: 'orders',
-    PROFILES: 'profiles',
+    USERS: 'users',
     BLOG: 'blog_posts',
     TEAM: 'team_members',
     SERVICES: 'editorial_services',
@@ -22,185 +41,73 @@ const TABLES = {
     NOTIFICATIONS: 'notifications'
 };
 
-const cleanDataForSupabase = (data: any, table: string) => {
+// Helper: Convert Firestore Timestamp to ISO string
+const timestampToString = (timestamp: any): string | undefined => {
+    if (!timestamp) return undefined;
+    if (timestamp.toDate) return timestamp.toDate().toISOString();
+    if (timestamp instanceof Date) return timestamp.toISOString();
+    return timestamp;
+};
+
+// Helper: Parse Firestore document to frontend format
+const parseFirestoreDoc = (docData: any, id: string): any => {
+    if (!docData) return null;
+
+    const parsed: any = { id, ...docData };
+
+    // Convert timestamps
+    if (parsed.createdAt) parsed.createdAt = timestampToString(parsed.createdAt);
+    if (parsed.updatedAt) parsed.updatedAt = timestampToString(parsed.updatedAt);
+    if (parsed.publishedAt) parsed.publishedAt = timestampToString(parsed.publishedAt);
+    if (parsed.submittedDate) parsed.submittedDate = timestampToString(parsed.submittedDate);
+    if (parsed.reviewedDate) parsed.reviewedDate = timestampToString(parsed.reviewedDate);
+    if (parsed.launchDate) parsed.launchDate = timestampToString(parsed.launchDate);
+    if (parsed.uploadedAt) parsed.uploadedAt = timestampToString(parsed.uploadedAt);
+    if (parsed.confirmedAt) parsed.confirmedAt = timestampToString(parsed.confirmedAt);
+
+    return parsed;
+};
+
+// Helper: Prepare data for Firestore (convert dates, remove undefined)
+const prepareForFirestore = (data: any): any => {
     const clean: any = {};
-
-    // Mapping frontend CamelCase to Supabase snake_case
-    const mapping: Record<string, string> = {
-        'coverUrl': 'cover_url',
-        'digitalFileUrl': 'digital_file_url',
-        'authorId': 'author_id',
-        'createdAt': 'created_at',
-        'updatedAt': 'updated_at',
-        'publishedAt': 'published_at',
-        'userId': 'user_id',
-        'orderId': 'order_id',
-        'bookId': 'book_id',
-        'customerName': 'customer_name',
-        'customerEmail': 'customer_email',
-        'customerId': 'customer_id',
-        'paymentNotificationId': 'payment_notification_id',
-        'totalAmount': 'total_amount',
-        'readerId': 'reader_id',
-        'readerName': 'reader_name',
-        'readerEmail': 'reader_email',
-        'userName': 'user_name',
-        'postId': 'post_id',
-        'imageUrl': 'image_url',
-        'likesCount': 'likes_count',
-        'commentsCount': 'comments_count',
-        'sharesCount': 'shares_count',
-        'authorName': 'author_name',
-        'submittedDate': 'submitted_date',
-        'reviewedDate': 'reviewed_date',
-        'fileUrl': 'file_url',
-        'fileName': 'file_name',
-        'isRead': 'is_read',
-        'isNew': 'is_new',
-        'isBestseller': 'is_bestseller',
-        'launchDate': 'launch_date',
-        'bankName': 'bank_name',
-        'accountNumber': 'account_number',
-        'isPrimary': 'is_primary',
-        'paymentMethods': 'payment_methods',
-        'whatsappNumber': 'whatsapp_number',
-        'preferredContact': 'preferred_contact',
-        'avatarUrl': 'avatar_url',
-        'photoUrl': 'photo_url', // Legacy support
-        'bio': 'bio',
-        'address': 'address',
-        'paymentInfo': 'payment_info',
-        'paymentInfoNotes': 'payment_info_notes',
-        'displayOrder': 'display_order'
-    };
-
-    const JSONFields = ['items', 'payment_methods', 'preferred_contact'];
-    const ArrayFields = ['details'];
-    const MappingTables = [TABLES.BOOKS];
-    const NumericFields = ['price', 'stock', 'pages', 'display_order', 'total_amount', 'rating', 'total'];
 
     Object.keys(data).forEach(key => {
         let value = data[key];
-        let dbKey = mapping[key] || key;
 
-        // Custom mapping for specific tables (e.g. books)
-        if (MappingTables.includes(table)) {
-            if (key === 'genre') dbKey = 'category';
-        }
-        // Skip internal or temporary id fields
-        if (key.startsWith('$')) return;
+        // Skip undefined values
+        if (value === undefined) return;
 
-        // Skip id if it's temporary (starts with temp_)
-        if (key === 'id' && (typeof value === 'string' && value.startsWith('temp_'))) return;
-        // Skip id if it's empty
-        if (key === 'id' && !value) return;
+        // Skip temporary IDs
+        if (key === 'id' && typeof value === 'string' && value.startsWith('temp_')) return;
 
-        // 1. Skip undefined/null (except if it's an intentional clear, but usually we want to skip)
-        if (value === undefined || value === null) return;
-
-        // 2. Sanitize Strings
-        if (typeof value === 'string') {
-            value = value.trim();
-        }
-
-        // 3. Handle specific types
-        if (JSONFields.includes(dbKey)) {
+        // Convert ISO strings to Timestamps
+        if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(value)) {
             try {
-                if (typeof value === 'string') {
-                    clean[dbKey] = value.trim() ? JSON.parse(value) : [];
-                } else {
-                    clean[dbKey] = value;
-                }
+                clean[key] = Timestamp.fromDate(new Date(value));
+                return;
             } catch (e) {
-                console.warn(`Erro ao processar JSON para ${dbKey}:`, value);
-                clean[dbKey] = [];
+                // Keep as string if conversion fails
             }
-        } else if (ArrayFields.includes(dbKey)) {
-            clean[dbKey] = Array.isArray(value) ? value : (value ? [value] : []);
-        } else if (NumericFields.includes(dbKey)) {
-            // Ensure numbers are numbers, not strings from forms
-            const num = Number(value);
-            clean[dbKey] = isNaN(num) ? 0 : num;
+        }
+
+        // Handle numbers
+        if (['price', 'stock', 'total', 'rating', 'pages', 'displayOrder'].includes(key)) {
+            clean[key] = Number(value) || 0;
         } else {
-            clean[dbKey] = value;
+            clean[key] = value;
         }
     });
 
     return clean;
 };
 
-const parseDataFromSupabase = (item: any) => {
-    if (!item) return null;
-    const parsed: any = { ...item };
+// ==================== BOOKS ====================
 
-    // Reverse mapping: snake_case to CamelCase for the frontend
-    const reverseMapping: Record<string, string> = {
-        'cover_url': 'coverUrl',
-        'is_bestseller': 'isBestseller',
-        'is_new': 'isNew',
-        'author_id': 'authorId',
-        'digital_file_url': 'digitalFileUrl',
-        'whatsapp_number': 'whatsappNumber',
-        'photo_url': 'avatarUrl',
-        'customer_id': 'customerId',
-        'customer_name': 'customerName',
-        'customer_email': 'customerEmail',
-        'payment_method': 'paymentMethod',
-        'payment_methods': 'paymentMethods',
-        'preferred_contact': 'preferredContact',
-        'total_amount': 'totalAmount',
-        'reader_id': 'readerId',
-        'reader_name': 'readerName',
-        'reader_email': 'readerEmail',
-        'order_id': 'orderId',
-        'payment_notification_id': 'paymentNotificationId',
-        'uploaded_at': 'uploadedAt',
-        'confirmed_by': 'confirmedBy',
-        'confirmed_at': 'confirmedAt',
-        'submitted_date': 'submittedDate',
-        'reviewed_date': 'reviewedDate',
-        'user_name': 'userName',
-        'book_id': 'bookId',
-        'user_id': 'userId',
-        'display_order': 'displayOrder', // Correcting to match frontend usage
-        'image_url': 'imageUrl',
-        'post_id': 'postId',
-        'created_at': 'createdAt',
-        'file_url': 'fileUrl',
-        'file_name': 'fileName',
-        'author_name': 'authorName',
-        'payment_info': 'paymentInfo',
-        'payment_info_notes': 'paymentInfoNotes',
-        'launch_date': 'launchDate',
-        'category': 'genre'
-    };
-
-    Object.keys(item).forEach(key => {
-        const frontendKey = reverseMapping[key];
-        if (frontendKey) {
-            parsed[frontendKey] = item[key];
-            delete parsed[key];
-        }
-    });
-
-    return parsed;
-};
-
-// Books
 // Cache implementation
 let booksCache: Book[] | null = null;
-let blogPostsCache: any[] | null = null;
-let siteContentCache: Map<string, Record<string, any>> = new Map();
-let testimonialsCache: any[] | null = null;
-
 let lastBooksFetch = 0;
-let lastBlogFetch = 0;
-let lastTestimonialsFetch = 0;
-let lastStatsFetch = 0;
-let lastStatsData: any = null;
-
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-const SHORT_CACHE = 1 * 60 * 1000;   // 1 minute for volatile data
 
 export const getBooks = async (forceRefresh = false): Promise<Book[]> => {
     const now = Date.now();
@@ -209,111 +116,191 @@ export const getBooks = async (forceRefresh = false): Promise<Book[]> => {
     }
 
     try {
-        const { data, error } = await supabase
-            .from(TABLES.BOOKS)
-            .select('*')
-            .order('created_at', { ascending: false });
+        const q = query(collection(db, COLLECTIONS.BOOKS), orderBy('createdAt', 'desc'));
+        const snapshot = await getDocs(q);
 
-        if (error) throw error;
-        const parsed = (data || []).map(parseDataFromSupabase) as Book[];
+        const books = snapshot.docs.map(doc =>
+            parseFirestoreDoc(doc.data(), doc.id)
+        ) as Book[];
 
-        booksCache = parsed;
+        booksCache = books;
         lastBooksFetch = now;
 
-        return parsed;
+        return books;
     } catch (error) {
-        console.error("Erro ao procurar livros:", error);
+        console.error('Erro ao procurar livros:', error);
         return booksCache || [];
     }
 };
 
-/**
- * Optimized version for listing pages (Home, Catalog)
- * Fetches only the essential fields to reduce payload size.
- */
 export const getBooksMinimal = async (forceRefresh = false): Promise<Book[]> => {
-    const now = Date.now();
-    if (!forceRefresh && booksCache && (now - lastBooksFetch < CACHE_DURATION)) {
-        return booksCache;
-    }
+    // For Firestore, we fetch all since there's no SELECT equivalent
+    // But we could optimize by using a separate minimal collection if needed
+    return getBooks(forceRefresh);
+};
 
+export const getBookById = async (id: string): Promise<Book | null> => {
     try {
-        // Essential fields for cards and filters
-        const fields = 'id, title, author, price, category, cover_url, is_bestseller, is_new, format, stock, created_at';
-        const { data, error } = await supabase
-            .from(TABLES.BOOKS)
-            .select(fields)
-            .order('created_at', { ascending: false });
+        const docRef = doc(db, COLLECTIONS.BOOKS, id);
+        const docSnap = await getDoc(docRef);
 
-        if (error) throw error;
-        const parsed = (data || []).map(parseDataFromSupabase) as Book[];
-
-        // We don't overwrite the full cache if we only got partial data, 
-        // unless the cache was empty.
-        if (!booksCache) {
-            booksCache = parsed;
-            lastBooksFetch = now;
+        if (docSnap.exists()) {
+            return parseFirestoreDoc(docSnap.data(), docSnap.id) as Book;
         }
-
-        return parsed;
+        return null;
     } catch (error) {
-        console.error("Erro ao procurar livros (minimal):", error);
-        return booksCache || [];
+        console.error('Erro ao buscar livro:', error);
+        return null;
     }
 };
 
 export const saveBook = async (book: Book) => {
     try {
-
-        const bookData = cleanDataForSupabase(book, TABLES.BOOKS);
-
-        // Critical: Remove ID from payload to avoid Supabase errors on update/insert
+        const bookData = prepareForFirestore(book);
         const { id, ...payload } = bookData;
 
-        // Log keys to verify snake_case
-
-
         if (id && id.length > 5 && !id.startsWith('temp_')) {
-
-            const { error } = await supabase
-                .from(TABLES.BOOKS)
-                .update(payload)
-                .eq('id', id);
-            if (error) {
-                console.error("dataService.saveBook - Erro no UPDATE:", error);
-                throw error;
-            }
-
+            // Update existing
+            const docRef = doc(db, COLLECTIONS.BOOKS, id);
+            await updateDoc(docRef, {
+                ...payload,
+                updatedAt: Timestamp.now()
+            });
         } else {
-
-            const { error } = await supabase
-                .from(TABLES.BOOKS)
-                .insert([payload]);
-            if (error) {
-                console.error("dataService.saveBook - Erro no INSERT:", error);
-                throw error;
-            }
-
+            // Create new
+            await addDoc(collection(db, COLLECTIONS.BOOKS), {
+                ...payload,
+                createdAt: Timestamp.now(),
+                updatedAt: Timestamp.now()
+            });
         }
 
         // Invalidate cache
         booksCache = null;
         lastBooksFetch = 0;
     } catch (error) {
-        console.error("Erro interno no saveBook:", error);
+        console.error('Erro ao salvar livro:', error);
         throw error;
     }
 };
 
 export const deleteBook = async (id: string) => {
-    const { error } = await supabase
-        .from(TABLES.BOOKS)
-        .delete()
-        .eq('id', id);
-    if (error) throw error;
+    try {
+        await deleteDoc(doc(db, COLLECTIONS.BOOKS, id));
+        // Invalidate cache
+        booksCache = null;
+        lastBooksFetch = 0;
+    } catch (error) {
+        console.error('Erro ao eliminar livro:', error);
+        throw error;
+    }
 };
 
-// Public Stats
+// ==================== ORDERS ====================
+
+export const getOrders = async (userId?: string): Promise<Order[]> => {
+    try {
+        let q;
+        if (userId) {
+            q = query(
+                collection(db, COLLECTIONS.ORDERS),
+                where('customerId', '==', userId),
+                orderBy('createdAt', 'desc')
+            );
+        } else {
+            q = query(collection(db, COLLECTIONS.ORDERS), orderBy('createdAt', 'desc'));
+        }
+
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc =>
+            parseFirestoreDoc(doc.data(), doc.id)
+        ) as Order[];
+    } catch (error) {
+        console.error('Erro ao procurar pedidos:', error);
+        return [];
+    }
+};
+
+export const createOrder = async (order: Omit<Order, 'id'>): Promise<string> => {
+    try {
+        const orderData = prepareForFirestore(order);
+        const docRef = await addDoc(collection(db, COLLECTIONS.ORDERS), {
+            ...orderData,
+            createdAt: Timestamp.now()
+        });
+        return docRef.id;
+    } catch (error) {
+        console.error('Erro ao criar pedido:', error);
+        throw error;
+    }
+};
+
+export const updateOrderStatus = async (orderId: string, status: Order['status']) => {
+    try {
+        const docRef = doc(db, COLLECTIONS.ORDERS, orderId);
+        await updateDoc(docRef, {
+            status,
+            updatedAt: Timestamp.now()
+        });
+    } catch (error) {
+        console.error('Erro ao atualizar status do pedido:', error);
+        throw error;
+    }
+};
+
+// ==================== USERS / PROFILES ====================
+
+export const getUserProfile = async (uid: string): Promise<User | null> => {
+    try {
+        const docRef = doc(db, COLLECTIONS.USERS, uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            return parseFirestoreDoc(docSnap.data(), docSnap.id) as User;
+        }
+        return null;
+    } catch (error) {
+        console.error('Erro ao buscar perfil:', error);
+        return null;
+    }
+};
+
+export const saveUserProfile = async (user: User) => {
+    try {
+        const userData = prepareForFirestore(user);
+        const { id, ...payload } = userData;
+
+        if (id) {
+            const docRef = doc(db, COLLECTIONS.USERS, id);
+            await setDoc(docRef, {
+                ...payload,
+                updatedAt: Timestamp.now()
+            }, { merge: true });
+        }
+    } catch (error) {
+        console.error('Erro ao salvar perfil:', error);
+        throw error;
+    }
+};
+
+export const getAllUsers = async (): Promise<User[]> => {
+    try {
+        const snapshot = await getDocs(collection(db, COLLECTIONS.USERS));
+        return snapshot.docs.map(doc =>
+            parseFirestoreDoc(doc.data(), doc.id)
+        ) as User[];
+    } catch (error) {
+        console.error('Erro ao buscar utilizadores:', error);
+        return [];
+    }
+};
+
+// ==================== PUBLIC STATS ====================
+
+let lastStatsData: any = null;
+let lastStatsFetch = 0;
+const SHORT_CACHE = 1 * 60 * 1000; // 1 minute
+
 export const getPublicStats = async () => {
     const now = Date.now();
     if (lastStatsData && (now - lastStatsFetch < SHORT_CACHE)) {
@@ -321,25 +308,26 @@ export const getPublicStats = async () => {
     }
 
     try {
-        const { count: booksCount } = await supabase.from(TABLES.BOOKS).select('*', { count: 'exact', head: true });
-        const { count: readersCount } = await supabase.from(TABLES.PROFILES).select('*', { count: 'exact', head: true });
+        const booksSnapshot = await getDocs(collection(db, COLLECTIONS.BOOKS));
+        const usersSnapshot = await getDocs(collection(db, COLLECTIONS.USERS));
 
         const stats = {
-            booksCount: booksCount || 0,
-            authorsCount: 0,
-            readersCount: readersCount || 0
+            booksCount: booksSnapshot.size,
+            authorsCount: 0, // Could be calculated if we track author role
+            readersCount: usersSnapshot.size
         };
 
         lastStatsData = stats;
         lastStatsFetch = now;
         return stats;
     } catch (error) {
-        console.error("Error fetching public stats:", error);
+        console.error('Error fetching public stats:', error);
         return lastStatsData || { booksCount: 0, authorsCount: 0, readersCount: 0 };
     }
 };
 
-// Categories
+// ==================== CATEGORIES ====================
+
 export const getCategories = async (): Promise<{ name: string; count: number; image?: string }[]> => {
     try {
         const books = await getBooks();
@@ -357,274 +345,108 @@ export const getCategories = async (): Promise<{ name: string; count: number; im
             image: data.image
         }));
     } catch (error) {
-        console.error("Error fetching categories:", error);
         return [];
     }
 };
 
-// Orders
-export const getOrders = async (userId?: string): Promise<Order[]> => {
-    try {
-        let query = supabase.from(TABLES.ORDERS).select('*').order('created_at', { ascending: false });
-        if (userId) query = query.eq('customer_id', userId);
+// Export the backup function names to maintain compatibility
+export { getPublicStats as getSiteStats };
 
-        const { data, error } = await query;
-        if (error) throw error;
-        return (data || []).map(parseDataFromSupabase) as Order[];
-    } catch (error) {
-        console.error("Erro ao procurar pedidos:", error);
-        return [];
-    }
-};
+// ==================== BLOG ====================
 
-export const createOrder = async (order: Omit<Order, 'id'>): Promise<string> => {
-    const orderData = cleanDataForSupabase(order, TABLES.ORDERS);
-    const { data, error } = await supabase
-        .from(TABLES.ORDERS)
-        .insert([orderData])
-        .select();
+let blogPostsCache: any[] | null = null;
+let lastBlogFetch = 0;
 
-    if (error) throw error;
-    return data[0].id;
-};
-
-export const updateOrderStatus = async (orderId: string, status: Order['status']) => {
-    const { error } = await supabase
-        .from(TABLES.ORDERS)
-        .update({ status })
-        .eq('id', orderId);
-    if (error) throw error;
-};
-
-// Users / Profiles
-export const getUserProfile = async (uid: string): Promise<User | null> => {
-    try {
-        const { data, error } = await supabase
-            .from(TABLES.PROFILES)
-            .select('*')
-            .eq('id', uid)
-            .single();
-
-        if (error) return null;
-        return parseDataFromSupabase(data) as User;
-    } catch (error) {
-        return null;
-    }
-};
-
-export const saveUserProfile = async (user: User) => {
-    const userData = cleanDataForSupabase(user, TABLES.PROFILES);
-    const { error } = await supabase
-        .from(TABLES.PROFILES)
-        .upsert({ id: user.id, ...userData });
-    if (error) console.error("Erro ao salvar perfil:", error);
-};
-
-export const getAllUsers = async (): Promise<User[]> => {
-    try {
-        const { data, error } = await supabase.from(TABLES.PROFILES).select('*');
-        if (error) throw error;
-        return (data || []).map(parseDataFromSupabase) as User[];
-    } catch (error) {
-        console.error("Erro ao buscar utilizadores:", error);
-        return [];
-    }
-};
-
-// Payment Notifications
-export const createPaymentNotification = async (notification: any): Promise<string> => {
-    const data = cleanDataForSupabase(notification, TABLES.PAYMENT_NOTIFICATIONS);
-    const { data: result, error } = await supabase
-        .from(TABLES.PAYMENT_NOTIFICATIONS)
-        .insert([data])
-        .select();
-
-    if (error) throw error;
-    return result[0].id;
-};
-
-export const getPaymentNotificationsByReader = async (readerId: string): Promise<any[]> => {
-    const { data, error } = await supabase
-        .from(TABLES.PAYMENT_NOTIFICATIONS)
-        .select('*')
-        .eq('reader_id', readerId)
-        .order('created_at', { ascending: false });
-
-    if (error) return [];
-    return (data || []).map(parseDataFromSupabase);
-};
-
-export const getAllPaymentNotifications = async (): Promise<any[]> => {
-    const { data, error } = await supabase
-        .from(TABLES.PAYMENT_NOTIFICATIONS)
-        .select('*')
-        .order('created_at', { ascending: false });
-
-    if (error) return [];
-    return (data || []).map(parseDataFromSupabase);
-};
-
-export const updatePaymentNotificationStatus = async (id: string, status: string) => {
-    const { error } = await supabase
-        .from(TABLES.PAYMENT_NOTIFICATIONS)
-        .update({ status, updated_at: new Date().toISOString() })
-        .eq('id', id);
-    if (error) throw error;
-};
-
-// Payment Proofs
-export const createPaymentProof = async (proof: any): Promise<string> => {
-    const data = cleanDataForSupabase(proof, TABLES.PAYMENT_PROOFS);
-    const { data: result, error } = await supabase
-        .from(TABLES.PAYMENT_PROOFS)
-        .insert([data])
-        .select();
-
-    if (error) throw error;
-    return result[0].id;
-};
-
-export const getPaymentProofByNotification = async (notificationId: string) => {
-    const { data, error } = await supabase
-        .from(TABLES.PAYMENT_PROOFS)
-        .select('*')
-        .eq('payment_notification_id', notificationId)
-        .single();
-
-    if (error) return null;
-    return parseDataFromSupabase(data);
-};
-
-export const confirmPaymentProof = async (proofId: string, adminId: string, notes?: string) => {
-    const { error } = await supabase
-        .from(TABLES.PAYMENT_PROOFS)
-        .update({
-            confirmed_by: adminId,
-            confirmed_at: new Date().toISOString(),
-            notes: notes || ''
-        })
-        .eq('id', proofId);
-    if (error) throw error;
-};
-
-// Manuscripts
-export const createManuscript = async (manuscript: any): Promise<string> => {
-    const data = cleanDataForSupabase(manuscript, TABLES.MANUSCRIPTS);
-    const { data: result, error } = await supabase
-        .from(TABLES.MANUSCRIPTS)
-        .insert([data])
-        .select();
-
-    if (error) throw error;
-    return result[0].id;
-};
-
-export const getManuscriptsByAuthor = async (authorId: string) => {
-    const { data, error } = await supabase
-        .from(TABLES.MANUSCRIPTS)
-        .select('*')
-        .eq('author_id', authorId)
-        .order('submitted_date', { ascending: false });
-
-    if (error) return [];
-    return (data || []).map(parseDataFromSupabase);
-};
-
-export const getAllManuscripts = async () => {
-    const { data, error } = await supabase
-        .from(TABLES.MANUSCRIPTS)
-        .select('*')
-        .order('submitted_date', { ascending: false });
-
-    if (error) return [];
-    return (data || []).map(parseDataFromSupabase);
-};
-
-export const updateManuscriptStatus = async (id: string, status: string, feedback?: string) => {
-    const { error } = await supabase
-        .from(TABLES.MANUSCRIPTS)
-        .update({ status, feedback, reviewed_date: new Date().toISOString() })
-        .eq('id', id);
-    if (error) throw error;
-};
-
-// Blog
 export const getBlogPosts = async (forceRefresh = false): Promise<any[]> => {
     const now = Date.now();
     if (!forceRefresh && blogPostsCache && (now - lastBlogFetch < CACHE_DURATION)) {
-        // console.log("dataService - Retornando posts do cache");
         return blogPostsCache;
     }
 
     try {
-        const { data, error } = await supabase
-            .from(TABLES.BLOG)
-            .select('*')
-            .order('date', { ascending: false });
+        const q = query(collection(db, COLLECTIONS.BLOG), orderBy('date', 'desc'));
+        const snapshot = await getDocs(q);
 
-        if (error) throw error;
-        const parsed = (data || []).map(parseDataFromSupabase);
+        const posts = snapshot.docs.map(doc => parseFirestoreDoc(doc.data(), doc.id));
 
-        blogPostsCache = parsed;
+        blogPostsCache = posts;
         lastBlogFetch = now;
 
-        return parsed;
+        return posts;
     } catch (error) {
-        console.error("Erro ao buscar posts:", error);
+        console.error('Erro ao buscar posts:', error);
         return blogPostsCache || [];
     }
 };
 
 export const saveBlogPost = async (post: any) => {
-    const data = cleanDataForSupabase(post, TABLES.BLOG);
-    const { error } = await supabase
-        .from(TABLES.BLOG)
-        .upsert({ id: post.id && !post.id.startsWith('temp_') ? post.id : undefined, ...data });
-    if (error) throw error;
+    try {
+        const postData = prepareForFirestore(post);
+        const { id, ...payload } = postData;
 
-    // Invalidate cache
-    blogPostsCache = null;
-    lastBlogFetch = 0;
+        if (id && !id.startsWith('temp_')) {
+            const docRef = doc(db, COLLECTIONS.BLOG, id);
+            await setDoc(docRef, { ...payload, updatedAt: Timestamp.now() }, { merge: true });
+        } else {
+            await addDoc(collection(db, COLLECTIONS.BLOG), {
+                ...payload,
+                date: Timestamp.now()
+            });
+        }
+
+        blogPostsCache = null;
+        lastBlogFetch = 0;
+    } catch (error) {
+        console.error('Erro ao salvar post:', error);
+        throw error;
+    }
 };
 
 export const deleteBlogPost = async (id: string) => {
-    await supabase.from(TABLES.BLOG).delete().eq('id', id);
-
-    // Invalidate cache
-    blogPostsCache = null;
-    lastBlogFetch = 0;
+    try {
+        await deleteDoc(doc(db, COLLECTIONS.BLOG, id));
+        blogPostsCache = null;
+        lastBlogFetch = 0;
+    } catch (error) {
+        console.error('Erro ao eliminar post:', error);
+        throw error;
+    }
 };
 
 // Blog Interactions
 export const getBlogPostInteractions = async (postId: string) => {
     try {
-        const [{ count: likesCount }, { data: comments, error: commentsError }] = await Promise.all([
-            supabase.from(TABLES.BLOG_LIKES).select('*', { count: 'exact', head: true }).eq('post_id', postId),
-            supabase.from(TABLES.BLOG_COMMENTS).select('*').eq('post_id', postId).order('created_at', { ascending: true })
+        const likesQuery = query(collection(db, COLLECTIONS.BLOG_LIKES), where('postId', '==', postId));
+        const commentsQuery = query(
+            collection(db, COLLECTIONS.BLOG_COMMENTS),
+            where('postId', '==', postId),
+            orderBy('createdAt', 'asc')
+        );
+
+        const [likesSnapshot, commentsSnapshot] = await Promise.all([
+            getDocs(likesQuery),
+            getDocs(commentsQuery)
         ]);
 
-        if (commentsError) throw commentsError;
-
         return {
-            likesCount: likesCount || 0,
-            comments: (comments || []).map(parseDataFromSupabase)
+            likesCount: likesSnapshot.size,
+            comments: commentsSnapshot.docs.map(doc => parseFirestoreDoc(doc.data(), doc.id))
         };
     } catch (error) {
-        console.error("Error fetching interactions:", error);
+        console.error('Error fetching interactions:', error);
         return { likesCount: 0, comments: [] };
     }
 };
 
-export const checkUserLike = async (postId: string, userId: string) => {
+export const checkUserLike = async (postId: string, userId: string): Promise<boolean> => {
     try {
-        const { data, error } = await supabase
-            .from(TABLES.BLOG_LIKES)
-            .select('*')
-            .eq('post_id', postId)
-            .eq('user_id', userId)
-            .single();
-
-        return !!data;
+        const q = query(
+            collection(db, COLLECTIONS.BLOG_LIKES),
+            where('postId', '==', postId),
+            where('userId', '==', userId)
+        );
+        const snapshot = await getDocs(q);
+        return !snapshot.empty;
     } catch (error) {
         return false;
     }
@@ -635,132 +457,456 @@ export const toggleBlogPostLike = async (postId: string, userId: string): Promis
         const isLiked = await checkUserLike(postId, userId);
 
         if (isLiked) {
-            const { error } = await supabase
-                .from(TABLES.BLOG_LIKES)
-                .delete()
-                .eq('post_id', postId)
-                .eq('user_id', userId);
-            if (error) throw error;
+            const q = query(
+                collection(db, COLLECTIONS.BLOG_LIKES),
+                where('postId', '==', postId),
+                where('userId', '==', userId)
+            );
+            const snapshot = await getDocs(q);
+            snapshot.forEach(async (docSnapshot) => {
+                await deleteDoc(docSnapshot.ref);
+            });
             return false;
         } else {
-            const { error } = await supabase
-                .from(TABLES.BLOG_LIKES)
-                .insert([{ post_id: postId, user_id: userId }]);
-            if (error) throw error;
+            await addDoc(collection(db, COLLECTIONS.BLOG_LIKES), {
+                postId,
+                userId,
+                createdAt: Timestamp.now()
+            });
             return true;
         }
     } catch (error) {
-        console.error("Error toggling like:", error);
+        console.error('Error toggling like:', error);
         return false;
     }
 };
 
 export const addBlogPostComment = async (comment: { postId: string; userId: string; userName: string; content: string }) => {
     try {
-        const data = cleanDataForSupabase(comment, TABLES.BLOG_COMMENTS);
-        const { error } = await supabase.from(TABLES.BLOG_COMMENTS).insert([data]);
-        if (error) throw error;
+        await addDoc(collection(db, COLLECTIONS.BLOG_COMMENTS), {
+            ...comment,
+            createdAt: Timestamp.now()
+        });
     } catch (error) {
-        console.error("Error adding comment:", error);
+        console.error('Error adding comment:', error);
         throw error;
     }
 };
 
-// Team
-export const getTeamMembers = async () => {
-    const { data, error } = await supabase
-        .from(TABLES.TEAM)
-        .select('*')
-        .order('display_order', { ascending: true });
+// ==================== TEAM ====================
 
-    if (error) return [];
-    return (data || []).map(parseDataFromSupabase);
+export const getTeamMembers = async () => {
+    try {
+        const q = query(collection(db, COLLECTIONS.TEAM), orderBy('displayOrder', 'asc'));
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => parseFirestoreDoc(doc.data(), doc.id));
+    } catch (error) {
+        console.error('Erro ao buscar equipe:', error);
+        return [];
+    }
 };
 
 export const saveTeamMember = async (member: any) => {
-    const data = cleanDataForSupabase(member, TABLES.TEAM);
-    const { error } = await supabase
-        .from(TABLES.TEAM)
-        .upsert({ id: member.id && !member.id.startsWith('temp_') ? member.id : undefined, ...data });
-    if (error) throw error;
+    try {
+        const memberData = prepareForFirestore(member);
+        const { id, ...payload } = memberData;
+
+        if (id && !id.startsWith('temp_')) {
+            await setDoc(doc(db, COLLECTIONS.TEAM, id), payload, { merge: true });
+        } else {
+            await addDoc(collection(db, COLLECTIONS.TEAM), payload);
+        }
+    } catch (error) {
+        console.error('Erro ao salvar membro:', error);
+        throw error;
+    }
 };
 
 export const deleteTeamMember = async (id: string) => {
-    await supabase.from(TABLES.TEAM).delete().eq('id', id);
+    try {
+        await deleteDoc(doc(db, COLLECTIONS.TEAM, id));
+    } catch (error) {
+        console.error('Erro ao eliminar membro:', error);
+        throw error;
+    }
 };
 
-// Services
-export const getEditorialServices = async () => {
-    const { data, error } = await supabase
-        .from(TABLES.SERVICES)
-        .select('*')
-        .order('display_order', { ascending: true });
+// ==================== SERVICES ====================
 
-    if (error) return [];
-    return (data || []).map(parseDataFromSupabase);
+export const getEditorialServices = async () => {
+    try {
+        const q = query(collection(db, COLLECTIONS.SERVICES), orderBy('displayOrder', 'asc'));
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => parseFirestoreDoc(doc.data(), doc.id));
+    } catch (error) {
+        console.error('Erro ao buscar serviços:', error);
+        return [];
+    }
 };
 
 export const saveEditorialService = async (service: any) => {
-    const data = cleanDataForSupabase(service, TABLES.SERVICES);
-    const { error } = await supabase
-        .from(TABLES.SERVICES)
-        .upsert({ id: service.id && !service.id.startsWith('temp_') ? service.id : undefined, ...data });
-    if (error) throw error;
+    try {
+        const serviceData = prepareForFirestore(service);
+        const { id, ...payload } = serviceData;
+
+        if (id && !id.startsWith('temp_')) {
+            await setDoc(doc(db, COLLECTIONS.SERVICES, id), payload, { merge: true });
+        } else {
+            await addDoc(collection(db, COLLECTIONS.SERVICES), payload);
+        }
+    } catch (error) {
+        console.error('Erro ao salvar serviço:', error);
+        throw error;
+    }
 };
 
 export const deleteEditorialService = async (id: string) => {
-    await supabase.from(TABLES.SERVICES).delete().eq('id', id);
+    try {
+        await deleteDoc(doc(db, COLLECTIONS.SERVICES, id));
+    } catch (error) {
+        console.error('Erro ao eliminar serviço:', error);
+        throw error;
+    }
 };
 
-// Reviews
+// Alias exports for compatibility
+export const getServices = getEditorialServices;
+export const saveService = saveEditorialService;
+export const deleteService = deleteEditorialService;
+
+// ==================== REVIEWS ====================
+
 export const getBookReviews = async (bookId: string) => {
     try {
-        const { data, error } = await supabase
-            .from(TABLES.REVIEWS)
-            .select('*')
-            .eq('book_id', bookId)
-            .order('date', { ascending: false });
-
-        if (error) throw error;
-        return (data || []).map(parseDataFromSupabase);
+        const q = query(
+            collection(db, COLLECTIONS.REVIEWS),
+            where('bookId', '==', bookId),
+            orderBy('date', 'desc')
+        );
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => parseFirestoreDoc(doc.data(), doc.id));
     } catch (error) {
-        console.error("Error fetching reviews:", error);
+        console.error('Error fetching reviews:', error);
         return [];
     }
 };
 
 export const addBookReview = async (review: { bookId: string; userId: string; userName: string; rating: number; comment: string }) => {
     try {
-        const data = cleanDataForSupabase(review, TABLES.REVIEWS);
-        const { error } = await supabase.from(TABLES.REVIEWS).insert([data]);
-        if (error) throw error;
+        await addDoc(collection(db, COLLECTIONS.REVIEWS), {
+            ...review,
+            date: Timestamp.now()
+        });
     } catch (error) {
-        console.error("Error adding review:", error);
+        console.error('Error adding review:', error);
         throw error;
     }
 };
 
-// Book Stats & Interactions
+export const getReviews = getBookReviews; // Alias
+
+// ==================== MANUSCRIPTS ====================
+
+export const createManuscript = async (manuscript: any): Promise<string> => {
+    try {
+        const manuscriptData = prepareForFirestore(manuscript);
+        const docRef = await addDoc(collection(db, COLLECTIONS.MANUSCRIPTS), {
+            ...manuscriptData,
+            submittedDate: Timestamp.now()
+        });
+        return docRef.id;
+    } catch (error) {
+        console.error('Erro ao criar manuscrito:', error);
+        throw error;
+    }
+};
+
+export const getManuscriptsByAuthor = async (authorId: string) => {
+    try {
+        const q = query(
+            collection(db, COLLECTIONS.MANUSCRIPTS),
+            where('authorId', '==', authorId),
+            orderBy('submittedDate', 'desc')
+        );
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => parseFirestoreDoc(doc.data(), doc.id));
+    } catch (error) {
+        console.error('Erro ao buscar manuscritos:', error);
+        return [];
+    }
+};
+
+export const getAllManuscripts = async () => {
+    try {
+        const q = query(collection(db, COLLECTIONS.MANUSCRIPTS), orderBy('submittedDate', 'desc'));
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => parseFirestoreDoc(doc.data(), doc.id));
+    } catch (error) {
+        console.error('Erro ao buscar manuscritos:', error);
+        return [];
+    }
+};
+
+export const updateManuscriptStatus = async (id: string, status: string, feedback?: string) => {
+    try {
+        const docRef = doc(db, COLLECTIONS.MANUSCRIPTS, id);
+        await updateDoc(docRef, {
+            status,
+            feedback: feedback || '',
+            reviewedDate: Timestamp.now()
+        });
+    } catch (error) {
+        console.error('Erro ao atualizar manuscrito:', error);
+        throw error;
+    }
+};
+
+export const getManuscripts = getAllManuscripts; // Alias
+
+// ==================== SITE CONTENT ====================
+
+let siteContentCache: Map<string, Record<string, any>> = new Map();
+
+export const getSiteContent = async (section?: string) => {
+    const cacheKey = section || 'all';
+    const cached = siteContentCache.get(cacheKey);
+
+    if (cached) {
+        return cached;
+    }
+
+    try {
+        let q;
+        if (section) {
+            q = query(collection(db, COLLECTIONS.SITE_CONTENT), where('section', '==', section));
+        } else {
+            q = collection(db, COLLECTIONS.SITE_CONTENT);
+        }
+
+        const snapshot = await getDocs(q);
+        const contentMap: Record<string, any> = {};
+
+        snapshot.docs.forEach(doc => {
+            const data = doc.data();
+            contentMap[data.key] = data.content;
+        });
+
+        siteContentCache.set(cacheKey, contentMap);
+        return contentMap;
+    } catch (error) {
+        console.error('Error fetching site content:', error);
+        return {};
+    }
+};
+
+export const saveSiteContent = async (key: string, section: string, content: any) => {
+    try {
+        const docId = `${section}_${key}`;
+        const docRef = doc(db, COLLECTIONS.SITE_CONTENT, docId);
+        await setDoc(docRef, {
+            key,
+            section,
+            content,
+            updatedAt: Timestamp.now()
+        }, { merge: true });
+
+        siteContentCache.clear();
+    } catch (error) {
+        console.error('Error saving site content:', error);
+        throw error;
+    }
+};
+
+// ==================== TESTIMONIALS ====================
+
+let testimonialsCache: any[] | null = null;
+let lastTestimonialsFetch = 0;
+
+export const getTestimonials = async (forceRefresh = false) => {
+    const now = Date.now();
+    if (!forceRefresh && testimonialsCache && (now - lastTestimonialsFetch < CACHE_DURATION)) {
+        return testimonialsCache;
+    }
+
+    try {
+        const q = query(
+            collection(db, COLLECTIONS.TESTIMONIALS),
+            where('isActive', '==', true),
+            orderBy('createdAt', 'desc')
+        );
+        const snapshot = await getDocs(q);
+        const testimonials = snapshot.docs.map(doc => parseFirestoreDoc(doc.data(), doc.id));
+
+        testimonialsCache = testimonials;
+        lastTestimonialsFetch = now;
+
+        return testimonials;
+    } catch (error) {
+        console.error('Error fetching testimonials:', error);
+        return testimonialsCache || [];
+    }
+};
+
+export const saveTestimonial = async (testimonial: any) => {
+    try {
+        const testimonialData = prepareForFirestore(testimonial);
+        const { id, ...payload } = testimonialData;
+
+        if (id && !id.startsWith('temp_')) {
+            await setDoc(doc(db, COLLECTIONS.TESTIMONIALS, id), payload, { merge: true });
+        } else {
+            await addDoc(collection(db, COLLECTIONS.TESTIMONIALS), {
+                ...payload,
+                createdAt: Timestamp.now(),
+                isActive: true
+            });
+        }
+
+        testimonialsCache = null;
+        lastTestimonialsFetch = 0;
+    } catch (error) {
+        console.error('Error saving testimonial:', error);
+        throw error;
+    }
+};
+
+export const deleteTestimonial = async (id: string) => {
+    try {
+        await deleteDoc(doc(db, COLLECTIONS.TESTIMONIALS, id));
+        testimonialsCache = null;
+        lastTestimonialsFetch = 0;
+    } catch (error) {
+        console.error('Error deleting testimonial:', error);
+        throw error;
+    }
+};
+
+// ==================== PAYMENT NOTIFICATIONS ====================
+
+export const createPaymentNotification = async (notification: any): Promise<string> => {
+    try {
+        const notificationData = prepareForFirestore(notification);
+        const docRef = await addDoc(collection(db, COLLECTIONS.PAYMENT_NOTIFICATIONS), {
+            ...notificationData,
+            createdAt: Timestamp.now()
+        });
+        return docRef.id;
+    } catch (error) {
+        console.error('Erro ao criar notificação de pagamento:', error);
+        throw error;
+    }
+};
+
+export const getPaymentNotificationsByReader = async (readerId: string): Promise<any[]> => {
+    try {
+        const q = query(
+            collection(db, COLLECTIONS.PAYMENT_NOTIFICATIONS),
+            where('readerId', '==', readerId),
+            orderBy('createdAt', 'desc')
+        );
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => parseFirestoreDoc(doc.data(), doc.id));
+    } catch (error) {
+        console.error('Erro ao buscar notificações:', error);
+        return [];
+    }
+};
+
+export const getAllPaymentNotifications = async (): Promise<any[]> => {
+    try {
+        const q = query(collection(db, COLLECTIONS.PAYMENT_NOTIFICATIONS), orderBy('createdAt', 'desc'));
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => parseFirestoreDoc(doc.data(), doc.id));
+    } catch (error) {
+        console.error('Erro ao buscar notificações:', error);
+        return [];
+    }
+};
+
+export const updatePaymentNotificationStatus = async (id: string, status: string) => {
+    try {
+        const docRef = doc(db, COLLECTIONS.PAYMENT_NOTIFICATIONS, id);
+        await updateDoc(docRef, {
+            status,
+            updatedAt: Timestamp.now()
+        });
+    } catch (error) {
+        console.error('Erro ao atualizar notificação:', error);
+        throw error;
+    }
+};
+
+// ==================== PAYMENT PROOFS ====================
+
+export const createPaymentProof = async (proof: any): Promise<string> => {
+    try {
+        const proofData = prepareForFirestore(proof);
+        const docRef = await addDoc(collection(db, COLLECTIONS.PAYMENT_PROOFS), {
+            ...proofData,
+            uploadedAt: Timestamp.now()
+        });
+        return docRef.id;
+    } catch (error) {
+        console.error('Erro ao criar comprovativo:', error);
+        throw error;
+    }
+};
+
+export const getPaymentProofByNotification = async (notificationId: string) => {
+    try {
+        const q = query(
+            collection(db, COLLECTIONS.PAYMENT_PROOFS),
+            where('paymentNotificationId', '==', notificationId),
+            limit(1)
+        );
+        const snapshot = await getDocs(q);
+        if (snapshot.empty) return null;
+        return parseFirestoreDoc(snapshot.docs[0].data(), snapshot.docs[0].id);
+    } catch (error) {
+        console.error('Erro ao buscar comprovativo:', error);
+        return null;
+    }
+};
+
+export const confirmPaymentProof = async (proofId: string, adminId: string, notes?: string) => {
+    try {
+        const docRef = doc(db, COLLECTIONS.PAYMENT_PROOFS, proofId);
+        await updateDoc(docRef, {
+            confirmedBy: adminId,
+            confirmedAt: Timestamp.now(),
+            notes: notes || ''
+        });
+    } catch (error) {
+        console.error('Erro ao confirmar comprovativo:', error);
+        throw error;
+    }
+};
+
+// ==================== BOOK STATS & INTERACTIONS ====================
+
 export const getBookStats = async (bookId: string) => {
     try {
-        const [
-            { count: viewsCount },
-            { data: reviewsData },
-            { data: salesData }
-        ] = await Promise.all([
-            supabase.from(TABLES.BOOK_VIEWS).select('*', { count: 'exact', head: true }).eq('book_id', bookId),
-            supabase.from(TABLES.REVIEWS).select('rating').eq('book_id', bookId),
-            supabase.from(TABLES.PAYMENT_NOTIFICATIONS).select('items').eq('status', 'confirmed')
+        const viewsQuery = query(collection(db, COLLECTIONS.BOOK_VIEWS), where('bookId', '==', bookId));
+        const reviewsQuery = query(collection(db, COLLECTIONS.REVIEWS), where('bookId', '==', bookId));
+        const salesQuery = query(
+            collection(db, COLLECTIONS.PAYMENT_NOTIFICATIONS),
+            where('status', '==', 'confirmed')
+        );
+
+        const [viewsSnapshot, reviewsSnapshot, salesSnapshot] = await Promise.all([
+            getDocs(viewsQuery),
+            getDocs(reviewsQuery),
+            getDocs(salesQuery)
         ]);
 
         // Calculate average rating
-        const ratings = (reviewsData || []).map(r => r.rating);
+        const ratings = reviewsSnapshot.docs.map(doc => doc.data().rating || 0);
         const avgRating = ratings.length > 0 ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0;
 
-        // Calculate sales for this specific book
+        // Calculate sales
         let salesCount = 0;
-        (salesData || []).forEach(sale => {
-            const items = Array.isArray(sale.items) ? sale.items : [];
+        salesSnapshot.docs.forEach(doc => {
+            const items = doc.data().items || [];
             items.forEach((item: any) => {
                 if (item.id === bookId || item.bookId === bookId) {
                     salesCount += item.quantity || 1;
@@ -769,34 +915,37 @@ export const getBookStats = async (bookId: string) => {
         });
 
         return {
-            views: viewsCount || 0,
+            views: viewsSnapshot.size,
             rating: Number(avgRating.toFixed(1)),
             sales: salesCount,
-            reviewsCount: reviewsData?.length || 0
+            reviewsCount: reviewsSnapshot.size
         };
     } catch (error) {
-        console.error("Error fetching book stats:", error);
+        console.error('Error fetching book stats:', error);
         return { views: 0, rating: 0, sales: 0, reviewsCount: 0 };
     }
 };
 
 export const incrementBookView = async (bookId: string) => {
     try {
-        await supabase.from(TABLES.BOOK_VIEWS).insert([{ book_id: bookId }]);
+        await addDoc(collection(db, COLLECTIONS.BOOK_VIEWS), {
+            bookId,
+            viewedAt: Timestamp.now()
+        });
     } catch (error) {
-        // Fail silently for views
+        // Fail silently
     }
 };
 
 export const checkIsFavorite = async (bookId: string, userId: string): Promise<boolean> => {
     try {
-        const { data } = await supabase
-            .from(TABLES.BOOK_FAVORITES)
-            .select('*')
-            .eq('book_id', bookId)
-            .eq('user_id', userId)
-            .single();
-        return !!data;
+        const q = query(
+            collection(db, COLLECTIONS.BOOK_FAVORITES),
+            where('bookId', '==', bookId),
+            where('userId', '==', userId)
+        );
+        const snapshot = await getDocs(q);
+        return !snapshot.empty;
     } catch (error) {
         return false;
     }
@@ -805,198 +954,161 @@ export const checkIsFavorite = async (bookId: string, userId: string): Promise<b
 export const toggleFavorite = async (bookId: string, userId: string): Promise<boolean> => {
     try {
         const isFav = await checkIsFavorite(bookId, userId);
+
         if (isFav) {
-            await supabase.from(TABLES.BOOK_FAVORITES).delete().eq('book_id', bookId).eq('user_id', userId);
+            const q = query(
+                collection(db, COLLECTIONS.BOOK_FAVORITES),
+                where('bookId', '==', bookId),
+                where('userId', '==', userId)
+            );
+            const snapshot = await getDocs(q);
+            snapshot.forEach(async (docSnapshot) => {
+                await deleteDoc(docSnapshot.ref);
+            });
             return false;
         } else {
-            await supabase.from(TABLES.BOOK_FAVORITES).insert([{ book_id: bookId, user_id: userId }]);
+            await addDoc(collection(db, COLLECTIONS.BOOK_FAVORITES), {
+                bookId,
+                userId,
+                createdAt: Timestamp.now()
+            });
             return true;
         }
     } catch (error) {
-        console.error("Error toggling favorite:", error);
+        console.error('Error toggling favorite:', error);
         return false;
     }
 };
 
-// Site Content & Testimonials
-export const getSiteContent = async (section?: string) => {
-    const cacheKey = section || 'all';
-    const cached = siteContentCache.get(cacheKey);
+// ==================== ADMIN & AUTHOR STATS ====================
 
-    if (cached) {
-
-        return cached;
-    }
-
+export const getAdminStats = async () => {
     try {
-        let query = supabase.from(TABLES.SITE_CONTENT).select('*');
-        if (section) query = query.eq('section', section);
+        const booksSnapshot = await getDocs(collection(db, COLLECTIONS.BOOKS));
+        const usersSnapshot = await getDocs(collection(db, COLLECTIONS.USERS));
+        const pendingQuery = query(
+            collection(db, COLLECTIONS.PAYMENT_NOTIFICATIONS),
+            where('status', '==', 'proof_uploaded')
+        );
+        const pendingSnapshot = await getDocs(pendingQuery);
 
-        const { data, error } = await query;
-        if (error) throw error;
+        const confirmedQuery = query(
+            collection(db, COLLECTIONS.PAYMENT_NOTIFICATIONS),
+            where('status', '==', 'confirmed')
+        );
+        const confirmedSnapshot = await getDocs(confirmedQuery);
 
-        // Convert to a convenient key-value object
-        const contentMap: Record<string, any> = {};
-        (data || []).forEach(item => {
-            contentMap[item.key] = item.content;
+        let revenue = 0;
+        confirmedSnapshot.docs.forEach(doc => {
+            revenue += Number(doc.data().totalAmount || 0);
         });
 
-        siteContentCache.set(cacheKey, contentMap);
-        return contentMap;
+        return {
+            totalBooks: booksSnapshot.size,
+            totalUsers: usersSnapshot.size,
+            pendingOrders: pendingSnapshot.size,
+            revenue
+        };
     } catch (error) {
-        console.error("Error fetching site content:", error);
-        return {};
+        console.error('Error fetching admin stats:', error);
+        return { totalBooks: 0, totalUsers: 0, pendingOrders: 0, revenue: 0 };
     }
-};
-
-export const saveSiteContent = async (key: string, section: string, content: any) => {
-    try {
-        const { error } = await supabase.from(TABLES.SITE_CONTENT).upsert({
-            key,
-            section,
-            content,
-            updated_at: new Date().toISOString()
-        }, { onConflict: 'key' });
-        if (error) throw error;
-
-        // Invalidate cache
-        siteContentCache.clear();
-    } catch (error) {
-        console.error("Error saving site content:", error);
-        throw error;
-    }
-};
-
-export const getTestimonials = async (forceRefresh = false) => {
-    const now = Date.now();
-    if (!forceRefresh && testimonialsCache && (now - lastTestimonialsFetch < CACHE_DURATION)) {
-        console.log("dataService - Retornando depoimentos do cache");
-        return testimonialsCache;
-    }
-
-    try {
-        const { data, error } = await supabase
-            .from(TABLES.TESTIMONIALS)
-            .select('*')
-            .eq('is_active', true)
-            .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        const parsed = (data || []).map(parseDataFromSupabase);
-
-        testimonialsCache = parsed;
-        lastTestimonialsFetch = now;
-
-        return parsed;
-    } catch (error) {
-        console.error("Error fetching testimonials:", error);
-        return testimonialsCache || [];
-    }
-};
-
-export const saveTestimonial = async (testimonial: any) => {
-    try {
-        const data = cleanDataForSupabase(testimonial, TABLES.TESTIMONIALS);
-        const { error } = await supabase.from(TABLES.TESTIMONIALS).upsert(data, { onConflict: 'id' });
-        if (error) throw error;
-
-        // Invalidate cache
-        testimonialsCache = null;
-        lastTestimonialsFetch = 0;
-    } catch (error) {
-        console.error("Error saving testimonial:", error);
-        throw error;
-    }
-};
-
-// Stats helpers
-export const getAdminStats = async () => {
-    const { count: totalBooks } = await supabase.from(TABLES.BOOKS).select('*', { count: 'exact', head: true });
-    const { count: totalUsers } = await supabase.from(TABLES.PROFILES).select('*', { count: 'exact', head: true });
-    const { count: pendingOrders } = await supabase.from(TABLES.PAYMENT_NOTIFICATIONS).select('*', { count: 'exact', head: true }).eq('status', 'proof_uploaded');
-
-    const { data: confirmedPayments } = await supabase.from(TABLES.PAYMENT_NOTIFICATIONS).select('total_amount').eq('status', 'confirmed');
-    const revenue = (confirmedPayments || []).reduce((acc, curr) => acc + (Number(curr.total_amount) || 0), 0);
-
-    return {
-        totalBooks: totalBooks || 0,
-        totalUsers: totalUsers || 0,
-        pendingOrders: pendingOrders || 0,
-        revenue
-    };
 };
 
 export const getAuthorStats = async (authorId: string) => {
-    const { count: publishedBooks } = await supabase.from(TABLES.BOOKS).select('*', { count: 'exact', head: true }).eq('author_id', authorId);
-    const { data: sales } = await supabase.from(TABLES.PAYMENT_NOTIFICATIONS).select('items').eq('status', 'confirmed');
+    try {
+        const booksQuery = query(
+            collection(db, COLLECTIONS.BOOKS),
+            where('authorId', '==', authorId)
+        );
+        const booksSnapshot = await getDocs(booksQuery);
 
-    let totalSales = 0;
-    let revenue = 0;
+        const salesQuery = query(
+            collection(db, COLLECTIONS.PAYMENT_NOTIFICATIONS),
+            where('status', '==', 'confirmed')
+        );
+        const salesSnapshot = await getDocs(salesQuery);
 
-    (sales || []).forEach(sale => {
-        const items = Array.isArray(sale.items) ? sale.items : [];
-        items.forEach((item: any) => {
-            if (item.authorId === authorId) {
-                totalSales += item.quantity;
-                revenue += (item.price * item.quantity);
-            }
+        let totalSales = 0;
+        let revenue = 0;
+
+        salesSnapshot.docs.forEach(doc => {
+            const items = doc.data().items || [];
+            items.forEach((item: any) => {
+                if (item.authorId === authorId) {
+                    totalSales += item.quantity || 1;
+                    revenue += (item.price || 0) * (item.quantity || 1);
+                }
+            });
         });
-    });
 
-    return {
-        publishedBooks: publishedBooks || 0,
-        totalSales,
-        totalRoyalties: revenue * 0.7
-    };
+        return {
+            publishedBooks: booksSnapshot.size,
+            totalSales,
+            totalRoyalties: revenue * 0.7
+        };
+    } catch (error) {
+        console.error('Error fetching author stats:', error);
+        return { publishedBooks: 0, totalSales: 0, totalRoyalties: 0 };
+    }
 };
 
 export const getAuthorConfirmedSales = async (authorId: string) => {
-    const { data: sales, error } = await supabase
-        .from(TABLES.PAYMENT_NOTIFICATIONS)
-        .select('id, created_at, items')
-        .eq('status', 'confirmed');
+    try {
+        const q = query(
+            collection(db, COLLECTIONS.PAYMENT_NOTIFICATIONS),
+            where('status', '==', 'confirmed')
+        );
+        const snapshot = await getDocs(q);
 
-    if (error) return [];
-
-    const authorSales: any[] = [];
-    (sales || []).forEach(sale => {
-        const items = Array.isArray(sale.items) ? sale.items : [];
-        items.forEach((item: any) => {
-            if (item.authorId === authorId) {
-                authorSales.push({
-                    id: `${sale.id}-${item.bookId}`,
-                    date: sale.created_at,
-                    bookTitle: item.bookTitle,
-                    quantity: item.quantity,
-                    royalty: (item.price * item.quantity) * 0.7
-                });
-            }
+        const sales: any[] = [];
+        snapshot.docs.forEach(doc => {
+            const data = doc.data();
+            const items = data.items || [];
+            items.forEach((item: any) => {
+                if (item.authorId === authorId) {
+                    sales.push({
+                        ...parseFirestoreDoc(data, doc.id),
+                        item
+                    });
+                }
+            });
         });
-    });
 
-    return authorSales;
+        return sales;
+    } catch (error) {
+        console.error('Error fetching confirmed sales:', error);
+        return [];
+    }
 };
+
+// ==================== USER BOOKS & DOWNLOADS ====================
 
 export const getUserBooks = async (readerId: string): Promise<Book[]> => {
-    const { data: confirmed } = await supabase
-        .from(TABLES.PAYMENT_NOTIFICATIONS)
-        .select('items')
-        .eq('reader_id', readerId)
-        .eq('status', 'confirmed');
+    try {
+        const q = query(
+            collection(db, COLLECTIONS.PAYMENT_NOTIFICATIONS),
+            where('readerId', '==', readerId),
+            where('status', '==', 'confirmed')
+        );
+        const snapshot = await getDocs(q);
 
-    const bookIds = new Set<string>();
-    (confirmed || []).forEach(sale => {
-        const items = Array.isArray(sale.items) ? sale.items : [];
-        items.forEach((item: any) => bookIds.add(item.bookId));
-    });
+        const bookIds = new Set<string>();
+        snapshot.docs.forEach(doc => {
+            const items = doc.data().items || [];
+            items.forEach((item: any) => bookIds.add(item.bookId));
+        });
 
-    if (bookIds.size === 0) return [];
+        if (bookIds.size === 0) return [];
 
-    const allBooks = await getBooks();
-    return allBooks.filter(book => bookIds.has(book.id));
+        const allBooks = await getBooks();
+        return allBooks.filter(book => bookIds.has(book.id));
+    } catch (error) {
+        console.error('Error fetching user books:', error);
+        return [];
+    }
 };
 
-// Digital Book Downloads
 export const checkDownloadAccess = async (bookId: string, userId: string | undefined, bookPrice: number): Promise<boolean> => {
     // Free books are always accessible
     if (bookPrice === 0) {
@@ -1009,21 +1121,22 @@ export const checkDownloadAccess = async (bookId: string, userId: string | undef
     }
 
     try {
-        const { data: confirmed } = await supabase
-            .from(TABLES.PAYMENT_NOTIFICATIONS)
-            .select('items')
-            .eq('reader_id', userId)
-            .eq('status', 'confirmed');
+        const q = query(
+            collection(db, COLLECTIONS.PAYMENT_NOTIFICATIONS),
+            where('readerId', '==', userId),
+            where('status', '==', 'confirmed')
+        );
+        const snapshot = await getDocs(q);
 
         // Check if user has purchased this book
-        const hasPurchased = (confirmed || []).some(sale => {
-            const items = Array.isArray(sale.items) ? sale.items : [];
+        const hasPurchased = snapshot.docs.some(doc => {
+            const items = doc.data().items || [];
             return items.some((item: any) => item.bookId === bookId);
         });
 
         return hasPurchased;
     } catch (error) {
-        console.error("Error checking download access:", error);
+        console.error('Error checking download access:', error);
         return false;
     }
 };
@@ -1033,41 +1146,43 @@ export const getUserPurchasedDigitalBooks = async (readerId: string): Promise<Bo
     return allPurchased.filter(book => book.format === 'digital' && book.digitalFileUrl);
 };
 
-// Notifications
+// ==================== NOTIFICATIONS ====================
+
 export const getNotifications = async (userId: string) => {
     try {
-        const { data, error } = await supabase
-            .from(TABLES.NOTIFICATIONS)
-            .select('*')
-            .eq('user_id', userId)
-            .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        return (data || []).map(parseDataFromSupabase);
+        const q = query(
+            collection(db, COLLECTIONS.NOTIFICATIONS),
+            where('userId', '==', userId),
+            where('isRead', '==', false),
+            orderBy('createdAt', 'desc')
+        );
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => parseFirestoreDoc(doc.data(), doc.id));
     } catch (error) {
-        console.error("Error fetching notifications:", error);
+        console.error('Error fetching notifications:', error);
         return [];
     }
 };
 
-export const markNotificationAsRead = async (id: string) => {
+export const markNotificationAsRead = async (notificationId: string) => {
     try {
-        const { error } = await supabase
-            .from(TABLES.NOTIFICATIONS)
-            .update({ is_read: true })
-            .eq('id', id);
-        if (error) throw error;
+        const docRef = doc(db, COLLECTIONS.NOTIFICATIONS, notificationId);
+        await updateDoc(docRef, { isRead: true });
     } catch (error) {
-        console.error("Error marking notification as read:", error);
+        console.error('Error marking notification as read:', error);
+        throw error;
     }
 };
 
-export const createNotification = async (notif: { userId: string; type: string; title: string; content: string; link?: string }) => {
+export const createNotification = async (notification: any) => {
     try {
-        const data = cleanDataForSupabase(notif, TABLES.NOTIFICATIONS);
-        const { error } = await supabase.from(TABLES.NOTIFICATIONS).insert([data]);
-        if (error) throw error;
+        await addDoc(collection(db, COLLECTIONS.NOTIFICATIONS), {
+            ...notification,
+            isRead: false,
+            createdAt: Timestamp.now()
+        });
     } catch (error) {
-        console.error("Error creating notification:", error);
+        console.error('Error creating notification:', error);
+        throw error;
     }
 };

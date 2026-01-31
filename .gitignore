@@ -29,3 +29,9 @@ dist-ssr
 
 # Vercel
 .vercel
+
+# Firebase Admin SDK credentials (NEVER commit this!)
+serviceAccountKey.json
+
+# Supabase export data
+supabase-export/

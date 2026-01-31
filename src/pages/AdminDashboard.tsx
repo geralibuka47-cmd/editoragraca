@@ -33,9 +33,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user }) => {
     const fetchData = async () => {
         setIsLoadingData(true);
         try {
-            const { data: { session } } = await (await import('../services/supabase')).supabase.auth.getSession();
-
-
             const [statsData, postsData] = await Promise.all([
                 getAdminStats(),
                 getBlogPosts()

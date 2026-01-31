@@ -1,132 +1,152 @@
-import { supabase } from "./supabase";
-import { User } from "../types";
-import { getUserProfile, saveUserProfile } from "./dataService";
+import {
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    signOut as firebaseSignOut,
+    onAuthStateChanged,
+    User as FirebaseUser,
+    sendPasswordResetEmail
+} from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { auth, db } from './firebase';
+import { User } from '../types';
 
+/**
+ * Convert Firebase User to our User type
+ */
+const convertFirebaseUser = async (firebaseUser: FirebaseUser): Promise<User> => {
+    // Get additional user data from Firestore
+    const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+
+    if (userDoc.exists()) {
+        const userData = userDoc.data();
+        return {
+            id: firebaseUser.uid,
+            name: userData.name || firebaseUser.displayName || 'Utilizador',
+            email: firebaseUser.email || '',
+            role: userData.role || 'leitor',
+            paymentMethods: userData.paymentMethods || [],
+            whatsappNumber: userData.whatsappNumber,
+            bio: userData.bio,
+            avatarUrl: userData.avatarUrl || firebaseUser.photoURL
+        };
+    }
+
+    // Fallback if no Firestore document exists
+    return {
+        id: firebaseUser.uid,
+        name: firebaseUser.displayName || 'Utilizador',
+        email: firebaseUser.email || '',
+        role: 'leitor'
+    };
+};
+
+/**
+ * Login with email and password
+ */
 export const login = async (email: string, password: string): Promise<User | null> => {
     try {
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        });
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        return await convertFirebaseUser(userCredential.user);
+    } catch (error: any) {
+        console.error('Erro ao fazer login:', error);
 
-        if (error) throw error;
-        if (!data.user) return null;
+        // Translate Firebase errors to Portuguese
+        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+            throw new Error('E-mail ou senha incorretos');
+        } else if (error.code === 'auth/too-many-requests') {
+            throw new Error('Muitas tentativas. Tente novamente mais tarde');
+        } else if (error.code === 'auth/network-request-failed') {
+            throw new Error('Erro de rede. Verifique sua conexão');
+        }
 
-        // Get extra profile info from Database with timeout
-        // If profile fetch hangs, we proceed with basic auth data
-        const profilePromise = getUserProfile(data.user.id);
-        const timeoutProfile = new Promise<null>((resolve) => setTimeout(() => resolve(null), 3000));
-
-        const profile = await Promise.race([profilePromise, timeoutProfile]);
-
-        if (profile) return profile;
-
-        return {
-            id: data.user.id,
-            name: data.user.user_metadata?.name || 'Utilizador',
-            email: data.user.email || email,
-            role: 'leitor'
-        };
-    } catch (error) {
-        console.error("Erro ao fazer login:", error);
         throw error;
     }
 };
 
+/**
+ * Sign up with email, password, and name
+ */
 export const signUp = async (email: string, password: string, name: string): Promise<User> => {
     try {
-        const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-                data: {
-                    name: name,
-                }
-            }
-        });
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const firebaseUser = userCredential.user;
 
-        if (error) throw error;
-        if (!data.user) throw new Error("Erro ao criar utilizador.");
-
+        // Create user document in Firestore
         const newUser: User = {
-            id: data.user.id,
+            id: firebaseUser.uid,
             name: name,
             email: email,
             role: 'leitor'
         };
 
-        await saveUserProfile(newUser);
+        await setDoc(doc(db, 'users', firebaseUser.uid), {
+            name,
+            email,
+            role: 'leitor',
+            createdAt: new Date().toISOString()
+        });
+
         return newUser;
-    } catch (error) {
-        console.error("Erro ao registar:", error);
+    } catch (error: any) {
+        console.error('Erro ao registar:', error);
+
+        // Translate Firebase errors
+        if (error.code === 'auth/email-already-in-use') {
+            throw new Error('Este e-mail já está registado');
+        } else if (error.code === 'auth/weak-password') {
+            throw new Error('A senha deve ter pelo menos 6 caracteres');
+        } else if (error.code === 'auth/invalid-email') {
+            throw new Error('E-mail inválido');
+        }
+
         throw error;
     }
 };
 
+/**
+ * Logout
+ */
 export const logout = async () => {
     try {
-        const { error } = await supabase.auth.signOut();
-        if (error) throw error;
-
-        // Manual cleanup as a fallback
-        for (const key in localStorage) {
-            if (key.startsWith('sb-') || key.includes('supabase.auth')) {
-                localStorage.removeItem(key);
-            }
-        }
+        await firebaseSignOut(auth);
     } catch (error) {
-        console.error("Erro ao fazer logout:", error);
-        // Even if supabase fails, we should clear local storage
-        for (const key in localStorage) {
-            if (key.startsWith('sb-') || key.includes('supabase.auth')) {
-                localStorage.removeItem(key);
-            }
-        }
+        console.error('Erro ao fazer logout:', error);
+        throw error;
     }
 };
 
-export const subscribeToAuthChanges = (callback: (user: User | null) => void) => {
-    // Check initial session
-    const checkInitialSession = async () => {
-        try {
-            const { data: { session }, error } = await supabase.auth.getSession();
-            if (error) throw error;
+/**
+ * Send password reset email
+ */
+export const resetPassword = async (email: string) => {
+    try {
+        await sendPasswordResetEmail(auth, email);
+    } catch (error: any) {
+        console.error('Erro ao enviar e-mail de recuperação:', error);
 
-            if (session?.user) {
-                const profile = await getUserProfile(session.user.id);
-                callback(profile || {
-                    id: session.user.id,
-                    name: session.user.user_metadata?.name || 'Utilizador',
-                    email: session.user.email || '',
-                    role: 'leitor'
-                });
-            } else {
+        if (error.code === 'auth/user-not-found') {
+            throw new Error('Nenhuma conta encontrada com este e-mail');
+        }
+
+        throw error;
+    }
+};
+
+/**
+ * Subscribe to auth state changes
+ */
+export const subscribeToAuthChanges = (callback: (user: User | null) => void) => {
+    return onAuthStateChanged(auth, async (firebaseUser) => {
+        if (firebaseUser) {
+            try {
+                const user = await convertFirebaseUser(firebaseUser);
+                callback(user);
+            } catch (error) {
+                console.error('Error converting Firebase user:', error);
                 callback(null);
             }
-        } catch (error) {
-            console.error("Auth check failed:", error);
-            callback(null); // Ensure we unblock the UI even on error
-        }
-    };
-
-    checkInitialSession();
-
-    // Listen for changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-        if (session?.user) {
-            const profile = await getUserProfile(session.user.id);
-            callback(profile || {
-                id: session.user.id,
-                name: session.user.user_metadata?.name || 'Utilizador',
-                email: session.user.email || '',
-                role: 'leitor'
-            });
         } else {
             callback(null);
         }
     });
-
-    return () => {
-        subscription.unsubscribe();
-    };
 };

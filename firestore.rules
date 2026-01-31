@@ -1,0 +1,225 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ==================== FUNÇÕES AUXILIARES ====================
+    
+    // Verifica se o utilizador está autenticado
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Verifica se é o próprio utilizador
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    // Verifica se é administrador
+    function isAdmin() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'adm';
+    }
+    
+    // Verifica se é autor
+    function isAuthor() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'autor';
+    }
+    
+    // ==================== USERS (Perfis) ====================
+    
+    match /users/{userId} {
+      // Qualquer um pode ler perfis públicos
+      allow read: if true;
+      
+      // Apenas o próprio utilizador ou admin podem criar/atualizar seus dados
+      allow create, update: if isOwner(userId) || isAdmin();
+      
+      // Apenas admin pode eliminar
+      allow delete: if isAdmin();
+    }
+    
+    // ==================== BOOKS ====================
+    
+    match /books/{bookId} {
+      // Qualquer um pode ler livros
+      allow read: if true;
+      
+      // Apenas admins e autores podem criar/atualizar/eliminar
+      allow create, update, delete: if isAdmin() || isAuthor();
+    }
+    
+    // ==================== ORDERS ====================
+    
+    match /orders/{orderId} {
+      // Utilizador pode ver apenas suas próprias encomendas
+      allow read: if isOwner(resource.data.customerId) || isAdmin();
+      
+      // Utilizador autenticado pode criar encomendas
+      allow create: if isAuthenticated();
+      
+      // Apenas admin pode atualizar status
+      allow update: if isAdmin();
+      
+      // Apenas admin pode eliminar
+      allow delete: if isAdmin();
+    }
+    
+    // ==================== BLOG ====================
+    
+    match /blog/{postId} {
+      // Qualquer um pode ler posts
+      allow read: if true;
+      
+      // Apenas admin pode criar/atualizar/eliminar
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // Blog Likes
+    match /blogLikes/{likeId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow delete: if isAuthenticated() && isOwner(resource.data.userId);
+    }
+    
+    // Blog Comments
+    match /blogComments/{commentId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update, delete: if isAdmin() || isOwner(resource.data.userId);
+    }
+    
+    // ==================== TESTIMONIALS ====================
+    
+    match /testimonials/{testimonialId} {
+      // Qualquer um pode ler depoimentos ativos
+      allow read: if resource.data.isActive == true;
+      
+      // Apenas admin pode criar/atualizar/eliminar
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // ==================== MANUSCRIPTS ====================
+    
+    match /manuscripts/{manuscriptId} {
+      // Autor pode ver apenas seus próprios manuscritos
+      allow read: if isOwner(resource.data.authorId) || isAdmin();
+      
+      // Autor autenticado pode submeter
+      allow create: if isAuthenticated();
+      
+      // Apenas admin pode atualizar status
+      allow update: if isAdmin();
+      
+      // Admin pode eliminar
+      allow delete: if isAdmin();
+    }
+    
+    // ==================== SITE CONTENT ====================
+    
+    match /siteContent/{contentId} {
+      // Qualquer um pode ler
+      allow read: if true;
+      
+      // Apenas admin pode modificar
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // ==================== TEAM ====================
+    
+    match /team/{memberId} {
+      // Qualquer um pode ler
+      allow read: if true;
+      
+      // Apenas admin pode modificar
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // ==================== SERVICES ====================
+    
+    match /services/{serviceId} {
+      // Qualquer um pode ler
+      allow read: if true;
+      
+      // Apenas admin pode modificar
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // ==================== REVIEWS ====================
+    
+    match /reviews/{reviewId} {
+      // Qualquer um pode ler avaliações
+      allow read: if true;
+      
+      // Utilizador autenticado pode criar
+      allow create: if isAuthenticated();
+      
+      // Apenas o próprio ou admin podem atualizar/eliminar
+      allow update, delete: if isOwner(resource.data.userId) || isAdmin();
+    }
+    
+    // ==================== PAYMENT NOTIFICATIONS ====================
+    
+    match /paymentNotifications/{notificationId} {
+      // Leitor pode ver apenas suas próprias notificações
+      allow read: if isOwner(resource.data.readerId) || isAdmin();
+      
+      // Leitor pode criar notificações
+      allow create: if isAuthenticated();
+      
+      // Apenas admin pode atualizar
+      allow update: if isAdmin();
+      
+      // Apenas admin pode eliminar
+      allow delete: if isAdmin();
+    }
+    
+    // ==================== PAYMENT PROOFS ====================
+    
+    match /paymentProofs/{proofId} {
+      // Apenas o leitor que enviou ou admin podem ver
+      allow read: if isAdmin(); // Admin vê todos
+      
+      // Leitor pode enviar comprovativo
+      allow create: if isAuthenticated();
+      
+      // Apenas admin pode confirmar
+      allow update: if isAdmin();
+      
+      // Apenas admin pode eliminar
+      allow delete: if isAdmin();
+    }
+    
+    // ==================== BOOK STATS & INTERACTIONS ====================
+    
+    // Book Views
+    match /bookViews/{viewId} {
+      allow read: if isAdmin();
+      allow create: if true; // Qualquer um pode registar visualização
+    }
+    
+    // Book Favorites
+    match /bookFavorites/{favoriteId} {
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      allow create: if isAuthenticated();
+      allow delete: if isOwner(resource.data.userId);
+    }
+    
+    // ==================== NOTIFICATIONS ====================
+    
+    match /notifications/{notificationId} {
+      // Apenas o destinatário pode ler suas notificações
+      allow read: if isOwner(resource.data.userId);
+      
+      // Sistema pode criar (no backend)
+      allow create: if isAdmin();
+      
+      // Utilizador pode marcar como lida
+      allow update: if isOwner(resource.data.userId);
+      
+      // Admin pode eliminar
+      allow delete: if isAdmin();
+    }
+  }
+}
