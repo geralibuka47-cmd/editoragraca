@@ -1,6 +1,6 @@
 import React from 'react';
 import logo from '../assets/imagens/logo.png';
-import { ShoppingBag, Search, User, Heart, LogOut, Menu, X, Bell, Phone, ArrowRight } from 'lucide-react';
+import { ShoppingBag, Search, User, LogOut, Menu, X, Bell } from 'lucide-react';
 import { motion as m, AnimatePresence } from 'framer-motion';
 import { User as UserType, Notification } from '../types';
 import { getNotifications, markNotificationAsRead } from '../services/dataService';
@@ -27,7 +27,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                 setNotifications(data);
             };
             fetchNotifs();
-            const interval = setInterval(fetchNotifs, 30000); // Check every 30s
+            const interval = setInterval(fetchNotifs, 30000);
             return () => clearInterval(interval);
         }
     }, [user]);
@@ -42,10 +42,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         if (searchQuery.trim()) {
-            // Navigate to catalog with query - we'll handle this in App.tsx or just by setting a global state
-            // For now, let's assume we can pass it or just navigate
             onNavigate('CATALOG');
-            // We might need a way to pass the query. Let's use localStorage or a prop.
             localStorage.setItem('pendingSearch', searchQuery.trim());
             setIsSearchOpen(false);
             setSearchQuery('');
@@ -57,346 +54,141 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
         { name: 'Catálogo', path: '/livros' },
         { name: 'Blog', path: '/blog' },
         { name: 'Serviços', path: '/servicos' },
-        { name: 'Sobre Nós', path: '/sobre' },
+        { name: 'Sobre', path: '/sobre' },
         { name: 'Contacto', path: '/contacto' },
     ];
 
     return (
-        <header className="flex flex-col w-full sticky top-0 z-50 glass-premium shadow-2xl shadow-black/[0.03]">
-            {/* Utility Top Bar - Ultra Minimalist */}
-            <div className="bg-brand-dark text-white/90 py-2 px-4 md:px-8 flex flex-col md:flex-row justify-between items-center text-[10px] md:text-[11px] uppercase tracking-[0.2em] font-black border-b border-white/5 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-brand-primary/10 to-transparent opacity-30"></div>
-                <div className="flex gap-6 items-center relative z-10">
-                    <span className="hidden sm:inline text-gray-400 font-bold">Património Literário Angolano</span>
-                    <span className="text-brand-primary flex items-center gap-2">
-                        <Phone className="w-3 h-3" /> +244 947 472 230
-                    </span>
+        <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100 shadow-sm h-20 md:h-24 flex items-center transition-all">
+            <div className="container mx-auto px-6 md:px-12 flex justify-between items-center h-full">
+                {/* 1. Brand Identity - Clean & Iconic */}
+                <div
+                    className="flex items-center gap-3 cursor-pointer group"
+                    onClick={() => onNavigate('HOME')}
+                >
+                    <img src={logo} alt="Editora Graça" className="h-10 w-auto md:h-12 object-contain" />
+                    <div className="flex flex-col">
+                        <span className="font-serif font-black text-brand-dark text-xl leading-none tracking-tight">EDITORA <span className="text-brand-primary">GRAÇA</span></span>
+                        <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-gray-400 hidden lg:block">Património Literário</span>
+                    </div>
                 </div>
-                <div className="flex gap-6 relative z-10 mt-2 md:mt-0">
-                    {user ? (
-                        <div className="flex items-center gap-4">
-                            <span className="text-brand-primary">Membro: <span className="text-white">{user.name}</span></span>
-                            <button onClick={onLogout} className="hover:text-brand-primary flex items-center gap-2 transition-all hover:scale-105 active:scale-95" title="Terminar Sessão">
-                                <LogOut className="w-3.5 h-3.5" /> Terminar
+
+                {/* 2. Primary Navigation - Centered & Modern */}
+                <nav className="hidden md:flex items-center gap-10">
+                    {navLinks.map((link) => {
+                        const isActive = (link.path === '/' && currentView === '/') || (link.path !== '/' && currentView.startsWith(link.path));
+                        return (
+                            <button
+                                key={link.path}
+                                onClick={() => onNavigate(link.path)}
+                                className={`text-sm font-bold uppercase tracking-widest transition-colors relative py-2 ${isActive ? 'text-brand-primary' : 'text-brand-dark/70 hover:text-brand-dark'
+                                    }`}
+                            >
+                                {link.name}
+                                {isActive && (
+                                    <m.div layoutId="navUnderline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-primary" />
+                                )}
                             </button>
-                        </div>
-                    ) : (
-                        <div className="flex items-center gap-6">
-                            <button onClick={() => onNavigate('/login?mode=login')} className="hover:text-brand-primary transition-all font-black" title="Entrar na minha conta">Acesso</button>
-                            <span className="opacity-10">|</span>
-                            <button onClick={() => onNavigate('/login?mode=register')} className="hover:text-brand-primary transition-all font-black" title="Criar uma nova conta">Registo</button>
-                        </div>
-                    )}
-                </div>
-            </div>
+                        );
+                    })}
+                </nav>
 
-            {/* Main Header Area - OPUS 3-Column Layout */}
-            <div className="py-2 md:py-4 px-4 md:px-8 flex justify-between items-center bg-white/80 backdrop-blur-xl border-b border-gray-100/50 relative">
-                {/* Column 1: Brand & Mobile Menu */}
-                <div className="flex items-center gap-4 md:w-1/4">
+                {/* 3. Actions - Minimalist Icons */}
+                <div className="flex items-center gap-4 md:gap-6">
                     <button
-                        className="md:hidden text-brand-dark p-2 hover:bg-gray-100 rounded-xl transition-all"
-                        onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        aria-label="Menu"
-                    >
-                        {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-                    </button>
-
-                    <m.div
-                        whileHover={{ scale: 1.02 }}
-                        className="flex items-center gap-3 cursor-pointer group"
-                        onClick={() => onNavigate('HOME')}
-                    >
-                        <img src={logo} alt="Editora Graça" className="h-8 md:h-12 w-auto object-contain transition-transform duration-500 group-hover:rotate-3" />
-                        <div className="hidden lg:flex flex-col">
-                            <span className="font-serif font-black text-brand-dark text-lg leading-none tracking-tighter">EDITORA <span className="text-brand-primary">GRAÇA</span></span>
-                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400">Património Literário</span>
-                        </div>
-                    </m.div>
-                </div>
-
-                {/* Column 2: Integrated Search (Center) */}
-                <div className="hidden md:flex flex-1 max-w-xl mx-8">
-                    <form onSubmit={handleSearch} className="w-full relative group">
-                        <div className="absolute inset-0 bg-brand-primary/5 blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity rounded-full"></div>
-                        <input
-                            type="text"
-                            placeholder="Pesquisar por título, autor ou género..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-12 pr-6 py-3 bg-gray-50/50 border border-gray-100 focus:bg-white focus:border-brand-primary/30 rounded-full text-sm font-medium transition-all outline-none relative z-10"
-                        />
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-brand-primary transition-colors z-10" />
-                    </form>
-                </div>
-
-                {/* Column 3: Actions (Right) */}
-                <div className="flex items-center justify-end gap-2 md:gap-4 md:w-1/4">
-                    <button
-                        className="md:hidden text-brand-dark p-2 hover:bg-gray-100 rounded-xl"
                         onClick={() => setIsSearchOpen(!isSearchOpen)}
+                        className="p-2 text-brand-dark/80 hover:text-brand-primary transition-colors rounded-full hover:bg-gray-50"
                         aria-label="Pesquisar"
                     >
                         <Search className="w-5 h-5" />
                     </button>
-                    <m.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => {
-                            if (!user) {
-                                onNavigate('/login?mode=login');
-                            } else {
-                                const dashboardView = user.role === 'adm' ? 'ADMIN' :
-                                    (user.role === 'autor' ? 'AUTHOR_DASHBOARD' : 'READER_DASHBOARD');
-                                onNavigate(dashboardView);
-                            }
-                        }}
-                        className="text-brand-dark hover:text-brand-primary transition-all flex items-center gap-3 p-2.5 hover:bg-gray-50 rounded-2xl relative group"
-                        title="Minha Conta"
+
+                    <button
+                        onClick={() => user ? onNavigate(user.role === 'adm' ? 'ADMIN' : 'READER_DASHBOARD') : onNavigate('/login?mode=login')}
+                        className="p-2 text-brand-dark/80 hover:text-brand-primary transition-colors rounded-full hover:bg-gray-50"
+                        title={user ? "Minha Conta" : "Entrar"}
                     >
-                        <User className="w-5 h-5 transition-transform group-hover:scale-110" />
-                    </m.button>
+                        <User className="w-5 h-5" />
+                    </button>
 
-                    <div className="relative">
-                        <m.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                            className="text-brand-dark hover:text-brand-primary transition-all p-2.5 hover:bg-gray-50 rounded-2xl relative group"
-                            title="Notificações"
-                            aria-label="Ver notificações"
-                        >
-                            <Bell className="w-5 h-5" />
-                            {unreadCount > 0 && (
-                                <span className="absolute -top-1 -right-1 bg-brand-primary text-white text-[9px] font-black w-5 h-5 rounded-full flex items-center justify-center ring-4 ring-white shadow-xl animate-pulse">
-                                    {unreadCount}
-                                </span>
-                            )}
-                        </m.button>
-
-                        <AnimatePresence>
-                            {isNotificationsOpen && (
-                                <m.div
-                                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                    exit={{ opacity: 0, y: 20, scale: 0.95 }}
-                                    className="absolute right-0 mt-6 w-96 glass-premium rounded-[2.5rem] border border-white shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] z-[100] overflow-hidden"
-                                >
-                                    <div className="p-8 border-b border-gray-100 flex items-center justify-between bg-gradient-to-br from-white to-gray-50">
-                                        <h4 className="font-black text-brand-dark uppercase tracking-widest text-xs">Centro de Avisos</h4>
-                                        <button
-                                            onClick={() => setIsNotificationsOpen(false)}
-                                            className="text-[10px] text-brand-primary font-black uppercase tracking-widest hover:opacity-70 transition-opacity"
-                                            title="Limpar todas as notificações"
-                                            aria-label="Limpar todas as notificações"
-                                        >
-                                            Limpar
-                                        </button>
-                                    </div>
-                                    <div className="max-h-[30rem] overflow-y-auto custom-scrollbar">
-                                        {notifications.length > 0 ? (
-                                            notifications.map(n => (
-                                                <m.div
-                                                    key={n.id}
-                                                    initial={{ opacity: 0 }}
-                                                    animate={{ opacity: 1 }}
-                                                    onClick={() => {
-                                                        handleMarkRead(n.id);
-                                                        if (n.link) onNavigate(n.link as any);
-                                                        setIsNotificationsOpen(false);
-                                                    }}
-                                                    className={`p-6 hover:bg-brand-primary/5 cursor-pointer border-b border-gray-50 transition-all flex items-start gap-4 ${!n.isRead ? 'bg-brand-primary/[0.02]' : ''}`}
-                                                >
-                                                    <div className={`w-3 h-3 rounded-full mt-2 flex-shrink-0 ${!n.isRead ? 'bg-brand-primary shadow-[0_0_10px_rgba(196,160,82,0.5)]' : 'bg-gray-200'}`}></div>
-                                                    <div className="space-y-1">
-                                                        <p className="font-black text-brand-dark text-xs uppercase tracking-tight leading-tight">{n.title}</p>
-                                                        <p className="text-gray-500 text-[11px] leading-relaxed font-bold opacity-80">{n.content}</p>
-                                                        <span className="text-[10px] text-gray-300 font-black block pt-2">{new Date(n.createdAt).toLocaleDateString()}</span>
-                                                    </div>
-                                                </m.div>
-                                            ))
-                                        ) : (
-                                            <div className="p-16 text-center">
-                                                <div className="w-20 h-20 bg-gray-50 rounded-[2rem] flex items-center justify-center mx-auto mb-6">
-                                                    <Bell className="w-10 h-10 text-gray-200" />
-                                                </div>
-                                                <p className="text-[11px] text-gray-400 font-black uppercase tracking-[0.3em] leading-loose">Silêncio Absoluto<br /><span className="opacity-50 font-bold">Sem novas atualizações</span></p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </m.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-
-                    <m.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="text-white bg-brand-dark hover:bg-brand-primary transition-all p-2.5 rounded-2xl relative group shadow-lg"
+                    <button
                         onClick={() => onNavigate('CHECKOUT')}
+                        className="relative p-2 text-brand-dark/80 hover:text-brand-primary transition-colors rounded-full hover:bg-gray-50"
                     >
                         <ShoppingBag className="w-5 h-5" />
                         {cartCount > 0 && (
-                            <span className="absolute -top-1 -right-1 bg-white text-brand-dark text-[10px] font-black w-6 h-6 rounded-full flex items-center justify-center ring-4 ring-brand-dark shadow-2xl">
+                            <span className="absolute top-1 right-1 w-4 h-4 bg-brand-primary text-white text-[9px] font-black flex items-center justify-center rounded-full">
                                 {cartCount}
                             </span>
                         )}
-                    </m.button>
+                    </button>
+
+                    <button
+                        className="md:hidden p-2 text-brand-dark"
+                        onClick={() => setIsMenuOpen(true)}
+                    >
+                        <Menu className="w-6 h-6" />
+                    </button>
                 </div>
             </div>
 
-            {/* Search Bar Overlay - Elegant Expansion */}
-            <AnimatePresence>
-                {isSearchOpen && (
-                    <m.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="bg-white/95 backdrop-blur-xl border-b border-gray-100 overflow-hidden"
-                    >
-                        <form onSubmit={handleSearch} className="container mx-auto max-w-5xl py-12 px-8 relative">
-                            <m.div
-                                initial={{ scale: 0.9, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                className="relative"
-                            >
-                                <Search className="absolute left-8 top-1/2 -translate-y-1/2 w-8 h-8 text-brand-primary/40" />
-                                <input
-                                    autoFocus
-                                    type="text"
-                                    placeholder="Qual obra busca hoje?"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full pl-24 pr-16 py-6 md:py-8 bg-gray-50 border-transparent focus:bg-white text-3xl md:text-5xl lg:text-6xl font-black text-brand-dark placeholder:text-gray-200 outline-none transition-all rounded-[2rem] md:rounded-[3rem] tracking-tighter italic font-serif"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setIsSearchOpen(false)}
-                                    className="absolute right-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-gray-100 rounded-full text-gray-400 hover:text-brand-dark hover:bg-gray-200 transition-all"
-                                    title="Fechar Pesquisa"
-                                    aria-label="Fechar Pesquisa"
-                                >
-                                    <X className="w-6 h-6" />
-                                </button>
-                            </m.div>
-                            <div className="mt-8 flex gap-6 px-12">
-                                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-300">Sugestões:</span>
-                                <div className="flex gap-4">
-                                    {['Obras Primas', 'Novos Talentos', 'Ensaios'].map(tag => (
-                                        <button key={tag} title={`Pesquisar por ${tag}`} className="text-[10px] font-black uppercase tracking-widest text-brand-primary hover:underline">{tag}</button>
-                                    ))}
-                                </div>
-                            </div>
-                        </form>
-                    </m.div>
-                )}
-            </AnimatePresence>
-
-            {/* Navigation Menu Area - Desktop - Sophisticated Links */}
-            <nav className="hidden md:flex bg-white/20 py-5 px-8 justify-center border-b border-gray-100/30 backdrop-blur-md">
-                <ul className="flex gap-12 lg:gap-20 font-black text-[11px] uppercase tracking-[0.4em] text-gray-400">
-                    {navLinks.map((link) => {
-                        const isActive = (link.path === '/' && currentView === '/') || (link.path !== '/' && currentView.startsWith(link.path));
-                        return (
-                            <li key={link.path}>
-                                <button
-                                    onClick={() => onNavigate(link.path)}
-                                    className={`hover:text-brand-primary transition-all relative pb-3 group ${isActive ? 'text-brand-primary text-gradient-gold' : ''}`}
-                                >
-                                    {link.name}
-                                    <m.span
-                                        layoutId="navTab"
-                                        className={`absolute bottom-0 left-0 h-1 bg-brand-primary rounded-full transition-all duration-500 ${isActive ? 'w-full' : 'w-0 group-hover:w-full opacity-30'}`}
-                                    ></m.span>
-                                </button>
-                            </li>
-                        );
-                    })}
-                </ul>
-            </nav>
-
-            {/* Mobile Menu - Immersive Drawer */}
+            {/* Mobile Menu Drawer */}
             <AnimatePresence>
                 {isMenuOpen && (
                     <m.div
-                        initial={{ x: '-100%' }}
+                        initial={{ x: '100%' }}
                         animate={{ x: 0 }}
-                        exit={{ x: '-100%' }}
-                        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                        className="fixed inset-0 z-[100] md:hidden"
+                        exit={{ x: '100%' }}
+                        transition={{ type: "tween", duration: 0.3 }}
+                        className="fixed inset-0 z-[60] bg-white flex flex-col pt-8 px-8 md:hidden shadow-2xl"
                     >
-                        <div className="absolute inset-0 bg-brand-dark/60 backdrop-blur-sm" onClick={() => setIsMenuOpen(false)}></div>
-                        <div className="absolute top-0 left-0 bottom-0 w-[85%] bg-white shadow-2xl flex flex-col p-10">
-                            <div className="flex justify-between items-center mb-16">
-                                <img src={logo} alt="Logo" className="h-10 w-auto" />
+                        <div className="flex justify-between items-center mb-12">
+                            <span className="font-serif font-black text-2xl text-brand-dark">MENU</span>
+                            <button onClick={() => setIsMenuOpen(false)} className="p-2 bg-gray-50 rounded-full">
+                                <X className="w-6 h-6 text-brand-dark" />
+                            </button>
+                        </div>
+                        <div className="flex flex-col gap-6">
+                            {navLinks.map((link, idx) => (
                                 <button
-                                    onClick={() => setIsMenuOpen(false)}
-                                    className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-brand-dark active:scale-95"
-                                    title="Fechar Menu"
-                                    aria-label="Fechar Menu"
+                                    key={link.path}
+                                    onClick={() => { setIsMenuOpen(false); onNavigate(link.path); }}
+                                    className="text-2xl font-black text-brand-dark text-left uppercase tracking-tight py-4 border-b border-gray-100 last:border-0"
                                 >
-                                    <X className="w-6 h-6" />
+                                    {link.name}
                                 </button>
-                            </div>
-
-                            <ul className="space-y-4">
-                                {navLinks.map((link) => {
-                                    const isActive = (link.path === '/' && currentView === '/') || (link.path !== '/' && currentView?.startsWith(link.path));
-                                    return (
-                                        <li key={link.path}>
-                                            <m.button
-                                                initial={{ opacity: 0, x: -20 }}
-                                                animate={{ opacity: 1, x: 0 }}
-                                                onClick={() => {
-                                                    setIsMenuOpen(false);
-                                                    onNavigate(link.path);
-                                                }}
-                                                className={`w-full text-left px-8 py-6 rounded-3xl text-sm font-black uppercase tracking-[0.3em] transition-all flex items-center justify-between group ${isActive
-                                                    ? 'bg-brand-primary text-white shadow-xl shadow-brand-primary/20'
-                                                    : 'text-gray-500 hover:bg-gray-50'
-                                                    }`}
-                                                title={`Ir para ${link.name}`}
-                                                aria-label={`Ir para ${link.name}`}
-                                            >
-                                                {link.name}
-                                                <ArrowRight className={`w-5 h-5 opacity-0 group-hover:opacity-100 transition-all ${isActive ? 'opacity-100' : ''}`} />
-                                            </m.button>
-                                        </li>
-                                    );
-                                })}
-                            </ul>
-
-                            <div className="mt-auto pt-10 border-t border-gray-100">
-                                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-300 mb-6">Membro Graça</p>
-                                {user ? (
-                                    <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-[1.5rem]">
-                                        <div className="w-12 h-12 bg-brand-primary rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg">
-                                            {user.name.charAt(0)}
-                                        </div>
-                                        <div className="flex-1">
-                                            <p className="text-sm font-black text-brand-dark leading-none">{user.name}</p>
-                                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1">Escritor de Elite</p>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <button
-                                        onClick={() => {
-                                            setIsMenuOpen(false);
-                                            onNavigate('/login?mode=login');
-                                        }}
-                                        className="w-full py-6 bg-brand-dark text-white rounded-[1.5rem] font-black uppercase tracking-[0.4em] text-[10px] shadow-2xl shadow-brand-dark/20"
-                                        title="Entrar ou Registar"
-                                        aria-label="Entrar ou Registar"
-                                    >
-                                        Aceder à Casa
-                                    </button>
-                                )}
-                            </div>
+                            ))}
                         </div>
                     </m.div>
                 )}
             </AnimatePresence>
-        </header >
+
+            {/* Search Overlay */}
+            <AnimatePresence>
+                {isSearchOpen && (
+                    <m.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="absolute top-full left-0 right-0 bg-white border-b border-gray-100 shadow-xl py-6 px-4 md:px-12 flex justify-center"
+                    >
+                        <form onSubmit={handleSearch} className="w-full max-w-3xl relative">
+                            <input
+                                autoFocus
+                                type="text"
+                                placeholder="O que procura..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full pl-6 pr-14 py-4 bg-gray-50 rounded-xl text-lg font-medium outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all font-sans"
+                            />
+                            <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 text-brand-primary font-bold uppercase text-xs tracking-widest">
+                                Buscar
+                            </button>
+                        </form>
+                    </m.div>
+                )}
+            </AnimatePresence>
+        </header>
     );
 };
 

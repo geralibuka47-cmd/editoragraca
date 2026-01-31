@@ -2,18 +2,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;1,400&family=Montserrat:ital,wght@0,300;0,400;0,600;0,700;0,900;1,400&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap');
 
 @theme {
-    --color-brand-primary: #C0A062;
-    /* Dourado Muted Premium */
-    --color-brand-dark: #111827;
-    /* Charcoal Profundo (Neutral) */
-    --color-brand-light: #FAFAFA;
-    /* Off-White Quente */
-    --color-brand-accent: #1F2937;
-    /* Cinza Escuro */
-    --color-brand-black: #0A0A0A;
-    /* Preto Quase Absoluto */
-    --color-brand-gray: #6B7280;
-    /* Cinza Neutro */
+    --color-brand-primary: #B78628;
+    /* Dourado Institucional (Sharper) */
+    --color-brand-dark: #0F172A;
+    /* Slate 900 (Tech Navy) */
+    --color-brand-light: #FFFFFF;
+    /* Pure White */
+    --color-brand-accent: #334155;
+    /* Slate 700 */
+    --color-brand-black: #020617;
+    /* Slate 950 */
+    --color-brand-gray: #64748B;
+    /* Slate 500 */
 
     --font-serif: "Montserrat", sans-serif;
     --font-body: "Open Sans", sans-serif;
