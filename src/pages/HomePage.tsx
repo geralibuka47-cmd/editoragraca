@@ -114,55 +114,48 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
 
     return (
         <div className="relative overflow-x-hidden bg-[#F8FAFC]">
-            {/* Hero Section */}
-            <section className="relative min-h-screen flex items-center overflow-hidden bg-brand-dark pt-20">
-                {/* Immersive Background Elements */}
-                <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_70%_30%,_rgba(196,160,82,0.1)_0%,_transparent_70%)] pointer-events-none"></div>
-                <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-brand-dark via-brand-dark/50 to-transparent z-10"></div>
+            {/* Hero Section - OPUS Style */}
+            <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-white pt-20">
+                {/* Immersive Background Elements - OPUS Style */}
+                <div className="absolute inset-0 bg-gradient-to-br from-white via-white to-brand-primary/5 pointer-events-none"></div>
+                <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_70%_30%,_rgba(196,160,82,0.03)_0%,_transparent_70%)] pointer-events-none"></div>
 
-                <m.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 2, ease: "easeOut" }}
-                    className="absolute -top-[10%] -right-[5%] w-[80%] aspect-square bg-[#C4A052]/5 rounded-full blur-[120px] pointer-events-none"
-                ></m.div>
-
-                <div className="container mx-auto px-6 md:px-8 grid lg:grid-cols-2 items-center gap-16 md:gap-32 py-20 relative z-20">
+                <div className="container mx-auto px-6 md:px-8 grid lg:grid-cols-2 lg:items-center gap-16 md:gap-32 py-12 md:py-20 relative z-20">
                     <m.div
                         initial="hidden"
                         animate="visible"
                         variants={containerVariants}
-                        className="space-y-8 md:space-y-12 text-center lg:text-left"
+                        className="space-y-6 md:space-y-10 text-center lg:text-left"
                     >
-                        <m.div variants={itemVariants} className="inline-flex items-center gap-4 px-6 py-2.5 bg-white/5 backdrop-blur-md rounded-full border border-white/10 text-brand-primary font-black tracking-[0.4em] uppercase text-[10px] md:text-xs">
-                            {upcomingLaunch ? <Clock className="w-4 h-4 animate-pulse" /> : <Sparkles className="w-4 h-4" />}
-                            <span>{upcomingLaunch ? 'Brevemente: Obra Prima' : 'Legado Editorial de Elite'}</span>
+                        <m.div variants={itemVariants} className="inline-flex items-center gap-4 px-5 py-2 bg-brand-dark/5 backdrop-blur-md rounded-full border border-gray-100 text-brand-primary font-black tracking-[0.4em] uppercase text-[9px] md:text-[10px]">
+                            {upcomingLaunch ? <Clock className="w-3.5 h-3.5 animate-pulse" /> : <Sparkles className="w-3.5 h-3.5" />}
+                            <span>{upcomingLaunch ? 'Brevemente' : 'Legado Editorial'}</span>
                         </m.div>
 
-                        <m.h1 variants={itemVariants} className="text-4xl sm:text-6xl md:text-[6rem] lg:text-[7.5rem] font-black leading-[0.9] text-white tracking-tighter">
+                        <m.h1 variants={itemVariants} className="text-5xl sm:text-7xl md:text-[5rem] lg:text-[6.5rem] font-black leading-[1] text-brand-dark tracking-tighter">
                             {upcomingLaunch ? (
                                 <>
-                                    <span className="text-gradient-gold uppercase text-[0.35em] block tracking-[0.2em] mb-3 md:mb-4">O Próximo</span>
+                                    <span className="text-gradient-gold uppercase text-[0.4em] block tracking-[0.2em] mb-4">O Próximo</span>
                                     <span className="italic font-serif font-normal">{upcomingLaunch.title}</span>
                                 </>
                             ) : (
                                 <>
                                     {siteContent['hero.title'] || "Onde a Arte"} <br />
-                                    <span className="text-gradient-gold italic font-serif font-normal text-[0.85em] lowercase">{siteContent['hero.subtitle'] || "Encontra o Legado"}</span>
+                                    <span className="text-gradient-gold italic font-serif font-normal text-[0.9em] lowercase">{siteContent['hero.subtitle'] || "Encontra o Legado"}</span>
                                 </>
                             )}
                         </m.h1>
 
-                        <m.p variants={itemVariants} className="text-lg md:text-xl text-gray-400 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium opacity-80">
+                        <m.p variants={itemVariants} className="text-reading max-w-xl mx-auto lg:mx-0 opacity-80">
                             {upcomingLaunch
                                 ? (upcomingLaunch.description || '').slice(0, 150) + '...'
                                 : (siteContent['hero.description'] || "Curadoria de excelência para leitores que exigem o extraordinário. Literatura angolana elevada ao patamar mundial.")
                             }
                         </m.p>
 
-                        <m.div variants={itemVariants} className="flex flex-col sm:flex-row justify-center lg:justify-start gap-6 pt-6">
+                        <m.div variants={itemVariants} className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 pt-4">
                             <button
-                                className="w-full sm:w-auto py-7 px-12 bg-white text-brand-dark rounded-[1.5rem] font-black uppercase text-[11px] tracking-[0.3em] hover:bg-brand-primary hover:text-white hover:scale-105 transition-all shadow-2xl flex items-center justify-center gap-4 group"
+                                className="w-full sm:w-auto py-5 px-10 bg-brand-dark text-white rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] hover:bg-brand-primary hover:scale-105 transition-all shadow-xl shadow-brand-dark/10 flex items-center justify-center gap-4 group"
                                 onClick={() => upcomingLaunch ? onViewDetails(upcomingLaunch) : navigate('/livros')}
                             >
                                 {upcomingLaunch ? 'Garantir Exemplar' : 'Explorar o Acervo'}
@@ -171,7 +164,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                             {!upcomingLaunch && (
                                 <button
                                     onClick={() => onNavigate('/sobre')}
-                                    className="w-full sm:w-auto py-7 px-12 glass-premium border border-white/10 text-white rounded-[1.5rem] font-black uppercase text-[11px] tracking-[0.3em] hover:bg-white/10 transition-all flex items-center justify-center"
+                                    className="w-full sm:w-auto py-5 px-10 bg-white border border-gray-100 text-brand-dark rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] hover:bg-gray-50 transition-all flex items-center justify-center"
                                 >
                                     Nossa Essência
                                 </button>
@@ -179,26 +172,26 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                         </m.div>
 
                         {/* High Impact Stats */}
-                        <m.div variants={itemVariants} className="flex items-center justify-center lg:justify-start gap-8 md:gap-16 pt-12 md:pt-16 border-t border-white/5">
+                        <m.div variants={itemVariants} className="flex items-center justify-center lg:justify-start gap-8 md:gap-12 pt-8 md:pt-12 border-t border-gray-100">
                             <div className="flex flex-col">
-                                <span className="text-3xl md:text-5xl font-black text-white tracking-tighter">
+                                <span className="text-3xl md:text-5xl font-black text-brand-dark tracking-tighter">
                                     {stats.booksCount > 0 ? (
                                         <m.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                                             {stats.booksCount}<span className="text-brand-primary italic">+</span>
                                         </m.span>
                                     ) : '...'}
                                 </span>
-                                <span className="text-[10px] uppercase tracking-[0.4em] text-gray-500 font-black mt-2">Obras de Arte</span>
+                                <span className="text-[9px] uppercase tracking-[0.3em] text-gray-400 font-black mt-2">Obras de Arte</span>
                             </div>
                             <div className="flex flex-col">
-                                <span className="text-3xl md:text-5xl font-black text-white tracking-tighter">
+                                <span className="text-3xl md:text-5xl font-black text-brand-dark tracking-tighter">
                                     {stats.readersCount > 0 ? (
                                         <m.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                                             {stats.readersCount}<span className="text-brand-primary italic">+</span>
                                         </m.span>
                                     ) : 'Mil+'}
                                 </span>
-                                <span className="text-[10px] uppercase tracking-[0.4em] text-gray-500 font-black mt-2">Leitores de Elite</span>
+                                <span className="text-[9px] uppercase tracking-[0.3em] text-gray-400 font-black mt-2">Leitores Fidelizados</span>
                             </div>
                         </m.div>
                     </m.div>
@@ -209,44 +202,44 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                         transition={{ duration: 1, delay: 0.3 }}
                         className="relative hidden lg:block"
                     >
-                        <div className="relative z-10 w-full aspect-[4/5] bg-brand-dark rounded-[4rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] overflow-hidden border-[1px] border-white/10 group cursor-pointer" onClick={() => featuredBook && onViewDetails(featuredBook)}>
+                        <div className="relative z-10 w-full aspect-[3/4] max-w-[440px] ml-auto bg-gray-50 rounded-[2.5rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.1)] overflow-hidden border border-gray-100 group cursor-pointer" onClick={() => featuredBook && onViewDetails(featuredBook)}>
                             {featuredBook?.coverUrl ? (
                                 <img
                                     src={featuredBook.coverUrl}
                                     alt={featuredBook.title}
                                     loading="eager"
-                                    className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-110"
+                                    className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-105"
                                 />
                             ) : (
-                                <div className="flex flex-col items-center justify-center h-full bg-brand-light/5">
-                                    <BookOpen className="w-32 h-32 text-white/5" />
+                                <div className="flex flex-col items-center justify-center h-full bg-gray-50">
+                                    <BookOpen className="w-32 h-32 text-gray-200" />
                                 </div>
                             )}
-                            <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 flex items-end p-16">
-                                <div className="space-y-4 translate-y-8 group-hover:translate-y-0 transition-transform duration-700">
-                                    <h4 className="text-white font-black text-4xl uppercase leading-none tracking-tighter">{featuredBook?.title}</h4>
-                                    <p className="text-gradient-gold font-serif italic text-xl">Por {featuredBook?.author}</p>
-                                    <span className="inline-flex items-center gap-3 text-white font-black text-xs uppercase tracking-[0.3em] pt-4">
-                                        Explorar Obra <ArrowRight className="w-5 h-5" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 flex items-end p-12">
+                                <div className="space-y-3 translate-y-8 group-hover:translate-y-0 transition-transform duration-700">
+                                    <h4 className="text-white font-black text-3xl uppercase leading-none tracking-tighter">{featuredBook?.title}</h4>
+                                    <p className="text-brand-primary font-serif italic text-lg">Por {featuredBook?.author}</p>
+                                    <span className="inline-flex items-center gap-3 text-white font-black text-[10px] uppercase tracking-[0.3em] pt-4 border-b border-brand-primary/0 group-hover:border-brand-primary transition-all">
+                                        Explorar Obra <ArrowRight className="w-4 h-4" />
                                     </span>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Floating Metadata Card */}
+                        {/* Floating Metadata Card - Refined */}
                         <m.div
-                            animate={{ y: [0, -20, 0] }}
+                            animate={{ y: [0, -15, 0] }}
                             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                            className="absolute -bottom-12 -left-12 glass-premium p-8 rounded-[2.5rem] shadow-2xl border border-white/20 z-30 group"
+                            className="absolute bottom-12 -left-12 bg-white p-6 rounded-[2rem] shadow-xl border border-gray-100 z-30 group"
                         >
-                            <div className="flex items-center gap-6">
-                                <div className="w-20 h-20 bg-brand-primary text-white flex items-center justify-center rounded-[1.5rem] shadow-[0_10px_30px_rgba(196,160,82,0.4)] group-hover:rotate-12 transition-transform duration-500">
-                                    {upcomingLaunch ? <Clock className="w-10 h-10" /> : <Trophy className="w-10 h-10" />}
+                            <div className="flex items-center gap-5">
+                                <div className="w-16 h-16 bg-brand-dark text-brand-primary flex items-center justify-center rounded-2xl shadow-lg group-hover:rotate-6 transition-transform">
+                                    {upcomingLaunch ? <Clock className="w-8 h-8" /> : <Trophy className="w-8 h-8" />}
                                 </div>
                                 <div>
-                                    <h5 className="font-serif font-black text-3xl text-white italic leading-none">{upcomingLaunch ? 'Countdown' : 'Bestseller'}</h5>
-                                    <p className="text-[10px] uppercase tracking-[0.4em] text-brand-primary font-black pt-3">
-                                        {upcomingLaunch ? 'Lançamento Global' : 'Crítica Aclamada'}
+                                    <h5 className="font-serif font-black text-2xl text-brand-dark italic leading-none">{upcomingLaunch ? 'Countdown' : 'Bestseller'}</h5>
+                                    <p className="text-[9px] uppercase tracking-[0.3em] text-brand-primary font-black pt-2">
+                                        {upcomingLaunch ? 'Lançamento Breve' : 'Mérito Editorial'}
                                     </p>
                                 </div>
                             </div>
@@ -435,49 +428,51 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
             </m.section>
 
             {/* Testimonials - Immersive Design */}
-            {testimonials.length > 0 && (
-                <m.section
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    variants={containerVariants}
-                    className="py-24 md:py-48 bg-[#F8FAFC] overflow-hidden optimize-render"
-                >
-                    <div className="container mx-auto px-6 md:px-8">
-                        <m.div variants={itemVariants} className="text-center mb-20 md:mb-32">
-                            <span className="text-brand-primary text-[10px] md:text-xs font-black uppercase tracking-[0.5em] block mb-6 md:mb-8 text-center">Vozes da Autoridade</span>
-                            <h2 className="text-4xl sm:text-5xl md:text-7xl lg:text-[7rem] font-black text-brand-dark tracking-tighter leading-[0.9] uppercase text-center">
-                                Reverberação <br />
-                                <span className="text-gradient-gold italic font-serif lowercase">Eternizada</span>
-                            </h2>
-                        </m.div>
+            {
+                testimonials.length > 0 && (
+                    <m.section
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        variants={containerVariants}
+                        className="py-24 md:py-48 bg-[#F8FAFC] overflow-hidden optimize-render"
+                    >
+                        <div className="container mx-auto px-6 md:px-8">
+                            <m.div variants={itemVariants} className="text-center mb-20 md:mb-32">
+                                <span className="text-brand-primary text-[10px] md:text-xs font-black uppercase tracking-[0.5em] block mb-6 md:mb-8 text-center">Vozes da Autoridade</span>
+                                <h2 className="text-4xl sm:text-5xl md:text-7xl lg:text-[7rem] font-black text-brand-dark tracking-tighter leading-[0.9] uppercase text-center">
+                                    Reverberação <br />
+                                    <span className="text-gradient-gold italic font-serif lowercase">Eternizada</span>
+                                </h2>
+                            </m.div>
 
-                        <div className="grid md:grid-cols-3 gap-12 md:gap-16">
-                            {testimonials.map((t, idx) => (
-                                <m.div
-                                    key={t.id || idx}
-                                    variants={itemVariants}
-                                    className="glass-premium p-12 md:p-16 rounded-[4rem] relative group border border-white shadow-2xl hover:-translate-y-4 transition-all duration-700"
-                                >
-                                    <div className="absolute -top-8 left-16 w-20 h-20 bg-brand-dark text-brand-primary rounded-[1.5rem] flex items-center justify-center shadow-2xl border-4 border-white">
-                                        <Star className="w-8 h-8 fill-current" />
-                                    </div>
-                                    <p className="text-gray-600 italic font-black text-2xl mb-12 leading-relaxed opacity-90 border-l-4 border-brand-primary/20 pl-8">"{t.content}"</p>
-                                    <div className="flex items-center gap-6">
-                                        <div className="w-20 h-20 rounded-[1.5rem] overflow-hidden bg-brand-dark shadow-2xl grayscale group-hover:grayscale-0 transition-all duration-700">
-                                            {t.photoUrl ? <img src={t.photoUrl} alt={t.name} className="w-full h-full object-cover" /> : <Users className="w-full h-full p-6 text-white/10" />}
+                            <div className="grid md:grid-cols-3 gap-12 md:gap-16">
+                                {testimonials.map((t, idx) => (
+                                    <m.div
+                                        key={t.id || idx}
+                                        variants={itemVariants}
+                                        className="glass-premium p-12 md:p-16 rounded-[4rem] relative group border border-white shadow-2xl hover:-translate-y-4 transition-all duration-700"
+                                    >
+                                        <div className="absolute -top-8 left-16 w-20 h-20 bg-brand-dark text-brand-primary rounded-[1.5rem] flex items-center justify-center shadow-2xl border-4 border-white">
+                                            <Star className="w-8 h-8 fill-current" />
                                         </div>
-                                        <div>
-                                            <h4 className="font-black text-brand-dark text-2xl tracking-tighter uppercase">{t.name}</h4>
-                                            <p className="text-[10px] uppercase tracking-[0.4em] text-brand-primary font-black mt-2">{t.role}</p>
+                                        <p className="text-gray-600 italic font-black text-2xl mb-12 leading-relaxed opacity-90 border-l-4 border-brand-primary/20 pl-8">"{t.content}"</p>
+                                        <div className="flex items-center gap-6">
+                                            <div className="w-20 h-20 rounded-[1.5rem] overflow-hidden bg-brand-dark shadow-2xl grayscale group-hover:grayscale-0 transition-all duration-700">
+                                                {t.photoUrl ? <img src={t.photoUrl} alt={t.name} className="w-full h-full object-cover" /> : <Users className="w-full h-full p-6 text-white/10" />}
+                                            </div>
+                                            <div>
+                                                <h4 className="font-black text-brand-dark text-2xl tracking-tighter uppercase">{t.name}</h4>
+                                                <p className="text-[10px] uppercase tracking-[0.4em] text-brand-primary font-black mt-2">{t.role}</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                </m.div>
-                            ))}
+                                    </m.div>
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                </m.section>
-            )}
+                    </m.section>
+                )
+            }
 
             {/* Newsletter - Closing with Elegance */}
             <m.section

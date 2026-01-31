@@ -90,41 +90,55 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                 </div>
             </div>
 
-            {/* Main Header Area - High Aesthetics */}
-            <div className="py-4 md:py-6 px-4 md:px-8 flex justify-between items-center bg-white/20 backdrop-blur-xl relative">
-                <div className="w-1/4 md:w-1/3 flex gap-6 items-center">
+            {/* Main Header Area - OPUS 3-Column Layout */}
+            <div className="py-2 md:py-4 px-4 md:px-8 flex justify-between items-center bg-white/80 backdrop-blur-xl border-b border-gray-100/50 relative">
+                {/* Column 1: Brand & Mobile Menu */}
+                <div className="flex items-center gap-4 md:w-1/4">
                     <button
-                        className="md:hidden text-brand-dark p-3 bg-white/50 backdrop-blur-md rounded-2xl shadow-sm border border-white/20 transition-all active:scale-95"
+                        className="md:hidden text-brand-dark p-2 hover:bg-gray-100 rounded-xl transition-all"
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                         aria-label="Menu"
                     >
                         {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                     </button>
 
-                    <m.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="hidden md:flex items-center gap-3 text-gray-400 hover:text-brand-primary transition-all group px-4 py-2 rounded-2xl hover:bg-brand-primary/5 border border-transparent hover:border-brand-primary/10"
-                        title="Explorar Acervo"
-                        aria-label="Pesquisar livros"
-                        onClick={() => setIsSearchOpen(!isSearchOpen)}
+                    <m.div
+                        whileHover={{ scale: 1.02 }}
+                        className="flex items-center gap-3 cursor-pointer group"
+                        onClick={() => onNavigate('HOME')}
                     >
-                        <Search className={`w-5 h-5 transition-transform group-hover:rotate-12 ${isSearchOpen ? 'text-brand-primary' : ''}`} />
-                        <span className="text-[10px] font-black uppercase tracking-[0.3em] overflow-hidden whitespace-nowrap hidden lg:block">Procurar Obra</span>
-                    </m.button>
+                        <img src={logo} alt="Editora Graça" className="h-8 md:h-12 w-auto object-contain transition-transform duration-500 group-hover:rotate-3" />
+                        <div className="hidden lg:flex flex-col">
+                            <span className="font-serif font-black text-brand-dark text-lg leading-none tracking-tighter">EDITORA <span className="text-brand-primary">GRAÇA</span></span>
+                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400">Património Literário</span>
+                        </div>
+                    </m.div>
                 </div>
 
-                <m.button
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex-1 md:w-1/3 flex flex-col items-center cursor-pointer group"
-                    onClick={() => onNavigate('HOME')}
-                    title="Editora Graça"
-                >
-                    <img src={logo} alt="Editora Graça" className="h-8 md:h-12 lg:h-18 w-auto object-contain transition-transform duration-700 group-hover:scale-110 drop-shadow-2xl" />
-                </m.button>
+                {/* Column 2: Integrated Search (Center) */}
+                <div className="hidden md:flex flex-1 max-w-xl mx-8">
+                    <form onSubmit={handleSearch} className="w-full relative group">
+                        <div className="absolute inset-0 bg-brand-primary/5 blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity rounded-full"></div>
+                        <input
+                            type="text"
+                            placeholder="Pesquisar por título, autor ou género..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-12 pr-6 py-3 bg-gray-50/50 border border-gray-100 focus:bg-white focus:border-brand-primary/30 rounded-full text-sm font-medium transition-all outline-none relative z-10"
+                        />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-brand-primary transition-colors z-10" />
+                    </form>
+                </div>
 
-                <div className="w-1/4 md:w-1/3 flex justify-end gap-3 md:gap-6 items-center">
+                {/* Column 3: Actions (Right) */}
+                <div className="flex items-center justify-end gap-2 md:gap-4 md:w-1/4">
+                    <button
+                        className="md:hidden text-brand-dark p-2 hover:bg-gray-100 rounded-xl"
+                        onClick={() => setIsSearchOpen(!isSearchOpen)}
+                        aria-label="Pesquisar"
+                    >
+                        <Search className="w-5 h-5" />
+                    </button>
                     <m.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
@@ -137,13 +151,10 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                                 onNavigate(dashboardView);
                             }
                         }}
-                        className="text-brand-dark hover:text-brand-primary transition-all flex items-center gap-3 group p-2.5 bg-white/30 backdrop-blur-md rounded-2xl border border-white/40 shadow-sm"
-                        title="Ver o meu painel"
+                        className="text-brand-dark hover:text-brand-primary transition-all flex items-center gap-3 p-2.5 hover:bg-gray-50 rounded-2xl relative group"
+                        title="Minha Conta"
                     >
                         <User className="w-5 h-5 transition-transform group-hover:scale-110" />
-                        <span className="hidden lg:block text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 group-hover:text-brand-primary transition-colors">
-                            Painel
-                        </span>
                     </m.button>
 
                     <div className="relative">
@@ -151,11 +162,11 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                            className="text-brand-dark hover:text-brand-primary transition-all p-2.5 bg-white/30 backdrop-blur-md rounded-2xl border border-white/40 shadow-sm relative group"
+                            className="text-brand-dark hover:text-brand-primary transition-all p-2.5 hover:bg-gray-50 rounded-2xl relative group"
                             title="Notificações"
                             aria-label="Ver notificações"
                         >
-                            <Bell className="w-5 h-5 transition-transform group-hover:rotate-12" />
+                            <Bell className="w-5 h-5" />
                             {unreadCount > 0 && (
                                 <span className="absolute -top-1 -right-1 bg-brand-primary text-white text-[9px] font-black w-5 h-5 rounded-full flex items-center justify-center ring-4 ring-white shadow-xl animate-pulse">
                                     {unreadCount}
@@ -221,10 +232,10 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                     <m.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="text-brand-dark hover:text-brand-primary transition-all p-2.5 bg-brand-dark text-white rounded-2xl relative group shadow-xl shadow-brand-dark/10"
+                        className="text-white bg-brand-dark hover:bg-brand-primary transition-all p-2.5 rounded-2xl relative group shadow-lg"
                         onClick={() => onNavigate('CHECKOUT')}
                     >
-                        <ShoppingBag className="w-5 h-5 text-brand-primary" />
+                        <ShoppingBag className="w-5 h-5" />
                         {cartCount > 0 && (
                             <span className="absolute -top-1 -right-1 bg-white text-brand-dark text-[10px] font-black w-6 h-6 rounded-full flex items-center justify-center ring-4 ring-brand-dark shadow-2xl">
                                 {cartCount}

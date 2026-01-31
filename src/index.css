@@ -83,7 +83,7 @@
     }
 
     .glass-premium {
-        @apply bg-white/80 backdrop-blur-xl border border-white/20 shadow-2xl;
+        @apply bg-white/80 backdrop-blur-xl border border-white/50 shadow-[0_8px_32px_rgba(0, 0, 0, 0.05)];
     }
 
     .glass-dark {
@@ -112,6 +112,14 @@
 
     .text-gradient-gold {
         @apply bg-gradient-to-br from-[#C5A059] via-[#E5C185] to-[#B18942] bg-clip-text text-transparent;
+    }
+
+    .section-module {
+        @apply py-24 md:py-32 px-6 md:px-8 border-b border-gray-100/50;
+    }
+
+    .section-title {
+        @apply text-[10px] md:text-xs font-black uppercase tracking-[0.5em] text-brand-primary mb-6 block text-center md:text-left;
     }
 
     .text-reading {
