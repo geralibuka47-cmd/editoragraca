@@ -183,10 +183,10 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                                     className="absolute right-0 mt-6 w-96 glass-premium rounded-[2.5rem] border border-white shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] z-[100] overflow-hidden"
                                 >
                                     <div className="p-8 border-b border-gray-100 flex items-center justify-between bg-gradient-to-br from-white to-gray-50">
-                                        <h4 className="font-black text-brand-dark uppercase tracking-[0.3em] text-[11px]">Centro de Avisos</h4>
+                                        <h4 className="font-black text-brand-dark uppercase tracking-widest text-xs">Centro de Avisos</h4>
                                         <button
                                             onClick={() => setIsNotificationsOpen(false)}
-                                            className="text-[10px] text-brand-primary font-black uppercase tracking-wider hover:opacity-70 transition-opacity"
+                                            className="text-[10px] text-brand-primary font-black uppercase tracking-widest hover:opacity-70 transition-opacity"
                                             title="Limpar todas as notificações"
                                             aria-label="Limpar todas as notificações"
                                         >

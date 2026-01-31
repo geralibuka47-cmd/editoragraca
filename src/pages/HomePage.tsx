@@ -116,9 +116,9 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
         <div className="relative overflow-x-hidden bg-[#F8FAFC]">
             {/* Hero Section - OPUS Style */}
             <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-white pt-20">
-                {/* Immersive Background Elements - OPUS Style */}
-                <div className="absolute inset-0 bg-gradient-to-br from-white via-white to-brand-primary/5 pointer-events-none"></div>
-                <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_70%_30%,_rgba(196,160,82,0.03)_0%,_transparent_70%)] pointer-events-none"></div>
+                {/* Immersive Background Elements - RETIRED per user feedback */}
+                {/* <div className="absolute inset-0 bg-gradient-to-br from-white via-white to-brand-primary/5 pointer-events-none"></div> */}
+                {/* <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_70%_30%,_rgba(196,160,82,0.03)_0%,_transparent_70%)] pointer-events-none"></div> */}
 
                 <div className="container mx-auto px-6 md:px-8 grid lg:grid-cols-2 lg:items-center gap-16 md:gap-32 py-12 md:py-20 relative z-20">
                     <m.div
@@ -127,12 +127,12 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                         variants={containerVariants}
                         className="space-y-6 md:space-y-10 text-center lg:text-left"
                     >
-                        <m.div variants={itemVariants} className="inline-flex items-center gap-4 px-5 py-2 bg-brand-dark/5 backdrop-blur-md rounded-full border border-gray-100 text-brand-primary font-black tracking-[0.4em] uppercase text-[9px] md:text-[10px]">
-                            {upcomingLaunch ? <Clock className="w-3.5 h-3.5 animate-pulse" /> : <Sparkles className="w-3.5 h-3.5" />}
+                        <m.div variants={itemVariants} className="inline-flex items-center gap-4 px-4 py-1.5 bg-brand-dark/5 backdrop-blur-md rounded-full border border-gray-100 text-brand-primary font-bold tracking-widest uppercase text-[9px]">
+                            {upcomingLaunch ? <Clock className="w-3 h-3 animate-pulse" /> : <Sparkles className="w-3 h-3" />}
                             <span>{upcomingLaunch ? 'Brevemente' : 'Legado Editorial'}</span>
                         </m.div>
 
-                        <m.h1 variants={itemVariants} className="text-5xl sm:text-7xl md:text-[5rem] lg:text-[6.5rem] font-black leading-[1] text-brand-dark tracking-tighter">
+                        <m.h1 variants={itemVariants} className="text-5xl md:text-7xl lg:text-[5rem] font-black leading-[1.05] text-brand-dark tracking-tight">
                             {upcomingLaunch ? (
                                 <>
                                     <span className="text-gradient-gold uppercase text-[0.4em] block tracking-[0.2em] mb-4">O Próximo</span>
@@ -146,7 +146,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                             )}
                         </m.h1>
 
-                        <m.p variants={itemVariants} className="text-reading max-w-xl mx-auto lg:mx-0 opacity-80">
+                        <m.p variants={itemVariants} className="text-reading max-w-xl mx-auto lg:mx-0 opacity-80 text-lg">
                             {upcomingLaunch
                                 ? (upcomingLaunch.description || '').slice(0, 150) + '...'
                                 : (siteContent['hero.description'] || "Curadoria de excelência para leitores que exigem o extraordinário. Literatura angolana elevada ao patamar mundial.")
@@ -155,7 +155,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
 
                         <m.div variants={itemVariants} className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 pt-4">
                             <button
-                                className="w-full sm:w-auto py-5 px-10 bg-brand-dark text-white rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] hover:bg-brand-primary hover:scale-105 transition-all shadow-xl shadow-brand-dark/10 flex items-center justify-center gap-4 group"
+                                className="w-full sm:w-auto py-4 px-8 bg-brand-dark text-white rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-brand-primary hover:scale-105 transition-all shadow-xl shadow-brand-dark/10 flex items-center justify-center gap-4 group"
                                 onClick={() => upcomingLaunch ? onViewDetails(upcomingLaunch) : navigate('/livros')}
                             >
                                 {upcomingLaunch ? 'Garantir Exemplar' : 'Explorar o Acervo'}
@@ -171,27 +171,27 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                             )}
                         </m.div>
 
-                        {/* High Impact Stats */}
-                        <m.div variants={itemVariants} className="flex items-center justify-center lg:justify-start gap-8 md:gap-12 pt-8 md:pt-12 border-t border-gray-100">
+                        {/* High Impact Stats - Refined Spacing */}
+                        <m.div variants={itemVariants} className="flex items-center justify-center lg:justify-start gap-8 md:gap-12 pt-8 md:pt-10 border-t border-gray-100/50">
                             <div className="flex flex-col">
-                                <span className="text-3xl md:text-5xl font-black text-brand-dark tracking-tighter">
+                                <span className="text-3xl md:text-4xl font-black text-brand-dark tracking-tight">
                                     {stats.booksCount > 0 ? (
                                         <m.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                                             {stats.booksCount}<span className="text-brand-primary italic">+</span>
                                         </m.span>
                                     ) : '...'}
                                 </span>
-                                <span className="text-[9px] uppercase tracking-[0.3em] text-gray-400 font-black mt-2">Obras de Arte</span>
+                                <span className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mt-1">Obras de Arte</span>
                             </div>
                             <div className="flex flex-col">
-                                <span className="text-3xl md:text-5xl font-black text-brand-dark tracking-tighter">
+                                <span className="text-3xl md:text-4xl font-black text-brand-dark tracking-tight">
                                     {stats.readersCount > 0 ? (
                                         <m.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                                             {stats.readersCount}<span className="text-brand-primary italic">+</span>
                                         </m.span>
                                     ) : 'Mil+'}
                                 </span>
-                                <span className="text-[9px] uppercase tracking-[0.3em] text-gray-400 font-black mt-2">Leitores Fidelizados</span>
+                                <span className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mt-1">Leitores Fidelizados</span>
                             </div>
                         </m.div>
                     </m.div>
@@ -202,7 +202,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                         transition={{ duration: 1, delay: 0.3 }}
                         className="relative hidden lg:block"
                     >
-                        <div className="relative z-10 w-full aspect-[3/4] max-w-[440px] ml-auto bg-gray-50 rounded-[2.5rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.1)] overflow-hidden border border-gray-100 group cursor-pointer" onClick={() => featuredBook && onViewDetails(featuredBook)}>
+                        <div className="relative z-10 w-full aspect-[3/4] max-w-[400px] ml-auto bg-gray-50 rounded-[2rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] overflow-hidden border border-gray-100 group cursor-pointer" onClick={() => featuredBook && onViewDetails(featuredBook)}>
                             {featuredBook?.coverUrl ? (
                                 <img
                                     src={featuredBook.coverUrl}
@@ -212,36 +212,28 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                                 />
                             ) : (
                                 <div className="flex flex-col items-center justify-center h-full bg-gray-50">
-                                    <BookOpen className="w-32 h-32 text-gray-200" />
+                                    <BookOpen className="w-24 h-24 text-gray-200" />
                                 </div>
                             )}
-                            <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 flex items-end p-12">
-                                <div className="space-y-3 translate-y-8 group-hover:translate-y-0 transition-transform duration-700">
-                                    <h4 className="text-white font-black text-3xl uppercase leading-none tracking-tighter">{featuredBook?.title}</h4>
-                                    <p className="text-brand-primary font-serif italic text-lg">Por {featuredBook?.author}</p>
-                                    <span className="inline-flex items-center gap-3 text-white font-black text-[10px] uppercase tracking-[0.3em] pt-4 border-b border-brand-primary/0 group-hover:border-brand-primary transition-all">
-                                        Explorar Obra <ArrowRight className="w-4 h-4" />
-                                    </span>
+                            <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 flex items-end p-8">
+                                <div className="space-y-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-700">
+                                    <h4 className="text-white font-bold text-2xl uppercase leading-none tracking-tight">{featuredBook?.title}</h4>
+                                    <p className="text-brand-primary font-serif italic text-base">Por {featuredBook?.author}</p>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Floating Metadata Card - Refined */}
+                        {/* Floating Metadata Card - Discreet & Minimal - REQUEST 3 */}
                         <m.div
-                            animate={{ y: [0, -15, 0] }}
+                            animate={{ y: [0, -5, 0] }}
                             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                            className="absolute bottom-12 -left-12 bg-white p-6 rounded-[2rem] shadow-xl border border-gray-100 z-30 group"
+                            className="absolute bottom-6 -left-6 bg-white/95 backdrop-blur-md p-3 pr-5 rounded-2xl shadow-lg border border-gray-100 z-30 group flex items-center gap-3"
                         >
-                            <div className="flex items-center gap-5">
-                                <div className="w-16 h-16 bg-brand-dark text-brand-primary flex items-center justify-center rounded-2xl shadow-lg group-hover:rotate-6 transition-transform">
-                                    {upcomingLaunch ? <Clock className="w-8 h-8" /> : <Trophy className="w-8 h-8" />}
-                                </div>
-                                <div>
-                                    <h5 className="font-serif font-black text-2xl text-brand-dark italic leading-none">{upcomingLaunch ? 'Countdown' : 'Bestseller'}</h5>
-                                    <p className="text-[9px] uppercase tracking-[0.3em] text-brand-primary font-black pt-2">
-                                        {upcomingLaunch ? 'Lançamento Breve' : 'Mérito Editorial'}
-                                    </p>
-                                </div>
+                            <div className="w-8 h-8 bg-brand-dark/5 text-brand-primary flex items-center justify-center rounded-xl">
+                                {upcomingLaunch ? <Clock className="w-4 h-4" /> : <Trophy className="w-4 h-4" />}
+                            </div>
+                            <div>
+                                <h5 className="font-serif font-black text-sm text-brand-dark italic leading-none">{upcomingLaunch ? 'Countdown' : 'Bestseller'}</h5>
                             </div>
                         </m.div>
                     </m.div>
