@@ -68,7 +68,7 @@ service cloud.firestore {
     
     // ==================== BLOG ====================
     
-    match /blog/{postId} {
+    match /blog_posts/{postId} {
       // Qualquer um pode ler posts
       allow read: if true;
       
@@ -77,14 +77,14 @@ service cloud.firestore {
     }
     
     // Blog Likes
-    match /blogLikes/{likeId} {
+    match /blog_likes/{likeId} {
       allow read: if true;
       allow create: if isAuthenticated();
       allow delete: if isAuthenticated() && isOwner(resource.data.userId);
     }
     
     // Blog Comments
-    match /blogComments/{commentId} {
+    match /blog_comments/{commentId} {
       allow read: if true;
       allow create: if isAuthenticated();
       allow update, delete: if isAdmin() || isOwner(resource.data.userId);
@@ -118,7 +118,7 @@ service cloud.firestore {
     
     // ==================== SITE CONTENT ====================
     
-    match /siteContent/{contentId} {
+    match /site_content/{contentId} {
       // Qualquer um pode ler
       allow read: if true;
       
@@ -128,7 +128,7 @@ service cloud.firestore {
     
     // ==================== TEAM ====================
     
-    match /team/{memberId} {
+    match /team_members/{memberId} {
       // Qualquer um pode ler
       allow read: if true;
       
@@ -138,7 +138,7 @@ service cloud.firestore {
     
     // ==================== SERVICES ====================
     
-    match /services/{serviceId} {
+    match /editorial_services/{serviceId} {
       // Qualquer um pode ler
       allow read: if true;
       
@@ -161,7 +161,7 @@ service cloud.firestore {
     
     // ==================== PAYMENT NOTIFICATIONS ====================
     
-    match /paymentNotifications/{notificationId} {
+    match /payment_notifications/{notificationId} {
       // Leitor pode ver apenas suas próprias notificações
       allow read: if isOwner(resource.data.readerId) || isAdmin();
       
@@ -177,7 +177,7 @@ service cloud.firestore {
     
     // ==================== PAYMENT PROOFS ====================
     
-    match /paymentProofs/{proofId} {
+    match /payment_proofs/{proofId} {
       // Apenas o leitor que enviou ou admin podem ver
       allow read: if isAdmin(); // Admin vê todos
       
@@ -194,13 +194,13 @@ service cloud.firestore {
     // ==================== BOOK STATS & INTERACTIONS ====================
     
     // Book Views
-    match /bookViews/{viewId} {
+    match /book_views/{viewId} {
       allow read: if isAdmin();
       allow create: if true; // Qualquer um pode registar visualização
     }
     
     // Book Favorites
-    match /bookFavorites/{favoriteId} {
+    match /book_favorites/{favoriteId} {
       allow read: if isOwner(resource.data.userId) || isAdmin();
       allow create: if isAuthenticated();
       allow delete: if isOwner(resource.data.userId);

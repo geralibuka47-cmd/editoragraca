@@ -55,7 +55,21 @@ Após realizar o deploy inicial, execute estes testes manualmente:
 | **Imagens** | Verificar se capas e fotos de perfil carregam. | Sem erros 403 (Security Rules ok). |
 | **Performance** | Abrir o site em modo incógnito no telemóvel. | Carregamento rápido (< 2s). |
 
-## 5. Processo de Deploy (Resumo)
+## 5. Regras de Segurança (Firestore & Storage) [IMPORTANTE]
+
+Como migramos para o Firebase, as regras de segurança são fundamentais para proteger os dados. Certifique-se de que os ficheiros `firestore.rules` e `storage.rules` estão sincronizados com o servidor.
+
+### Como aplicar as regras
+
+Se tiver o Firebase CLI instalado:
+
+```bash
+firebase deploy --only firestore:rules,storage
+```
+
+*Caso contrário, copie o conteúdo dos ficheiros e cole diretamente nos separadores "Rules" das consolas Firestore e Storage no site do Firebase.*
+
+## 6. Processo de Deploy (Resumo)
 
 ### Fluxo de Trabalho Recomendado
 

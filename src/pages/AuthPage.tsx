@@ -41,32 +41,32 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
             await fetch('/favicon.ico', { cache: 'no-store' });
             const internetTime = Date.now() - start;
 
-            // Now check Supabase specifically
-            const sbUrl = import.meta.env.VITE_SUPABASE_URL;
-            if (sbUrl) {
+            // Now check Firebase specifically
+            const fbProjectId = import.meta.env.VITE_FIREBASE_PROJECT_ID;
+            if (fbProjectId) {
                 try {
-                    const startSb = Date.now();
-                    // Timeout for Supabase check (5s)
-                    const sbTimeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000));
+                    const startFb = Date.now();
+                    // Timeout for Firebase check (5s)
+                    const fbTimeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000));
 
-                    // fetch with no-cors to allowing cross-origin opaque checking
+                    // fetch a Firebase-related endpoint to check connectivity
                     await Promise.race([
-                        fetch(`${sbUrl}/auth/v1/health`, { mode: 'no-cors', cache: 'no-store' }),
-                        sbTimeout
+                        fetch(`https://${fbProjectId}.firebaseapp.com`, { mode: 'no-cors', cache: 'no-store' }),
+                        fbTimeout
                     ]);
 
-                    const sbTime = Date.now() - startSb;
+                    const fbTime = Date.now() - startFb;
                     setConnectionStatus('ok');
-                    setError(`Diagnóstico: Internet OK (${internetTime}ms). Servidor Banco de Dados OK (${sbTime}ms). Se falhar novamente, tente dados móveis.`);
-                } catch (sbErr) {
-                    console.error("Supabase check failed:", sbErr);
+                    setError(`Diagnóstico: Internet OK (${internetTime}ms). Servidor Firebase OK (${fbTime}ms). Se falhar novamente, tente dados móveis.`);
+                } catch (fbErr) {
+                    console.error("Firebase check failed:", fbErr);
                     setConnectionStatus('error');
-                    setError(`Internet OK (${internetTime}ms), mas o Servidor de Dados NÃO responde (Bloqueio ou Falha). Tente outra rede (ex: dados móveis).`);
+                    setError(`Internet OK (${internetTime}ms), mas o Servidor Firebase NÃO responde (Bloqueio ou Falha). Tente outra rede (ex: dados móveis).`);
                     return;
                 }
             } else {
                 setConnectionStatus('ok');
-                setError(`Conexão OK (${internetTime}ms). URL do servidor não configurada.`);
+                setError(`Conexão OK (${internetTime}ms). Firebase não configurado.`);
             }
         } catch (e) {
             setConnectionStatus('error');
@@ -135,7 +135,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
 
             const msg = err.message || '';
             if (msg === 'timeout') {
-                setError('⏱️ A conexão com o servidor demorou muito. Isto pode indicar um problema com o Supabase. Verifique se o projeto está ativo e se as credenciais estão corretas.');
+                setError('⏱️ A conexão com o servidor demorou muito. Isto pode indicar um problema com o Firebase. Verifique se o projeto está ativo e se as credenciais estão corretas.');
             } else if (msg.includes('Invalid login credentials') || msg.includes('Invalid log in')) {
                 setError('🔒 E-mail ou senha incorretos. Por favor, tente novamente.');
             } else if (msg.includes('Email not confirmed')) {
@@ -145,7 +145,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
             } else if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) {
                 setError('🌐 Erro de rede. Verifique sua conexão com a internet e tente novamente.');
             } else if (err.status === 401 || msg.includes('401')) {
-                setError('🔐 Erro de autenticação (401). As credenciais do Supabase podem estar incorretas ou o projeto pode estar pausado. Contacte o administrador.');
+                setError('🔐 Erro de autenticação (401). As credenciais do Firebase podem estar incorretas ou o projeto pode estar pausado. Contacte o administrador.');
             } else {
                 setError(`❌ ${msg || 'Ocorreu um erro ao processar o seu pedido. Tente novamente.'}`);
             }
