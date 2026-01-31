@@ -308,20 +308,35 @@ export const getPublicStats = async () => {
     }
 
     try {
-        const booksSnapshot = await getDocs(collection(db, COLLECTIONS.BOOKS));
-        const usersSnapshot = await getDocs(collection(db, COLLECTIONS.USERS));
+        // Individual fetches to prevent one failure from breaking all stats
+        let booksCount = 0;
+        let readersCount = 0;
+
+        try {
+            const booksSnapshot = await getDocs(collection(db, COLLECTIONS.BOOKS));
+            booksCount = booksSnapshot.size;
+        } catch (e) {
+            console.warn('Could not fetch books count for stats (likely permission restricted)');
+        }
+
+        try {
+            const usersSnapshot = await getDocs(collection(db, COLLECTIONS.USERS));
+            readersCount = usersSnapshot.size;
+        } catch (e) {
+            console.warn('Could not fetch users count for stats (likely permission restricted)');
+        }
 
         const stats = {
-            booksCount: booksSnapshot.size,
-            authorsCount: 0, // Could be calculated if we track author role
-            readersCount: usersSnapshot.size
+            booksCount,
+            authorsCount: 0,
+            readersCount
         };
 
         lastStatsData = stats;
         lastStatsFetch = now;
         return stats;
     } catch (error) {
-        console.error('Error fetching public stats:', error);
+        console.error('Error in getPublicStats wrapper:', error);
         return lastStatsData || { booksCount: 0, authorsCount: 0, readersCount: 0 };
     }
 };
@@ -741,7 +756,18 @@ export const getTestimonials = async (forceRefresh = false) => {
         lastTestimonialsFetch = now;
 
         return testimonials;
-    } catch (error) {
+    } catch (error: any) {
+        // Handle missing index or permissions
+        if (error.code === 'failed-precondition') {
+            console.warn('Firestore index required for testimonials query. Falling back to all active.');
+            try {
+                const fallbackQ = query(collection(db, COLLECTIONS.TESTIMONIALS), where('isActive', '==', true));
+                const snapshot = await getDocs(fallbackQ);
+                return snapshot.docs.map(doc => parseFirestoreDoc(doc.data(), doc.id));
+            } catch (e) {
+                return [];
+            }
+        }
         console.error('Error fetching testimonials:', error);
         return testimonialsCache || [];
     }
