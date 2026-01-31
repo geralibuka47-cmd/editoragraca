@@ -121,7 +121,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                     onClick={() => onNavigate('HOME')}
                     title="Editora Graça"
                 >
-                    <img src={logo} alt="Editora Graça" className="h-12 md:h-18 w-auto object-contain transition-transform duration-700 group-hover:scale-110 drop-shadow-2xl" />
+                    <img src={logo} alt="Editora Graça" className="h-8 md:h-12 lg:h-18 w-auto object-contain transition-transform duration-700 group-hover:scale-110 drop-shadow-2xl" />
                 </m.button>
 
                 <div className="w-1/4 md:w-1/3 flex justify-end gap-3 md:gap-6 items-center">

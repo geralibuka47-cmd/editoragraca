@@ -140,7 +140,7 @@ const AboutPage: React.FC = () => {
                             <span>Vanguardismo Literário Angolano</span>
                         </m.div>
 
-                        <m.h1 variants={itemVariants} className="text-4xl sm:text-6xl md:text-8xl lg:text-[7rem] font-black tracking-tighter mb-10 leading-[0.9] uppercase">
+                        <m.h1 variants={itemVariants} className="text-4xl sm:text-5xl md:text-8xl lg:text-[7rem] font-black tracking-tighter mb-8 md:mb-10 leading-[0.9] uppercase">
                             Onde a Arte <br />
                             <span className="text-gradient-gold italic font-serif lowercase font-normal">Se Eterniza</span>
                         </m.h1>
@@ -243,13 +243,13 @@ const AboutPage: React.FC = () => {
                                 <m.div
                                     key={index}
                                     variants={itemVariants}
-                                    className="p-12 rounded-[3.5rem] border border-gray-100 hover:border-brand-primary/40 hover:bg-gray-50 transition-all duration-700 group flex flex-col items-center text-center"
+                                    className="p-8 md:p-12 rounded-[2.5rem] md:rounded-[3.5rem] border border-gray-100 hover:border-brand-primary/40 hover:bg-gray-50 transition-all duration-700 group flex flex-col items-center text-center"
                                 >
-                                    <div className="w-20 h-20 bg-gray-50 rounded-[1.5rem] flex items-center justify-center mb-10 group-hover:bg-brand-primary transition-all duration-500 shadow-xl border border-gray-100/50">
-                                        <Icon className="w-10 h-10 text-brand-primary group-hover:text-white" />
+                                    <div className="w-16 h-16 md:w-20 md:h-20 bg-gray-50 rounded-[1.2rem] md:rounded-[1.5rem] flex items-center justify-center mb-8 md:mb-10 group-hover:bg-brand-primary transition-all duration-500 shadow-xl border border-gray-100/50">
+                                        <Icon className="w-8 h-8 md:w-10 md:h-10 text-brand-primary group-hover:text-white" />
                                     </div>
-                                    <h3 className="text-2xl font-black text-brand-dark mb-6 tracking-tighter uppercase leading-none">{value.title}</h3>
-                                    <p className="text-gray-500 font-bold text-base leading-relaxed opacity-80">{value.description}</p>
+                                    <h3 className="text-xl md:text-2xl font-black text-brand-dark mb-4 md:mb-6 tracking-tighter uppercase leading-none">{value.title}</h3>
+                                    <p className="text-gray-500 font-bold text-sm md:text-base leading-relaxed opacity-80">{value.description}</p>
                                 </m.div>
                             );
                         })}
@@ -328,7 +328,7 @@ const AboutPage: React.FC = () => {
                         <div className="w-32 h-2 bg-brand-primary mx-auto rounded-full"></div>
                     </m.div>
 
-                    <div className="max-w-6xl mx-auto space-y-40 relative">
+                    <div className="max-w-6xl mx-auto space-y-24 md:space-y-40 relative">
                         {/* Central Line */}
                         <div className="absolute left-[50%] top-0 bottom-0 w-[1px] bg-gray-100 hidden md:block"></div>
 
@@ -338,24 +338,24 @@ const AboutPage: React.FC = () => {
                                 initial={{ opacity: 0, y: 50 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                className={`flex flex-col md:flex-row gap-20 items-center relative ${index % 2 === 0 ? '' : 'md:flex-row-reverse'}`}
+                                className={`flex flex-col md:flex-row gap-8 md:gap-20 items-center relative ${index % 2 === 0 ? '' : 'md:flex-row-reverse'}`}
                             >
                                 <div className={`flex-1 ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'}`}>
                                     <m.span
                                         initial={{ opacity: 0, scale: 0.5 }}
                                         whileInView={{ opacity: 0.1, scale: 1 }}
-                                        className="text-brand-primary text-[6rem] sm:text-[8rem] md:text-[10rem] font-black leading-none block mb-0 md:-mb-12"
+                                        className="text-brand-primary text-[5rem] sm:text-[8rem] md:text-[10rem] font-black leading-none block mb-[-1rem] md:-mb-12"
                                     >
                                         {item.date?.slice(-2) || item.year?.slice(-2)}
                                     </m.span>
-                                    <div className="relative z-10">
-                                        <h3 className="text-4xl font-black text-brand-dark mb-6 uppercase tracking-tighter">{item.title}</h3>
-                                        <p className="text-gray-500 font-bold text-lg leading-relaxed max-w-lg mx-auto md:mx-0 ${index % 2 === 0 ? 'md:ml-auto' : ''}">
+                                    <div className="relative z-10 text-center md:text-inherit px-4 md:px-0">
+                                        <h3 className="text-2xl md:text-4xl font-black text-brand-dark mb-4 md:mb-6 uppercase tracking-tighter">{item.title}</h3>
+                                        <p className="text-gray-500 font-bold text-base md:text-lg leading-relaxed max-w-lg mx-auto md:mx-0 ${index % 2 === 0 ? 'md:ml-auto' : ''}">
                                             {item.description}
                                         </p>
                                     </div>
                                 </div>
-                                <div className="w-10 h-10 rounded-[1.5rem] bg-brand-dark border-4 border-brand-primary shadow-[0_0_40px_rgba(196,160,82,0.4)] shrink-0 z-20 hidden md:block group-hover:rotate-45 transition-transform duration-500"></div>
+                                <div className="w-8 h-8 md:w-10 md:h-10 rounded-[1rem] md:rounded-[1.5rem] bg-brand-dark border-4 border-brand-primary shadow-[0_0_40px_rgba(196,160,82,0.4)] shrink-0 z-20 hidden md:block transition-transform duration-500"></div>
                                 <div className="flex-1 hidden md:block px-12">
                                     <div className="w-full h-px bg-gray-100 relative">
                                         <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-gray-200 rounded-full"></div>

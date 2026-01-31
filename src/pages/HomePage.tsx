@@ -139,10 +139,10 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                             <span>{upcomingLaunch ? 'Brevemente: Obra Prima' : 'Legado Editorial de Elite'}</span>
                         </m.div>
 
-                        <m.h1 variants={itemVariants} className="text-4xl sm:text-6xl md:text-[6rem] lg:text-[7rem] font-black leading-[0.9] text-white tracking-tighter">
+                        <m.h1 variants={itemVariants} className="text-4xl sm:text-6xl md:text-[6rem] lg:text-[7.5rem] font-black leading-[0.9] text-white tracking-tighter">
                             {upcomingLaunch ? (
                                 <>
-                                    <span className="text-gradient-gold uppercase text-[0.4em] block tracking-[0.2em] mb-4">O Próximo</span>
+                                    <span className="text-gradient-gold uppercase text-[0.35em] block tracking-[0.2em] mb-3 md:mb-4">O Próximo</span>
                                     <span className="italic font-serif font-normal">{upcomingLaunch.title}</span>
                                 </>
                             ) : (
@@ -281,20 +281,20 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                                         key={idx}
                                         variants={itemVariants}
                                         onClick={() => navigate('/livros')}
-                                        className={`group relative h-[400px] md:h-[600px] rounded-[2.5rem] md:rounded-[3.5rem] overflow-hidden bg-brand-dark p-8 md:p-16 flex items-end cursor-pointer shadow-2xl transition-all duration-700 ${isWide ? 'md:col-span-8' : 'md:col-span-4'}`}
+                                        className={`group relative h-[300px] sm:h-[400px] md:h-[600px] rounded-[2rem] md:rounded-[3.5rem] overflow-hidden bg-brand-dark p-6 sm:p-8 md:p-16 flex items-end cursor-pointer shadow-2xl transition-all duration-700 ${isWide ? 'md:col-span-8' : 'md:col-span-4'}`}
                                     >
                                         {cat.image && (
                                             <img src={cat.image} alt={cat.name} loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-40 grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000" />
                                         )}
                                         <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/20 to-transparent group-hover:from-brand-primary/80 transition-all duration-700"></div>
-                                        <div className="relative z-10 space-y-4 md:space-y-6 translate-y-4 md:translate-y-8 group-hover:translate-y-0 transition-transform duration-700">
-                                            <div className="text-white font-black text-3xl md:text-5xl lg:text-6xl leading-none tracking-tighter uppercase">{cat.name}</div>
-                                            <div className="flex items-center gap-4">
-                                                <p className="text-white/60 text-[10px] md:text-xs font-black uppercase tracking-[0.3em]">{cat.count} Edições</p>
-                                                <div className="h-px w-12 bg-white/20"></div>
+                                        <div className="relative z-10 space-y-3 sm:space-y-4 md:space-y-6 translate-y-2 sm:translate-y-4 md:translate-y-8 group-hover:translate-y-0 transition-transform duration-700">
+                                            <div className="text-white font-black text-2xl sm:text-3xl md:text-5xl lg:text-6xl leading-none tracking-tighter uppercase">{cat.name}</div>
+                                            <div className="flex items-center gap-3 md:gap-4">
+                                                <p className="text-white/60 text-[9px] md:text-xs font-black uppercase tracking-[0.3em]">{cat.count} Edições</p>
+                                                <div className="h-px w-8 md:w-12 bg-white/20"></div>
                                             </div>
-                                            <button className="text-white font-black text-[10px] md:text-[11px] uppercase tracking-[0.4em] flex items-center gap-4 opacity-0 group-hover:opacity-100 transition-all delay-100 py-4 border-b border-white/0 group-hover:border-white/40">
-                                                Inspecionar <ArrowRight className="w-4 h-4" />
+                                            <button className="text-white font-black text-[9px] md:text-[11px] uppercase tracking-[0.4em] flex items-center gap-3 md:gap-4 opacity-0 group-hover:opacity-100 transition-all delay-100 py-2 sm:py-4 border-b border-white/0 group-hover:border-white/40">
+                                                Inspecionar <ArrowRight className="w-3 md:w-4 h-3 md:h-4" />
                                             </button>
                                         </div>
                                     </m.div>
@@ -484,27 +484,27 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
-                className="bg-brand-dark py-32 md:py-64 px-6 overflow-hidden relative"
+                className="bg-brand-dark py-24 md:py-48 px-4 sm:px-6 overflow-hidden relative"
             >
                 <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_rgba(196,160,82,0.1)_0%,_transparent_70%)]"></div>
 
                 <div className="container mx-auto relative z-10 text-center">
-                    <div className="max-w-4xl mx-auto space-y-16">
+                    <div className="max-w-4xl mx-auto space-y-12 md:space-y-16">
                         <m.div
                             initial={{ y: 20, opacity: 0 }}
                             whileInView={{ y: 0, opacity: 1 }}
                             transition={{ duration: 1 }}
-                            className="w-24 h-24 glass-premium rounded-[2.5rem] flex items-center justify-center text-brand-primary mx-auto shadow-[0_20px_50px_rgba(196,160,82,0.2)] border border-white/5"
+                            className="w-20 h-20 md:w-24 md:h-24 glass-premium rounded-[2.5rem] flex items-center justify-center text-brand-primary mx-auto shadow-[0_20px_50px_rgba(196,160,82,0.2)] border border-white/5"
                         >
-                            <Mail className="w-10 h-10" />
+                            <Mail className="w-8 h-8 md:w-10 md:h-10" />
                         </m.div>
 
-                        <div className="space-y-8">
-                            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-[6rem] font-black text-white tracking-tighter leading-none uppercase">
+                        <div className="space-y-6 md:space-y-8">
+                            <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-[6.5rem] font-black text-white tracking-tighter leading-[1] md:leading-none uppercase">
                                 Convite ao <br />
                                 <span className="text-gradient-gold italic font-serif lowercase">Inesquecível</span>
                             </h2>
-                            <p className="text-xl md:text-2xl text-gray-400 font-medium max-w-2xl mx-auto leading-relaxed opacity-80">
+                            <p className="text-lg md:text-2xl text-gray-400 font-medium max-w-2xl mx-auto leading-relaxed opacity-80">
                                 Seja o primeiro a acessar lançamentos exclusivos e insights editoriais de elite.
                             </p>
                         </div>
@@ -513,20 +513,20 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                             initial={{ y: 20, opacity: 0 }}
                             whileInView={{ y: 0, opacity: 1 }}
                             transition={{ duration: 1, delay: 0.2 }}
-                            className="flex flex-col md:flex-row gap-6 max-w-2xl mx-auto glass-premium p-4 md:p-6 rounded-[3rem] border border-white/10 shadow-2xl"
+                            className="flex flex-col md:flex-row gap-4 md:gap-6 max-w-2xl mx-auto glass-premium p-3 md:p-6 rounded-[2rem] md:rounded-[3rem] border border-white/10 shadow-2xl"
                             onSubmit={handleSubscribe}
                         >
                             <input
                                 type="email"
                                 required
                                 placeholder="Seu email de prestígio"
-                                className="flex-1 bg-transparent border-0 px-8 py-5 text-white focus:ring-0 text-xl font-medium placeholder:text-gray-600"
+                                className="flex-1 bg-transparent border-0 px-6 md:px-8 py-4 md:py-5 text-white focus:ring-0 text-lg md:text-xl font-medium placeholder:text-gray-600"
                                 value={newsletterEmail}
                                 onChange={(e) => setNewsletterEmail(e.target.value)}
                             />
                             <button
                                 type="submit"
-                                className="px-12 py-5 bg-brand-primary text-white rounded-[1.5rem] font-black text-[11px] uppercase tracking-[0.4em] shadow-2xl hover:bg-white hover:text-brand-dark hover:scale-105 active:scale-95 transition-all duration-500"
+                                className="px-10 md:px-12 py-4 md:py-5 bg-brand-primary text-white rounded-[1.2rem] md:rounded-[1.5rem] font-black text-[10px] md:text-[11px] uppercase tracking-[0.4em] shadow-2xl hover:bg-white hover:text-brand-dark hover:scale-105 active:scale-95 transition-all duration-500"
                                 disabled={isSubscribing}
                             >
                                 {isSubscribing ? 'Codificando...' : 'Filiar-se'}
@@ -540,9 +540,9 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                     initial={{ opacity: 0, y: 100 }}
                     animate={{ opacity: 1, y: 0 }}
                     onClick={scrollToTop}
-                    className="fixed bottom-12 right-12 w-20 h-20 bg-brand-primary text-white rounded-full shadow-[0_20px_50px_rgba(196,160,82,0.4)] z-50 flex items-center justify-center group hover:bg-white hover:text-brand-dark transition-all duration-700 border-4 border-brand-dark"
+                    className="fixed bottom-8 right-8 md:bottom-12 md:right-12 w-16 h-16 md:w-20 md:h-20 bg-brand-primary text-white rounded-full shadow-[0_20px_50px_rgba(196,160,82,0.4)] z-50 flex items-center justify-center group hover:bg-white hover:text-brand-dark transition-all duration-700 border-2 md:border-4 border-brand-dark"
                 >
-                    <ChevronUp className="w-8 h-8 group-hover:-translate-y-2 transition-transform duration-500" />
+                    <ChevronUp className="w-6 h-6 md:w-8 md:h-8 group-hover:-translate-y-2 transition-transform duration-500" />
                 </m.button>
             </m.section>
         </div>

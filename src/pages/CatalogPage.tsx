@@ -143,7 +143,7 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
                             <span className="text-gray-700">/</span>
                             <span className="text-white">Explorar Catálogo</span>
                         </div>
-                        <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-8 md:mb-10 leading-[0.9]">
+                        <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-6 md:mb-10 leading-[0.9]">
                             Nosso <span className="text-gradient-gold italic font-serif font-normal">Acervo</span>
                         </h1>
                         <p className="text-lg md:text-xl text-gray-400 font-medium leading-relaxed max-w-2xl opacity-80">
@@ -159,14 +159,14 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
                     <div className="glass-premium p-4 md:p-6 rounded-[2.5rem] shadow-2xl shadow-brand-dark/10 border border-white/40">
                         <div className="flex flex-col lg:flex-row gap-4 items-center">
                             {/* Search Input */}
-                            <div className="flex-1 w-full relative group">
+                            <div className="flex-1 relative group">
                                 <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-brand-primary transition-colors" />
                                 <input
                                     type="text"
                                     placeholder="Pesquisar..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full pl-14 md:pl-16 pr-12 py-4 md:py-5 bg-white/50 border-2 border-transparent rounded-[1.2rem] md:rounded-[1.5rem] focus:bg-white focus:border-brand-primary/20 focus:ring-0 transition-all font-bold text-brand-dark placeholder:text-gray-400 placeholder:font-bold"
+                                    className="w-full pl-14 md:pl-16 pr-8 md:pr-12 py-4 md:py-5 bg-white/50 border-2 border-transparent rounded-[1.2rem] md:rounded-[1.5rem] focus:bg-white focus:border-brand-primary/20 focus:ring-0 transition-all font-bold text-brand-dark placeholder:text-gray-400 placeholder:font-bold"
                                 />
                                 {searchQuery && (
                                     <button
@@ -328,14 +328,14 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
                             {Array(8).fill(0).map((_, i) => <BookCardSkeleton key={i} />)}
                         </div>
                     ) : filteredBooks.length > 0 ? (
-                        <m.div
-                            initial="hidden"
-                            animate="visible"
-                            variants={containerVariants}
-                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 md:gap-12 lg:gap-14"
-                        >
-                            {filteredBooks.map(book => (
-                                <m.div key={book.id} variants={itemVariants}>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8 md:gap-10">
+                            {filteredBooks.map((book) => (
+                                <m.div
+                                    key={book.id}
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    whileInView={{ opacity: 1, scale: 1 }}
+                                    viewport={{ once: true }}
+                                >
                                     <BookCard
                                         book={book}
                                         onAddToCart={onAddToCart}
@@ -344,7 +344,7 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
                                     />
                                 </m.div>
                             ))}
-                        </m.div>
+                        </div>
                     ) : (
                         <m.div
                             initial={{ opacity: 0, scale: 0.95 }}

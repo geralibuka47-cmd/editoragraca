@@ -21,7 +21,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                             <img src={logo} alt="Editora Graça" className="h-14 w-auto object-contain brightness-0 invert mb-2" />
                             <div className="w-12 h-1 bg-brand-primary rounded-full"></div>
                         </div>
-                        <p className="text-gray-400 text-lg leading-relaxed font-medium">
+                        <p className="text-gray-400 text-base md:text-lg leading-relaxed font-medium">
                             Dedicados à publicação de obras literárias de excelência. Fomentando a cultura e o conhecimento através das letras.
                         </p>
                         <div className="flex gap-4">
@@ -44,7 +44,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                     </div>
 
                     <div>
-                        <h4 className="text-gradient-gold text-xl font-black mb-10 uppercase tracking-widest text-[11px]">Navegação Rápida</h4>
+                        <h4 className="text-gradient-gold font-black mb-8 md:mb-10 uppercase tracking-widest text-[10px] md:text-[11px]">Navegação Rápida</h4>
                         <ul className="space-y-5">
                             {[
                                 { label: 'Início', path: '/' },
@@ -67,7 +67,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                     </div>
 
                     <div>
-                        <h4 className="text-gradient-gold text-xl font-black mb-10 uppercase tracking-widest text-[11px]">Legal & Suporte</h4>
+                        <h4 className="text-gradient-gold font-black mb-8 md:mb-10 uppercase tracking-widest text-[10px] md:text-[11px]">Legal & Suporte</h4>
                         <ul className="space-y-5">
                             {[
                                 { label: 'Termos de Serviço', path: '/servicos' },
@@ -90,7 +90,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                     </div>
 
                     <div>
-                        <h4 className="text-gradient-gold text-xl font-black mb-10 uppercase tracking-widest text-[11px]">Sede Administrativa</h4>
+                        <h4 className="text-gradient-gold font-black mb-8 md:mb-10 uppercase tracking-widest text-[10px] md:text-[11px]">Sede Administrativa</h4>
                         <ul className="space-y-8">
                             <li className="flex gap-5 items-start">
                                 <div className="w-12 h-12 glass-premium rounded-2xl flex items-center justify-center shrink-0 text-brand-primary shadow-lg">
