@@ -136,7 +136,10 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
             const msg = err.message || '';
             if (msg === 'timeout') {
                 setError('⏱️ A conexão com o servidor demorou muito. Isto pode indicar um problema com o Firebase. Verifique se o projeto está ativo e se as credenciais estão corretas.');
-            } else if (msg.includes('Invalid login credentials') || msg.includes('Invalid log in')) {
+            } else if (msg.includes('Invalid login credentials') ||
+                msg.includes('Invalid log in') ||
+                msg.includes('invalid-credential') ||
+                msg.includes('E-mail ou senha incorretos')) {
                 setError('🔒 E-mail ou senha incorretos. Por favor, tente novamente.');
             } else if (msg.includes('Email not confirmed')) {
                 setError('📧 O seu e-mail ainda não foi confirmado. Verifique a sua caixa de entrada.');

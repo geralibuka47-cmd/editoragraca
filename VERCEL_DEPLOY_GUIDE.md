@@ -18,13 +18,16 @@ Este passo é crucial para o funcionamento do Firebase e Sentry. Adicione estas 
 | Key | Value |
 | :--- | :--- |
 | `VITE_FIREBASE_API_KEY` | *(Sua chave do Firebase)* |
-| `VITE_FIREBASE_AUTH_DOMAIN` | `editoragraca.firebaseapp.com` |
-| `VITE_FIREBASE_PROJECT_ID` | `editoragraca` |
-| `VITE_FIREBASE_STORAGE_BUCKET` | `editoragraca.firebasestorage.app` |
+| `VITE_FIREBASE_AUTH_DOMAIN` | `editora-graca.firebaseapp.com` |
+| `VITE_FIREBASE_PROJECT_ID` | `editora-graca` |
+| `VITE_FIREBASE_STORAGE_BUCKET` | `editora-graca.firebasestorage.app` |
 | `VITE_FIREBASE_MESSAGING_SENDER_ID` | *(Seu ID)* |
 | `VITE_FIREBASE_APP_ID` | *(Seu App ID)* |
 | `VITE_FIREBASE_MEASUREMENT_ID` | *(Seu ID de Analytics)* |
 | `VITE_SENTRY_DSN` | *(Sua URL do Sentry)* |
+
+> [!NOTE]
+> Se vir o erro **(auth/invalid-credential)**, isto geralmente significa que o e-mail ou a senha estão incorretos, ou que a conta ainda não foi criada no novo sistema (Firebase).
 
 > [!TIP]
 > Marque todas as opções (Production, Preview, Development) para estas variáveis se quiser que o ambiente de teste também funcione.
