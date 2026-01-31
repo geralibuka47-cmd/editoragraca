@@ -82,7 +82,7 @@ const BookCard: React.FC<BookCardProps> = ({ book, onAddToCart, onToggleWishlist
                 <div className="mb-2">
                     <p className="text-[9px] font-black text-brand-primary/50 uppercase tracking-[0.2em] mb-1">{book.genre || 'Literatura'}</p>
                     <h3
-                        className="font-serif text-lg font-black text-brand-dark line-clamp-2 leading-tight group-hover:text-brand-primary transition-colors cursor-pointer min-h-[3rem]"
+                        className="font-serif text-base md:text-lg font-black text-brand-dark line-clamp-2 leading-tight group-hover:text-brand-primary transition-colors cursor-pointer min-h-[2.5rem] md:min-h-[3rem]"
                         onClick={() => onViewDetails(book)}
                     >
                         {book.title}

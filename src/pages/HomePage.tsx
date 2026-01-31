@@ -139,10 +139,10 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                             <span>{upcomingLaunch ? 'Brevemente: Obra Prima' : 'Legado Editorial de Elite'}</span>
                         </m.div>
 
-                        <m.h1 variants={itemVariants} className="text-5xl md:text-[8rem] font-black leading-[0.85] text-white tracking-tighter">
+                        <m.h1 variants={itemVariants} className="text-4xl sm:text-6xl md:text-[6rem] lg:text-[7rem] font-black leading-[0.9] text-white tracking-tighter">
                             {upcomingLaunch ? (
                                 <>
-                                    <span className="text-gradient-gold uppercase text-[0.6em] block tracking-normal mb-6">O Próximo</span>
+                                    <span className="text-gradient-gold uppercase text-[0.4em] block tracking-[0.2em] mb-4">O Próximo</span>
                                     <span className="italic font-serif font-normal">{upcomingLaunch.title}</span>
                                 </>
                             ) : (
@@ -153,7 +153,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                             )}
                         </m.h1>
 
-                        <m.p variants={itemVariants} className="text-xl md:text-2xl text-gray-400 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium opacity-80">
+                        <m.p variants={itemVariants} className="text-lg md:text-xl text-gray-400 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium opacity-80">
                             {upcomingLaunch
                                 ? (upcomingLaunch.description || '').slice(0, 150) + '...'
                                 : (siteContent['hero.description'] || "Curadoria de excelência para leitores que exigem o extraordinário. Literatura angolana elevada ao patamar mundial.")
@@ -179,9 +179,9 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                         </m.div>
 
                         {/* High Impact Stats */}
-                        <m.div variants={itemVariants} className="flex items-center justify-center lg:justify-start gap-12 md:gap-20 pt-16 border-t border-white/5">
+                        <m.div variants={itemVariants} className="flex items-center justify-center lg:justify-start gap-8 md:gap-16 pt-12 md:pt-16 border-t border-white/5">
                             <div className="flex flex-col">
-                                <span className="text-4xl md:text-6xl font-black text-white tracking-tighter">
+                                <span className="text-3xl md:text-5xl font-black text-white tracking-tighter">
                                     {stats.booksCount > 0 ? (
                                         <m.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                                             {stats.booksCount}<span className="text-brand-primary italic">+</span>
@@ -191,7 +191,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                                 <span className="text-[10px] uppercase tracking-[0.4em] text-gray-500 font-black mt-2">Obras de Arte</span>
                             </div>
                             <div className="flex flex-col">
-                                <span className="text-4xl md:text-6xl font-black text-white tracking-tighter">
+                                <span className="text-3xl md:text-5xl font-black text-white tracking-tighter">
                                     {stats.readersCount > 0 ? (
                                         <m.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                                             {stats.readersCount}<span className="text-brand-primary italic">+</span>
@@ -264,12 +264,12 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                 className="py-24 md:py-48 bg-white relative overflow-hidden optimize-render px-6"
             >
                 <div className="container mx-auto relative z-10">
-                    <m.div variants={itemVariants} className="text-center mb-24 md:mb-32">
-                        <span className="text-brand-primary font-black text-xs uppercase tracking-[0.5em] mb-6 block">Curadoria Estruturada</span>
-                        <h2 className="text-5xl md:text-9xl font-black text-brand-dark tracking-tighter mb-10 uppercase leading-none">
+                    <m.div variants={itemVariants} className="text-center mb-20 md:mb-32">
+                        <span className="text-brand-primary font-black text-[10px] md:text-xs uppercase tracking-[0.5em] mb-4 md:mb-6 block text-center">Curadoria Estruturada</span>
+                        <h2 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-brand-dark tracking-tighter mb-8 md:mb-10 uppercase leading-[0.9] text-center">
                             Universo <span className="text-gradient-gold italic font-serif lowercase">Literário</span>
                         </h2>
-                        <div className="w-24 h-2 bg-brand-primary mx-auto rounded-full"></div>
+                        <div className="w-16 md:w-24 h-1.5 md:h-2 bg-brand-primary mx-auto rounded-full"></div>
                     </m.div>
 
                     {categories.length > 0 ? (
@@ -281,19 +281,19 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                                         key={idx}
                                         variants={itemVariants}
                                         onClick={() => navigate('/livros')}
-                                        className={`group relative h-[450px] md:h-[600px] rounded-[3.5rem] overflow-hidden bg-brand-dark p-12 md:p-16 flex items-end cursor-pointer shadow-2xl transition-all duration-700 ${isWide ? 'md:col-span-8' : 'md:col-span-4'}`}
+                                        className={`group relative h-[400px] md:h-[600px] rounded-[2.5rem] md:rounded-[3.5rem] overflow-hidden bg-brand-dark p-8 md:p-16 flex items-end cursor-pointer shadow-2xl transition-all duration-700 ${isWide ? 'md:col-span-8' : 'md:col-span-4'}`}
                                     >
                                         {cat.image && (
                                             <img src={cat.image} alt={cat.name} loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-40 grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000" />
                                         )}
                                         <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/20 to-transparent group-hover:from-brand-primary/80 transition-all duration-700"></div>
-                                        <div className="relative z-10 space-y-6 translate-y-8 group-hover:translate-y-0 transition-transform duration-700">
-                                            <div className="text-white font-black text-4xl md:text-6xl leading-none tracking-tighter uppercase">{cat.name}</div>
+                                        <div className="relative z-10 space-y-4 md:space-y-6 translate-y-4 md:translate-y-8 group-hover:translate-y-0 transition-transform duration-700">
+                                            <div className="text-white font-black text-3xl md:text-5xl lg:text-6xl leading-none tracking-tighter uppercase">{cat.name}</div>
                                             <div className="flex items-center gap-4">
-                                                <p className="text-white/60 text-xs font-black uppercase tracking-[0.3em]">{cat.count} Edições</p>
+                                                <p className="text-white/60 text-[10px] md:text-xs font-black uppercase tracking-[0.3em]">{cat.count} Edições</p>
                                                 <div className="h-px w-12 bg-white/20"></div>
                                             </div>
-                                            <button className="text-white font-black text-[11px] uppercase tracking-[0.4em] flex items-center gap-4 opacity-0 group-hover:opacity-100 transition-all delay-100 py-4 border-b border-white/0 group-hover:border-white/40">
+                                            <button className="text-white font-black text-[10px] md:text-[11px] uppercase tracking-[0.4em] flex items-center gap-4 opacity-0 group-hover:opacity-100 transition-all delay-100 py-4 border-b border-white/0 group-hover:border-white/40">
                                                 Inspecionar <ArrowRight className="w-4 h-4" />
                                             </button>
                                         </div>
@@ -330,7 +330,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                                 <div className="w-16 h-1 bg-brand-primary rounded-full"></div>
                                 <span>Recentemente Catalogados</span>
                             </m.div>
-                            <m.h2 variants={itemVariants} className="text-5xl md:text-9xl font-black text-white tracking-tighter leading-[0.85] uppercase">
+                            <m.h2 variants={itemVariants} className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tighter leading-[0.9] uppercase text-center md:text-left">
                                 Novas <br />
                                 <span className="text-gradient-gold italic font-serif lowercase">Perspectivas</span>
                             </m.h2>
@@ -380,7 +380,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                                 <div className="absolute top-0 right-0 w-64 h-64 bg-brand-primary/10 blur-[80px] rounded-full"></div>
                                 <div className="relative z-10 space-y-10">
                                     <span className="text-brand-primary text-xs font-black uppercase tracking-[0.5em] block">Laboratório de Talentos</span>
-                                    <h3 className="text-5xl md:text-7xl font-black tracking-tighter leading-none uppercase">
+                                    <h3 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tighter leading-none uppercase">
                                         Seu Nome na <br />
                                         <span className="text-gradient-gold italic font-serif lowercase">História</span>
                                     </h3>
@@ -409,19 +409,19 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                                     ))
                                 ) : (
                                     recentPosts.map(post => (
-                                        <div key={post.id} onClick={() => navigate('/blog')} className="group py-12 flex gap-10 items-start cursor-pointer hover:bg-gray-50 transition-all px-6 rounded-[2rem] -mx-6">
-                                            <div className="w-32 h-32 md:w-40 md:h-40 rounded-[2rem] overflow-hidden shrink-0 shadow-2xl transition-all duration-700 group-hover:scale-95">
+                                        <div key={post.id} onClick={() => navigate('/blog')} className="group py-8 md:py-12 flex flex-col sm:flex-row gap-6 md:gap-10 items-start cursor-pointer hover:bg-gray-50 transition-all px-4 md:px-6 rounded-[1.5rem] md:rounded-[2rem] -mx-4 md:-mx-6">
+                                            <div className="w-full sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-[1.5rem] md:rounded-[2rem] overflow-hidden shrink-0 shadow-lg md:shadow-2xl transition-all duration-700 group-hover:scale-95">
                                                 <img src={post.imageUrl} alt={post.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1s]" />
                                             </div>
-                                            <div className="flex-1 space-y-4">
-                                                <div className="flex items-center gap-4 text-[10px] text-gray-400 font-black uppercase tracking-[0.3em]">
+                                            <div className="flex-1 space-y-3 md:space-y-4">
+                                                <div className="flex items-center gap-4 text-[9px] md:text-[10px] text-gray-400 font-black uppercase tracking-[0.3em]">
                                                     <Clock className="w-3 h-3 text-brand-primary" />
                                                     <span>{new Date(post.date).toLocaleDateString('pt-AO', { month: 'long', year: 'numeric' })}</span>
                                                 </div>
-                                                <h4 className="font-black text-brand-dark text-2xl md:text-3xl line-clamp-2 uppercase tracking-tighter leading-none group-hover:text-brand-primary transition-colors">
+                                                <h4 className="font-black text-brand-dark text-xl md:text-2xl lg:text-3xl line-clamp-2 uppercase tracking-tighter leading-tight group-hover:text-brand-primary transition-colors">
                                                     {post.title}
                                                 </h4>
-                                                <p className="text-gray-400 text-sm font-medium line-clamp-2 leading-relaxed opacity-0 group-hover:opacity-100 transition-all duration-500">
+                                                <p className="text-gray-400 text-xs md:text-sm font-medium line-clamp-2 leading-relaxed opacity-0 group-hover:opacity-100 transition-all duration-500">
                                                     Explore as nuances profundas desta narrativa exclusiva da Editora Graça.
                                                 </p>
                                             </div>
@@ -444,9 +444,9 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                     className="py-24 md:py-48 bg-[#F8FAFC] overflow-hidden optimize-render"
                 >
                     <div className="container mx-auto px-6 md:px-8">
-                        <m.div variants={itemVariants} className="text-center mb-32">
-                            <span className="text-brand-primary text-xs font-black uppercase tracking-[0.5em] block mb-8">Vozes da Autoridade</span>
-                            <h2 className="text-5xl md:text-[8rem] font-black text-brand-dark tracking-tighter leading-[0.85] uppercase">
+                        <m.div variants={itemVariants} className="text-center mb-20 md:mb-32">
+                            <span className="text-brand-primary text-[10px] md:text-xs font-black uppercase tracking-[0.5em] block mb-6 md:mb-8 text-center">Vozes da Autoridade</span>
+                            <h2 className="text-4xl sm:text-5xl md:text-7xl lg:text-[7rem] font-black text-brand-dark tracking-tighter leading-[0.9] uppercase text-center">
                                 Reverberação <br />
                                 <span className="text-gradient-gold italic font-serif lowercase">Eternizada</span>
                             </h2>
@@ -500,11 +500,11 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                         </m.div>
 
                         <div className="space-y-8">
-                            <h2 className="text-5xl md:text-[7rem] font-black text-white tracking-tighter leading-none uppercase">
+                            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-[6rem] font-black text-white tracking-tighter leading-none uppercase">
                                 Convite ao <br />
                                 <span className="text-gradient-gold italic font-serif lowercase">Inesquecível</span>
                             </h2>
-                            <p className="text-2xl text-gray-400 font-medium max-w-2xl mx-auto leading-relaxed opacity-80">
+                            <p className="text-xl md:text-2xl text-gray-400 font-medium max-w-2xl mx-auto leading-relaxed opacity-80">
                                 Seja o primeiro a acessar lançamentos exclusivos e insights editoriais de elite.
                             </p>
                         </div>

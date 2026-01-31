@@ -140,12 +140,12 @@ const AboutPage: React.FC = () => {
                             <span>Vanguardismo Literário Angolano</span>
                         </m.div>
 
-                        <m.h1 variants={itemVariants} className="text-6xl md:text-[10rem] font-black tracking-tighter mb-12 leading-[0.85] uppercase">
+                        <m.h1 variants={itemVariants} className="text-4xl sm:text-6xl md:text-8xl lg:text-[7rem] font-black tracking-tighter mb-10 leading-[0.9] uppercase">
                             Onde a Arte <br />
                             <span className="text-gradient-gold italic font-serif lowercase font-normal">Se Eterniza</span>
                         </m.h1>
 
-                        <m.p variants={itemVariants} className="text-xl md:text-4xl text-gray-400 font-medium leading-relaxed max-w-4xl mx-auto lg:mx-0 mb-20 opacity-90">
+                        <m.p variants={itemVariants} className="text-lg md:text-2xl text-gray-400 font-medium leading-relaxed max-w-4xl mx-auto lg:mx-0 mb-16 opacity-90">
                             Uma casa editorial de elite comprometida com a sofisticação intelectual e a preservação do <span className="text-white">património cultural</span> através da curadoria literária de alta performance.
                         </m.p>
 
@@ -229,7 +229,7 @@ const AboutPage: React.FC = () => {
                         className="text-center max-w-5xl mx-auto mb-32"
                     >
                         <span className="text-brand-primary font-black text-xs uppercase tracking-[0.5em] mb-8 block">Nossa Bússola Ética</span>
-                        <m.h2 variants={itemVariants} className="text-5xl md:text-[8rem] font-black text-brand-dark tracking-tighter mb-10 uppercase leading-[0.85]">
+                        <m.h2 variants={itemVariants} className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-brand-dark tracking-tighter mb-8 md:mb-10 uppercase leading-[0.9]">
                             Pilares de <br />
                             <span className="text-gradient-gold italic font-serif font-normal lowercase">Prestígio</span>
                         </m.h2>
@@ -274,7 +274,7 @@ const AboutPage: React.FC = () => {
 
                         <div className="grid lg:grid-cols-2 gap-24 items-center relative z-10">
                             <div className="space-y-16">
-                                <h3 className="text-5xl md:text-[5rem] font-black text-white tracking-tighter leading-[0.9] font-serif italic">
+                                <h3 className="text-3xl sm:text-4xl md:text-6xl font-black text-white tracking-tighter leading-[1] font-serif italic">
                                     "Acreditamos que o talento angolano não merece apenas uma voz; merece um <span className="text-gradient-gold">palco mundial</span> de magnitude absoluta."
                                 </h3>
 
@@ -321,7 +321,7 @@ const AboutPage: React.FC = () => {
                         className="text-center mb-48"
                     >
                         <span className="text-brand-primary font-black text-xs uppercase tracking-[0.5em] mb-8 block">A Jornada do Sucesso</span>
-                        <m.h2 variants={itemVariants} className="text-5xl md:text-[8rem] font-black text-brand-dark tracking-tighter mb-10 uppercase leading-[0.85]">
+                        <m.h2 variants={itemVariants} className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-brand-dark tracking-tighter mb-8 md:mb-10 uppercase leading-[0.9]">
                             Evolução do <br />
                             <span className="text-gradient-gold italic font-serif font-normal lowercase">Impossível</span>
                         </m.h2>
@@ -343,8 +343,8 @@ const AboutPage: React.FC = () => {
                                 <div className={`flex-1 ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'}`}>
                                     <m.span
                                         initial={{ opacity: 0, scale: 0.5 }}
-                                        whileInView={{ opacity: 0.2, scale: 1 }}
-                                        className="text-brand-primary text-[8rem] md:text-[12rem] font-black leading-none block mb-0 md:-mb-12"
+                                        whileInView={{ opacity: 0.1, scale: 1 }}
+                                        className="text-brand-primary text-[6rem] sm:text-[8rem] md:text-[10rem] font-black leading-none block mb-0 md:-mb-12"
                                     >
                                         {item.date?.slice(-2) || item.year?.slice(-2)}
                                     </m.span>
@@ -384,10 +384,10 @@ const AboutPage: React.FC = () => {
                                     <div className="w-24 h-24 glass-premium rounded-[2rem] flex items-center justify-center mx-auto mb-10 group-hover:bg-brand-primary group-hover:scale-110 transition-all duration-700 shadow-2xl border border-white/5">
                                         <StatIcon className="w-12 h-12 text-brand-primary group-hover:text-white" />
                                     </div>
-                                    <div className="text-6xl md:text-[9rem] font-black text-white tracking-tighter mb-6 leading-none group-hover:text-gradient-gold transition-all">
+                                    <div className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tighter mb-4 md:mb-6 leading-none group-hover:text-gradient-gold transition-all">
                                         {stat.number}
                                     </div>
-                                    <div className="text-[12px] font-black uppercase tracking-[0.5em] text-gray-500 group-hover:text-brand-primary transition-colors">
+                                    <div className="text-[10px] md:text-[12px] font-black uppercase tracking-[0.5em] text-gray-500 group-hover:text-brand-primary transition-colors">
                                         {stat.label}
                                     </div>
                                 </m.div>
@@ -407,7 +407,7 @@ const AboutPage: React.FC = () => {
                         transition={{ duration: 1 }}
                         className="max-w-6xl mx-auto space-y-20"
                     >
-                        <h2 className="text-6xl md:text-[10rem] font-black text-brand-dark tracking-tighter leading-[0.85] uppercase">
+                        <h2 className="text-4xl sm:text-6xl md:text-8xl lg:text-[7.5rem] font-black text-brand-dark tracking-tighter leading-[0.9] uppercase">
                             Vamos Criar <br />
                             <span className="text-gradient-gold italic font-serif lowercase font-normal">Sua História?</span>
                         </h2>

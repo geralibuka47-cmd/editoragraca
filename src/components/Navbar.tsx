@@ -256,7 +256,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                                     placeholder="Qual obra busca hoje?"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full pl-24 pr-16 py-8 bg-gray-50 border-transparent focus:bg-white text-4xl md:text-6xl font-black text-brand-dark placeholder:text-gray-200 outline-none transition-all rounded-[3rem] tracking-tighter italic font-serif"
+                                    className="w-full pl-24 pr-16 py-6 md:py-8 bg-gray-50 border-transparent focus:bg-white text-3xl md:text-5xl lg:text-6xl font-black text-brand-dark placeholder:text-gray-200 outline-none transition-all rounded-[2rem] md:rounded-[3rem] tracking-tighter italic font-serif"
                                 />
                                 <button
                                     type="button"

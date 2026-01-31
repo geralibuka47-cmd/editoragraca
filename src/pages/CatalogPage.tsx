@@ -143,10 +143,10 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
                             <span className="text-gray-700">/</span>
                             <span className="text-white">Explorar Catálogo</span>
                         </div>
-                        <h1 className="text-5xl md:text-9xl font-black tracking-tighter mb-10 leading-[0.85]">
+                        <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-8 md:mb-10 leading-[0.9]">
                             Nosso <span className="text-gradient-gold italic font-serif font-normal">Acervo</span>
                         </h1>
-                        <p className="text-xl md:text-2xl text-gray-400 font-medium leading-relaxed max-w-2xl opacity-80">
+                        <p className="text-lg md:text-xl text-gray-400 font-medium leading-relaxed max-w-2xl opacity-80">
                             Uma curadoria de literatura angolana e internacional, desenhada para leitores que procuram excelência.
                         </p>
                     </m.div>
@@ -163,10 +163,10 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
                                 <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-brand-primary transition-colors" />
                                 <input
                                     type="text"
-                                    placeholder="Pesquisar título, autor ou gênero..."
+                                    placeholder="Pesquisar..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full pl-16 pr-12 py-5 bg-white/50 border-2 border-transparent rounded-[1.5rem] focus:bg-white focus:border-brand-primary/20 focus:ring-0 transition-all font-bold text-brand-dark placeholder:text-gray-400 placeholder:font-bold"
+                                    className="w-full pl-14 md:pl-16 pr-12 py-4 md:py-5 bg-white/50 border-2 border-transparent rounded-[1.2rem] md:rounded-[1.5rem] focus:bg-white focus:border-brand-primary/20 focus:ring-0 transition-all font-bold text-brand-dark placeholder:text-gray-400 placeholder:font-bold"
                                 />
                                 {searchQuery && (
                                     <button
@@ -198,14 +198,14 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
 
                                 <button
                                     onClick={() => setShowFilters(!showFilters)}
-                                    className={`px-8 py-5 rounded-[1.5rem] font-black text-[10px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shadow-xl ${showFilters || activeFiltersCount > 0
+                                    className={`px-6 md:px-8 py-4 md:py-5 rounded-[1.2rem] md:rounded-[1.5rem] font-black text-[9px] md:text-[10px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shadow-xl ${showFilters || activeFiltersCount > 0
                                         ? 'bg-brand-primary text-white shadow-brand-primary/20'
                                         : 'bg-brand-dark text-white hover:bg-brand-primary shadow-brand-dark/20'
                                         }`}
                                 >
                                     <Filter className="w-4 h-4" />
-                                    <span>Filtros</span>
-                                    {activeFiltersCount > 0 && <span className="w-6 h-6 bg-white text-brand-primary rounded-lg flex items-center justify-center text-[9px] font-black shadow-lg">{activeFiltersCount}</span>}
+                                    <span className="hidden sm:inline">Filtros</span>
+                                    {activeFiltersCount > 0 && <span className="w-5 h-5 md:w-6 md:h-6 bg-white text-brand-primary rounded-lg flex items-center justify-center text-[8px] md:text-[9px] font-black shadow-lg">{activeFiltersCount}</span>}
                                 </button>
                             </div>
                         </div>
@@ -312,14 +312,14 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
                 <div className="container mx-auto px-4 md:px-8">
                     <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
                         <div>
-                            <h2 className="text-3xl md:text-5xl font-black text-brand-dark tracking-tighter">
+                            <h2 className="text-2xl md:text-4xl font-black text-brand-dark tracking-tighter">
                                 {loading ? 'Carregando...' : (
                                     <>
-                                        <span className="text-gradient-gold">{filteredBooks.length}</span> Obras Literárias
+                                        <span className="text-gradient-gold">{filteredBooks.length}</span> Obras Catalogadas
                                     </>
                                 )}
                             </h2>
-                            <p className="text-gray-400 font-bold uppercase tracking-[0.32em] text-[9px] mt-2">Exploração de acervo em destaque</p>
+                            <p className="text-gray-400 font-bold uppercase tracking-[0.32em] text-[8px] md:text-[9px] mt-2">Curadoria de excelência literária</p>
                         </div>
                     </div>
 

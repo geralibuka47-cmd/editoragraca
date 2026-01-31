@@ -84,10 +84,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user }) => {
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                         >
-                            <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-white mb-4">
+                            <h1 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tighter text-white mb-4">
                                 <span className="text-gradient-gold uppercase">Admin</span> Central
                             </h1>
-                            <p className="text-gray-400 font-black tracking-[0.3em] uppercase text-[10px] opacity-60">Gestão Estratégica & Operacional</p>
+                            <p className="text-gray-400 font-black tracking-[0.3em] uppercase text-[9px] md:text-[10px] opacity-60">Gestão Estratégica & Operacional</p>
                         </m.div>
 
                         <m.div
@@ -173,7 +173,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user }) => {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -20 }}
-                                    className="card-premium min-h-[700px] relative overflow-hidden p-10 md:p-14"
+                                    className="card-premium min-h-[600px] md:min-h-[700px] relative overflow-hidden p-6 sm:p-8 md:p-14"
                                 >
                                     {/* Header Decorative Accent */}
                                     <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-brand-primary via-brand-primary/50 to-transparent opacity-20"></div>
@@ -182,8 +182,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user }) => {
                                         <div className="space-y-12">
                                             <div className="flex justify-between items-center mb-12">
                                                 <div>
-                                                    <h2 className="text-4xl md:text-5xl font-black text-brand-dark tracking-tighter uppercase mb-2">Painel de <span className="text-brand-primary italic font-serif lowercase">Controlo</span></h2>
-                                                    <p className="text-gray-400 font-bold text-sm tracking-wide">Monitorização e gestão em tempo real.</p>
+                                                    <h2 className="text-3xl md:text-5xl font-black text-brand-dark tracking-tighter uppercase mb-2 leading-tight">Painel de <span className="text-brand-primary italic font-serif lowercase">Controlo</span></h2>
+                                                    <p className="text-gray-400 font-bold text-xs md:text-sm tracking-wide">Monitorização e gestão em tempo real.</p>
                                                 </div>
                                                 <button
                                                     onClick={fetchData}
@@ -242,16 +242,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user }) => {
                                                 initial={{ opacity: 0 }}
                                                 animate={{ opacity: 1 }}
                                                 transition={{ delay: 0.5 }}
-                                                className="mt-20 p-8 bg-brand-dark rounded-[2.5rem] text-white flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl shadow-brand-dark/20"
+                                                className="mt-12 md:mt-20 p-6 md:p-8 bg-brand-dark rounded-[2rem] md:rounded-[2.5rem] text-white flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8 shadow-2xl shadow-brand-dark/20"
                                             >
-                                                <div className="space-y-2 text-center md:text-left">
-                                                    <p className="text-brand-primary text-[10px] font-black uppercase tracking-[0.3em]">Manutenção de Sistema</p>
-                                                    <h4 className="text-xl font-black">Integridade da Base de Dados</h4>
+                                                <div className="space-y-1 text-center md:text-left">
+                                                    <p className="text-brand-primary text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em]">Manutenção de Sistema</p>
+                                                    <h4 className="text-lg md:text-xl font-black">Integridade da Base de Dados</h4>
                                                 </div>
                                                 <div className="flex gap-4">
-                                                    <div className="px-6 py-3 bg-white/5 rounded-xl border border-white/10 text-[10px] font-black uppercase tracking-widest text-green-400 flex items-center gap-2">
-                                                        <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-                                                        Sistemas Nominais
+                                                    <div className="px-4 md:px-6 py-2 md:py-3 bg-white/5 rounded-xl border border-white/10 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-green-400 flex items-center gap-2">
+                                                        <div className="w-1.5 md:w-2 h-1.5 md:h-2 rounded-full bg-green-400 animate-pulse"></div>
+                                                        Online
                                                     </div>
                                                 </div>
                                             </m.div>
