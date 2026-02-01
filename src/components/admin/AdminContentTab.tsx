@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion as m, AnimatePresence } from 'framer-motion';
-import { Type, MessageSquare, Save, Plus, Trash2, Edit, Users, Star, Loader2, ChevronRight, Globe, Layout, Image as ImageIcon, Briefcase, FileText, CheckCircle2, X, Tag } from 'lucide-react';
-import { getSiteContent, saveSiteContent, getTestimonials, saveTestimonial } from '../../services/dataService';
+import { Type, MessageSquare, Save, Plus, Trash2, Edit, Users, Star, Loader2, ChevronRight, Globe, Layout, Image as ImageIcon, Briefcase, FileText, CheckCircle2, X, Tag, Zap, Sparkles } from 'lucide-react';
+import { getSiteContent, saveSiteContent, getTestimonials, saveTestimonial, saveEditorialService, saveTeamMember } from '../../services/dataService';
 
 const AdminContentTab: React.FC = () => {
     const [activeSubTab, setActiveSubTab] = useState<'text' | 'testimonials'>('text');
@@ -11,6 +11,103 @@ const AdminContentTab: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [lastSaved, setLastSaved] = useState<string | null>(null);
+    const [isSyncing, setIsSyncing] = useState(false);
+
+    const PREMIUM_DEFAULTS: Record<string, { section: string; value: any }> = {
+        'home.hero.title': { section: 'home', value: "Onde a Arte" },
+        'home.hero.subtitle': { section: 'home', value: "Encontra o Legado" },
+        'home.hero.description': { section: 'home', value: "Curadoria de excelência para leitores que exigem o extraordinário." },
+        'home.experience.list': { section: 'home', value: ["Acabamentos de luxo em cada edição.", "Curadoria internacional de autores.", "Eventos exclusivos para membros."] },
+        'home.experience.premium_title': { section: 'home', value: "Premium" },
+        'home.experience.premium_desc': { section: 'home', value: "Qualidade inegociável em cada página impressa." },
+        'home.experience.eternal_title': { section: 'home', value: "Eterno" },
+        'home.experience.eternal_desc': { section: 'home', value: "Obras feitas para durar gerações." },
+
+        'about.hero.text': { section: 'about', value: "Uma casa editorial de elite comprometida com a sofisticação intelectual e a preservação do património cultural através da curadoria literária de alta performance." },
+        'about.vision.quote': { section: 'about', value: "Acreditamos que o talento angolano não merece apenas uma voz; merece um Palco Mundial de magnitude absoluta." },
+        'about.philosophy': {
+            section: 'about', value: [
+                { icon: 'Target', label: 'Filosofia Principal', title: 'Rigor & Estética', description: 'Cada obra é submetida a uma auditoria editorial implacável para garantir o status de obra-prima.' },
+                { icon: 'Sparkles', label: 'Visão Futurista', title: 'Inovação Nativa', description: 'Lideramos a evolução da narrativa em Angola, mesclando tradição impressa com tecnologia imersiva.' },
+                { icon: 'Zap', label: 'Impacto Cultural', title: 'Legado Atemporal', description: 'Construímos o cânone literário do futuro, dando voz aos pensadores que definem o nosso tempo.' }
+            ]
+        },
+        'about.values': {
+            section: 'about', value: [
+                { icon: 'BookOpen', title: 'Excelência Literária', description: 'Compromisso inabalável com a qualidade e rigor editorial em cada publicação.' },
+                { icon: 'Heart', title: 'Paixão pela Cultura', description: 'Promover e preservar a riqueza cultural angolana através da literatura.' },
+                { icon: 'Users', title: 'Valorização de Autores', description: 'Apoio integral a escritores locais, dando voz às suas histórias únicas.' },
+                { icon: 'Award', title: 'Reconhecimento', description: 'Busca constante pela excelência reconhecida nacional e internacionalmente.' }
+            ]
+        },
+        'about.stats': {
+            section: 'about', value: [
+                { number: '26+', label: 'Obras Publicadas', icon: 'BookOpen' },
+                { number: '100%', label: 'Autores Angolanos', icon: 'Star' },
+                { number: '5+', label: 'Anos de Actividade', icon: 'Zap' },
+                { number: '18', label: 'Províncias Alcançadas', icon: 'MapPin' }
+            ]
+        },
+        'about.timeline': {
+            section: 'about', value: [
+                { year: '2020', title: 'Fundação', description: 'Fundada pelo designer literário Nilton Graça, com o propósito de fortalecer o setor editorial e promover a literautra lusófona.' },
+                { year: '2021', title: 'Início Editorial', description: 'Início das operações de edição, diagramação e design, servindo autores independentes e parceiros.' },
+                { year: '2023', title: 'Crescimento', description: 'Marca de 26+ obras publicadas sob selo próprio e através de colaborações institucionais.' },
+                { year: '2026', title: 'Reestruturação', description: 'Reorganização estratégica, consolidação da comunidade e expansão para formatos digitais.' }
+            ]
+        },
+
+        'services.methodology': {
+            section: 'services', value: [
+                { icon: 'MessageSquare', title: 'Consulta Inicial', description: 'Conversamos sobre a sua obra, objetivos e público-alvo para definir a melhor estratégia.' },
+                { icon: 'Search', title: 'Análise Editorial', description: 'A nossa equipa avalia o seu manuscrito e sugere os serviços ideais para o seu sucesso.' },
+                { icon: 'Zap', title: 'Execução Criativa', description: 'Transformamos o seu texto com revisão, diagramação e design de capa de nível mundial.' },
+                { icon: 'Award', title: 'Publicação Final', description: 'Entregamos a sua obra pronta para o mercado, com toda a qualidade da Editora Graça.' }
+            ]
+        }
+    };
+
+    const PREMIUM_SERVICES = [
+        { title: 'Revisão e Edição', price: '250 Kz / página', details: ['Correção ortográfica e gramatical', 'Adequação ao acordo ortográfico', 'Edição profissional completa'], order: 1 },
+        { title: 'Diagramação', price: '250 Kz / página', details: ['Layout profissional para impressão', 'Tipografia avançada', 'Arquivo pronto para a gráfica'], order: 2 },
+        { title: 'Design de Capa', price: '10.000 Kz', details: ['Design exclusivo para livro físico', 'Opção E-book por 7.500 Kz', 'Revisões ilimitadas'], order: 3 },
+        { title: 'Legalização', price: '6.000 Kz', details: ['Registo Internacional ISBN', 'Depósito Legal obrigatório', 'Proteção de direitos autorais'], order: 4 },
+        { title: 'Impressão', price: 'Desde 3.500 Kz', details: ['Valor varia conforme formato', 'Acabamento premium', 'Sem tiragem mínima'], order: 5 },
+        { title: 'Marketing Digital', price: '5.000 Kz / post', details: ['Criação de post publicitário', 'Copywriting persuasivo', 'Foco em conversão'], order: 6 }
+    ];
+
+    const PREMIUM_TEAM = [
+        { name: 'Geral Ibuka', role: 'Director-Geral', department: 'Administração', bio: 'Com mais de 15 anos de experiência no setor editorial, Geral lidera a visão estratégica da Editora Graça.', photoUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=800&q=80', displayOrder: 1 },
+        { name: 'Maria Santos', role: 'Editora-Chefe', department: 'Editorial', bio: 'Responsável pela curadoria e revisão editorial de todas as obras publicadas.', photoUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=800&q=80', displayOrder: 2 },
+        { name: 'João Ferreira', role: 'Designer Gráfico', department: 'Design', bio: 'Especialista em design de capas e diagramação, João transforma manuscritos em obras visuais.', photoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&q=80', displayOrder: 3 }
+    ];
+
+    const handleSyncPremium = async () => {
+        if (!window.confirm("Isso irá sincronizar os textos 'Premium' padrão, serviços e membros da equipa para o banco de dados. Deseja continuar?")) return;
+
+        setIsSyncing(true);
+        try {
+            // 1. Sync Site Content
+            const contentPromises = Object.entries(PREMIUM_DEFAULTS).map(([key, data]) =>
+                saveSiteContent(key, data.section, data.value)
+            );
+
+            // 2. Sync Editorial Services
+            const servicesPromises = PREMIUM_SERVICES.map(s => saveEditorialService(s));
+
+            // 3. Sync Team Members
+            const teamPromises = PREMIUM_TEAM.map(m => saveTeamMember(m));
+
+            await Promise.all([...contentPromises, ...servicesPromises, ...teamPromises]);
+            alert("Sincronização profunda concluída com sucesso! Todo o acervo premium está agora no banco de dados.");
+            loadData();
+        } catch (error) {
+            console.error("Erro na sincronização profunda:", error);
+            alert("Erro ao sincronizar dados premium completos.");
+        } finally {
+            setIsSyncing(false);
+        }
+    };
 
     // Testimonial Modal
     const [showTestimonialModal, setShowTestimonialModal] = useState(false);
@@ -84,17 +181,26 @@ const AdminContentTab: React.FC = () => {
         'home.hero.title': { label: 'Título Hero', type: 'text', icon: Type },
         'home.hero.subtitle': { label: 'Subtítulo Hero', type: 'text', icon: Type },
         'home.hero.description': { label: 'Descrição Hero', type: 'textarea', icon: Layout },
+        'home.experience.list': { label: 'Lista de Experiência (JSON: string[])', type: 'json', icon: FileText },
+        'home.experience.premium_title': { label: 'Card Premium - Título', type: 'text', icon: Star },
+        'home.experience.premium_desc': { label: 'Card Premium - Descrição', type: 'textarea', icon: MessageSquare },
+        'home.experience.eternal_title': { label: 'Card Eterno - Título', type: 'text', icon: Zap },
+        'home.experience.eternal_desc': { label: 'Card Eterno - Descrição', type: 'textarea', icon: MessageSquare },
         'home.newsletter.title': { label: 'Título Newsletter', type: 'text', icon: Type },
         'home.newsletter.description': { label: 'Descrição Newsletter', type: 'textarea', icon: MessageSquare },
 
+        'about.hero.text': { label: 'Texto Hero (Principal)', type: 'textarea', icon: Layout },
         'about.mission.title': { label: 'Título Missão', type: 'text', icon: Type },
-        'about.values': { label: 'Valores (Estrutura JSON)', type: 'json', icon: FileText },
-        'about.stats': { label: 'Estatísticas (Estrutura JSON)', type: 'json', icon: Layout },
-        'about.timeline': { label: 'Timeline (Estrutura JSON)', type: 'json', icon: Globe },
+        'about.philosophy': { label: 'Filosofia Grid (JSON)', type: 'json', icon: Sparkles },
+        'about.values': { label: 'Pilhares de Prestígio (JSON)', type: 'json', icon: FileText },
+        'about.stats': { label: 'Métricas de Impacto (JSON)', type: 'json', icon: Layout },
+        'about.timeline': { label: 'Timeline Narrativa (JSON)', type: 'json', icon: Globe },
+        'about.vision.quote': { label: 'Citação do Fundador', type: 'textarea', icon: MessageSquare },
 
         'services.hero.title': { label: 'Título Hero (Serviços)', type: 'text', icon: Type },
         'services.hero.subtitle': { label: 'Subtítulo Hero (Serviços)', type: 'text', icon: Type },
         'services.hero.description': { label: 'Descrição Hero (Serviços)', type: 'textarea', icon: Briefcase },
+        'services.methodology': { label: 'Arquitetura do Legado (JSON)', type: 'json', icon: Sparkles },
         'services.cta.title': { label: 'Título CTA', type: 'text', icon: Type },
         'services.cta.description': { label: 'Descrição CTA', type: 'textarea', icon: MessageSquare },
 
@@ -106,9 +212,9 @@ const AdminContentTab: React.FC = () => {
     };
 
     const getKeysForPage = () => {
-        if (selectedPage === 'home') return ['home.hero.title', 'home.hero.subtitle', 'home.hero.description', 'home.newsletter.title', 'home.newsletter.description'];
-        if (selectedPage === 'about') return ['about.values', 'about.stats', 'about.timeline', 'about.mission.title'];
-        if (selectedPage === 'services') return ['services.hero.title', 'services.hero.subtitle', 'services.hero.description', 'services.cta.title', 'services.cta.description'];
+        if (selectedPage === 'home') return ['home.hero.title', 'home.hero.subtitle', 'home.hero.description', 'home.experience.list', 'home.experience.premium_title', 'home.experience.premium_desc', 'home.experience.eternal_title', 'home.experience.eternal_desc', 'home.newsletter.title', 'home.newsletter.description'];
+        if (selectedPage === 'about') return ['about.hero.text', 'about.mission.title', 'about.philosophy', 'about.values', 'about.stats', 'about.timeline', 'about.vision.quote'];
+        if (selectedPage === 'services') return ['services.hero.title', 'services.hero.subtitle', 'services.hero.description', 'services.methodology', 'services.cta.title', 'services.cta.description'];
         return ['team.hero.title', 'team.hero.subtitle', 'team.hero.description', 'team.cta.title', 'team.cta.description'];
     };
 
@@ -120,7 +226,17 @@ const AdminContentTab: React.FC = () => {
                     <p className="text-gray-400 font-bold text-sm">Esculpa cada palavra e depoimento que define o site.</p>
                 </div>
 
-                <div className="flex bg-gray-100/50 p-2 rounded-[1.5rem] backdrop-blur-sm self-stretch xl:self-auto">
+                <div className="flex bg-gray-100/50 p-2 rounded-[1.5rem] backdrop-blur-sm self-stretch xl:self-auto gap-2">
+                    <button
+                        onClick={handleSyncPremium}
+                        disabled={isSyncing}
+                        className="px-6 py-3.5 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 bg-brand-dark/5 text-brand-dark hover:bg-brand-primary hover:text-white disabled:opacity-50"
+                        title="Sincronizar Padrões Premium"
+                    >
+                        {isSyncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4 text-brand-primary group-hover:text-white" />}
+                        Sync Premium
+                    </button>
+                    <div className="w-px h-8 bg-gray-200 self-center mx-2 hidden xl:block"></div>
                     <button
                         onClick={() => setActiveSubTab('text')}
                         className={`flex-1 xl:flex-none px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 ${activeSubTab === 'text' ? 'bg-white text-brand-primary shadow-xl scale-105' : 'text-gray-400 hover:text-brand-dark'}`}

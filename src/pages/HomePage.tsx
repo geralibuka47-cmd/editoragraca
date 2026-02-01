@@ -71,8 +71,10 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                         </m.div>
 
                         <m.h1 variants={fadeInUp} className="text-6xl md:text-8xl font-black uppercase leading-[0.9] tracking-tighter">
-                            Onde a Arte <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-amber-600">Encontra o Legado</span>
+                            {siteContent['home.hero.title'] || "Onde a Arte"} <br />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-amber-600">
+                                {siteContent['home.hero.subtitle'] || "Encontra o Legado"}
+                            </span>
                         </m.h1>
 
                         <m.p variants={fadeInUp} className="text-xl md:text-2xl text-gray-500 font-medium max-w-lg leading-relaxed">
@@ -166,11 +168,11 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                             Mais que uma editora, <br />um movimento.
                         </h2>
                         <ul className="space-y-6">
-                            {[
+                            {(siteContent['home.experience.list'] || [
                                 "Acabamentos de luxo em cada edição.",
                                 "Curadoria internacional de autores.",
                                 "Eventos exclusivos para membros."
-                            ].map((item, i) => (
+                            ]).map((item: string, i: number) => (
                                 <li key={i} className="flex items-center gap-4 text-xl font-medium text-gray-300">
                                     <CheckCircle className="w-6 h-6 text-brand-primary shrink-0" />
                                     {item}
@@ -181,13 +183,13 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                     <div className="grid grid-cols-2 gap-6">
                         <div className="bg-white/5 p-8 rounded-3xl backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-colors">
                             <Star className="w-10 h-10 text-brand-primary mb-6" />
-                            <h4 className="text-2xl font-black mb-2">Premium</h4>
-                            <p className="text-sm text-gray-400">Qualidade inegociável em cada página impressa.</p>
+                            <h4 className="text-2xl font-black mb-2">{siteContent['home.experience.premium_title'] || "Premium"}</h4>
+                            <p className="text-sm text-gray-400">{siteContent['home.experience.premium_desc'] || "Qualidade inegociável em cada página impressa."}</p>
                         </div>
                         <div className="bg-white/5 p-8 rounded-3xl backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-colors translate-y-12">
                             <Clock className="w-10 h-10 text-brand-primary mb-6" />
-                            <h4 className="text-2xl font-black mb-2">Eterno</h4>
-                            <p className="text-sm text-gray-400">Obras feitas para durar gerações.</p>
+                            <h4 className="text-2xl font-black mb-2">{siteContent['home.experience.eternal_title'] || "Eterno"}</h4>
+                            <p className="text-sm text-gray-400">{siteContent['home.experience.eternal_desc'] || "Obras feitas para durar gerações."}</p>
                         </div>
                     </div>
                 </div>

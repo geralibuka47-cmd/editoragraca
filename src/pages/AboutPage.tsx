@@ -14,7 +14,12 @@ const AboutPage: React.FC = () => {
         'Heart': Heart,
         'Award': Award,
         'Users': Users,
-        'TrendingUp': TrendingUp
+        'TrendingUp': TrendingUp,
+        'Target': Target,
+        'Sparkles': Sparkles,
+        'Zap': Zap,
+        'Star': Star,
+        'MapPin': MapPin
     };
 
     useEffect(() => {
@@ -31,6 +36,27 @@ const AboutPage: React.FC = () => {
         };
         loadContent();
     }, []);
+
+    const philosophy = siteContent['about.philosophy'] || [
+        {
+            icon: 'Target',
+            label: 'Filosofia Principal',
+            title: 'Rigor & Estética',
+            description: 'Cada obra é submetida a uma auditoria editorial implacável para garantir o status de obra-prima.'
+        },
+        {
+            icon: 'Sparkles',
+            label: 'Visão Futurista',
+            title: 'Inovação Nativa',
+            description: 'Lideramos a evolução da narrativa em Angola, mesclando tradição impressa com tecnologia imersiva.'
+        },
+        {
+            icon: 'Zap',
+            label: 'Impacto Cultural',
+            title: 'Legado Atemporal',
+            description: 'Construímos o cânone literário do futuro, dando voz aos pensadores que definem o nosso tempo.'
+        }
+    ];
 
     const values = siteContent['about.values'] || [
         {
@@ -56,10 +82,10 @@ const AboutPage: React.FC = () => {
     ];
 
     const stats = siteContent['about.stats'] || [
-        { number: '26+', label: 'Obras Publicadas', icon: BookOpen },
-        { number: '100%', label: 'Autores Angolanos', icon: Star },
-        { number: '5+', label: 'Anos de Actividade', icon: Zap },
-        { number: '18', label: 'Províncias Alcançadas', icon: MapPin }
+        { number: '26+', label: 'Obras Publicadas', icon: 'BookOpen' },
+        { number: '100%', label: 'Autores Angolanos', icon: 'Star' },
+        { number: '5+', label: 'Anos de Actividade', icon: 'Zap' },
+        { number: '18', label: 'Províncias Alcançadas', icon: 'MapPin' }
     ];
 
     const timeline = siteContent['about.timeline'] || [
@@ -143,7 +169,9 @@ const AboutPage: React.FC = () => {
                         </m.h1>
 
                         <m.p variants={itemVariants} className="text-xl md:text-3xl text-gray-400 font-light leading-relaxed max-w-4xl mx-auto lg:mx-0 opacity-80 mb-20">
-                            Uma casa editorial de elite comprometida com a sofisticação intelectual e a preservação do <span className="text-white font-black italic">património cultural</span> através da curadoria literária de alta performance.
+                            {siteContent['about.hero.text'] || (
+                                <>Uma casa editorial de elite comprometida com a sofisticação intelectual e a preservação do <span className="text-white font-black italic">património cultural</span> através da curadoria literária de alta performance.</>
+                            )}
                         </m.p>
 
                         <m.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-10 justify-center lg:justify-start">
@@ -169,44 +197,28 @@ const AboutPage: React.FC = () => {
             <section className="py-24 md:py-48 bg-white relative z-10 -mt-20">
                 <div className="container mx-auto px-6 md:px-12">
                     <div className="grid lg:grid-cols-3 gap-12 md:gap-20">
-                        {[
-                            {
-                                icon: Target,
-                                label: 'Filosofia Principal',
-                                title: 'Rigor & Estética',
-                                description: 'Cada obra é submetida a uma auditoria editorial implacável para garantir o status de obra-prima.'
-                            },
-                            {
-                                icon: Sparkles,
-                                label: 'Visão Futurista',
-                                title: 'Inovação Nativa',
-                                description: 'Lideramos a evolução da narrativa em Angola, mesclando tradição impressa com tecnologia imersiva.'
-                            },
-                            {
-                                icon: Zap,
-                                label: 'Impacto Cultural',
-                                title: 'Legado Atemporal',
-                                description: 'Construímos o cânone literário do futuro, dando voz aos pensadores que definem o nosso tempo.'
-                            }
-                        ].map((item, i) => (
-                            <m.div
-                                key={i}
-                                initial="hidden"
-                                whileInView="visible"
-                                viewport={{ once: true }}
-                                variants={itemVariants}
-                                className="group relative flex flex-col gap-8 bg-white p-12 md:p-16 rounded-[4rem] border border-gray-100 hover:border-brand-primary/20 hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.1)] transition-all duration-700"
-                            >
-                                <div className="w-20 h-20 bg-brand-dark text-brand-primary rounded-[1.5rem] flex items-center justify-center mb-4 group-hover:bg-brand-primary group-hover:text-white transition-all duration-500 group-hover:rotate-12">
-                                    <item.icon className="w-10 h-10" />
-                                </div>
-                                <div className="space-y-6">
-                                    <span className="text-brand-primary font-black uppercase tracking-[0.4em] text-[10px] block">{item.label}</span>
-                                    <h2 className="text-4xl font-black text-brand-dark tracking-tighter uppercase leading-none">{item.title}</h2>
-                                    <p className="text-gray-500 font-medium text-lg leading-relaxed">{item.description}</p>
-                                </div>
-                            </m.div>
-                        ))}
+                        {philosophy.map((item: any, i: number) => {
+                            const Icon = iconMap[item.icon] || Sparkles;
+                            return (
+                                <m.div
+                                    key={i}
+                                    initial="hidden"
+                                    whileInView="visible"
+                                    viewport={{ once: true }}
+                                    variants={itemVariants}
+                                    className="group relative flex flex-col gap-8 bg-white p-12 md:p-16 rounded-[4rem] border border-gray-100 hover:border-brand-primary/20 hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.1)] transition-all duration-700"
+                                >
+                                    <div className="w-20 h-20 bg-brand-dark text-brand-primary rounded-[1.5rem] flex items-center justify-center mb-4 group-hover:bg-brand-primary group-hover:text-white transition-all duration-500 group-hover:rotate-12">
+                                        <Icon className="w-10 h-10" />
+                                    </div>
+                                    <div className="space-y-6">
+                                        <span className="text-brand-primary font-black uppercase tracking-[0.4em] text-[10px] block">{item.label}</span>
+                                        <h2 className="text-4xl font-black text-brand-dark tracking-tighter uppercase leading-none">{item.title}</h2>
+                                        <p className="text-gray-500 font-medium text-lg leading-relaxed">{item.description}</p>
+                                    </div>
+                                </m.div>
+                            );
+                        })}
                     </div>
                 </div>
             </section>
@@ -266,7 +278,9 @@ const AboutPage: React.FC = () => {
                         <div className="grid lg:grid-cols-2 gap-24 items-center">
                             <div className="space-y-16">
                                 <h3 className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-[0.9] uppercase italic font-serif">
-                                    "Acreditamos que o talento angolano não merece apenas uma voz; merece um <span className="text-brand-primary not-italic font-sans">Palco Mundial</span> de magnitude absoluta."
+                                    {siteContent['about.vision.quote'] || (
+                                        <>"Acreditamos que o talento angolano não merece apenas uma voz; merece um <span className="text-brand-primary not-italic font-sans">Palco Mundial</span> de magnitude absoluta."</>
+                                    )}
                                 </h3>
 
                                 <div className="flex items-center gap-10">

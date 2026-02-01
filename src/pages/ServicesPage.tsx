@@ -145,28 +145,41 @@ const ServicesPage: React.FC = () => {
         return BookOpen;
     };
 
-    const processSteps = [
+    const processSteps = siteContent['services.methodology'] || [
         {
-            icon: MessageSquare,
+            icon: 'MessageSquare',
             title: 'Consulta Inicial',
             description: 'Conversamos sobre a sua obra, objetivos e público-alvo para definir a melhor estratégia.'
         },
         {
-            icon: Search,
+            icon: 'Search',
             title: 'Análise Editorial',
             description: 'A nossa equipa avalia o seu manuscrito e sugere os serviços ideais para o seu sucesso.'
         },
         {
-            icon: Zap,
+            icon: 'Zap',
             title: 'Execução Criativa',
             description: 'Transformamos o seu texto com revisão, diagramação e design de capa de nível mundial.'
         },
         {
-            icon: Award,
+            icon: 'Award',
             title: 'Publicação Final',
             description: 'Entregamos a sua obra pronta para o mercado, com toda a qualidade da Editora Graça.'
         }
     ];
+
+    const iconMap: Record<string, any> = {
+        'MessageSquare': MessageSquare,
+        'Search': Search,
+        'Zap': Zap,
+        'Award': Award,
+        'BookOpen': BookOpen,
+        'Pencil': Pencil,
+        'Palette': Palette,
+        'Shield': Shield,
+        'Megaphone': Megaphone,
+        'Printer': Printer
+    };
 
     return (
         <div className="min-h-screen bg-white overflow-x-hidden">
@@ -342,29 +355,32 @@ const ServicesPage: React.FC = () => {
                     </m.div>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 relative">
-                        {processSteps.map((step, idx) => (
-                            <m.div
-                                key={idx}
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: idx * 0.1 }}
-                                className="group p-12 rounded-[3.5rem] bg-gray-50 hover:bg-white border border-transparent hover:border-gray-100 hover:shadow-2xl transition-all duration-700"
-                            >
-                                <div className="mb-12 relative inline-block">
-                                    <div className="w-24 h-24 bg-brand-dark text-brand-primary rounded-[2rem] flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-700">
-                                        <step.icon className="w-10 h-10" />
+                        {processSteps.map((step: any, idx: number) => {
+                            const Icon = iconMap[step.icon] || Sparkles;
+                            return (
+                                <m.div
+                                    key={idx}
+                                    initial={{ opacity: 0, y: 30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: idx * 0.1 }}
+                                    className="group p-12 rounded-[3.5rem] bg-gray-50 hover:bg-white border border-transparent hover:border-gray-100 hover:shadow-2xl transition-all duration-700"
+                                >
+                                    <div className="mb-12 relative inline-block">
+                                        <div className="w-24 h-24 bg-brand-dark text-brand-primary rounded-[2rem] flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-700">
+                                            <Icon className="w-10 h-10" />
+                                        </div>
+                                        <div className="absolute -bottom-3 -right-3 w-10 h-10 bg-brand-primary text-white rounded-xl flex items-center justify-center text-xs font-black shadow-xl border-4 border-white">
+                                            0{idx + 1}
+                                        </div>
                                     </div>
-                                    <div className="absolute -bottom-3 -right-3 w-10 h-10 bg-brand-primary text-white rounded-xl flex items-center justify-center text-xs font-black shadow-xl border-4 border-white">
-                                        0{idx + 1}
-                                    </div>
-                                </div>
-                                <h4 className="text-2xl font-black text-brand-dark mb-6 tracking-tighter uppercase leading-tight">{step.title}</h4>
-                                <p className="text-gray-500 font-medium text-base leading-relaxed opacity-70 group-hover:opacity-100 transition-opacity">
-                                    {step.description}
-                                </p>
-                            </m.div>
-                        ))}
+                                    <h4 className="text-2xl font-black text-brand-dark mb-6 tracking-tighter uppercase leading-tight">{step.title}</h4>
+                                    <p className="text-gray-500 font-medium text-base leading-relaxed opacity-70 group-hover:opacity-100 transition-opacity">
+                                        {step.description}
+                                    </p>
+                                </m.div>
+                            );
+                        })}
                     </div>
                 </div>
             </section>
