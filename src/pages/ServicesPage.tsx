@@ -5,6 +5,7 @@ import { m, AnimatePresence, Variants } from 'framer-motion';
 import { ViewState, EditorialService } from '../types';
 import { getEditorialServices, getSiteContent } from '../services/dataService';
 import { ServiceCardSkeleton } from '../components/SkeletonLoader';
+import BudgetGenerator from '../components/BudgetGenerator';
 
 const ServicesPage: React.FC = () => {
     const navigate = useNavigate();
@@ -36,40 +37,79 @@ const ServicesPage: React.FC = () => {
         {
             id: 'f-1',
             icon: Pencil,
-            title: 'Revisão e Edição de Texto',
-            price: 'Desde 15.000 Kz',
+            title: 'Revisão e Edição',
+            price: '250 Kz / página',
             details: [
                 'Correção ortográfica e gramatical',
                 'Adequação ao acordo ortográfico',
-                'Sugestões de melhoria estilística',
+                'Preço reduzido para > 250 páginas (200 Kz)',
                 'Revisão de coerência e coesão',
-                'Até 2 rondas de revisão'
+                'Edição profissional completa'
             ]
         },
         {
             id: 'f-2',
             icon: BookOpen,
-            title: 'Diagramação Profissional',
-            price: 'Desde 20.000 Kz',
+            title: 'Diagramação',
+            price: '250 Kz / página',
             details: [
-                'Design de páginas interno',
-                'Tipografia profissional',
-                'Formatação de capítulos',
-                'Inclusão de imagens e gráficos',
-                'Arquivo pronto para impressão'
+                'Layout profissional para impressão',
+                'Tipografia avançada',
+                'Preço reduzido para > 250 páginas (200 Kz)',
+                'Inclusão de elementos gráficos',
+                'Arquivo pronto para a gráfica'
             ]
         },
         {
             id: 'f-3',
             icon: Palette,
             title: 'Design de Capa',
-            price: 'Desde 25.000 Kz',
+            price: '10.000 Kz',
             details: [
-                'Design exclusivo e original',
-                'Até 3 propostas de capa',
+                'Design exclusivo para livro físico',
+                'Opção E-book por 7.500 Kz',
                 'Revisões ilimitadas',
-                'Capa + lombada + contracapa',
+                'Adaptação para redes sociais',
                 'Arquivos em alta resolução'
+            ]
+        },
+        {
+            id: 'f-4',
+            icon: Shield,
+            title: 'Legalização',
+            price: '6.000 Kz',
+            details: [
+                'Registo Internacional ISBN',
+                'Depósito Legal obrigatório',
+                'Proteção de direitos autorais',
+                'Catalogação na fonte',
+                'Consultoria burocrática'
+            ]
+        },
+        {
+            id: 'f-5',
+            icon: Printer,
+            title: 'Impressão',
+            price: 'Desde 3.500 Kz',
+            details: [
+                'Valor varia conforme formato',
+                'Acabamento premium',
+                'Preço por exemplar',
+                'Sem tiragem mínima obrigatória',
+                'Prova de impressão incluída'
+            ]
+        },
+        {
+            id: 'f-6',
+            icon: Megaphone,
+            title: 'Marketing Digital',
+            price: '5.000 Kz / post',
+            details: [
+                'Criação de post publicitário',
+                'Design otimizado para Instagram',
+                'Foco em conversão e vendas',
+                'Copywriting persuasivo',
+                'Entrega em 24h'
             ]
         }
     ];
@@ -192,6 +232,42 @@ const ServicesPage: React.FC = () => {
                 </div>
             </section>
 
+            {/* Special Conditions Banner - NEW */}
+            <section className="bg-brand-primary py-8 relative overflow-hidden">
+                <div className="container mx-auto px-6 md:px-8">
+                    <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-24 text-white">
+                        <m.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            className="flex items-center gap-4 group"
+                        >
+                            <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
+                                <Zap className="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                                <span className="font-black uppercase tracking-[0.2em] text-[10px] block opacity-70">Facilidade</span>
+                                <span className="font-bold uppercase tracking-[0.1em] text-sm">Pagamento em 2 prestações</span>
+                            </div>
+                        </m.div>
+                        <div className="w-px h-10 bg-white/20 hidden md:block"></div>
+                        <m.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 }}
+                            className="flex items-center gap-4 group"
+                        >
+                            <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
+                                <Sparkles className="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                                <span className="font-black uppercase tracking-[0.2em] text-[10px] block opacity-70">Bónus Editorial</span>
+                                <span className="font-bold uppercase tracking-[0.1em] text-sm">2 Exemplares prova incluídos</span>
+                            </div>
+                        </m.div>
+                    </div>
+                </div>
+            </section>
+
             {/* Services Grid - High End Cards */}
             <section className="py-24 md:py-48 -mt-32 md:-mt-48 relative z-20 optimize-render">
                 <div className="container mx-auto px-6 md:px-8">
@@ -264,9 +340,20 @@ const ServicesPage: React.FC = () => {
                 </div>
             </section>
 
+            {/* Budget Calculator Section - NEW */}
+            <section className="py-24 bg-brand-dark/5 border-y border-brand-dark/10">
+                <div className="container mx-auto px-6 md:px-8">
+                    <div className="text-center mb-16">
+                        <span className="text-brand-primary font-black text-xs uppercase tracking-[0.5em] mb-4 block">Planejamento</span>
+                        <h2 className="text-4xl md:text-5xl font-black text-brand-dark tracking-tighter uppercase leading-none">Simule seu Investimento</h2>
+                    </div>
+                    <BudgetGenerator />
+                </div>
+            </section>
+
             {/* Methodology Section - Scientific & Artistic */}
             <section className="py-24 md:py-48 bg-white relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-[#F8FAFC] to-transparent"></div>
+                <div className="absolute top-0 left-0 w-1/2 h-full bg-gradient-to-r from-[#F8FAFC] to-transparent"></div>
 
                 <div className="container mx-auto px-6 md:px-8 relative z-10">
                     <m.div

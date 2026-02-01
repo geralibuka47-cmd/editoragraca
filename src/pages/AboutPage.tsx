@@ -107,7 +107,7 @@ const AboutPage: React.FC = () => {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-brand-light">
                 <Loader2 className="w-12 h-12 text-brand-primary animate-spin" />
-                <p className="text-gray-400 font-serif italic text-lg animate-pulse">Carregando a nossa história...</p>
+                <p className="text-gray-400 font-light italic text-lg animate-pulse">Carregando a nossa história...</p>
             </div>
         );
     }
@@ -142,7 +142,7 @@ const AboutPage: React.FC = () => {
 
                         <m.h1 variants={itemVariants} className="text-4xl sm:text-5xl md:text-8xl lg:text-[7rem] font-black tracking-tighter mb-8 md:mb-10 leading-[0.9] uppercase">
                             Onde a Arte <br />
-                            <span className="text-gradient-gold italic font-serif lowercase font-normal">Se Eterniza</span>
+                            <span className="text-gradient-gold italic font-light lowercase">Se Eterniza</span>
                         </m.h1>
 
                         <m.p variants={itemVariants} className="text-lg md:text-2xl text-gray-400 font-medium leading-relaxed max-w-4xl mx-auto lg:mx-0 mb-16 opacity-90">
@@ -231,7 +231,7 @@ const AboutPage: React.FC = () => {
                         <span className="text-brand-primary font-black text-xs uppercase tracking-[0.5em] mb-8 block">Nossa Bússola Ética</span>
                         <m.h2 variants={itemVariants} className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-brand-dark tracking-tighter mb-8 md:mb-10 uppercase leading-[0.9]">
                             Pilares de <br />
-                            <span className="text-gradient-gold italic font-serif font-normal lowercase">Prestígio</span>
+                            <span className="text-gradient-gold italic font-light lowercase">Prestígio</span>
                         </m.h2>
                         <div className="w-32 h-2 bg-brand-primary mx-auto rounded-full"></div>
                     </m.div>
@@ -274,7 +274,7 @@ const AboutPage: React.FC = () => {
 
                         <div className="grid lg:grid-cols-2 gap-24 items-center relative z-10">
                             <div className="space-y-16">
-                                <h3 className="text-3xl sm:text-4xl md:text-6xl font-black text-white tracking-tighter leading-[1] font-serif italic">
+                                <h3 className="text-3xl sm:text-4xl md:text-6xl font-black text-white tracking-tighter leading-[1] italic font-light">
                                     "Acreditamos que o talento angolano não merece apenas uma voz; merece um <span className="text-gradient-gold">palco mundial</span> de magnitude absoluta."
                                 </h3>
 
@@ -323,7 +323,7 @@ const AboutPage: React.FC = () => {
                         <span className="text-brand-primary font-black text-xs uppercase tracking-[0.5em] mb-8 block">A Jornada do Sucesso</span>
                         <m.h2 variants={itemVariants} className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-brand-dark tracking-tighter mb-8 md:mb-10 uppercase leading-[0.9]">
                             Evolução do <br />
-                            <span className="text-gradient-gold italic font-serif font-normal lowercase">Impossível</span>
+                            <span className="text-gradient-gold italic font-light lowercase">Impossível</span>
                         </m.h2>
                         <div className="w-32 h-2 bg-brand-primary mx-auto rounded-full"></div>
                     </m.div>
@@ -409,7 +409,7 @@ const AboutPage: React.FC = () => {
                     >
                         <h2 className="text-4xl sm:text-6xl md:text-8xl lg:text-[7.5rem] font-black text-brand-dark tracking-tighter leading-[0.9] uppercase">
                             Vamos Criar <br />
-                            <span className="text-gradient-gold italic font-serif lowercase font-normal">Sua História?</span>
+                            <span className="text-gradient-gold italic font-light lowercase">Sua História?</span>
                         </h2>
 
                         <div className="flex flex-col sm:flex-row gap-10 justify-center items-center">
@@ -431,7 +431,7 @@ const AboutPage: React.FC = () => {
                         </div>
 
                         <div className="pt-20 border-t border-gray-100">
-                            <p className="text-gray-400 font-serif italic text-2xl">"Editora Graça: Onde cada página é um legado eternizado."</p>
+                            <p className="text-gray-400 font-light italic text-2xl">"Editora Graça: Onde cada página é um legado eternizado."</p>
                         </div>
                     </m.div>
                 </div>
