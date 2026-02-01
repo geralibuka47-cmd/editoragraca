@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Heart, Award, Users, TrendingUp, MapPin, Mail, Phone, Loader2, Sparkles, Target, Zap, ArrowRight, Quote, Star } from 'lucide-react';
+import { BookOpen, Heart, Award, Users, TrendingUp, MapPin, Mail, Phone, Loader2, Sparkles, Target, Zap, ArrowRight, Quote, Star, ArrowUpRight } from 'lucide-react';
 import { m, AnimatePresence, Variants } from 'framer-motion';
-import { ViewState } from '../types';
 import { getSiteContent } from '../services/dataService';
 
 const AboutPage: React.FC = () => {
@@ -105,71 +104,71 @@ const AboutPage: React.FC = () => {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-brand-light">
+            <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-white">
                 <Loader2 className="w-12 h-12 text-brand-primary animate-spin" />
-                <p className="text-gray-400 font-light italic text-lg animate-pulse">Carregando a nossa história...</p>
+                <p className="text-gray-400 font-light italic text-lg animate-pulse">Tecendo narrativas imortais...</p>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] overflow-x-hidden">
+        <div className="min-h-screen bg-white overflow-x-hidden">
             {/* Nav Padding Spacer */}
-            <div className="h-[120px] lg:h-[128px] bg-brand-dark"></div>
+            <div className="h-20 md:h-24 bg-brand-dark"></div>
 
-            {/* Premium Hero Section - Ultra Deep Immersive */}
-            <section className="relative min-h-screen flex items-center bg-brand-dark text-white pt-24 pb-48 md:pb-64 overflow-hidden">
-                {/* Visual Elements */}
-                <m.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 2 }}
-                    className="absolute top-0 right-0 w-[90%] aspect-square bg-[#C4A052]/5 blur-[150px] rounded-full -translate-y-1/2 translate-x-1/4"
-                ></m.div>
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,_rgba(196,160,82,0.1)_0%,_transparent_70%)]"></div>
+            {/* 1. CINEMATIC HERO */}
+            <section className="relative bg-brand-dark text-white pt-24 pb-48 md:pt-32 md:pb-64 overflow-hidden">
+                {/* Background Decorative Text */}
+                <div className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-1/4 select-none pointer-events-none opacity-[0.03] whitespace-nowrap">
+                    <span className="text-[30rem] font-black uppercase tracking-tighter leading-none">
+                        HISTÓRIA
+                    </span>
+                </div>
 
-                <div className="container mx-auto px-6 md:px-8 relative z-10 text-center lg:text-left">
+                <div className="container mx-auto px-6 md:px-12 relative z-10 text-center lg:text-left">
                     <m.div
                         initial="hidden"
                         animate="visible"
                         variants={containerVariants}
                         className="max-w-6xl"
                     >
-                        <m.div variants={itemVariants} className="inline-flex items-center gap-4 px-6 py-2.5 bg-white/5 backdrop-blur-xl rounded-full border border-white/10 text-brand-primary font-black text-[10px] md:text-xs uppercase tracking-[0.5em] mb-12">
+                        <m.div variants={itemVariants} className="flex items-center justify-center lg:justify-start gap-4 text-[10px] text-brand-primary font-black uppercase tracking-[0.4em] mb-12">
                             <Sparkles className="w-4 h-4" />
                             <span>Vanguardismo Literário Angolano</span>
                         </m.div>
 
-                        <m.h1 variants={itemVariants} className="text-4xl sm:text-5xl md:text-8xl lg:text-[7rem] font-black tracking-tighter mb-8 md:mb-10 leading-[0.9] uppercase">
-                            Onde a Arte <br />
-                            <span className="text-gradient-gold italic font-light lowercase">Se Eterniza</span>
+                        <m.h1 variants={itemVariants} className="text-6xl md:text-[10rem] font-black uppercase leading-[0.8] tracking-tighter mb-12">
+                            A Arte de <br />
+                            <span className="text-brand-primary italic font-serif lowercase font-normal md:text-[8rem]">Eternizar</span>
                         </m.h1>
 
-                        <m.p variants={itemVariants} className="text-lg md:text-2xl text-gray-400 font-medium leading-relaxed max-w-4xl mx-auto lg:mx-0 mb-16 opacity-90">
-                            Uma casa editorial de elite comprometida com a sofisticação intelectual e a preservação do <span className="text-white">património cultural</span> através da curadoria literária de alta performance.
+                        <m.p variants={itemVariants} className="text-xl md:text-3xl text-gray-400 font-light leading-relaxed max-w-4xl mx-auto lg:mx-0 opacity-80 mb-20">
+                            Uma casa editorial de elite comprometida com a sofisticação intelectual e a preservação do <span className="text-white font-black italic">património cultural</span> através da curadoria literária de alta performance.
                         </m.p>
 
-                        <m.div variants={itemVariants} className="flex flex-wrap justify-center lg:justify-start gap-12 items-center">
+                        <m.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-10 justify-center lg:justify-start">
                             <div className="flex -space-x-4">
                                 {[26, 27, 28, 29].map(i => (
-                                    <div key={i} className="w-20 h-20 rounded-2xl border-4 border-brand-dark bg-gray-800 overflow-hidden shadow-2xl grayscale hover:grayscale-0 transition-all duration-700">
+                                    <div key={i} className="w-14 h-14 rounded-2xl border-4 border-brand-dark bg-gray-800 overflow-hidden shadow-2xl grayscale hover:grayscale-0 transition-all duration-700">
                                         <img src={`https://i.pravatar.cc/100?img=${i}`} alt="Autor de Elite" className="w-full h-full object-cover" />
                                     </div>
                                 ))}
                             </div>
                             <div className="text-left py-2 px-6 border-l border-white/10">
-                                <span className="text-white font-black text-2xl tracking-tighter block">Ecossistema de Elite</span>
-                                <span className="text-brand-primary text-[10px] font-black uppercase tracking-[0.4em]">Propulsão Literária Mundial</span>
+                                <span className="text-white font-black text-2xl tracking-tighter block leading-none">Ecossistema de Elite</span>
+                                <span className="text-brand-primary text-[9px] font-black uppercase tracking-[0.4em] mt-2 block">Propulsão Literária Mundial</span>
                             </div>
                         </m.div>
                     </m.div>
                 </div>
+
+                <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-white to-transparent"></div>
             </section>
 
-            {/* Mission/Vision/Purpose Grid - Redesigned for Impact */}
-            <section className="py-24 md:py-48 -mt-32 md:-mt-48 relative z-20 optimize-render">
-                <div className="container mx-auto px-6 md:px-8">
-                    <div className="grid lg:grid-cols-3 gap-12 md:gap-16">
+            {/* 2. PHILOSOPHY GRID */}
+            <section className="py-24 md:py-48 bg-white relative z-10 -mt-20">
+                <div className="container mx-auto px-6 md:px-12">
+                    <div className="grid lg:grid-cols-3 gap-12 md:gap-20">
                         {[
                             {
                                 icon: Target,
@@ -196,15 +195,15 @@ const AboutPage: React.FC = () => {
                                 whileInView="visible"
                                 viewport={{ once: true }}
                                 variants={itemVariants}
-                                className="glass-premium p-16 rounded-[4rem] border border-white shadow-2xl hover:-translate-y-4 transition-all duration-700 group flex flex-col items-center text-center"
+                                className="group relative flex flex-col gap-8 bg-white p-12 md:p-16 rounded-[4rem] border border-gray-100 hover:border-brand-primary/20 hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.1)] transition-all duration-700"
                             >
-                                <div className="w-24 h-24 bg-brand-dark text-brand-primary rounded-[2rem] flex items-center justify-center mb-12 group-hover:bg-brand-primary group-hover:text-white transition-all duration-500 group-hover:rotate-12 shadow-2xl">
-                                    <item.icon className="w-12 h-12" />
+                                <div className="w-20 h-20 bg-brand-dark text-brand-primary rounded-[1.5rem] flex items-center justify-center mb-4 group-hover:bg-brand-primary group-hover:text-white transition-all duration-500 group-hover:rotate-12">
+                                    <item.icon className="w-10 h-10" />
                                 </div>
                                 <div className="space-y-6">
-                                    <span className="text-brand-primary font-black uppercase tracking-[0.5em] text-[10px] block">{item.label}</span>
-                                    <h2 className="text-3xl font-black text-brand-dark tracking-tighter uppercase leading-none">{item.title}</h2>
-                                    <p className="text-reading group-hover:opacity-100 transition-opacity duration-700">{item.description}</p>
+                                    <span className="text-brand-primary font-black uppercase tracking-[0.4em] text-[10px] block">{item.label}</span>
+                                    <h2 className="text-4xl font-black text-brand-dark tracking-tighter uppercase leading-none">{item.title}</h2>
+                                    <p className="text-gray-500 font-medium text-lg leading-relaxed">{item.description}</p>
                                 </div>
                             </m.div>
                         ))}
@@ -212,15 +211,9 @@ const AboutPage: React.FC = () => {
                 </div>
             </section>
 
-            {/* Values Section - Premium Design */}
-            <section className="py-32 md:py-64 bg-white relative overflow-hidden">
-                <m.div
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    className="absolute -left-20 top-40 w-80 h-80 bg-brand-primary/5 rounded-full blur-[100px]"
-                ></m.div>
-
-                <div className="container mx-auto px-6 md:px-8 relative z-10">
+            {/* 3. VALUES - POWER PILLARS */}
+            <section className="py-24 md:py-48 bg-gray-50 border-y border-gray-100">
+                <div className="container mx-auto px-6 md:px-12">
                     <m.div
                         initial="hidden"
                         whileInView="visible"
@@ -228,12 +221,11 @@ const AboutPage: React.FC = () => {
                         variants={containerVariants}
                         className="text-center max-w-5xl mx-auto mb-32"
                     >
-                        <span className="text-brand-primary font-black text-xs uppercase tracking-[0.5em] mb-8 block">Nossa Bússola Ética</span>
-                        <m.h2 variants={itemVariants} className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-brand-dark tracking-tighter mb-8 md:mb-10 uppercase leading-[0.9]">
+                        <span className="text-brand-primary font-black text-[10px] uppercase tracking-[0.5em] mb-8 block">Bússola Axiológica</span>
+                        <m.h2 variants={itemVariants} className="text-6xl md:text-[8rem] font-black text-brand-dark tracking-tighter mb-10 leading-[0.85] uppercase">
                             Pilares de <br />
-                            <span className="text-gradient-gold italic font-light lowercase">Prestígio</span>
+                            <span className="text-brand-primary italic font-serif lowercase font-normal md:text-[7rem]">Prestígio</span>
                         </m.h2>
-                        <div className="w-32 h-2 bg-brand-primary mx-auto rounded-full"></div>
                     </m.div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
@@ -243,13 +235,13 @@ const AboutPage: React.FC = () => {
                                 <m.div
                                     key={index}
                                     variants={itemVariants}
-                                    className="p-8 md:p-12 rounded-[2.5rem] md:rounded-[3.5rem] border border-gray-100 hover:border-brand-primary/40 hover:bg-gray-50 transition-all duration-700 group flex flex-col items-center text-center"
+                                    className="p-12 rounded-[3.5rem] bg-white border border-transparent hover:border-brand-primary/20 transition-all duration-700 group flex flex-col items-center text-center hover:shadow-2xl"
                                 >
-                                    <div className="w-16 h-16 md:w-20 md:h-20 bg-gray-50 rounded-[1.2rem] md:rounded-[1.5rem] flex items-center justify-center mb-8 md:mb-10 group-hover:bg-brand-primary transition-all duration-500 shadow-xl border border-gray-100/50">
-                                        <Icon className="w-8 h-8 md:w-10 md:h-10 text-brand-primary group-hover:text-white" />
+                                    <div className="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center mb-10 group-hover:bg-brand-primary transition-all duration-500">
+                                        <Icon className="w-10 h-10 text-brand-primary group-hover:text-white" />
                                     </div>
-                                    <h3 className="text-xl md:text-2xl font-black text-brand-dark mb-4 md:mb-6 tracking-tighter uppercase leading-none">{value.title}</h3>
-                                    <p className="text-reading">{value.description}</p>
+                                    <h3 className="text-2xl font-black text-brand-dark mb-6 tracking-tighter uppercase leading-tight">{value.title}</h3>
+                                    <p className="text-gray-500 font-medium leading-relaxed">{value.description}</p>
                                 </m.div>
                             );
                         })}
@@ -257,62 +249,53 @@ const AboutPage: React.FC = () => {
                 </div>
             </section>
 
-            {/* Founder's Master Quote - Cinematic Design */}
-            <section className="py-32 md:py-64 bg-brand-dark relative overflow-hidden">
+            {/* 4. FOUNDER'S VISION */}
+            <section className="py-32 md:py-64 bg-brand-dark overflow-hidden relative">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(196,160,82,0.1)_0%,_transparent_100%)]"></div>
 
-                <div className="container mx-auto px-6 md:px-8">
+                <div className="container mx-auto px-6 md:px-12 relative z-10">
                     <m.div
-                        initial={{ opacity: 0, y: 50 }}
-                        whileInView={{ opacity: 1, y: 0 }}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
-                        transition={{ duration: 1 }}
-                        className="relative glass-premium p-12 md:p-32 rounded-[5rem] border border-white/5 overflow-hidden"
+                        transition={{ duration: 1.2 }}
+                        className="relative bg-white/5 backdrop-blur-3xl p-12 md:p-32 rounded-[5rem] border border-white/10 overflow-hidden"
                     >
-                        <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/5 to-transparent"></div>
-                        <Quote className="absolute top-16 left-16 w-32 h-32 text-white/5 opacity-10" />
+                        <Quote className="absolute top-16 left-16 w-32 h-32 text-brand-primary opacity-5" />
 
-                        <div className="grid lg:grid-cols-2 gap-24 items-center relative z-10">
+                        <div className="grid lg:grid-cols-2 gap-24 items-center">
                             <div className="space-y-16">
-                                <h3 className="text-3xl sm:text-4xl md:text-6xl font-black text-white tracking-tighter leading-[1] italic font-light">
-                                    "Acreditamos que o talento angolano não merece apenas uma voz; merece um <span className="text-gradient-gold">palco mundial</span> de magnitude absoluta."
+                                <h3 className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-[0.9] uppercase italic font-serif">
+                                    "Acreditamos que o talento angolano não merece apenas uma voz; merece um <span className="text-brand-primary not-italic font-sans">Palco Mundial</span> de magnitude absoluta."
                                 </h3>
 
                                 <div className="flex items-center gap-10">
-                                    <div className="w-24 h-[2px] bg-brand-primary rounded-full"></div>
+                                    <div className="w-24 h-[1px] bg-brand-primary"></div>
                                     <div>
-                                        <p className="text-white font-black text-4xl tracking-tighter uppercase">Nilton Graça</p>
-                                        <p className="text-brand-primary text-[11px] font-black uppercase tracking-[0.5em] mt-2">Visionário & Mentor Editorial</p>
+                                        <p className="text-white font-black text-4xl tracking-tighter uppercase leading-none">Nilton Graça</p>
+                                        <p className="text-brand-primary text-[10px] font-black uppercase tracking-[0.5em] mt-4">Visionário & Mentor Editorial</p>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="relative group cursor-none">
-                                <m.div
-                                    animate={{
-                                        scale: [1, 1.05, 1],
-                                        rotate: [0, 2, 0]
-                                    }}
-                                    transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-                                    className="relative z-10 aspect-square lg:aspect-[4/5] bg-gray-900 rounded-[4rem] border border-white/10 flex items-center justify-center overflow-hidden shadow-2xl group-hover:border-brand-primary/50 transition-colors"
-                                >
-                                    <div className="absolute inset-0 bg-brand-primary/10 mix-blend-overlay"></div>
-                                    <Users className="w-48 h-48 text-white/5 group-hover:scale-110 transition-transform duration-1000" />
-                                    <div className="absolute inset-x-0 bottom-0 p-12 bg-gradient-to-t from-brand-dark to-transparent">
-                                        <p className="text-white/60 font-black text-[10px] uppercase tracking-[0.4em] text-center">Essência do Autor</p>
+                            <div className="relative group overflow-hidden rounded-[4rem]">
+                                <div className="aspect-[4/5] bg-gray-900 border border-white/5 flex items-center justify-center relative transition-transform duration-1000 group-hover:scale-105">
+                                    <div className="absolute inset-0 bg-brand-primary/5 mix-blend-overlay"></div>
+                                    <Users className="w-48 h-48 text-white/5 opacity-50 group-hover:scale-110 transition-transform duration-1000" />
+                                    <div className="absolute inset-0 flex flex-col justify-end p-12 bg-gradient-to-t from-brand-dark to-transparent">
+                                        <p className="text-brand-primary font-black text-[10px] uppercase tracking-[0.4em]">Essência Curatorial</p>
+                                        <p className="text-white/40 text-[9px] font-bold uppercase tracking-[0.2em] mt-2">Fundador da Editora Graça</p>
                                     </div>
-                                </m.div>
-                                {/* Floating elements */}
-                                <div className="absolute -top-12 -right-12 w-48 h-48 bg-brand-primary/20 blur-[60px] rounded-full group-hover:bg-brand-primary/40 transition-all"></div>
+                                </div>
                             </div>
                         </div>
                     </m.div>
                 </div>
             </section>
 
-            {/* Timeline - Sophisticated Visual Narrative */}
-            <section className="py-32 md:py-64 bg-white relative">
-                <div className="container mx-auto px-6 md:px-8">
+            {/* 5. TIMELINE NARRATIVE */}
+            <section className="py-24 md:py-48 bg-white overflow-hidden relative">
+                <div className="container mx-auto px-6 md:px-12">
                     <m.div
                         initial="hidden"
                         whileInView="visible"
@@ -320,17 +303,16 @@ const AboutPage: React.FC = () => {
                         variants={containerVariants}
                         className="text-center mb-48"
                     >
-                        <span className="text-brand-primary font-black text-xs uppercase tracking-[0.5em] mb-8 block">A Jornada do Sucesso</span>
-                        <m.h2 variants={itemVariants} className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-brand-dark tracking-tighter mb-8 md:mb-10 uppercase leading-[0.9]">
-                            Evolução do <br />
-                            <span className="text-gradient-gold italic font-light lowercase">Impossível</span>
+                        <span className="text-brand-primary font-black text-[10px] uppercase tracking-[0.5em] mb-8 block">Cronologia da Excelência</span>
+                        <m.h2 variants={itemVariants} className="text-6xl md:text-[8rem] font-black text-brand-dark tracking-tighter mb-10 leading-[0.85] uppercase">
+                            Génese do <br />
+                            <span className="text-brand-primary italic font-serif lowercase font-normal md:text-[7rem]">Impossível</span>
                         </m.h2>
-                        <div className="w-32 h-2 bg-brand-primary mx-auto rounded-full"></div>
                     </m.div>
 
-                    <div className="max-w-6xl mx-auto space-y-24 md:space-y-40 relative">
-                        {/* Central Line */}
-                        <div className="absolute left-[50%] top-0 bottom-0 w-[1px] bg-gray-100 hidden md:block"></div>
+                    <div className="max-w-6xl mx-auto space-y-32 md:space-y-64 relative">
+                        {/* Central Spine */}
+                        <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gray-100 hidden md:block"></div>
 
                         {timeline.map((item: any, index: number) => (
                             <m.div
@@ -338,56 +320,56 @@ const AboutPage: React.FC = () => {
                                 initial={{ opacity: 0, y: 50 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                className={`flex flex-col md:flex-row gap-8 md:gap-20 items-center relative ${index % 2 === 0 ? '' : 'md:flex-row-reverse'}`}
+                                transition={{ delay: index * 0.1 }}
+                                className={`flex flex-col md:flex-row gap-8 md:gap-24 items-center relative ${index % 2 === 0 ? '' : 'md:flex-row-reverse'}`}
                             >
                                 <div className={`flex-1 ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'}`}>
                                     <m.span
-                                        initial={{ opacity: 0, scale: 0.5 }}
-                                        whileInView={{ opacity: 0.1, scale: 1 }}
-                                        className="text-brand-primary text-[5rem] sm:text-[8rem] md:text-[10rem] font-black leading-none block mb-[-1rem] md:-mb-12"
+                                        initial={{ opacity: 0, scale: 0.8 }}
+                                        whileInView={{ opacity: 0.05, scale: 1 }}
+                                        className="text-brand-primary text-[10rem] md:text-[15rem] font-black leading-none block mb-[-2rem] md:-mb-24 pointer-events-none select-none"
                                     >
                                         {item.date?.slice(-2) || item.year?.slice(-2)}
                                     </m.span>
-                                    <div className="relative z-10 text-center md:text-inherit px-4 md:px-0">
-                                        <h3 className="text-2xl md:text-4xl font-black text-brand-dark mb-4 md:mb-6 uppercase tracking-tighter">{item.title}</h3>
-                                        <p className="text-gray-500 font-bold text-base md:text-lg leading-relaxed max-w-lg mx-auto md:mx-0 ${index % 2 === 0 ? 'md:ml-auto' : ''}">
+                                    <div className="relative z-10 px-4">
+                                        <h3 className="text-3xl md:text-5xl font-black text-brand-dark mb-6 uppercase tracking-tighter">{item.title}</h3>
+                                        <p className="text-gray-500 font-medium text-lg md:text-xl leading-relaxed max-w-lg mx-auto md:mx-0 ${index % 2 === 0 ? 'md:ml-auto' : ''}">
                                             {item.description}
                                         </p>
                                     </div>
                                 </div>
-                                <div className="w-8 h-8 md:w-10 md:h-10 rounded-[1rem] md:rounded-[1.5rem] bg-brand-dark border-4 border-brand-primary shadow-[0_0_40px_rgba(196,160,82,0.4)] shrink-0 z-20 hidden md:block transition-transform duration-500"></div>
-                                <div className="flex-1 hidden md:block px-12">
-                                    <div className="w-full h-px bg-gray-100 relative">
-                                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-gray-200 rounded-full"></div>
-                                    </div>
-                                </div>
+
+                                <div className="w-10 h-10 rounded-2xl bg-brand-dark border-4 border-brand-primary shadow-2xl shrink-0 z-20 hidden md:block group-hover:scale-125 transition-transform duration-700"></div>
+
+                                <div className="flex-1 hidden md:block"></div>
                             </m.div>
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* High impact Stats - Power Grid */}
+            {/* 6. POWER STATS */}
             <section className="py-32 md:py-64 bg-brand-dark text-white relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_70%_30%,_rgba(196,160,82,0.05)_0%,_transparent_70%)]"></div>
-
-                <div className="container mx-auto px-6 md:px-8 relative z-10">
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-16 md:gap-32">
+                <div className="container mx-auto px-6 md:px-12 relative z-10">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-12 md:gap-32">
                         {stats.map((stat: any, index: number) => {
                             const StatIcon = stat.icon || BookOpen;
                             return (
                                 <m.div
                                     key={index}
-                                    variants={itemVariants}
+                                    initial={{ opacity: 0, y: 30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: index * 0.1 }}
                                     className="text-center group"
                                 >
-                                    <div className="w-24 h-24 glass-premium rounded-[2rem] flex items-center justify-center mx-auto mb-10 group-hover:bg-brand-primary group-hover:scale-110 transition-all duration-700 shadow-2xl border border-white/5">
-                                        <StatIcon className="w-12 h-12 text-brand-primary group-hover:text-white" />
+                                    <div className="w-20 h-20 bg-white/5 border border-white/10 rounded-3xl flex items-center justify-center mx-auto mb-10 group-hover:bg-brand-primary group-hover:scale-110 transition-all duration-700 shadow-2xl">
+                                        <StatIcon className="w-10 h-10 text-brand-primary group-hover:text-white" />
                                     </div>
-                                    <div className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tighter mb-4 md:mb-6 leading-none group-hover:text-gradient-gold transition-all">
+                                    <div className="text-5xl md:text-8xl font-black text-white tracking-tighter mb-4 leading-none group-hover:text-brand-primary transition-colors">
                                         {stat.number}
                                     </div>
-                                    <div className="text-[10px] md:text-[12px] font-black uppercase tracking-[0.5em] text-gray-500 group-hover:text-brand-primary transition-colors">
+                                    <div className="text-[10px] font-black uppercase tracking-[0.5em] text-gray-500 group-hover:text-white transition-colors">
                                         {stat.label}
                                     </div>
                                 </m.div>
@@ -397,41 +379,39 @@ const AboutPage: React.FC = () => {
                 </div>
             </section>
 
-            {/* Final Artistic CTA */}
+            {/* 7. FINAL CTA */}
             <section className="py-32 md:py-64 bg-white relative">
-                <div className="container mx-auto px-6 md:px-8 text-center relative z-10">
+                <div className="container mx-auto px-6 md:px-12 text-center relative z-10">
                     <m.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
-                        transition={{ duration: 1 }}
                         className="max-w-6xl mx-auto space-y-20"
                     >
-                        <h2 className="text-4xl sm:text-6xl md:text-8xl lg:text-[7.5rem] font-black text-brand-dark tracking-tighter leading-[0.9] uppercase">
-                            Vamos Criar <br />
-                            <span className="text-gradient-gold italic font-light lowercase">Sua História?</span>
+                        <h2 className="text-6xl md:text-[10rem] font-black text-brand-dark tracking-tighter leading-[0.8] uppercase">
+                            Faça Parte <br />
+                            <span className="text-brand-primary italic font-serif lowercase font-normal md:text-[9rem]">do Futuro</span>
                         </h2>
 
                         <div className="flex flex-col sm:flex-row gap-10 justify-center items-center">
                             <button
                                 onClick={() => navigate('/contacto')}
-                                className="w-full sm:w-auto px-20 py-10 bg-brand-dark text-white font-black rounded-[2rem] hover:bg-brand-primary hover:scale-105 active:scale-95 transition-all text-xs uppercase tracking-[0.5em] shadow-2xl flex items-center justify-center gap-6 group"
+                                className="w-full sm:w-auto px-20 py-10 bg-brand-dark text-white font-black rounded-2xl hover:bg-brand-primary hover:scale-105 active:scale-95 transition-all text-[11px] uppercase tracking-[0.5em] shadow-2xl flex items-center justify-center gap-6 group"
+                                title="Iniciar Parceria Editorial de Alta Performance"
+                                aria-label="Iniciar Parceria Editorial de Alta Performance"
                             >
-                                Iniciar Parceria de Elite
+                                Iniciar Parceria
                                 <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
                             </button>
 
                             <button
                                 onClick={() => navigate('/livros')}
-                                className="w-full sm:w-auto px-20 py-10 glass-premium border border-gray-100 text-brand-dark font-black rounded-[2rem] hover:bg-gray-50 hover:scale-105 active:scale-95 transition-all text-xs uppercase tracking-[0.5em] flex items-center justify-center gap-6"
+                                className="w-full sm:w-auto px-20 py-10 bg-white border-2 border-brand-dark text-brand-dark font-black rounded-2xl hover:bg-gray-50 hover:scale-105 active:scale-95 transition-all text-[11px] uppercase tracking-[0.5em] flex items-center justify-center gap-6 group"
+                                title="Ver Catálogo de Atemporal"
+                                aria-label="Ver Catálogo de Atemporal"
                             >
-                                Ver Curadoria Atual
-                                <BookOpen className="w-6 h-6" />
+                                Ver Acervo <ArrowUpRight className="w-6 h-6" />
                             </button>
-                        </div>
-
-                        <div className="pt-20 border-t border-gray-100">
-                            <p className="text-gray-400 font-light italic text-2xl">"Editora Graça: Onde cada página é um legado eternizado."</p>
                         </div>
                     </m.div>
                 </div>
