@@ -193,8 +193,11 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
 
     return (
         <div className="min-h-screen bg-brand-light">
+            {/* Nav Padding Spacer */}
+            <div className="h-20 md:h-24 bg-brand-dark"></div>
+
             {/* Header - Immersive */}
-            <section className="bg-brand-dark text-white pt-24 pb-32 relative overflow-hidden">
+            <section className="bg-brand-dark text-white pt-20 pb-32 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-[60%] aspect-square bg-brand-primary/10 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/4"></div>
 
                 <div className="container mx-auto px-6 md:px-8 relative z-10">

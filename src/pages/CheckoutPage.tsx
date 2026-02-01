@@ -90,6 +90,9 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
     if (step === 'cart') {
         return (
             <div className="min-h-screen bg-brand-light py-8 md:py-16">
+                {/* Nav Padding Spacer */}
+                <div className="h-20 md:h-24 bg-brand-light"></div>
+
                 <div className="container mx-auto px-4 md:px-8">
                     <button
                         onClick={() => navigate('/')}
@@ -202,6 +205,9 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
     if (step === 'details') {
         return (
             <div className="min-h-screen bg-brand-light py-8 md:py-16">
+                {/* Nav Padding Spacer */}
+                <div className="h-20 md:h-24 bg-brand-light"></div>
+
                 <div className="container mx-auto px-4 md:px-8 max-w-4xl">
                     <button
                         onClick={() => setStep('cart')}
@@ -374,7 +380,10 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
 
     // Success View
     return (
-        <div className="min-h-screen bg-brand-light py-12 md:py-16 flex items-center">
+        <div className="min-h-screen bg-brand-light py-12 md:py-16 flex flex-col items-center">
+            {/* Nav Padding Spacer */}
+            <div className="h-20 md:h-24 bg-brand-light"></div>
+
             <div className="container mx-auto px-4 md:px-8 max-w-2xl text-center">
                 <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 animate-fade-in">
                     <div className="w-16 h-16 md:w-20 md:h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">

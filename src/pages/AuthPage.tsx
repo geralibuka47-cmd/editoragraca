@@ -162,7 +162,10 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 md:p-10 bg-[#F8FAFC] relative overflow-hidden">
+        <div className="min-h-screen flex flex-col items-center justify-center p-4 md:p-10 bg-[#F8FAFC] relative overflow-hidden">
+            {/* Nav Padding Spacer */}
+            <div className="h-16 md:h-20"></div>
+
             {/* Background Decorative Elements */}
             <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top_right,_rgba(196,160,82,0.05)_0%,_transparent_50%)]"></div>
             <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_bottom_left,_rgba(59,130,246,0.03)_0%,_transparent_40%)]"></div>

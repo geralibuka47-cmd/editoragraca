@@ -73,8 +73,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user }) => {
 
     return (
         <div className="min-h-screen bg-[#F8FAFC]">
+            {/* Nav Padding Spacer */}
+            <div className="h-20 md:h-24 bg-brand-dark"></div>
+
             {/* Header */}
-            <section className="bg-brand-dark pt-12 pb-24 relative overflow-hidden">
+            <section className="bg-brand-dark pt-20 pb-24 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-1/3 h-full bg-brand-primary/5 blur-[100px] rounded-full"></div>
                 <div className="absolute bottom-0 left-0 w-1/4 h-1/2 bg-blue-500/5 blur-[80px] rounded-full"></div>
 

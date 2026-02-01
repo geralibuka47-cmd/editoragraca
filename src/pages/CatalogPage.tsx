@@ -126,8 +126,11 @@ const CatalogPage: React.FC<CatalogPageProps> = ({
 
     return (
         <div className="min-h-screen bg-[#F8FAFC]">
+            {/* Nav Padding Spacer */}
+            <div className="h-20 md:h-24 bg-brand-dark"></div>
+
             {/* Premium Hero Header */}
-            <section className="bg-brand-dark text-white pt-24 pb-32 md:pt-32 md:pb-48 relative overflow-hidden">
+            <section className="bg-brand-dark text-white pt-20 pb-32 md:pt-24 md:pb-48 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-1/2 h-full bg-brand-primary/5 blur-[120px] rounded-full"></div>
                 <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-brand-primary/20 to-transparent"></div>
 

@@ -277,8 +277,11 @@ const BlogPage: React.FC<BlogPageProps> = ({ user }) => {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-12">
+            {/* Nav Padding Spacer */}
+            <div className="h-20 md:h-24 bg-brand-dark"></div>
+
             {/* Header */}
-            <div className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
+            <div className="bg-white border-b border-gray-200 sticky top-20 md:top-24 z-10 shadow-sm">
                 <div className="container mx-auto px-4 py-6">
                     <div className="flex items-center justify-between">
                         <div>
