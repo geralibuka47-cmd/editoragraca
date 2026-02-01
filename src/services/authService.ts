@@ -68,7 +68,7 @@ export const login = async (email: string, password: string): Promise<User | nul
 /**
  * Sign up with email, password, and name
  */
-export const signUp = async (email: string, password: string, name: string): Promise<User> => {
+export const signUp = async (email: string, password: string, name: string, role: 'leitor' | 'autor' = 'leitor'): Promise<User> => {
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const firebaseUser = userCredential.user;
@@ -78,13 +78,13 @@ export const signUp = async (email: string, password: string, name: string): Pro
             id: firebaseUser.uid,
             name: name,
             email: email,
-            role: 'leitor'
+            role: role
         };
 
         await setDoc(doc(db, 'users', firebaseUser.uid), {
             name,
             email,
-            role: 'leitor',
+            role: role,
             createdAt: new Date().toISOString()
         });
 

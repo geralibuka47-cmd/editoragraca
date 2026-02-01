@@ -64,7 +64,7 @@ const AdminOrdersTab: React.FC<AdminOrdersTabProps> = ({ user }) => {
         <div className="space-y-10">
             <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-8">
                 <div>
-                    <h2 className="text-4xl font-black text-brand-dark tracking-tighter uppercase mb-2">Fluxo de <span className="text-brand-primary lowercase italic font-serif">Vendas</span></h2>
+                    <h2 className="text-4xl font-black text-brand-dark tracking-tighter uppercase mb-2">Fluxo de <span className="text-brand-primary lowercase italic font-light">Vendas</span></h2>
                     <p className="text-gray-400 font-bold text-sm">Monitorização de pedidos e validação de pagamentos.</p>
                 </div>
             </div>

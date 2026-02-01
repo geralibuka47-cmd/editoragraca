@@ -17,6 +17,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
+    const [role, setRole] = useState<'leitor' | 'autor'>('leitor');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [connectionStatus, setConnectionStatus] = useState<'idle' | 'checking' | 'ok' | 'error'>('idle');
@@ -122,7 +123,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
                 }
             } else {
                 const user = await Promise.race([
-                    signUp(cleanEmail, password, cleanName),
+                    signUp(cleanEmail, password, cleanName, role),
                     timeoutPromise
                 ]) as any;
 
@@ -207,7 +208,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
                                 className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.9] uppercase"
                             >
                                 Junte-se ao Nosso <br />
-                                <span className="text-gradient-gold italic font-serif font-normal lowercase">Legado Literário</span>
+                                <span className="text-gradient-gold italic font-light lowercase">Legado Literário</span>
                             </m.h1>
 
                             <m.p
@@ -362,6 +363,34 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
                                     />
                                 </div>
                             </div>
+
+                            {!isLogin && (
+                                <div className="space-y-4">
+                                    <label className="text-[10px] uppercase tracking-[0.4em] font-black text-gray-400 ml-6">Perfil Graciano</label>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <button
+                                            type="button"
+                                            onClick={() => setRole('leitor')}
+                                            className={`py-4 rounded-3xl font-black text-[10px] uppercase tracking-widest transition-all border-2 
+                                                ${role === 'leitor'
+                                                    ? 'bg-brand-primary border-brand-primary text-white shadow-lg'
+                                                    : 'bg-white border-gray-100 text-gray-400 hover:border-brand-primary/20'}`}
+                                        >
+                                            Leitor
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setRole('autor')}
+                                            className={`py-4 rounded-3xl font-black text-[10px] uppercase tracking-widest transition-all border-2 
+                                                ${role === 'autor'
+                                                    ? 'bg-brand-primary border-brand-primary text-white shadow-lg'
+                                                    : 'bg-white border-gray-100 text-gray-400 hover:border-brand-primary/20'}`}
+                                        >
+                                            Autor
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
 
                             <m.button
                                 whileHover={{ scale: 1.02, y: -2 }}

@@ -116,7 +116,7 @@ const AdminContentTab: React.FC = () => {
         <div className="space-y-12">
             <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-8">
                 <div>
-                    <h2 className="text-4xl font-black text-brand-dark tracking-tighter uppercase mb-2">Narrativa <span className="text-brand-primary lowercase italic font-serif">Digital</span></h2>
+                    <h2 className="text-4xl font-black text-brand-dark tracking-tighter uppercase mb-2">Narrativa <span className="text-brand-primary lowercase italic font-light">Digital</span></h2>
                     <p className="text-gray-400 font-bold text-sm">Esculpa cada palavra e depoimento que define o site.</p>
                 </div>
 
@@ -348,7 +348,7 @@ const AdminContentTab: React.FC = () => {
                         >
                             <div className="p-10 border-b border-gray-100 flex items-center justify-between bg-gray-50/30">
                                 <div>
-                                    <h3 className="text-3xl font-black text-brand-dark tracking-tighter uppercase mb-1">Feedback de <span className="text-brand-primary lowercase italic font-serif">Impacto</span></h3>
+                                    <h3 className="text-3xl font-black text-brand-dark tracking-tighter uppercase mb-1">Feedback de <span className="text-brand-primary lowercase italic font-light">Impacto</span></h3>
                                     <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Edição de depoimento social</p>
                                 </div>
                                 <m.button

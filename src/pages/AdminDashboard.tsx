@@ -182,7 +182,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user }) => {
                                         <div className="space-y-12">
                                             <div className="flex justify-between items-center mb-12">
                                                 <div>
-                                                    <h2 className="text-3xl md:text-5xl font-black text-brand-dark tracking-tighter uppercase mb-2 leading-tight">Painel de <span className="text-brand-primary italic font-serif lowercase">Controlo</span></h2>
+                                                    <h2 className="text-3xl md:text-5xl font-black text-brand-dark tracking-tighter uppercase mb-2 leading-tight">Painel de <span className="text-brand-primary italic font-light lowercase">Controlo</span></h2>
                                                     <p className="text-gray-400 font-bold text-xs md:text-sm tracking-wide">Monitorização e gestão em tempo real.</p>
                                                 </div>
                                                 <button

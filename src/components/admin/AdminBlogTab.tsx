@@ -130,7 +130,7 @@ const AdminBlogTab: React.FC<AdminBlogTabProps> = ({ posts: initialPosts, onRefr
         <div className="max-w-4xl mx-auto space-y-12">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                 <div>
-                    <h2 className="text-4xl font-black text-brand-dark tracking-tighter uppercase mb-2">Editor de <span className="text-brand-primary lowercase italic font-serif text-5xl">Feed</span></h2>
+                    <h2 className="text-4xl font-black text-brand-dark tracking-tighter uppercase mb-2">Editor de <span className="text-brand-primary lowercase italic font-light text-5xl">Feed</span></h2>
                     <p className="text-gray-400 font-bold text-sm italic">Crie conexões reais com a sua comunidade de leitores.</p>
                 </div>
 

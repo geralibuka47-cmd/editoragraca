@@ -180,7 +180,7 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                 </div>
                                 <div>
                                     <h2 className="text-4xl font-black text-brand-dark tracking-tighter uppercase leading-none mb-2">
-                                        {book ? 'Lapidar' : 'Esculpir'} <span className="text-brand-primary lowercase italic font-serif">Obra</span>
+                                        {book ? 'Lapidar' : 'Esculpir'} <span className="text-brand-primary lowercase italic font-light">Obra</span>
                                     </h2>
                                     <p className="text-gray-400 font-bold text-[10px] uppercase tracking-widest">Metadata editorial e configuração de loja.</p>
                                 </div>
