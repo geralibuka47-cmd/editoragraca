@@ -11,7 +11,7 @@ interface TeamMember {
     department: string;
     bio: string;
     photoUrl: string;
-    order?: number;
+    displayOrder?: number;
 }
 
 const ContactPage: React.FC = () => {
@@ -39,7 +39,7 @@ const ContactPage: React.FC = () => {
             department: 'Administração',
             bio: 'Com mais de 15 anos de experiência no setor editorial, Geral lidera a visão estratégica da Editora Graça, garantindo excelência em cada publicação e promovendo a cultura angolana através da literatura.',
             photoUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=800&q=80',
-            order: 1
+            displayOrder: 1
         },
         {
             id: 'f-2',
@@ -48,7 +48,7 @@ const ContactPage: React.FC = () => {
             department: 'Editorial',
             bio: 'Responsável pela curadoria e revisão editorial de todas as obras publicadas. Maria tem olho afiado para boas histórias e compromisso inabalável com a qualidade literária.',
             photoUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=800&q=80',
-            order: 1
+            displayOrder: 2
         },
         {
             id: 'f-3',
@@ -57,7 +57,7 @@ const ContactPage: React.FC = () => {
             department: 'Design',
             bio: 'Especialista em design de capas e diagramação, João transforma manuscritos em obras visualmente deslumbrantes que capturam a essência de cada história.',
             photoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&q=80',
-            order: 1
+            displayOrder: 3
         }
     ];
 
@@ -66,6 +66,8 @@ const ContactPage: React.FC = () => {
             setIsLoadingTeam(true);
             try {
                 const membersData = await getTeamMembers();
+                // We keep fallback only if something goes wrong or no data exists yet
+                // But the priority is the database
                 setMembers(membersData.length > 0 ? membersData : FALLBACK_MEMBERS);
             } catch (error) {
                 console.error("Erro ao carregar dados da equipa:", error);

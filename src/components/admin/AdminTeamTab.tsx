@@ -10,7 +10,7 @@ const AdminTeamTab: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [isLoadingTeam, setIsLoadingTeam] = useState(true);
     const [showTeamModal, setShowTeamModal] = useState(false);
-    const [teamForm, setTeamForm] = useState<any>({ name: '', role: '', department: '', bio: '', photoUrl: '', order: 0 });
+    const [teamForm, setTeamForm] = useState<any>({ name: '', role: '', department: '', bio: '', photoUrl: '', displayOrder: 0 });
     const [isSavingTeam, setIsSavingTeam] = useState(false);
     const [teamErrors, setTeamErrors] = useState<Record<string, string>>({});
 
@@ -117,7 +117,7 @@ const AdminTeamTab: React.FC = () => {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => {
-                            setTeamForm({ name: '', role: '', department: '', bio: '', photoUrl: '', order: 0 });
+                            setTeamForm({ name: '', role: '', department: '', bio: '', photoUrl: '', displayOrder: 0 });
                             setShowTeamModal(true);
                         }}
                         className="btn-premium py-4 px-8 text-[10px] w-full sm:w-auto shadow-xl shadow-brand-primary/20"
@@ -180,7 +180,7 @@ const AdminTeamTab: React.FC = () => {
                                                 <span className="px-3 py-1 bg-brand-primary/5 text-brand-primary rounded-lg text-[9px] font-black uppercase tracking-widest">{member.department}</span>
                                             </td>
                                             <td className="px-8 py-6 text-right">
-                                                <span className="text-[10px] font-black text-gray-400">#{member.order}</span>
+                                                <span className="text-[10px] font-black text-gray-400">#{member.displayOrder || 0}</span>
                                             </td>
                                             <td className="px-8 py-6">
                                                 <div className="flex items-center justify-center gap-3">
@@ -323,8 +323,8 @@ const AdminTeamTab: React.FC = () => {
                                                 id="team-order"
                                                 type="number"
                                                 required
-                                                value={teamForm.order}
-                                                onChange={(e) => setTeamForm({ ...teamForm, order: parseInt(e.target.value) })}
+                                                value={teamForm.displayOrder || 0}
+                                                onChange={(e) => setTeamForm({ ...teamForm, displayOrder: parseInt(e.target.value) })}
                                                 className="w-full pl-12 pr-6 py-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-primary/20 focus:bg-white outline-none transition-all font-bold"
                                             />
                                         </div>
@@ -392,7 +392,7 @@ const AdminTeamTab: React.FC = () => {
                     </div>
                 )}
             </AnimatePresence>
-        </div>
+        </div >
     );
 };
 
