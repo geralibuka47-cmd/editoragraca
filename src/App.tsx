@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import { ToastProvider } from './components/Toast';
+import { ToastProvider, useToast } from './components/Toast';
 import { subscribeToAuthChanges } from './services/authService';
 import { getBooks } from './services/dataService';
 import { Book, User } from './types';
 import { Loader2 } from 'lucide-react';
 
 // Lazy loading pages
-const BookDetailModal = React.lazy(() => import('./components/BookDetailModal'));
+// Lazy loading pages
 const AuthPage = React.lazy(() => import('./pages/AuthPage'));
 const CatalogPage = React.lazy(() => import('./pages/CatalogPage'));
 const HomePage = React.lazy(() => import('./pages/HomePage'));
@@ -21,6 +21,7 @@ const BlogPage = React.lazy(() => import('./pages/BlogPage'));
 const ReaderDashboard = React.lazy(() => import('./pages/ReaderDashboard'));
 const AuthorDashboard = React.lazy(() => import('./pages/AuthorDashboard'));
 const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard'));
+const BookPage = React.lazy(() => import('./pages/BookPage'));
 
 // Scroll to top on route change
 const ScrollToTop = () => {
@@ -59,7 +60,7 @@ const AppContent: React.FC = () => {
         const saved = localStorage.getItem('cart');
         return saved ? JSON.parse(saved) : [];
     });
-    const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+    const { showToast } = useToast();
     const navigate = useNavigate();
 
     // Sync cart to local storage
@@ -116,6 +117,7 @@ const AppContent: React.FC = () => {
             }
             return [...prev, { ...book, quantity: 1 }];
         });
+        showToast(`"${book.title}" adicionado ao carrinho!`, 'success');
     };
 
     const handleUpdateQuantity = (bookId: string, newQuantity: number) => {
@@ -128,18 +130,7 @@ const AppContent: React.FC = () => {
 
     const handleAction = (type: string, payload?: any) => {
         if (type === 'VIEW_BOOK') {
-            // Fetch full book info if needed (minimal fetch doesn't have description/isbn)
-            const fetchFullBook = async () => {
-                try {
-                    const { getBooks } = await import('./services/dataService');
-                    const allBooks = await getBooks();
-                    const fullBook = allBooks.find(b => b.id === payload.id);
-                    setSelectedBook(fullBook || payload);
-                } catch (e) {
-                    setSelectedBook(payload);
-                }
-            };
-            fetchFullBook();
+            navigate(`/livro/${payload.id}`);
         } else if (type === 'ADD_TO_CART') {
             handleAddToCart(payload);
         } else if (type === 'NAVIGATE') {
@@ -253,29 +244,16 @@ const AppContent: React.FC = () => {
                             </ProtectedRoute>
                         } />
 
+                        <Route path="/livro/:id" element={
+                            <BookPage user={user} onAddToCart={(b) => handleAction('ADD_TO_CART', b)} />
+                        } />
+
                         <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
                 </React.Suspense>
             </main>
 
-            <Footer onNavigate={(v: string) => handleAction('NAVIGATE', v)} />
-
-            {/* Logic for Book Modal - kept global for simplicity */}
-            {selectedBook && (
-                <React.Suspense fallback={null}>
-                    <BookDetailModal
-                        isOpen={!!selectedBook}
-                        onClose={() => setSelectedBook(null)}
-                        book={selectedBook}
-                        onAddToCart={(b) => {
-                            handleAction('ADD_TO_CART', b);
-                            setSelectedBook(null);
-                        }}
-                        onNavigate={(v: string) => handleAction('NAVIGATE', v)}
-                        user={user}
-                    />
-                </React.Suspense>
-            )}
+            <Footer />
         </div>
     );
 };
