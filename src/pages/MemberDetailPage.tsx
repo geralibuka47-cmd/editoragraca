@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { m, useScroll, useTransform } from 'framer-motion';
+import { m, useScroll, useTransform, Variants } from 'framer-motion';
 import { ArrowLeft, Mail, Linkedin, Twitter, Sparkles, MapPin, Award, BookOpen, Quote, Loader2 } from 'lucide-react';
 import { getTeamMemberById } from '../services/dataService';
 
@@ -53,9 +53,9 @@ const MemberDetailPage: React.FC = () => {
         );
     }
 
-    const itemVariants = {
+    const itemVariants: Variants = {
         hidden: { opacity: 0, y: 30 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+        visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
     };
 
     return (
