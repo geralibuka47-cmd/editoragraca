@@ -192,12 +192,36 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
     }
 
     return (
-        <div className="min-h-screen bg-brand-light">
-            {/* Nav Padding Spacer */}
-            <div className="h-20 md:h-24 bg-brand-dark"></div>
+        <div className="min-h-screen bg-[#0A0A0A] text-white selection:bg-brand-primary/30">
+            {/* Dashboard Internal Header */}
+            <header className="h-24 bg-brand-dark/80 backdrop-blur-3xl border-b border-white/5 fixed top-0 left-0 right-0 z-[100] px-8 flex items-center justify-between">
+                <div
+                    onClick={() => navigate('/')}
+                    className="flex items-center gap-3 cursor-pointer group"
+                >
+                    <div className="w-10 h-10 bg-brand-primary rounded-xl flex items-center justify-center group-hover:shadow-[0_0_20px_rgba(189,147,56,0.3)] transition-all">
+                        <ArrowRight className="text-white w-5 h-5 rotate-180" />
+                    </div>
+                    <span className="text-[10px] font-black text-white uppercase tracking-[0.3em] hidden sm:block">Voltar ao Site</span>
+                </div>
+
+                <div className="flex items-center gap-6">
+                    <div className="text-right hidden sm:block">
+                        <p className="text-[10px] font-black text-white">{user.name}</p>
+                        <p className="text-[8px] text-brand-primary font-black uppercase tracking-[0.2em]">Escritor Protocol | Online</p>
+                    </div>
+                    <button
+                        onClick={() => navigate('/')}
+                        className="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors border border-white/5"
+                        title="Configurações"
+                    >
+                        <Settings className="w-4 h-4 text-gray-400" />
+                    </button>
+                </div>
+            </header>
 
             {/* Header - Immersive */}
-            <section className="bg-brand-dark text-white pt-20 pb-32 relative overflow-hidden">
+            <section className="bg-brand-dark text-white pt-32 pb-32 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-[60%] aspect-square bg-brand-primary/10 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/4"></div>
 
                 <div className="container mx-auto px-6 md:px-8 relative z-10">
@@ -217,38 +241,59 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
                             <p className="text-gray-400 font-bold mt-4 opacity-70">Sua central de produção e gestão literária.</p>
                         </div>
 
-                        <div className="flex items-center gap-5 bg-white/5 backdrop-blur-xl p-3 rounded-[2.5rem] border border-white/10 shadow-2xl">
-                            <div className="w-14 h-14 rounded-2xl bg-brand-primary/20 flex items-center justify-center text-brand-primary font-black text-2xl border border-brand-primary/20">
-                                {user.name.charAt(0)}
+                        <m.div
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            className="flex items-center gap-6 bg-white/[0.03] backdrop-blur-3xl p-6 rounded-[2.5rem] border border-white/5 shadow-2xl relative group"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-br from-brand-primary/5 to-transparent rounded-[2.5rem] -z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                            <div className="relative">
+                                <div className="w-16 h-16 rounded-2xl bg-brand-primary/10 flex items-center justify-center text-brand-primary font-black text-2xl border border-brand-primary/20 shadow-[0_0_20px_rgba(189,147,56,0.2)]">
+                                    {user.name.charAt(0)}
+                                </div>
+                                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-brand-primary rounded-lg flex items-center justify-center border-2 border-[#0D0D0D] shadow-lg">
+                                    <CheckCircle className="w-3 h-3 text-white" />
+                                </div>
                             </div>
+
                             <div className="pr-8">
-                                <p className="text-white text-base font-black leading-none mb-1.5">{user.name}</p>
-                                <p className="text-brand-primary text-[10px] font-black uppercase tracking-[0.2em] opacity-80">Membro da Comunidade</p>
+                                <h2 className="text-white text-lg font-black tracking-tight mb-1 uppercase">{user.name}</h2>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                                    <span className="text-brand-primary text-[8px] font-black uppercase tracking-[0.2em]">ESCRITOR PREMIUM</span>
+                                </div>
                             </div>
-                        </div>
+                        </m.div>
                     </div>
 
                     {/* Tabs - Modernized */}
-                    <div className="flex flex-wrap gap-4">
+                    <div className="flex flex-wrap justify-center md:justify-start gap-4 p-2 bg-white/[0.02] border border-white/5 rounded-3xl backdrop-blur-xl max-w-fit mx-auto md:mx-0">
                         {[
-                            { id: 'manuscripts', label: 'Meus Manuscritos', icon: FileText },
-                            { id: 'submit', label: 'Submeter Obra', icon: Upload },
-                            { id: 'royalties', label: 'Royalties & Vendas', icon: CreditCard },
-                            { id: 'banking', label: 'Dados Bancários', icon: Settings }
+                            { id: 'manuscripts', label: 'OBRAS', icon: FileText },
+                            { id: 'submit', label: 'SUBMETER', icon: Upload },
+                            { id: 'royalties', label: 'FINANCEIRO', icon: CreditCard },
+                            { id: 'banking', label: 'PROTOCOLOS', icon: Settings }
                         ].map((tab) => (
                             <m.button
-                                whileHover={{ y: -4 }}
+                                whileHover={{ scale: 1.02, backgroundColor: 'rgba(255,255,255,0.05)' }}
                                 whileTap={{ scale: 0.98 }}
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as any)}
-                                className={`px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all flex items-center gap-3 border-2 
+                                className={`px-8 py-4 rounded-2xl font-black text-[9px] uppercase tracking-[0.3em] transition-all flex items-center gap-4 relative overflow-hidden group
                                     ${activeTab === tab.id
-                                        ? 'bg-brand-primary border-brand-primary text-white shadow-xl shadow-brand-primary/20'
-                                        : 'bg-white/5 border-white/10 text-white hover:bg-white/10'
+                                        ? 'bg-brand-primary text-white shadow-[0_20px_40px_-10px_rgba(189,147,56,0.3)]'
+                                        : 'text-gray-500 hover:text-white'
                                     }`}
                             >
-                                <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? 'text-white' : 'text-brand-primary'}`} />
-                                {tab.label}
+                                <tab.icon className={`w-4 h-4 transition-transform group-hover:scale-110 ${activeTab === tab.id ? 'text-white' : 'text-brand-primary'}`} />
+                                <span className="relative z-10">{tab.label}</span>
+                                {activeTab === tab.id && (
+                                    <m.div
+                                        layoutId="tab-pill-auth"
+                                        className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"
+                                    />
+                                )}
                             </m.button>
                         ))}
                     </div>
@@ -264,60 +309,79 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -20 }}
-                            className="card-premium p-8 md:p-12 lg:p-16 min-h-[600px] shadow-2xl shadow-brand-dark/5"
+                            className="bg-white/5 backdrop-blur-3xl rounded-[4rem] border border-white/5 p-12 md:p-20 min-h-[700px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.5)] relative overflow-hidden"
                         >
+                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-primary/20 to-transparent" />
                             {/* Manuscripts Tab */}
                             {activeTab === 'manuscripts' && (
                                 <div className="space-y-12">
                                     <div className="flex items-center justify-between mb-8">
-                                        <h2 className="text-3xl md:text-5xl font-black text-brand-dark tracking-tighter uppercase leading-none">
-                                            Meus <span className="text-gradient-gold italic font-light lowercase">Manuscritos</span>
+                                        <h2 className="text-3xl md:text-5xl font-black text-white tracking-tighter uppercase leading-none">
+                                            Meus <span className="text-brand-primary italic font-light lowercase">Manuscritos</span>
                                         </h2>
                                     </div>
                                     <div className="grid gap-6">
                                         {isLoadingManuscripts ? (
-                                            <div className="text-center py-20 text-gray-500 italic">Carregando manuscritos...</div>
+                                            <div className="text-center py-20 text-gray-500 italic font-black uppercase text-[10px] tracking-widest">Sincronizando arquivos...</div>
                                         ) : manuscripts.length > 0 ? (
                                             manuscripts.map((manuscript) => (
-                                                <div key={manuscript.id} className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all">
-                                                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                                                <div key={manuscript.id} className="bg-white/[0.03] rounded-3xl border border-white/5 p-8 hover:bg-white/[0.05] transition-all group">
+                                                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                                                         <div className="flex-1">
-                                                            <h3 className="text-2xl font-black text-brand-dark mb-2">{manuscript.title}</h3>
-                                                            <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-                                                                <span className="flex items-center gap-2">
-                                                                    <FileText className="w-4 h-4" />
+                                                            <h3 className="text-2xl font-black text-white mb-2 group-hover:text-brand-primary transition-colors">{manuscript.title}</h3>
+                                                            <div className="flex flex-wrap gap-4 text-[10px] font-black uppercase tracking-widest text-gray-500">
+                                                                <span className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-lg border border-white/5">
+                                                                    <FileText className="w-3 h-3 text-brand-primary" />
                                                                     {manuscript.genre}
                                                                 </span>
-                                                                <span>Submetido: {new Date(manuscript.submittedDate).toLocaleDateString('pt-AO')}</span>
+                                                                <span className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-lg border border-white/5">
+                                                                    Submetido: {new Date(manuscript.submittedDate).toLocaleDateString('pt-AO')}
+                                                                </span>
                                                                 {manuscript.reviewedDate && (
-                                                                    <span>Analisado: {new Date(manuscript.reviewedDate).toLocaleDateString('pt-AO')}</span>
+                                                                    <span className="flex items-center gap-2 px-3 py-1 bg-brand-primary/10 rounded-lg border border-brand-primary/10 text-brand-primary">
+                                                                        Analisado: {new Date(manuscript.reviewedDate).toLocaleDateString('pt-AO')}
+                                                                    </span>
                                                                 )}
                                                             </div>
                                                         </div>
                                                         <div className="flex items-center gap-4">
-                                                            <div className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold ${getStatusColor(manuscript.status)}`}>
+                                                            <div className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] border ${getStatusColor(manuscript.status)}`}>
                                                                 {getStatusIcon(manuscript.status)}
                                                                 {getStatusText(manuscript.status)}
                                                             </div>
-                                                            <a href={manuscript.fileUrl} target="_blank" rel="noopener noreferrer" title="Ver manuscrito" aria-label="Ver ficheiro do manuscrito" className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all">
+                                                            <a
+                                                                href={manuscript.fileUrl}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                title="Ver manuscrito"
+                                                                aria-label="Ver ficheiro do manuscrito"
+                                                                className="w-12 h-12 bg-white/5 hover:bg-brand-primary/20 rounded-xl flex items-center justify-center border border-white/5 text-gray-400 hover:text-brand-primary transition-all"
+                                                            >
                                                                 <Eye className="w-5 h-5" />
                                                             </a>
                                                         </div>
                                                     </div>
 
                                                     {manuscript.feedback && (
-                                                        <div className="mt-4 p-4 bg-brand-light rounded-xl border border-brand-primary/20">
-                                                            <p className="text-[10px] font-black text-brand-primary uppercase tracking-widest mb-1">Feedback do Editor</p>
-                                                            <p className="text-sm text-gray-700 italic">"{manuscript.feedback}"</p>
+                                                        <div className="mt-6 p-6 bg-brand-primary/5 rounded-2xl border border-brand-primary/10">
+                                                            <p className="text-[9px] font-black text-brand-primary uppercase tracking-[0.3em] mb-2">Comentário Editorial</p>
+                                                            <p className="text-sm text-gray-400 font-medium italic leading-relaxed">"{manuscript.feedback}"</p>
                                                         </div>
                                                     )}
                                                 </div>
                                             ))
                                         ) : (
-                                            <div className="bg-white rounded-3xl p-12 text-center border-2 border-dashed border-gray-100">
-                                                <FileText className="w-16 h-16 text-gray-200 mx-auto mb-4" />
-                                                <p className="text-gray-500 font-medium">Ainda não submeteu nenhum manuscrito.</p>
-                                                <button onClick={() => setActiveTab('submit')} className="btn-premium mt-6 mx-auto">Submeter Primeiro Trabalho</button>
+                                            <div className="bg-white/5 rounded-3xl p-20 text-center border-2 border-dashed border-white/10">
+                                                <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-8">
+                                                    <FileText className="w-10 h-10 text-brand-primary opacity-50" />
+                                                </div>
+                                                <p className="text-gray-500 font-black uppercase text-[11px] tracking-[0.3em]">Nenhum manuscrito identificado</p>
+                                                <button
+                                                    onClick={() => setActiveTab('submit')}
+                                                    className="px-10 py-4 mt-10 bg-brand-primary hover:bg-brand-primary/90 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl transition-all shadow-xl shadow-brand-primary/20"
+                                                >
+                                                    Submeter Primeira Obra
+                                                </button>
                                             </div>
                                         )}
                                     </div>

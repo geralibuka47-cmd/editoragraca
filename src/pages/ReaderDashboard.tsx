@@ -124,11 +124,42 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user }) => {
 
     return (
         <div className="min-h-screen bg-[#0A0A0A] text-white selection:bg-brand-primary/30">
-            {/* Nav Padding Spacer */}
-            <div className="h-24 md:h-32 bg-black/50 backdrop-blur-md border-b border-white/5 fixed top-0 left-0 right-0 z-[100]"></div>
+            {/* Dashboard Internal Header */}
+            <header className="h-24 bg-black/80 backdrop-blur-3xl border-b border-white/5 fixed top-0 left-0 right-0 z-[100] px-8 flex items-center justify-between">
+                <div
+                    onClick={() => navigate('/')}
+                    className="flex items-center gap-3 cursor-pointer group"
+                >
+                    <div className="w-10 h-10 bg-brand-primary rounded-xl flex items-center justify-center group-hover:shadow-[0_0_20px_rgba(189,147,56,0.3)] transition-all">
+                        <ArrowRight className="text-white w-5 h-5 rotate-180" />
+                    </div>
+                    <span className="text-[10px] font-black text-white uppercase tracking-[0.3em] hidden sm:block">Voltar ao Site</span>
+                </div>
+
+                <div className="flex items-center gap-6">
+                    <div className="text-right hidden sm:block">
+                        <p className="text-[10px] font-black text-white">{user.name}</p>
+                        <p className="text-[8px] text-brand-primary font-black uppercase tracking-[0.2em]">Leitor Elite | Online</p>
+                    </div>
+                    <button
+                        onClick={() => setActiveTab('settings')}
+                        className="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors border border-white/5"
+                        title="Protocolos de Identidade"
+                    >
+                        <Settings className="w-4 h-4 text-gray-400" />
+                    </button>
+                    <button
+                        onClick={() => navigate('/')}
+                        className="p-3 bg-red-500/10 hover:bg-red-500/20 rounded-xl transition-colors border border-red-500/20 text-red-500"
+                        title="Terminar Sessão"
+                    >
+                        <ArrowRight className="w-4 h-4" />
+                    </button>
+                </div>
+            </header>
 
             {/* Header - Immersive */}
-            <section className="pt-48 pb-24 relative overflow-hidden">
+            <section className="pt-32 pb-24 relative overflow-hidden">
                 {/* Background Decorative Text */}
                 <div className="absolute top-20 left-1/2 -translate-x-1/2 pointer-events-none select-none z-0">
                     <span className="text-[15rem] md:text-[25rem] font-black text-white/[0.02] leading-none uppercase tracking-tighter">

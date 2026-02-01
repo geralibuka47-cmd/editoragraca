@@ -162,6 +162,11 @@ const AppContent: React.FC = () => {
         }
     };
 
+    const location = useLocation();
+    const isDashboard = location.pathname.startsWith('/admin') ||
+        location.pathname.startsWith('/autor') ||
+        location.pathname.startsWith('/minha-biblioteca');
+
     if (authLoading) {
         return (
             <div className="h-screen flex items-center justify-center bg-brand-light">
@@ -172,17 +177,19 @@ const AppContent: React.FC = () => {
 
     return (
         <div className="min-h-screen flex flex-col font-sans text-brand-dark bg-brand-light">
-            <Navbar
-                cartCount={cart.reduce((acc, item) => acc + item.quantity, 0)}
-                user={user}
-                onLogout={async () => {
-                    const { logout } = await import('./services/authService');
-                    await logout();
-                    navigate('/');
-                }}
-                currentView={location.pathname} // Passing path as currentView for now
-                onNavigate={(v: string) => handleAction('NAVIGATE', v)}
-            />
+            {!isDashboard && (
+                <Navbar
+                    cartCount={cart.reduce((acc, item) => acc + item.quantity, 0)}
+                    user={user}
+                    onLogout={async () => {
+                        const { logout } = await import('./services/authService');
+                        await logout();
+                        navigate('/');
+                    }}
+                    currentView={location.pathname}
+                    onNavigate={(v: string) => handleAction('NAVIGATE', v)}
+                />
+            )}
 
             <main className="flex-grow">
                 <React.Suspense fallback={
@@ -256,7 +263,7 @@ const AppContent: React.FC = () => {
                 </React.Suspense>
             </main>
 
-            <Footer />
+            {!isDashboard && <Footer />}
         </div>
     );
 };

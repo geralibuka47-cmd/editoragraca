@@ -21,7 +21,7 @@ const AdminStats: React.FC<AdminStatsProps> = ({ stats, isLoading }) => {
     ];
 
     return (
-        <div className="flex flex-wrap md:flex-nowrap gap-4 w-full">
+        <div className="flex flex-wrap gap-4 w-full">
             {statCards.map((stat, index) => (
                 <m.div
                     key={index}

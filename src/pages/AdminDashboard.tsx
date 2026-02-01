@@ -215,8 +215,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user }) => {
                         <div className="mb-12 relative overflow-hidden rounded-[3rem] bg-gradient-to-br from-[#111] to-[#070707] border border-white/5 p-12 group">
                             <div className="absolute top-0 right-0 w-96 h-96 bg-brand-primary/10 blur-[120px] rounded-full group-hover:bg-brand-primary/20 transition-all duration-1000" />
 
-                            <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
-                                <div>
+                            <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-12">
+                                <div className="max-w-2xl">
                                     <m.div
                                         initial={{ opacity: 0, x: -20 }}
                                         animate={{ opacity: 1, x: 0 }}
@@ -240,9 +240,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user }) => {
                                     </m.h3>
                                 </div>
 
-                                {activeTab === 'stats' && (
-                                    <AdminStats stats={stats} isLoading={isLoadingData} />
-                                )}
+                                <div className="w-full lg:w-auto overflow-x-auto pb-4 lg:pb-0">
+                                    {activeTab === 'stats' && (
+                                        <AdminStats stats={stats} isLoading={isLoadingData} />
+                                    )}
+                                </div>
                             </div>
                         </div>
 
