@@ -1,56 +1,93 @@
 import React from 'react';
-import { ShoppingBag, Eye } from 'lucide-react';
+import { ShoppingBag, Eye, Star, ArrowUpRight } from 'lucide-react';
 import { Book } from '../types';
 import { optimizeImageUrl } from '../components/OptimizedImage';
 
 interface BookCardProps {
     book: Book;
-    onAddToCart: (book: any) => void;
-    onToggleWishlist: (book: any) => void;
-    onViewDetails: (book: any) => void;
+    onAddToCart: (book: Book) => void;
+    onToggleWishlist: (book: Book) => void;
+    onViewDetails: (book: Book) => void;
 }
 
 const BookCard: React.FC<BookCardProps> = ({ book, onAddToCart, onViewDetails }) => {
     return (
         <div
-            className="group relative flex flex-col gap-4 cursor-pointer"
+            className="group relative flex flex-col gap-6 cursor-pointer"
             onClick={() => onViewDetails(book)}
         >
-            {/* Cover Image - Clean Rounded Architecture */}
-            <div className="relative aspect-[2/3] overflow-hidden rounded-2xl bg-gray-100 shadow-sm transition-all duration-500 group-hover:shadow-2xl group-hover:shadow-brand-primary/10 group-hover:-translate-y-2">
+            {/* 1. COVER ARCHITECTURE - Premium Cinematic */}
+            <div className="relative aspect-[2/3] overflow-hidden rounded-[2.5rem] bg-gray-50 shadow-sm transition-all duration-700 group-hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.15)] group-hover:-translate-y-4">
+
+                {/* Dynamic Image */}
                 <img
                     src={optimizeImageUrl(book.coverUrl)}
                     alt={book.title}
                     loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110 group-hover:rotate-1"
                 />
 
-                {/* Overlay Action - Tech Minimal */}
-                <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-white/95 backdrop-blur-md border-t border-gray-100 flex items-center justify-between">
-                    <span className="text-brand-dark font-black text-lg">
-                        {new Intl.NumberFormat('pt-AO', { style: 'currency', currency: 'AOA' }).format(book.price)}
-                    </span>
+                {/* Status Badges */}
+                <div className="absolute top-6 left-6 flex flex-col gap-2">
+                    {book.isBestseller && (
+                        <div className="px-4 py-2 bg-brand-primary text-white text-[8px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg flex items-center gap-2">
+                            <Star className="w-3 h-3 fill-current" />
+                            Bestseller
+                        </div>
+                    )}
+                    {book.isNew && (
+                        <div className="px-4 py-2 bg-brand-dark text-white text-[8px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg">
+                            Lançamento
+                        </div>
+                    )}
+                </div>
+
+                {/* Quick Action Overlay - Tech Minimal */}
+                <div className="absolute inset-0 bg-brand-dark/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 backdrop-blur-[2px] flex items-center justify-center gap-3">
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onViewDetails(book); }}
+                        className="p-5 bg-white text-brand-dark rounded-[1.5rem] hover:bg-brand-primary hover:text-white transition-all transform translate-y-8 group-hover:translate-y-0 duration-500 shadow-xl"
+                        title="Ver Detalhes"
+                    >
+                        <ArrowUpRight className="w-5 h-5" />
+                    </button>
                     <button
                         onClick={(e) => { e.stopPropagation(); onAddToCart(book); }}
-                        className="p-2 bg-brand-dark text-white rounded-xl hover:bg-brand-primary transition-colors"
-                        title="Adicionar ao carrinho"
+                        className="p-5 bg-brand-primary text-white rounded-[1.5rem] hover:bg-brand-dark transition-all transform translate-y-8 group-hover:translate-y-0 duration-500 delay-75 shadow-xl"
+                        title="Adicionar ao Carrinho"
                     >
-                        <ShoppingBag className="w-4 h-4" />
+                        <ShoppingBag className="w-5 h-5" />
                     </button>
+                </div>
+
+                {/* Format Indicator */}
+                <div className="absolute bottom-6 right-6 p-3 bg-white/90 backdrop-blur-md rounded-2xl border border-white/50 text-[8px] font-black uppercase tracking-widest text-brand-dark shadow-sm">
+                    {book.format === 'digital' ? 'E-book' : 'Físico'}
                 </div>
             </div>
 
-            {/* Info - Clean Sans Typography */}
-            <div className="space-y-1">
-                <h3 className="font-sans font-bold text-brand-dark text-base leading-tight uppercase tracking-tight line-clamp-2 group-hover:text-brand-primary transition-colors">
-                    {book.title}
-                </h3>
-                <p className="text-sm text-gray-400 font-medium font-body truncate">
-                    {book.author}
-                </p>
-                <div className="flex items-center gap-2 pt-1">
-                    <span className="px-2 py-0.5 bg-gray-100 text-brand-dark text-[10px] font-bold uppercase tracking-widest rounded-md">
-                        {book.category}
+            {/* 2. INFORMATION SYSTEM - Clean Sans */}
+            <div className="space-y-4 px-2">
+                <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-1 flex-1">
+                        <h3 className="font-sans font-black text-brand-dark text-lg leading-tight uppercase tracking-tight line-clamp-2 group-hover:text-brand-primary transition-colors">
+                            {book.title}
+                        </h3>
+                        <p className="text-sm text-gray-400 font-bold uppercase tracking-widest truncate">
+                            {book.author}
+                        </p>
+                    </div>
+                    <div className="text-right">
+                        <p className="font-black text-brand-dark text-xl tracking-tighter">
+                            {book.price === 0 ? 'Gratuito' : `${book.price.toLocaleString()} Kz`}
+                        </p>
+                        <p className="text-[10px] text-gray-300 font-bold uppercase tracking-widest">AOA</p>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                    <span className="px-4 py-1.5 bg-gray-50 text-gray-500 text-[9px] font-bold uppercase tracking-widest rounded-lg border border-gray-100">
+                        {book.genre}
                     </span>
                 </div>
             </div>
