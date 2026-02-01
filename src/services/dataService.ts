@@ -521,6 +521,20 @@ export const getTeamMembers = async () => {
     }
 };
 
+export const getTeamMemberById = async (id: string) => {
+    try {
+        const docRef = doc(db, COLLECTIONS.TEAM, id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return parseFirestoreDoc(docSnap.data(), docSnap.id);
+        }
+        return null;
+    } catch (error) {
+        console.error('Erro ao buscar membro da equipe:', error);
+        return null;
+    }
+};
+
 export const saveTeamMember = async (member: any) => {
     try {
         const memberData = prepareForFirestore(member);

@@ -22,6 +22,7 @@ const ReaderDashboard = React.lazy(() => import('./pages/ReaderDashboard'));
 const AuthorDashboard = React.lazy(() => import('./pages/AuthorDashboard'));
 const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard'));
 const BookPage = React.lazy(() => import('./pages/BookPage'));
+const MemberDetailPage = React.lazy(() => import('./pages/MemberDetailPage'));
 
 // Scroll to top on route change
 const ScrollToTop = () => {
@@ -146,7 +147,8 @@ const AppContent: React.FC = () => {
                 'AUTH': '/login',
                 'READER_DASHBOARD': '/minha-biblioteca',
                 'AUTHOR_DASHBOARD': '/autor',
-                'ADMIN': '/admin'
+                'ADMIN': '/admin',
+                'MEMBER': '/membro'
             };
             if (routes[payload]) {
                 navigate(routes[payload]);
@@ -247,6 +249,7 @@ const AppContent: React.FC = () => {
                         <Route path="/livro/:id" element={
                             <BookPage user={user} onAddToCart={(b) => handleAction('ADD_TO_CART', b)} />
                         } />
+                        <Route path="/membro/:id" element={<MemberDetailPage />} />
 
                         <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
