@@ -221,35 +221,38 @@ const AdminContentTab: React.FC = () => {
     return (
         <div className="space-y-12">
             <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-8">
-                <div>
-                    <h2 className="text-4xl font-black text-brand-dark tracking-tighter uppercase mb-2">Narrativa <span className="text-brand-primary lowercase italic font-light">Digital</span></h2>
-                    <p className="text-gray-400 font-bold text-sm">Esculpa cada palavra e depoimento que define o site.</p>
+                <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                        <div className="w-1.5 h-8 bg-brand-primary rounded-full shadow-[0_0_15px_rgba(189,147,56,0.5)]" />
+                        <h2 className="text-3xl font-black text-white tracking-tighter uppercase mb-0">Narrativa <span className="text-brand-primary italic font-light lowercase">Digital</span></h2>
+                    </div>
+                    <p className="text-gray-500 font-bold text-xs uppercase tracking-widest pl-4 italic">Gestão de Conteúdo e Identidade do Site</p>
                 </div>
 
-                <div className="flex bg-gray-100/50 p-2 rounded-[1.5rem] backdrop-blur-sm self-stretch xl:self-auto gap-2">
+                <div className="flex bg-white/5 p-2 rounded-2xl border border-white/5 backdrop-blur-xl self-stretch xl:self-auto gap-2">
                     <button
                         onClick={handleSyncPremium}
                         disabled={isSyncing}
-                        className="px-6 py-3.5 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 bg-brand-dark/5 text-brand-dark hover:bg-brand-primary hover:text-white disabled:opacity-50"
+                        className="px-6 py-3.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 bg-brand-primary/10 text-brand-primary hover:bg-brand-primary hover:text-white disabled:opacity-50 group"
                         title="Sincronizar Padrões Premium"
                     >
                         {isSyncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4 text-brand-primary group-hover:text-white" />}
-                        Sync Premium
+                        SYNC PREMIUM
                     </button>
-                    <div className="w-px h-8 bg-gray-200 self-center mx-2 hidden xl:block"></div>
+                    <div className="w-px h-8 bg-white/10 self-center mx-2 hidden xl:block"></div>
                     <button
                         onClick={() => setActiveSubTab('text')}
-                        className={`flex-1 xl:flex-none px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 ${activeSubTab === 'text' ? 'bg-white text-brand-primary shadow-xl scale-105' : 'text-gray-400 hover:text-brand-dark'}`}
+                        className={`flex-1 xl:flex-none px-8 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 ${activeSubTab === 'text' ? 'bg-brand-primary text-white shadow-[0_10px_25px_-5px_rgba(189,147,56,0.3)]' : 'text-gray-500 hover:text-white'}`}
                     >
                         <Type className="w-4 h-4" />
-                        Textos
+                        TERMINAL DE TEXTO
                     </button>
                     <button
                         onClick={() => setActiveSubTab('testimonials')}
-                        className={`flex-1 xl:flex-none px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 ${activeSubTab === 'testimonials' ? 'bg-white text-brand-primary shadow-xl scale-105' : 'text-gray-400 hover:text-brand-dark'}`}
+                        className={`flex-1 xl:flex-none px-8 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 ${activeSubTab === 'testimonials' ? 'bg-brand-primary text-white shadow-[0_10px_25px_-5px_rgba(189,147,56,0.3)]' : 'text-gray-500 hover:text-white'}`}
                     >
                         <MessageSquare className="w-4 h-4" />
-                        Depoimentos
+                        TESTEMUNHOS
                     </button>
                 </div>
             </div>
@@ -268,17 +271,17 @@ const AdminContentTab: React.FC = () => {
                             {['home', 'about', 'services', 'team'].map((page) => (
                                 <m.button
                                     key={page}
-                                    whileHover={{ x: 5 }}
+                                    whileHover={{ x: 5, backgroundColor: 'rgba(255,255,255,0.05)' }}
                                     whileTap={{ scale: 0.98 }}
                                     onClick={() => setSelectedPage(page as any)}
-                                    className={`w-full p-6 rounded-[2rem] text-left transition-all border-2 flex items-center justify-between group relative overflow-hidden ${selectedPage === page ? 'bg-brand-primary border-brand-primary text-white shadow-2xl' : 'bg-white border-gray-100 text-brand-dark hover:border-brand-primary/20 hover:shadow-lg'}`}
+                                    className={`w-full p-6 rounded-2xl text-left transition-all border flex items-center justify-between group relative overflow-hidden ${selectedPage === page ? 'bg-brand-primary border-brand-primary text-white shadow-[0_20px_40px_-10px_rgba(189,147,56,0.4)]' : 'bg-white/5 border-white/5 text-gray-400 hover:border-white/10 hover:text-white'}`}
                                 >
-                                    <span className="font-black uppercase tracking-[0.2em] text-[11px] relative z-10">{page}</span>
-                                    <ChevronRight className={`w-5 h-5 relative z-10 ${selectedPage === page ? 'text-white' : 'text-brand-primary opacity-20 group-hover:opacity-100'}`} />
+                                    <span className="font-black uppercase tracking-[0.3em] text-[10px] relative z-10">{page}</span>
+                                    <ChevronRight className={`w-5 h-5 relative z-10 transition-transform ${selectedPage === page ? 'text-white translate-x-1' : 'text-gray-700 group-hover:text-white'}`} />
                                     {selectedPage === page && (
                                         <m.div
                                             layoutId="active-bg"
-                                            className="absolute inset-0 bg-gradient-to-r from-brand-primary to-brand-dark opacity-10"
+                                            className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"
                                         />
                                     )}
                                 </m.button>
@@ -286,21 +289,25 @@ const AdminContentTab: React.FC = () => {
                         </div>
 
                         {/* Editor Area */}
-                        <div className="xl:col-span-3 bg-white rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.05)] border border-gray-100 overflow-hidden">
-                            <div className="p-12 border-b border-gray-50 bg-gray-50/30 flex justify-between items-center">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center">
+                        <m.div
+                            className="xl:col-span-3 bg-white/5 rounded-[3.5rem] border border-white/5 overflow-hidden shadow-2xl relative"
+                        >
+                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-primary/30 to-transparent" />
+
+                            <div className="p-12 border-b border-white/5 bg-white/[0.02] flex justify-between items-center">
+                                <div className="flex items-center gap-5">
+                                    <div className="w-14 h-14 bg-brand-primary/10 rounded-2xl border border-brand-primary/20 flex items-center justify-center">
                                         <Layout className="w-6 h-6 text-brand-primary" />
                                     </div>
                                     <div>
-                                        <h3 className="text-2xl font-black text-brand-dark tracking-tighter uppercase">{selectedPage}</h3>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-300">Editor de Componentes</p>
+                                        <h3 className="text-3xl font-black text-white tracking-tighter uppercase">{selectedPage}</h3>
+                                        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500">Terminal de Edição de Componentes</p>
                                     </div>
                                 </div>
                                 {isLoading && <Loader2 className="w-6 h-6 text-brand-primary animate-spin" />}
                             </div>
 
-                            <div className="p-12 space-y-12">
+                            <div className="p-12 space-y-16 custom-scrollbar">
                                 {getKeysForPage().map((key) => {
                                     const field = editFields[key];
                                     if (!field) return null;
@@ -309,32 +316,35 @@ const AdminContentTab: React.FC = () => {
                                         <m.div
                                             key={key}
                                             layout
-                                            className="space-y-4 group"
+                                            className="space-y-6 group"
                                         >
-                                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
-                                                <div className="flex items-center gap-3">
-                                                    <field.icon className="w-4 h-4 text-brand-primary" />
-                                                    <label htmlFor={`field-ctrl-${key}`} className="text-[11px] font-black uppercase tracking-widest text-gray-400">{field.label}</label>
+                                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-1.5 h-6 bg-brand-primary/40 rounded-full" />
+                                                    <div className="flex items-center gap-3">
+                                                        <field.icon className="w-4 h-4 text-brand-primary" />
+                                                        <label htmlFor={`field-ctrl-${key}`} className="text-[11px] font-black uppercase tracking-[0.3em] text-gray-500">{field.label}</label>
+                                                    </div>
                                                 </div>
                                                 <m.button
-                                                    whileHover={{ scale: 1.05 }}
+                                                    whileHover={{ scale: 1.05, filter: 'brightness(1.1)' }}
                                                     whileTap={{ scale: 0.95 }}
                                                     onClick={() => handleSaveText(key, siteContent[key])}
                                                     disabled={isSaving}
-                                                    className={`px-5 py-2 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2 ${lastSaved === key ? 'bg-green-50 text-green-600' : 'bg-brand-primary/5 text-brand-primary hover:bg-brand-primary hover:text-white shadow-sm'}`}
+                                                    className={`px-6 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-[0.3em] transition-all flex items-center gap-3 border ${lastSaved === key ? 'bg-green-500/10 border-green-500/20 text-green-500' : 'bg-brand-primary/10 border-brand-primary/20 text-brand-primary hover:bg-brand-primary hover:text-white shadow-lg'}`}
                                                 >
                                                     {isSaving ? <Loader2 className="w-3 h-3 animate-spin" /> : (lastSaved === key ? <CheckCircle2 className="w-3 h-3" /> : <Save className="w-3 h-3" />)}
-                                                    {lastSaved === key ? 'Gravado!' : 'Gravar'}
+                                                    {lastSaved === key ? 'PROTOCOLOS SINCRONIZADOS' : 'REGISTAR ALTERAÇÃO'}
                                                 </m.button>
                                             </div>
 
                                             {field.type === 'textarea' || field.type === 'json' ? (
-                                                <div className="relative">
+                                                <div className="relative group/field">
                                                     <textarea
                                                         id={`field-ctrl-${key}`}
                                                         title={field.label}
-                                                        placeholder={`Descreva aqui o conteúdo para ${field.label.toLowerCase()}...`}
-                                                        className="w-full px-8 py-6 bg-gray-50/50 rounded-[2rem] border-2 border-transparent focus:border-brand-primary/20 focus:bg-white outline-none transition-all h-60 min-h-[150px] font-medium text-gray-600 shadow-inner"
+                                                        placeholder={`Insira aqui os parâmetros para ${field.label.toLowerCase()}...`}
+                                                        className="w-full px-10 py-8 bg-white/[0.03] rounded-[2.5rem] border border-white/5 focus:border-brand-primary/30 focus:bg-white/[0.05] outline-none transition-all h-64 min-h-[180px] font-medium text-gray-400 leading-relaxed shadow-2xl placeholder:text-gray-800 custom-scrollbar uppercase tracking-wider italic"
                                                         value={field.type === 'json' ? JSON.stringify(siteContent[key] || [], null, 2) : (siteContent[key] || '')}
                                                         onChange={(e) => {
                                                             let val = e.target.value;
@@ -346,13 +356,13 @@ const AdminContentTab: React.FC = () => {
                                                     />
                                                 </div>
                                             ) : (
-                                                <div className="relative">
+                                                <div className="relative group/field">
                                                     <input
                                                         type="text"
                                                         id={`field-ctrl-${key}`}
                                                         title={field.label}
-                                                        placeholder={`Texto para ${field.label.toLowerCase()}...`}
-                                                        className="w-full px-8 py-5 bg-gray-50/50 rounded-2xl border-2 border-transparent focus:border-brand-primary/20 focus:bg-white outline-none transition-all font-black text-brand-dark shadow-inner text-lg"
+                                                        placeholder={`Definição para ${field.label.toLowerCase()}...`}
+                                                        className="w-full px-10 py-6 bg-white/[0.03] rounded-2xl border border-white/5 focus:border-brand-primary/30 focus:bg-white/[0.05] outline-none transition-all font-black text-white uppercase tracking-[0.2em] shadow-2xl text-lg placeholder:text-gray-800"
                                                         value={siteContent[key] || ''}
                                                         onChange={(e) => setSiteContent({ ...siteContent, [key]: e.target.value })}
                                                     />
@@ -362,7 +372,7 @@ const AdminContentTab: React.FC = () => {
                                     );
                                 })}
                             </div>
-                        </div>
+                        </m.div>
                     </m.div>
                 ) : (
                     <m.div
@@ -374,16 +384,16 @@ const AdminContentTab: React.FC = () => {
                     >
                         <div className="flex justify-end">
                             <m.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
+                                whileHover={{ scale: 1.02, filter: 'brightness(1.1)' }}
+                                whileTap={{ scale: 0.98 }}
                                 onClick={() => {
                                     setTestimonialForm({ name: '', role: '', content: '', rating: 5, photo_url: '', is_active: true });
                                     setShowTestimonialModal(true);
                                 }}
-                                className="btn-premium px-10 py-5 text-[10px] shadow-2xl shadow-brand-primary/20"
+                                className="px-10 py-5 bg-brand-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] shadow-[0_20px_40px_-10px_rgba(189,147,56,0.3)] hover:brightness-110 transition-all flex items-center justify-center gap-4"
                             >
-                                <Plus className="w-4 h-4 mr-2" />
-                                <span>Novo Depoimento</span>
+                                <Plus className="w-5 h-5" />
+                                <span>REGISTAR TESTEMUNHO</span>
                             </m.button>
                         </div>
 
@@ -396,45 +406,47 @@ const AdminContentTab: React.FC = () => {
                                         initial={{ opacity: 0, scale: 0.9 }}
                                         animate={{ opacity: 1, scale: 1 }}
                                         exit={{ opacity: 0, scale: 0.9 }}
-                                        className="bg-white p-10 rounded-[3rem] shadow-xl border border-gray-50 relative group transition-all hover:shadow-2xl hover:-translate-y-2"
+                                        className="bg-white/5 p-12 rounded-[3.5rem] border border-white/5 relative group transition-all hover:bg-white/[0.07] hover:shadow-2xl hover:-translate-y-2 overflow-hidden"
                                     >
-                                        <div className="absolute top-8 right-8 flex gap-2">
+                                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-primary/20 to-transparent" />
+
+                                        <div className="absolute top-10 right-10 flex gap-3">
                                             <m.button
-                                                whileHover={{ scale: 1.1 }}
+                                                whileHover={{ scale: 1.1, rotate: -5 }}
                                                 whileTap={{ scale: 0.9 }}
                                                 onClick={() => {
                                                     setTestimonialForm(t);
                                                     setShowTestimonialModal(true);
                                                 }}
-                                                className="p-3 bg-blue-50 text-blue-600 rounded-xl opacity-0 group-hover:opacity-100 transition-all hover:bg-blue-600 hover:text-white"
-                                                title="Editar"
+                                                className="p-3 bg-white/5 text-gray-400 rounded-xl opacity-0 group-hover:opacity-100 transition-all hover:bg-white/10 hover:text-white border border-white/5"
+                                                title="Editar Parâmetros"
                                             >
                                                 <Edit className="w-4 h-4" />
                                             </m.button>
                                         </div>
 
-                                        <div className="flex gap-1.5 mb-6">
+                                        <div className="flex gap-2 mb-8">
                                             {[...Array(5)].map((_, i) => (
-                                                <Star key={i} className={`w-4 h-4 ${i < t.rating ? 'text-yellow-400 fill-current' : 'text-gray-100'}`} />
+                                                <Star key={i} className={`w-4 h-4 shadow-[0_0_10px_rgba(189,147,56,0.2)] ${i < t.rating ? 'text-brand-primary fill-current' : 'text-white/5'}`} />
                                             ))}
                                         </div>
 
-                                        <div className="relative mb-8">
-                                            <MessageSquare className="absolute -left-2 -top-2 w-12 h-12 text-gray-50 -z-0" />
-                                            <p className="text-gray-600 italic text-sm leading-relaxed relative z-10 line-clamp-5">"{t.content}"</p>
+                                        <div className="relative mb-10">
+                                            <MessageSquare className="absolute -left-4 -top-4 w-16 h-16 text-white/[0.02] -z-0" />
+                                            <p className="text-gray-400 italic text-base leading-relaxed relative z-10 line-clamp-6 font-medium uppercase tracking-wide">"{t.content}"</p>
                                         </div>
 
-                                        <div className="flex items-center gap-5 pt-8 border-t border-gray-50">
-                                            <div className="w-14 h-14 rounded-2xl bg-brand-primary/5 overflow-hidden flex items-center justify-center border-2 border-white shadow-lg">
+                                        <div className="flex items-center gap-6 pt-10 border-t border-white/5">
+                                            <div className="w-16 h-16 rounded-2xl bg-brand-primary/10 overflow-hidden flex items-center justify-center border border-white/10 shadow-xl group-hover:scale-110 transition-transform">
                                                 {t.photo_url ? (
                                                     <img src={t.photo_url} alt={t.name} className="w-full h-full object-cover" />
                                                 ) : (
-                                                    <Users className="w-6 h-6 text-brand-primary/30" />
+                                                    <Users className="w-8 h-8 text-brand-primary/30" />
                                                 )}
                                             </div>
                                             <div>
-                                                <h4 className="font-black text-brand-dark tracking-tighter">{t.name}</h4>
-                                                <p className="text-[10px] text-brand-primary font-black uppercase tracking-widest">{t.role}</p>
+                                                <h4 className="font-black text-white text-lg tracking-tighter uppercase">{t.name}</h4>
+                                                <p className="text-[10px] text-brand-primary font-black uppercase tracking-[0.3em]">{t.role}</p>
                                             </div>
                                         </div>
                                     </m.div>
@@ -454,97 +466,104 @@ const AdminContentTab: React.FC = () => {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={() => setShowTestimonialModal(false)}
-                            className="absolute inset-0 bg-brand-dark/40 backdrop-blur-2xl"
+                            className="absolute inset-0 bg-black/80 backdrop-blur-2xl"
                         />
                         <m.div
-                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            initial={{ opacity: 0, scale: 0.95, y: 40 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            className="bg-white rounded-[3.5rem] w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl relative z-20 border border-white/20 flex flex-col"
+                            exit={{ opacity: 0, scale: 0.95, y: 40 }}
+                            className="bg-[#0D0D0D] rounded-[4rem] w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8)] relative z-20 border border-white/10 flex flex-col"
                         >
-                            <div className="p-10 border-b border-gray-100 flex items-center justify-between bg-gray-50/30">
-                                <div>
-                                    <h3 className="text-3xl font-black text-brand-dark tracking-tighter uppercase mb-1">Feedback de <span className="text-brand-primary lowercase italic font-light">Impacto</span></h3>
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Edição de depoimento social</p>
+                            <div className="p-12 border-b border-white/5 relative bg-gradient-to-b from-white/[0.02] to-transparent">
+                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-primary to-transparent" />
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h3 className="text-4xl font-black text-white tracking-tighter uppercase mb-2">Relato de <span className="text-brand-primary lowercase italic font-light">Impacto</span></h3>
+                                        <div className="flex items-center gap-3">
+                                            <Sparkles className="w-4 h-4 text-brand-primary animate-pulse" />
+                                            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500">Curadoria de Prova Social</p>
+                                        </div>
+                                    </div>
+                                    <m.button
+                                        whileHover={{ rotate: 90, scale: 1.1 }}
+                                        whileTap={{ scale: 0.9 }}
+                                        onClick={() => setShowTestimonialModal(false)}
+                                        className="w-14 h-14 flex items-center justify-center bg-white/5 border border-white/5 text-gray-500 hover:text-white rounded-2xl transition-all"
+                                        title="Sair do Terminal"
+                                        aria-label="Sair do Terminal"
+                                    >
+                                        <X className="w-6 h-6" />
+                                    </m.button>
                                 </div>
-                                <m.button
-                                    whileHover={{ rotate: 90, scale: 1.1 }}
-                                    whileTap={{ scale: 0.9 }}
-                                    onClick={() => setShowTestimonialModal(false)}
-                                    className="w-12 h-12 flex items-center justify-center bg-white shadow-sm border border-gray-100 text-gray-400 hover:text-brand-dark rounded-full transition-all"
-                                    title="Fechar"
-                                >
-                                    <X className="w-6 h-6" />
-                                </m.button>
                             </div>
 
-                            <form onSubmit={handleSaveTestimonial} className="flex-1 overflow-y-auto p-12 space-y-10">
-                                <div className="grid md:grid-cols-2 gap-8">
-                                    <div className="space-y-3">
-                                        <label htmlFor="t-name" className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Nome do Autor</label>
-                                        <div className="relative">
-                                            <Users className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                            <form onSubmit={handleSaveTestimonial} className="flex-1 overflow-y-auto p-12 space-y-12 custom-scrollbar">
+                                <div className="grid md:grid-cols-2 gap-10">
+                                    <div className="space-y-4">
+                                        <label htmlFor="t-name" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">AUTORIA DO RELATO</label>
+                                        <div className="relative group">
+                                            <Users className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-brand-primary transition-colors" />
                                             <input
                                                 id="t-name"
                                                 type="text"
                                                 required
                                                 value={testimonialForm.name}
                                                 onChange={(e) => setTestimonialForm({ ...testimonialForm, name: e.target.value })}
-                                                className="w-full pl-12 pr-8 py-5 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-primary/20 focus:bg-white outline-none transition-all font-black text-brand-dark"
-                                                placeholder="Ex: Pedro Alvares"
+                                                className="w-full pl-16 pr-8 py-6 bg-white/5 border border-white/5 rounded-2xl focus:border-brand-primary/30 focus:bg-white/10 outline-none transition-all font-black text-white uppercase tracking-widest text-lg placeholder:text-gray-800"
+                                                placeholder="EX: PEDRO ALVARES"
                                             />
                                         </div>
                                     </div>
-                                    <div className="space-y-3">
-                                        <label htmlFor="t-role" className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Cargo ou Título</label>
-                                        <div className="relative">
-                                            <Tag className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                                    <div className="space-y-4">
+                                        <label htmlFor="t-role" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">CARGO / TITULAÇÃO</label>
+                                        <div className="relative group">
+                                            <Tag className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-brand-primary transition-colors" />
                                             <input
                                                 id="t-role"
                                                 type="text"
                                                 required
                                                 value={testimonialForm.role}
                                                 onChange={(e) => setTestimonialForm({ ...testimonialForm, role: e.target.value })}
-                                                className="w-full pl-12 pr-8 py-5 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-primary/20 focus:bg-white outline-none transition-all font-bold text-gray-600"
-                                                placeholder="Ex: Leitor Assíduo"
+                                                className="w-full pl-16 pr-8 py-6 bg-white/5 border border-white/5 rounded-2xl focus:border-brand-primary/30 focus:bg-white/10 outline-none transition-all font-black text-white uppercase tracking-widest placeholder:text-gray-800"
+                                                placeholder="EX: LEITOR ASSÍDUO"
                                             />
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="space-y-3">
-                                    <label htmlFor="t-content" className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Conteúdo do Relato</label>
-                                    <div className="relative">
-                                        <MessageSquare className="absolute left-5 top-6 w-4 h-4 text-gray-300" />
+                                <div className="space-y-4">
+                                    <label htmlFor="t-content" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">CORPO DO TESTEMUNHO</label>
+                                    <div className="relative group">
+                                        <MessageSquare className="absolute left-6 top-8 w-4 h-4 text-gray-600 group-focus-within:text-brand-primary transition-colors" />
                                         <textarea
                                             id="t-content"
                                             required
                                             value={testimonialForm.content}
                                             onChange={(e) => setTestimonialForm({ ...testimonialForm, content: e.target.value })}
-                                            className="w-full pl-12 pr-8 py-6 bg-gray-50 rounded-[2rem] border-2 border-transparent focus:border-brand-primary/20 focus:bg-white outline-none transition-all h-40 resize-none font-medium text-gray-600 leading-relaxed shadow-inner"
-                                            placeholder="Compartilhe a experiência vivida..."
+                                            className="w-full pl-16 pr-8 py-8 bg-white/5 border border-white/5 rounded-[2.5rem] focus:border-brand-primary/30 focus:bg-white/10 outline-none transition-all h-48 resize-none font-medium text-gray-400 leading-relaxed italic uppercase tracking-wider custom-scrollbar placeholder:text-gray-800"
+                                            placeholder="DESCREVA A EXPERIÊNCIA LITERÁRIA..."
                                         />
                                     </div>
                                 </div>
 
-                                <div className="grid md:grid-cols-2 gap-8">
-                                    <div className="space-y-3">
-                                        <label htmlFor="t-photo" className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">URL da Imagem de Perfil</label>
-                                        <div className="relative">
-                                            <ImageIcon className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                                <div className="grid md:grid-cols-2 gap-10">
+                                    <div className="space-y-4">
+                                        <label htmlFor="t-photo" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">LOCALIZAÇÃO DA IMAGEM</label>
+                                        <div className="relative group">
+                                            <ImageIcon className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-brand-primary transition-colors" />
                                             <input
                                                 id="t-photo"
                                                 type="url"
                                                 value={testimonialForm.photo_url || ''}
                                                 onChange={(e) => setTestimonialForm({ ...testimonialForm, photo_url: e.target.value })}
-                                                className="w-full pl-12 pr-8 py-5 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-primary/20 focus:bg-white outline-none transition-all text-[11px] font-black uppercase tracking-widest text-gray-400"
-                                                placeholder="https://..."
+                                                className="w-full pl-16 pr-8 py-6 bg-white/5 border border-white/5 rounded-2xl focus:border-brand-primary/30 focus:bg-white/10 outline-none transition-all text-[10px] font-black uppercase tracking-[0.3em] text-gray-500"
+                                                placeholder="HTTPS://..."
                                             />
                                         </div>
                                     </div>
-                                    <div className="space-y-3">
-                                        <label htmlFor="t-rating" className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Classificação Estelar</label>
-                                        <div id="t-rating" className="flex bg-gray-50 p-2.5 rounded-2xl items-center justify-around">
+                                    <div className="space-y-4">
+                                        <label htmlFor="t-rating" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">NÍVEL DE SATISFAÇÃO</label>
+                                        <div id="t-rating" className="flex bg-white/5 border border-white/5 p-4 rounded-2xl items-center justify-around">
                                             {[1, 2, 3, 4, 5].map((star) => (
                                                 <button
                                                     key={star}
@@ -552,9 +571,9 @@ const AdminContentTab: React.FC = () => {
                                                     title={`Avaliar com ${star} estrelas`}
                                                     aria-label={`Avaliar com ${star} estrelas`}
                                                     onClick={() => setTestimonialForm({ ...testimonialForm, rating: star })}
-                                                    className={`p-2 transition-all transform hover:scale-125 ${testimonialForm.rating >= star ? 'text-yellow-400 fill-current' : 'text-gray-200'}`}
+                                                    className={`p-2 transition-all transform hover:scale-125 ${testimonialForm.rating >= star ? 'text-brand-primary fill-current shadow-[0_0_15px_rgba(189,147,56,0.3)]' : 'text-gray-800'}`}
                                                 >
-                                                    <Star className="w-5 h-5" />
+                                                    <Star className="w-6 h-6" />
                                                 </button>
                                             ))}
                                         </div>
@@ -562,28 +581,28 @@ const AdminContentTab: React.FC = () => {
                                 </div>
                             </form>
 
-                            <div className="p-12 border-t border-gray-100 bg-gray-50/50 flex gap-6">
+                            <div className="p-12 border-t border-white/5 bg-white/[0.01] flex flex-col sm:flex-row gap-6">
                                 <button
                                     type="button"
                                     onClick={() => setShowTestimonialModal(false)}
-                                    className="flex-1 px-8 py-5 border-2 border-gray-100 text-gray-400 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:border-gray-200 hover:text-brand-dark transition-all"
+                                    className="flex-1 px-10 py-6 border border-white/10 text-gray-500 rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] hover:bg-white/5 hover:text-white transition-all flex items-center justify-center gap-2"
                                 >
-                                    Cancelar
+                                    ABORTAR
                                 </button>
                                 <m.button
-                                    whileHover={{ scale: 1.02 }}
+                                    whileHover={{ scale: 1.02, filter: 'brightness(1.1)' }}
                                     whileTap={{ scale: 0.98 }}
                                     type="submit"
                                     onClick={handleSaveTestimonial}
                                     disabled={isSaving}
-                                    className="flex-2 btn-premium py-5 px-12 text-[10px] shadow-2xl shadow-brand-primary/20"
+                                    className="flex-[1.5] py-6 px-12 bg-brand-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] shadow-[0_20px_50px_-15px_rgba(189,147,56,0.4)] transition-all flex items-center justify-center gap-4"
                                 >
                                     {isSaving ? (
-                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                        <Loader2 className="w-5 h-5 animate-spin" />
                                     ) : (
                                         <>
-                                            <Save className="w-4 h-4 mr-3" />
-                                            <span>Guardar Depoimento</span>
+                                            <Save className="w-5 h-5" />
+                                            <span>SINCRONIZAR RELATO</span>
                                         </>
                                     )}
                                 </m.button>

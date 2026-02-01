@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion as m, AnimatePresence } from 'framer-motion';
-import { Plus, Edit, Trash2, Search, Filter, BookOpen, Package, DollarSign, ArrowUpRight, ChevronRight, Loader2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Filter, BookOpen, Package, DollarSign, ArrowUpRight, ChevronRight, Loader2, Sparkles, AlertCircle, Zap } from 'lucide-react';
 import { Book } from '../../types';
 import { useToast } from '../Toast';
 import BookFormModal from './BookFormModal';
@@ -119,103 +119,75 @@ const AdminBooksTab: React.FC<AdminBooksTabProps> = ({ onStatsRefresh }) => {
 
     return (
         <div className="space-y-12">
-            {/* Header Section */}
+            {/* 1. Header & Quick Actions */}
             <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-8">
-                <div>
-                    <h2 className="text-4xl font-black text-brand-dark tracking-tighter uppercase mb-2">Acervo <span className="text-brand-primary lowercase italic font-light">Literário</span></h2>
-                    <p className="text-gray-400 font-bold text-sm">Controlo total de catálogo, stock e distribuição digital.</p>
+                <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                        <div className="w-1.5 h-8 bg-brand-primary rounded-full shadow-[0_0_15px_rgba(189,147,56,0.5)]" />
+                        <h2 className="text-3xl font-black text-white tracking-tighter uppercase mb-0">Arquivos Literários</h2>
+                    </div>
+                    <p className="text-gray-500 font-bold text-xs uppercase tracking-widest pl-4">Gestão de Catálogo e Direitos Digitais</p>
                 </div>
 
                 <div className="flex flex-col md:flex-row gap-4 w-full xl:w-auto">
                     <div className="relative group flex-1 md:w-80">
-                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-brand-primary transition-colors" />
+                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-brand-primary transition-colors" />
                         <input
                             type="text"
-                            placeholder="Procurar título, autor ou gênero..."
+                            placeholder="LOCALIZAR OBRA..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-12 pr-6 py-4 bg-gray-50/50 border-2 border-transparent focus:border-brand-primary/10 focus:bg-white rounded-[1.5rem] text-[11px] font-black uppercase tracking-widest outline-none transition-all shadow-sm"
+                            className="w-full pl-12 pr-6 py-4 bg-white/5 border border-white/5 focus:border-brand-primary/20 focus:bg-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white outline-none transition-all shadow-xl"
                         />
                     </div>
                     <m.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                         onClick={openAddModal}
-                        className="btn-premium px-10 py-5 justify-center shadow-2xl shadow-brand-primary/20"
+                        className="bg-brand-primary hover:bg-brand-primary/90 text-white font-black uppercase text-[10px] tracking-[0.3em] px-10 py-4 rounded-2xl flex items-center justify-center gap-3 shadow-[0_10px_40px_-10px_rgba(189,147,56,0.4)] transition-all"
                     >
-                        <Plus className="w-5 h-5" />
+                        <Plus className="w-4 h-4" />
                         <span>Nova Obra</span>
                     </m.button>
                 </div>
             </div>
 
-            {/* Quick Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[
-                    { label: 'Total de Obras', value: stats.total, icon: BookOpen, color: 'brand-primary' },
-                    { label: 'Stock Crítico', value: stats.lowStock, icon: Package, color: 'orange-500' },
-                    { label: 'Distribuição Digital', value: stats.digital, icon: ArrowUpRight, color: 'blue-500' },
-                    { label: 'Valor Estimado', value: `${(stats.totalValue / 1000).toFixed(1)}k Kz`, icon: DollarSign, color: 'emerald-500' },
-                ].map((stat, idx) => (
-                    <m.div
-                        key={idx}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: idx * 0.1 }}
-                        className="bg-white p-8 rounded-[2.5rem] border border-gray-50 shadow-xl shadow-brand-dark/5 flex items-center justify-between group hover:border-brand-primary/20 transition-all pointer-events-none"
-                    >
-                        <div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">{stat.label}</p>
-                            <h4 className="text-3xl font-black text-brand-dark tracking-tighter">{stat.value}</h4>
-                        </div>
-                        <div className={`w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-${stat.color} group-hover:scale-110 transition-transform`}>
-                            <stat.icon className="w-6 h-6" />
-                        </div>
-                    </m.div>
-                ))}
-            </div>
-
-            {/* Table Controls */}
-            <div className="flex bg-gray-50/50 p-2 rounded-[1.8rem] backdrop-blur-sm w-fit">
+            {/* 2. Micro Stats Row */}
+            <div className="flex bg-white/5 p-2 rounded-2xl border border-white/5 w-fit">
                 {(['all', 'físico', 'digital'] as const).map((format) => (
                     <button
                         key={format}
                         onClick={() => setFilterFormat(format)}
-                        className={`px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${filterFormat === format ? 'bg-white text-brand-primary shadow-xl scale-105' : 'text-gray-400 hover:text-brand-dark'}`}
+                        className={`px-10 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${filterFormat === format
+                            ? 'bg-brand-primary text-white shadow-lg'
+                            : 'text-gray-500 hover:text-white'
+                            }`}
                     >
                         {format === 'all' ? 'Ver Tudo' : format}
                     </button>
                 ))}
             </div>
 
-            {/* Content Display */}
-            <div className="bg-white rounded-[3.5rem] shadow-2xl shadow-brand-dark/5 border border-gray-100 overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full min-w-[1000px]">
+            {/* 3. High-Fidelity Data Table */}
+            <div className="bg-white/5 rounded-[2.5rem] border border-white/5 overflow-hidden shadow-2xl relative">
+                <div className="overflow-x-auto custom-scrollbar">
+                    <table className="w-full min-w-[900px] border-collapse">
                         <thead>
-                            <tr className="bg-gray-50/30">
-                                <th className="px-10 py-8 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.25em]">Identidade Editorial</th>
-                                <th className="px-10 py-8 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.25em]">Categoria</th>
-                                <th className="px-10 py-8 text-right text-[10px] font-black text-gray-400 uppercase tracking-[0.25em]">Valor Unitário</th>
-                                <th className="px-10 py-8 text-right text-[10px] font-black text-gray-400 uppercase tracking-[0.25em]">Stock</th>
-                                <th className="px-10 py-8 text-center text-[10px] font-black text-gray-400 uppercase tracking-[0.25em]">Gestão</th>
+                            <tr className="bg-white/5 border-b border-white/5">
+                                <th className="px-10 py-8 text-left text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Capa & Título</th>
+                                <th className="px-10 py-8 text-left text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Formato & Género</th>
+                                <th className="px-10 py-8 text-right text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Valor</th>
+                                <th className="px-10 py-8 text-right text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Stock Atual</th>
+                                <th className="px-10 py-8 text-center text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Operações</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-50">
+                        <tbody className="divide-y divide-white/5">
                             <AnimatePresence mode="popLayout">
                                 {isLoadingBooks ? (
                                     [1, 2, 3, 4, 5].map(i => (
                                         <tr key={i} className="animate-pulse">
-                                            <td className="px-10 py-8">
-                                                <div className="flex items-center gap-6">
-                                                    <div className="w-16 h-20 bg-gray-50 rounded-2xl" />
-                                                    <div className="space-y-3">
-                                                        <div className="h-4 bg-gray-50 rounded-full w-48" />
-                                                        <div className="h-3 bg-gray-50 rounded-full w-32" />
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td colSpan={4}><div className="h-4 bg-gray-50 rounded-full mx-10" /></td>
+                                            <td className="px-10 py-8"><div className="h-20 bg-white/5 rounded-2xl w-full" /></td>
+                                            <td colSpan={4} className="px-10 py-8"><div className="h-4 bg-white/5 rounded-full w-full" /></td>
                                         </tr>
                                     ))
                                 ) : filteredBooks.length > 0 ? (
@@ -226,89 +198,88 @@ const AdminBooksTab: React.FC<AdminBooksTabProps> = ({ onStatsRefresh }) => {
                                             initial={{ opacity: 0 }}
                                             animate={{ opacity: 1 }}
                                             exit={{ opacity: 0 }}
-                                            className="hover:bg-gray-50/20 transition-all group"
+                                            className="hover:bg-white/[0.03] transition-colors group"
                                         >
                                             <td className="px-10 py-8">
                                                 <div className="flex items-center gap-6">
-                                                    <div className="w-16 h-20 bg-gray-50 rounded-2xl overflow-hidden border border-gray-100 shadow-xl group-hover:scale-110 transition-transform duration-500 relative">
+                                                    <div className="w-16 h-20 bg-brand-dark/40 rounded-xl overflow-hidden border border-white/5 shadow-2xl group-hover:scale-105 transition-transform duration-500 shrink-0">
                                                         {book.coverUrl ? (
                                                             <img src={book.coverUrl} alt={book.title} className="w-full h-full object-cover" />
                                                         ) : (
-                                                            <div className="w-full h-full flex items-center justify-center text-gray-200">
+                                                            <div className="w-full h-full flex items-center justify-center text-gray-800">
                                                                 <BookOpen className="w-8 h-8" />
                                                             </div>
                                                         )}
-                                                        {book.format === 'digital' && (
-                                                            <div className="absolute top-1 right-1 bg-brand-primary p-1 rounded-md shadow-lg">
-                                                                <ArrowUpRight className="w-2.5 h-2.5 text-white" />
-                                                            </div>
-                                                        )}
                                                     </div>
-                                                    <div>
-                                                        <div className="font-black text-brand-dark text-[15px] tracking-tight hover:text-brand-primary transition-colors mb-1">{book.title}</div>
-                                                        <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{book.author}</div>
+                                                    <div className="space-y-1">
+                                                        <div className="font-black text-white text-[15px] tracking-tight hover:text-brand-primary transition-colors cursor-pointer">{book.title}</div>
+                                                        <div className="text-[9px] text-brand-primary font-black uppercase tracking-widest">{book.author}</div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="px-10 py-8">
                                                 <div className="flex flex-col gap-2">
-                                                    <span className="text-[10px] font-black uppercase tracking-widest text-brand-dark/60">{book.genre}</span>
-                                                    <span className={`text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border w-fit ${book.format === 'digital' ? 'text-blue-500 border-blue-100 bg-blue-50' : 'text-emerald-500 border-emerald-100 bg-emerald-50'}`}>
-                                                        {book.format || 'físico'}
-                                                    </span>
+                                                    <span className="text-[10px] font-black uppercase text-gray-400">{book.genre}</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className={`text-[8px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg border ${book.format === 'digital'
+                                                            ? 'bg-blue-500/10 border-blue-500/20 text-blue-400'
+                                                            : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                                                            }`}>
+                                                            {book.format === 'digital' ? 'E-Book' : 'Físico'}
+                                                        </span>
+                                                        {book.format === 'digital' && <Zap className="w-3 h-3 text-brand-primary" />}
+                                                    </div>
                                                 </div>
                                             </td>
-                                            <td className="px-10 py-8 text-right font-black text-brand-primary">
-                                                <span className="text-sm">{Number(book.price).toLocaleString()}</span>
-                                                <span className="text-[10px] ml-1.5 opacity-60">Kz</span>
+                                            <td className="px-10 py-8 text-right">
+                                                <div className="text-white font-black text-lg tracking-tighter">
+                                                    {Number(book.price).toLocaleString()}
+                                                    <span className="text-[10px] text-gray-600 ml-1.5 uppercase tracking-widest">Kz</span>
+                                                </div>
                                             </td>
                                             <td className="px-10 py-8 text-right">
-                                                <div className="flex flex-col items-end gap-1">
-                                                    <div className={`text-sm font-black ${Number(book.stock ?? 0) < 10 ? 'text-red-500' : 'text-brand-dark'}`}>
+                                                <div className="flex flex-col items-end gap-1.5">
+                                                    <div className={`text-md font-black ${Number(book.stock ?? 0) < 10 ? 'text-red-500' : 'text-white'}`}>
                                                         {book.stock ?? 0}
+                                                        {Number(book.stock ?? 0) < 5 && <AlertCircle className="w-3 h-3 inline ml-2 animate-bounce" />}
                                                     </div>
-                                                    <div className="h-1.5 w-16 bg-gray-100 rounded-full overflow-hidden">
+                                                    <div className="h-1 w-20 bg-white/5 rounded-full overflow-hidden">
                                                         <m.div
                                                             initial={{ width: 0 }}
                                                             animate={{ width: `${Math.min(((book.stock ?? 0) / 50) * 100, 100)}%` }}
-                                                            className={`h-full rounded-full ${Number(book.stock ?? 0) < 10 ? 'bg-red-500' : 'bg-brand-primary'}`}
+                                                            className={`h-full ${Number(book.stock ?? 0) < 10 ? 'bg-red-500' : 'bg-brand-primary'}`}
                                                         />
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="px-10 py-8">
-                                                <div className="flex items-center justify-center gap-4">
-                                                    <m.button
-                                                        whileHover={{ scale: 1.1, rotate: -3 }}
-                                                        whileTap={{ scale: 0.9 }}
+                                                <div className="flex items-center justify-center gap-3">
+                                                    <button
                                                         onClick={() => openEditModal(book)}
-                                                        className="w-12 h-12 bg-white shadow-lg border border-gray-100 text-gray-400 hover:text-brand-primary rounded-2xl transition-all flex items-center justify-center"
+                                                        className="w-12 h-12 bg-white/5 hover:bg-brand-primary/10 text-gray-500 hover:text-brand-primary rounded-xl transition-all flex items-center justify-center border border-white/5 group/btn"
                                                         title="Editar Obra"
+                                                        aria-label="Editar Obra"
                                                     >
-                                                        <Edit className="w-5 h-5" />
-                                                    </m.button>
-                                                    <m.button
-                                                        whileHover={{ scale: 1.1, rotate: 3 }}
-                                                        whileTap={{ scale: 0.9 }}
+                                                        <Edit className="w-4 h-4 transition-transform group-hover/btn:scale-110" />
+                                                    </button>
+                                                    <button
                                                         onClick={() => handleDeleteBook(book.id)}
-                                                        className="w-12 h-12 bg-white shadow-lg border border-gray-100 text-gray-400 hover:text-red-500 rounded-2xl transition-all flex items-center justify-center"
+                                                        className="w-12 h-12 bg-white/5 hover:bg-red-500/10 text-gray-500 hover:text-red-500 rounded-xl transition-all flex items-center justify-center border border-white/5 group/btn"
                                                         title="Eliminar Obra"
+                                                        aria-label="Eliminar Obra"
                                                     >
-                                                        <Trash2 className="w-5 h-5" />
-                                                    </m.button>
+                                                        <Trash2 className="w-4 h-4 transition-transform group-hover/btn:scale-110" />
+                                                    </button>
                                                 </div>
                                             </td>
                                         </m.tr>
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan={5} className="px-10 py-40 text-center">
-                                            <div className="flex flex-col items-center gap-6 opacity-20 grayscale scale-110">
-                                                <BookOpen className="w-20 h-20 text-brand-primary" />
-                                                <div className="space-y-2">
-                                                    <p className="font-black uppercase tracking-[0.4em] text-[11px] text-brand-dark">Acervo Deserto</p>
-                                                    <p className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Nenhum resultado para os filtros atuais.</p>
-                                                </div>
+                                        <td colSpan={5} className="py-40 text-center">
+                                            <div className="flex flex-col items-center gap-6 opacity-20">
+                                                <BookOpen className="w-16 h-16 text-brand-primary" />
+                                                <p className="font-black text-[11px] uppercase tracking-[0.4em]">Acervo não Identificado</p>
                                             </div>
                                         </td>
                                     </tr>
@@ -330,3 +301,4 @@ const AdminBooksTab: React.FC<AdminBooksTabProps> = ({ onStatsRefresh }) => {
 };
 
 export default AdminBooksTab;
+

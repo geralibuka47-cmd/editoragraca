@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion as m, AnimatePresence } from 'framer-motion';
-import { Plus, Edit, Trash2, Loader2, Save, X, Search, User, Briefcase, Tag, Hash, Image as ImageIcon, FileText } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, Save, X, Search, User, Briefcase, Tag, Hash, Image as ImageIcon, FileText, Shield, Crosshair } from 'lucide-react';
 import { useToast } from '../Toast';
 
 const AdminTeamTab: React.FC = () => {
@@ -20,7 +20,7 @@ const AdminTeamTab: React.FC = () => {
             const { getTeamMembers } = await import('../../services/dataService');
             const data = await getTeamMembers();
             setTeamMembers(data);
-            setFilteredMembers(data);
+            setFilteredMembers(data || []);
         } catch (error) {
             console.error('Erro ao buscar membros da equipa:', error);
             showToast('Erro ao carregar membros da equipa.', 'error');
@@ -81,7 +81,7 @@ const AdminTeamTab: React.FC = () => {
     };
 
     const handleDeleteTeam = async (id: string) => {
-        if (!confirm('Eliminar este membro?')) return;
+        if (!confirm('Eliminar este membro do directório de missões?')) return;
         try {
             const { deleteTeamMember } = await import('../../services/dataService');
             await deleteTeamMember(id);
@@ -94,22 +94,26 @@ const AdminTeamTab: React.FC = () => {
     };
 
     return (
-        <div className="space-y-10">
+        <div className="space-y-12">
+            {/* Header Section */}
             <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-8">
-                <div>
-                    <h2 className="text-4xl font-black text-brand-dark tracking-tighter uppercase mb-2">Engrenagem <span className="text-brand-primary lowercase italic font-light">Humana</span></h2>
-                    <p className="text-gray-400 font-bold text-sm">Gestão dos talentos que movem a Editora Graça.</p>
+                <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                        <div className="w-1.5 h-8 bg-brand-primary rounded-full shadow-[0_0_15px_rgba(189,147,56,0.5)]" />
+                        <h2 className="text-3xl font-black text-white tracking-tighter uppercase mb-0">Comando de <span className="text-brand-primary italic font-light lowercase">Elite</span></h2>
+                    </div>
+                    <p className="text-gray-500 font-bold text-xs uppercase tracking-widest pl-4 italic">Directório de Operadores e Especialistas</p>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-center gap-4 w-full xl:w-auto">
+                <div className="flex flex-col sm:flex-row items-center gap-6 w-full xl:w-auto">
                     <div className="relative group w-full sm:w-80">
-                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-brand-primary transition-colors" />
+                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-brand-primary transition-colors" />
                         <input
                             type="text"
-                            placeholder="Pesquisar membros..."
+                            placeholder="PESQUISAR OPERADOR..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-12 pr-6 py-4 bg-gray-50 border-2 border-transparent focus:border-brand-primary/20 focus:bg-white rounded-[1.5rem] text-[11px] font-black uppercase tracking-widest outline-none transition-all shadow-sm"
+                            className="w-full pl-14 pr-8 py-5 bg-white/5 border border-white/5 focus:border-brand-primary/20 focus:bg-white/10 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] text-white outline-none transition-all shadow-2xl"
                         />
                     </div>
 
@@ -120,33 +124,36 @@ const AdminTeamTab: React.FC = () => {
                             setTeamForm({ name: '', role: '', department: '', bio: '', photoUrl: '', displayOrder: 0 });
                             setShowTeamModal(true);
                         }}
-                        className="btn-premium py-4 px-8 text-[10px] w-full sm:w-auto shadow-xl shadow-brand-primary/20"
+                        className="w-full sm:w-auto px-10 py-5 bg-brand-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] shadow-[0_15px_40px_-10px_rgba(189,147,56,0.3)] hover:brightness-110 transition-all flex items-center justify-center gap-4"
                     >
-                        <Plus className="w-4 h-4 mr-2" />
-                        <span>Novo Membro</span>
+                        <Plus className="w-5 h-5" />
+                        <span>RECRUTAR COLABORADOR</span>
                     </m.button>
                 </div>
             </div>
 
-            <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-brand-dark/5 border border-gray-100 overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full min-w-[900px]">
+            {/* Table Container */}
+            <div className="bg-white/5 rounded-[3rem] border border-white/5 overflow-hidden shadow-2xl relative">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-primary/20 to-transparent" />
+
+                <div className="overflow-x-auto custom-scrollbar">
+                    <table className="w-full min-w-[1000px] border-collapse">
                         <thead>
-                            <tr className="bg-gray-50/50">
-                                <th className="px-8 py-6 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Membro / Perfil</th>
-                                <th className="px-8 py-6 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Cargo</th>
-                                <th className="px-8 py-6 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Departamento</th>
-                                <th className="px-8 py-6 text-right text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Ordem</th>
-                                <th className="px-8 py-6 text-center text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Ações</th>
+                            <tr className="bg-white/[0.02]">
+                                <th className="px-10 py-8 text-left text-[9px] font-black text-gray-500 uppercase tracking-[0.4em]">Identificação / Perfil</th>
+                                <th className="px-10 py-8 text-left text-[9px] font-black text-gray-500 uppercase tracking-[0.4em]">Função Estratégica</th>
+                                <th className="px-10 py-8 text-left text-[9px] font-black text-gray-500 uppercase tracking-[0.4em]">Sectores</th>
+                                <th className="px-10 py-8 text-right text-[9px] font-black text-gray-500 uppercase tracking-[0.4em]">Hierarquia</th>
+                                <th className="px-10 py-8 text-center text-[9px] font-black text-gray-500 uppercase tracking-[0.4em]">Acções de Comando</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-50">
+                        <tbody className="divide-y divide-white/5">
                             <AnimatePresence mode="popLayout">
                                 {isLoadingTeam ? (
-                                    [1, 2, 3].map(i => (
+                                    [1, 2, 3, 4, 5].map(i => (
                                         <tr key={i} className="animate-pulse">
-                                            <td colSpan={5} className="px-8 py-6">
-                                                <div className="h-4 bg-gray-100 rounded-full w-full"></div>
+                                            <td colSpan={5} className="px-10 py-8">
+                                                <div className="h-6 bg-white/5 rounded-full w-full"></div>
                                             </td>
                                         </tr>
                                     ))
@@ -154,56 +161,70 @@ const AdminTeamTab: React.FC = () => {
                                     filteredMembers.map((member) => (
                                         <m.tr
                                             key={member.id}
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            className="hover:bg-gray-50/50 transition-colors group text-sm"
+                                            initial={{ opacity: 0, x: -10 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            exit={{ opacity: 0, x: 10 }}
+                                            className="hover:bg-white/[0.03] transition-colors group"
                                         >
-                                            <td className="px-8 py-6">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 rounded-2xl overflow-hidden bg-gray-100 border border-gray-100 flex-shrink-0 group-hover:scale-11 transition-transform">
+                                            <td className="px-10 py-8">
+                                                <div className="flex items-center gap-6">
+                                                    <div className="w-16 h-16 rounded-[1.5rem] overflow-hidden bg-white/5 border border-white/10 flex-shrink-0 group-hover:border-brand-primary/40 transition-all duration-500 relative">
                                                         {member.photoUrl ? (
-                                                            <img src={member.photoUrl} alt={member.name} className="w-full h-full object-cover" />
+                                                            <>
+                                                                <img src={member.photoUrl} alt={member.name} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+                                                                <div className="absolute inset-0 bg-brand-primary/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                            </>
                                                         ) : (
-                                                            <div className="w-full h-full flex items-center justify-center text-gray-300">
-                                                                <User className="w-6 h-6" />
+                                                            <div className="w-full h-full flex items-center justify-center text-gray-700">
+                                                                <User className="w-8 h-8" />
                                                             </div>
                                                         )}
                                                     </div>
-                                                    <span className="font-black text-brand-dark tracking-tight">{member.name}</span>
+                                                    <div className="space-y-1">
+                                                        <span className="block font-black text-white text-base tracking-tighter uppercase group-hover:text-brand-primary transition-colors">{member.name}</span>
+                                                        <span className="block text-[8px] font-bold text-gray-600 uppercase tracking-[0.3em]">Status: Active Operator</span>
+                                                    </div>
                                                 </div>
                                             </td>
-                                            <td className="px-8 py-6">
-                                                <span className="text-gray-500 font-bold">{member.role}</span>
+                                            <td className="px-10 py-8">
+                                                <div className="flex flex-col">
+                                                    <span className="text-gray-300 font-black text-[11px] uppercase tracking-widest">{member.role}</span>
+                                                    <span className="text-[9px] text-gray-600 font-bold uppercase">Technical Specialist</span>
+                                                </div>
                                             </td>
-                                            <td className="px-8 py-6">
-                                                <span className="px-3 py-1 bg-brand-primary/5 text-brand-primary rounded-lg text-[9px] font-black uppercase tracking-widest">{member.department}</span>
+                                            <td className="px-10 py-8">
+                                                <span className="px-4 py-2 bg-brand-primary/10 border border-brand-primary/20 text-brand-primary rounded-lg text-[9px] font-black uppercase tracking-[0.2em] shadow-lg shadow-brand-primary/5">
+                                                    {member.department}
+                                                </span>
                                             </td>
-                                            <td className="px-8 py-6 text-right">
-                                                <span className="text-[10px] font-black text-gray-400">#{member.displayOrder || 0}</span>
+                                            <td className="px-10 py-8 text-right">
+                                                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/5">
+                                                    <div className="w-1 h-1 rounded-full bg-brand-primary" />
+                                                    <span className="text-[10px] font-black text-gray-400">LEV. {member.displayOrder || 0}</span>
+                                                </div>
                                             </td>
-                                            <td className="px-8 py-6">
-                                                <div className="flex items-center justify-center gap-3">
+                                            <td className="px-10 py-8">
+                                                <div className="flex items-center justify-center gap-4">
                                                     <m.button
-                                                        whileHover={{ scale: 1.1, y: -2 }}
+                                                        whileHover={{ scale: 1.1, rotate: -5 }}
                                                         whileTap={{ scale: 0.9 }}
                                                         onClick={() => {
                                                             setTeamForm(member);
                                                             setShowTeamModal(true);
                                                         }}
-                                                        className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white flex items-center justify-center transition-all shadow-sm"
-                                                        title="Editar membro"
+                                                        className="w-12 h-12 bg-white/5 border border-white/5 text-gray-400 rounded-2xl hover:bg-white/10 hover:text-white flex items-center justify-center transition-all shadow-xl group/edit"
+                                                        title="Editar Operador"
                                                     >
-                                                        <Edit className="w-4 h-4" />
+                                                        <Edit className="w-5 h-5 transition-transform group-hover/edit:scale-110" />
                                                     </m.button>
                                                     <m.button
-                                                        whileHover={{ scale: 1.1, y: -2 }}
+                                                        whileHover={{ scale: 1.1, rotate: 5 }}
                                                         whileTap={{ scale: 0.9 }}
                                                         onClick={() => handleDeleteTeam(member.id)}
-                                                        className="w-10 h-10 bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white flex items-center justify-center transition-all shadow-sm"
-                                                        title="Eliminar membro"
+                                                        className="w-12 h-12 bg-red-500/5 border border-red-500/10 text-red-500/50 rounded-2xl hover:bg-red-500 hover:text-white flex items-center justify-center transition-all shadow-xl group/delete"
+                                                        title="Revogar Acesso"
                                                     >
-                                                        <Trash2 className="w-4 h-4" />
+                                                        <Trash2 className="w-5 h-5 transition-transform group-hover/delete:scale-110" />
                                                     </m.button>
                                                 </div>
                                             </td>
@@ -211,10 +232,10 @@ const AdminTeamTab: React.FC = () => {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan={5} className="px-8 py-32 text-center">
-                                            <div className="flex flex-col items-center gap-4 opacity-20 grayscale">
-                                                <Briefcase className="w-16 h-16" />
-                                                <p className="font-black uppercase tracking-[0.3em] text-[10px]">Nenhum colaborador encontrado.</p>
+                                        <td colSpan={5} className="px-10 py-40 text-center">
+                                            <div className="flex flex-col items-center gap-8 opacity-10 grayscale">
+                                                <Shield className="w-24 h-24 text-brand-primary" />
+                                                <p className="font-black uppercase tracking-[0.5em] text-[11px]">Nenhum Operador Detectado no Perímetro.</p>
                                             </div>
                                         </td>
                                     </tr>
@@ -234,156 +255,167 @@ const AdminTeamTab: React.FC = () => {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={() => setShowTeamModal(false)}
-                            className="absolute inset-0 bg-brand-dark/40 backdrop-blur-xl"
+                            className="absolute inset-0 bg-black/80 backdrop-blur-2xl"
                         />
                         <m.div
-                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            initial={{ opacity: 0, scale: 0.95, y: 30 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            className="bg-white rounded-[3rem] w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl relative z-20 border border-white/20 flex flex-col"
+                            exit={{ opacity: 0, scale: 0.95, y: 30 }}
+                            className="bg-[#0D0D0D] rounded-[4rem] w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8)] relative z-20 border border-white/10 flex flex-col"
                         >
-                            <div className="p-10 border-b border-gray-100 flex items-center justify-between">
-                                <div>
-                                    <h3 className="text-3xl font-black text-brand-dark tracking-tighter uppercase mb-1">{teamForm.id ? 'Editar Perfil' : 'Novo Perfil'}</h3>
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-brand-primary">Configuração de colaborador</p>
+                            <div className="p-12 border-b border-white/5 relative bg-gradient-to-b from-white/[0.02] to-transparent">
+                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-primary to-transparent" />
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h3 className="text-4xl font-black text-white tracking-tighter uppercase mb-2">{teamForm.id ? 'Refinar Perfil' : 'Integrar Operador'}</h3>
+                                        <div className="flex items-center gap-3">
+                                            <Crosshair className="w-4 h-4 text-brand-primary" />
+                                            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500">Configuração de Payload de Equipa</p>
+                                        </div>
+                                    </div>
+                                    <m.button
+                                        whileHover={{ rotate: 90, scale: 1.1 }}
+                                        whileTap={{ scale: 0.9 }}
+                                        onClick={() => setShowTeamModal(false)}
+                                        className="w-14 h-14 flex items-center justify-center bg-white/5 border border-white/5 text-gray-500 hover:text-white rounded-2xl transition-all"
+                                        title="Fechar Terminal"
+                                        aria-label="Fechar Terminal"
+                                    >
+                                        <X className="w-6 h-6" />
+                                    </m.button>
                                 </div>
-                                <m.button
-                                    whileHover={{ rotate: 90, scale: 1.1 }}
-                                    whileTap={{ scale: 0.9 }}
-                                    onClick={() => setShowTeamModal(false)}
-                                    className="w-12 h-12 flex items-center justify-center bg-gray-50 text-gray-400 hover:text-brand-dark rounded-full transition-all"
-                                    title="Fechar"
-                                >
-                                    <X className="w-6 h-6" />
-                                </m.button>
                             </div>
 
-                            <form onSubmit={handleSaveTeam} className="flex-1 overflow-y-auto p-10 space-y-8">
+                            <form onSubmit={handleSaveTeam} className="flex-1 overflow-y-auto p-12 space-y-10 custom-scrollbar">
                                 {teamErrors.form && (
-                                    <div className="p-6 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-4 text-red-600 text-xs font-black uppercase tracking-widest">
-                                        <X className="w-4 h-4" />
+                                    <m.div
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: 'auto' }}
+                                        className="p-6 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-4 text-red-500 text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-red-500/5"
+                                    >
+                                        <X className="w-5 h-5" />
                                         {teamErrors.form}
-                                    </div>
+                                    </m.div>
                                 )}
 
-                                <div className="grid md:grid-cols-2 gap-8">
-                                    <div className="space-y-2">
-                                        <label htmlFor="team-name" className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Nome Completo</label>
+                                <div className="grid md:grid-cols-2 gap-10">
+                                    <div className="space-y-4">
+                                        <label htmlFor="team-name" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">NOME CODIFICADO</label>
                                         <div className="relative">
-                                            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                                            <User className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
                                             <input
                                                 id="team-name"
                                                 type="text"
                                                 required
                                                 value={teamForm.name}
                                                 onChange={(e) => setTeamForm({ ...teamForm, name: e.target.value })}
-                                                className="w-full pl-12 pr-6 py-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-primary/20 focus:bg-white outline-none transition-all font-bold"
-                                                placeholder="Ex: João Mendonça"
+                                                className="w-full pl-16 pr-8 py-5 bg-white/5 border border-white/5 rounded-2xl focus:border-brand-primary/30 focus:bg-white/10 outline-none transition-all font-black text-white uppercase tracking-widest placeholder:text-gray-800"
+                                                placeholder="OPERADOR ALFA"
                                             />
                                         </div>
                                     </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="team-role" className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Cargo / Título</label>
+                                    <div className="space-y-4">
+                                        <label htmlFor="team-role" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">ESPECIALIZAÇÃO</label>
                                         <div className="relative">
-                                            <Tag className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                                            <Tag className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
                                             <input
                                                 id="team-role"
                                                 type="text"
                                                 required
                                                 value={teamForm.role}
                                                 onChange={(e) => setTeamForm({ ...teamForm, role: e.target.value })}
-                                                className="w-full pl-12 pr-6 py-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-primary/20 focus:bg-white outline-none transition-all font-bold"
-                                                placeholder="Ex: Editor Executivo"
+                                                className="w-full pl-16 pr-8 py-5 bg-white/5 border border-white/5 rounded-2xl focus:border-brand-primary/30 focus:bg-white/10 outline-none transition-all font-black text-white uppercase tracking-widest placeholder:text-gray-800"
+                                                placeholder="ESTRATEGISTA"
                                             />
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="grid md:grid-cols-2 gap-8">
-                                    <div className="space-y-2">
-                                        <label htmlFor="team-department" className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Departamento</label>
+                                <div className="grid md:grid-cols-2 gap-10">
+                                    <div className="space-y-4">
+                                        <label htmlFor="team-department" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">SECTOR DE ATUAÇÃO</label>
                                         <div className="relative">
-                                            <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                                            <Briefcase className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
                                             <input
                                                 id="team-department"
                                                 type="text"
                                                 required
                                                 value={teamForm.department}
                                                 onChange={(e) => setTeamForm({ ...teamForm, department: e.target.value })}
-                                                className="w-full pl-12 pr-6 py-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-primary/20 focus:bg-white outline-none transition-all font-bold"
-                                                placeholder="Ex: Editorial"
+                                                className="w-full pl-16 pr-8 py-5 bg-white/5 border border-white/5 rounded-2xl focus:border-brand-primary/30 focus:bg-white/10 outline-none transition-all font-black text-white uppercase tracking-widest placeholder:text-gray-800"
+                                                placeholder="NÚCLEO CENTRAL"
                                             />
                                         </div>
                                     </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="team-order" className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Ordem de Exibição</label>
+                                    <div className="space-y-4">
+                                        <label htmlFor="team-order" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">NÍVEL DE ACESSO</label>
                                         <div className="relative">
-                                            <Hash className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                                            <Hash className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
                                             <input
                                                 id="team-order"
                                                 type="number"
                                                 required
                                                 value={teamForm.displayOrder || 0}
                                                 onChange={(e) => setTeamForm({ ...teamForm, displayOrder: parseInt(e.target.value) })}
-                                                className="w-full pl-12 pr-6 py-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-primary/20 focus:bg-white outline-none transition-all font-bold"
+                                                className="w-full pl-16 pr-8 py-5 bg-white/5 border border-white/5 rounded-2xl focus:border-brand-primary/30 focus:bg-white/10 outline-none transition-all font-black text-white uppercase tracking-widest shadow-inner"
                                             />
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label htmlFor="team-photo" className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">URL da Foto de Perfil</label>
+                                <div className="space-y-4">
+                                    <label htmlFor="team-photo" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">BIOMETRIC ASSET (FOTO URL)</label>
                                     <div className="relative">
-                                        <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                                        <ImageIcon className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
                                         <input
                                             id="team-photo"
                                             type="url"
                                             required
                                             value={teamForm.photoUrl}
                                             onChange={(e) => setTeamForm({ ...teamForm, photoUrl: e.target.value })}
-                                            className="w-full pl-12 pr-6 py-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-primary/20 focus:bg-white outline-none transition-all text-xs font-bold"
-                                            placeholder="https://images.unsplash.com/..."
+                                            className="w-full pl-16 pr-8 py-5 bg-white/5 border border-white/5 rounded-2xl focus:border-brand-primary/30 focus:bg-white/10 outline-none transition-all text-[11px] font-black text-gray-400 uppercase tracking-widest"
+                                            placeholder="HTTPS://..."
                                         />
                                     </div>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label htmlFor="team-bio" className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Biografia / Pequeno Resumo</label>
+                                <div className="space-y-4">
+                                    <label htmlFor="team-bio" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">DOSSIER TÉCNICO (BIO)</label>
                                     <div className="relative">
-                                        <FileText className="absolute left-4 top-6 w-4 h-4 text-gray-300" />
+                                        <FileText className="absolute left-6 top-8 w-4 h-4 text-gray-600" />
                                         <textarea
                                             id="team-bio"
                                             required
                                             value={teamForm.bio}
                                             onChange={(e) => setTeamForm({ ...teamForm, bio: e.target.value })}
-                                            className="w-full pl-12 pr-6 py-6 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-primary/20 focus:bg-white outline-none transition-all h-32 resize-none font-medium text-gray-600"
-                                            placeholder="Fale um pouco sobre a trajetória deste membro..."
+                                            className="w-full pl-16 pr-8 py-8 bg-white/5 border border-white/5 rounded-[2.5rem] focus:border-brand-primary/30 focus:bg-white/10 outline-none transition-all h-48 resize-none font-medium text-gray-400 leading-relaxed italic uppercase tracking-wider"
+                                            placeholder="REGISTO DE TRAJECTÓRIA E IMPACTO..."
                                         />
                                     </div>
                                 </div>
                             </form>
 
-                            <div className="p-10 border-t border-gray-100 bg-gray-50/50 flex gap-6">
+                            <div className="p-12 border-t border-white/5 bg-white/[0.01] flex flex-col sm:flex-row gap-6">
                                 <button
                                     type="button"
                                     onClick={() => setShowTeamModal(false)}
-                                    className="flex-1 px-8 py-5 border-2 border-gray-100 text-gray-400 rounded-[1.5rem] font-black text-[10px] uppercase tracking-widest hover:border-gray-200 hover:text-brand-dark transition-all flex items-center justify-center gap-2"
+                                    className="flex-1 px-10 py-6 border border-white/10 text-gray-500 rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] hover:bg-white/5 hover:text-white transition-all flex items-center justify-center gap-2"
                                 >
-                                    Cancelar
+                                    ABORTAR
                                 </button>
                                 <m.button
-                                    whileHover={{ scale: 1.02 }}
+                                    whileHover={{ scale: 1.02, filter: 'brightness(1.1)' }}
                                     whileTap={{ scale: 0.98 }}
                                     onClick={handleSaveTeam}
                                     disabled={isSavingTeam}
-                                    className="flex-2 btn-premium py-5 px-12 text-[10px] shadow-xl shadow-brand-primary/20"
+                                    className="flex-[1.5] py-6 px-12 bg-brand-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] shadow-[0_20px_50px_-15px_rgba(189,147,56,0.4)] transition-all flex items-center justify-center gap-4"
                                 >
                                     {isSavingTeam ? (
-                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                        <Loader2 className="w-5 h-5 animate-spin" />
                                     ) : (
                                         <>
-                                            <Save className="w-4 h-4 mr-2" />
-                                            <span>Salvar Alterações</span>
+                                            <Save className="w-5 h-5 shadow-inner" />
+                                            <span>EFECTUAR REGISTO</span>
                                         </>
                                     )}
                                 </m.button>

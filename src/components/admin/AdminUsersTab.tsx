@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion as m, AnimatePresence } from 'framer-motion';
-import { Edit, Search, User as UserIcon, Shield, PenTool, Mail, Calendar } from 'lucide-react';
+import { Edit, Search, User as UserIcon, Shield, PenTool, Mail, Calendar, Activity } from 'lucide-react';
 
 const AdminUsersTab: React.FC = () => {
     const [users, setUsers] = useState<any[]>([]);
@@ -43,50 +43,55 @@ const AdminUsersTab: React.FC = () => {
     };
 
     const getRoleStyles = (role: string) => {
-        if (role === 'admin' || role === 'adm') return 'bg-purple-50 text-purple-600 border-purple-100';
-        if (role === 'author') return 'bg-blue-50 text-blue-600 border-blue-100';
-        return 'bg-gray-50 text-gray-600 border-gray-100';
+        if (role === 'admin' || role === 'adm') return 'bg-purple-500/10 text-purple-400 border-purple-500/20';
+        if (role === 'author') return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+        return 'bg-gray-500/10 text-gray-400 border-gray-500/20';
     };
 
     return (
-        <div className="space-y-10">
+        <div className="space-y-12">
+            {/* Header Section */}
             <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-8">
-                <div>
-                    <h2 className="text-4xl font-black text-brand-dark tracking-tighter uppercase mb-2">Comunidade <span className="text-brand-primary lowercase italic font-light">Graciana</span></h2>
-                    <p className="text-gray-400 font-bold text-sm">Controle de acessos e perfis de utilizadores.</p>
+                <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                        <div className="w-1.5 h-8 bg-brand-primary rounded-full shadow-[0_0_15px_rgba(189,147,56,0.5)]" />
+                        <h2 className="text-3xl font-black text-white tracking-tighter uppercase mb-0">Diretório <span className="text-brand-primary italic font-light lowercase">Comunitário</span></h2>
+                    </div>
+                    <p className="text-gray-500 font-bold text-xs uppercase tracking-widest pl-4">Gestão de Utilizadores e Privilégios</p>
                 </div>
 
                 <div className="relative group w-full xl:w-96">
-                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-brand-primary transition-colors" />
+                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-brand-primary transition-colors" />
                     <input
                         type="text"
-                        placeholder="Pesquisar por nome ou email..."
+                        placeholder="LOCALIZAR UTILIZADOR..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-12 pr-6 py-4 bg-gray-50 border-2 border-transparent focus:border-brand-primary/20 focus:bg-white rounded-[1.5rem] text-[11px] font-black uppercase tracking-widest outline-none transition-all shadow-sm"
+                        className="w-full pl-12 pr-6 py-4 bg-white/5 border border-white/5 focus:border-brand-primary/20 focus:bg-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white outline-none transition-all shadow-xl"
                     />
                 </div>
             </div>
 
-            <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-brand-dark/5 border border-gray-100 overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full min-w-[800px]">
+            {/* Content Display */}
+            <div className="bg-white/5 rounded-[2.5rem] border border-white/5 overflow-hidden shadow-2xl">
+                <div className="overflow-x-auto custom-scrollbar">
+                    <table className="w-full min-w-[800px] border-collapse">
                         <thead>
-                            <tr className="bg-gray-50/50">
-                                <th className="px-8 py-6 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Identidade</th>
-                                <th className="px-8 py-6 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Contacto</th>
-                                <th className="px-8 py-6 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Privilégio</th>
-                                <th className="px-8 py-6 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Membro Desde</th>
-                                <th className="px-8 py-6 text-center text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Gestão</th>
+                            <tr className="bg-white/5 border-b border-white/5">
+                                <th className="px-10 py-8 text-left text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Utilizador</th>
+                                <th className="px-10 py-8 text-left text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Contacto Directo</th>
+                                <th className="px-10 py-8 text-left text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Nível de Acesso</th>
+                                <th className="px-10 py-8 text-left text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Ingresso</th>
+                                <th className="px-10 py-8 text-center text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Operações</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-50">
+                        <tbody className="divide-y divide-white/5">
                             <AnimatePresence mode="popLayout">
                                 {isLoadingUsers ? (
                                     [1, 2, 3].map(i => (
                                         <tr key={i} className="animate-pulse">
-                                            <td colSpan={5} className="px-8 py-6">
-                                                <div className="h-4 bg-gray-100 rounded-full w-full"></div>
+                                            <td colSpan={5} className="px-10 py-8">
+                                                <div className="h-4 bg-white/5 rounded-full w-full"></div>
                                             </td>
                                         </tr>
                                     ))
@@ -94,61 +99,62 @@ const AdminUsersTab: React.FC = () => {
                                     filteredUsers.map((u) => (
                                         <m.tr
                                             key={u.id}
+                                            layout
                                             initial={{ opacity: 0 }}
                                             animate={{ opacity: 1 }}
                                             exit={{ opacity: 0 }}
-                                            className="hover:bg-gray-50/50 transition-colors group"
+                                            className="hover:bg-white/[0.03] transition-colors group"
                                         >
-                                            <td className="px-8 py-6">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-10 h-10 bg-brand-primary/10 rounded-full flex items-center justify-center text-brand-primary font-black text-[10px]">
+                                            <td className="px-10 py-8">
+                                                <div className="flex items-center gap-5">
+                                                    <div className="w-12 h-12 bg-white/5 border border-white/5 rounded-2xl flex items-center justify-center text-brand-primary font-black text-sm group-hover:scale-110 transition-transform">
                                                         {u.name?.charAt(0).toUpperCase()}
                                                     </div>
                                                     <div>
-                                                        <div className="font-black text-brand-dark text-sm tracking-tight">{u.name}</div>
-                                                        <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{u.id.substring(0, 8)}</div>
+                                                        <div className="font-black text-white text-[14px] tracking-tight">{u.name}</div>
+                                                        <div className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">{u.id.substring(0, 12)}</div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-8 py-6">
-                                                <div className="flex items-center gap-2 text-xs text-gray-600 font-medium">
-                                                    <Mail className="w-3 h-3 text-gray-300" />
+                                            <td className="px-10 py-8">
+                                                <div className="flex items-center gap-3 text-[12px] text-gray-400 font-medium">
+                                                    <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
+                                                        <Mail className="w-3.4 h-3.5 text-gray-600" />
+                                                    </div>
                                                     {u.email}
                                                 </div>
                                             </td>
-                                            <td className="px-8 py-6">
-                                                <span className={`flex items-center gap-2 w-fit px-3 py-1.5 rounded-lg border text-[9px] font-black uppercase tracking-[0.2em] ${getRoleStyles(u.role)}`}>
+                                            <td className="px-10 py-8">
+                                                <span className={`flex items-center gap-2.5 w-fit px-4 py-2 rounded-xl border text-[9px] font-black uppercase tracking-[0.2em] shadow-lg ${getRoleStyles(u.role)}`}>
                                                     {getRoleIcon(u.role)}
-                                                    {u.role === 'admin' || u.role === 'adm' ? 'Administrador' : u.role === 'author' ? 'Autor' : 'Leitor'}
+                                                    {u.role === 'admin' || u.role === 'adm' ? 'Administrador' : u.role === 'author' ? 'Escritor' : 'Explorador'}
                                                 </span>
                                             </td>
-                                            <td className="px-8 py-6">
-                                                <div className="flex items-center gap-2 text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                                                    <Calendar className="w-3 h-3" />
+                                            <td className="px-10 py-8">
+                                                <div className="flex items-center gap-3 text-[10px] text-gray-500 font-black uppercase tracking-widest">
+                                                    <Calendar className="w-4 h-4 text-gray-700" />
                                                     {new Date(u.joined || Date.now()).toLocaleDateString('pt-AO')}
                                                 </div>
                                             </td>
-                                            <td className="px-8 py-6">
+                                            <td className="px-10 py-8">
                                                 <div className="flex items-center justify-center">
-                                                    <m.button
-                                                        whileHover={{ scale: 1.1 }}
-                                                        whileTap={{ scale: 0.9 }}
-                                                        title="Editar utilizador"
-                                                        aria-label="Editar utilizador"
-                                                        className="w-10 h-10 bg-white shadow-sm border border-gray-100 text-gray-400 hover:text-brand-primary hover:border-brand-primary/20 transition-all flex items-center justify-center rounded-xl"
+                                                    <button
+                                                        title="Aceder Perfil Completo"
+                                                        aria-label="Aceder Perfil Completo"
+                                                        className="w-12 h-12 bg-white/5 hover:bg-brand-primary/10 text-gray-500 hover:text-brand-primary rounded-xl transition-all flex items-center justify-center border border-white/5 group/btn"
                                                     >
-                                                        <Edit className="w-4 h-4" />
-                                                    </m.button>
+                                                        <Edit className="w-4 h-4 transition-transform group-hover/btn:scale-110" />
+                                                    </button>
                                                 </div>
                                             </td>
                                         </m.tr>
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan={5} className="px-8 py-32 text-center">
-                                            <div className="flex flex-col items-center gap-4 opacity-20 grayscale">
-                                                <UserIcon className="w-16 h-16" />
-                                                <p className="font-black uppercase tracking-[0.3em] text-[10px]">Nenhum utilizador encontrado.</p>
+                                        <td colSpan={5} className="py-40 text-center">
+                                            <div className="flex flex-col items-center gap-6 opacity-20">
+                                                <UserIcon className="w-16 h-16 text-brand-primary" />
+                                                <p className="font-black text-[11px] uppercase tracking-[0.4em]">Nenhum Identidade Localizada</p>
                                             </div>
                                         </td>
                                     </tr>
@@ -163,3 +169,4 @@ const AdminUsersTab: React.FC = () => {
 };
 
 export default AdminUsersTab;
+
