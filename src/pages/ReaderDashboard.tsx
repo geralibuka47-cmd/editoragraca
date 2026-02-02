@@ -18,6 +18,14 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user }) => {
     const [purchasedBooks, setPurchasedBooks] = useState<Book[]>([]);
     const [isLoadingLibrary, setIsLoadingLibrary] = useState(false);
 
+    // Settings state
+    const [profileData, setProfileData] = useState({
+        name: user?.name || '',
+        email: user?.email || '',
+        whatsapp: user?.whatsappNumber || ''
+    });
+    const [isSavingProfile, setIsSavingProfile] = useState(false);
+
     const fetchLibrary = async () => {
         if (!user) return;
         setIsLoadingLibrary(true);
@@ -92,6 +100,25 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user }) => {
         }
     };
 
+    const handleSaveProfile = async () => {
+        if (!user) return;
+        setIsSavingProfile(true);
+        try {
+            const { saveUserProfile } = await import('../services/dataService');
+            await saveUserProfile({
+                ...user,
+                name: profileData.name,
+                whatsappNumber: profileData.whatsapp
+            });
+            showToast('Perfil atualizado com sucesso!', 'success');
+        } catch (error) {
+            console.error('Erro ao salvar perfil:', error);
+            showToast('Erro ao salvar alterações.', 'error');
+        } finally {
+            setIsSavingProfile(false);
+        }
+    };
+
     // Mock data - in real app would come from database
 
     const wishlistBooks = [
@@ -123,601 +150,324 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user }) => {
     }
 
     return (
-        <div className="min-h-screen bg-[#0A0A0A] text-white selection:bg-brand-primary/30">
-            {/* Dashboard Internal Header */}
-            <header className="h-24 bg-black/80 backdrop-blur-3xl border-b border-white/5 fixed top-0 left-0 right-0 z-[100] px-8 flex items-center justify-between">
-                <div
-                    onClick={() => navigate('/')}
-                    className="flex items-center gap-3 cursor-pointer group"
-                >
-                    <div className="w-10 h-10 bg-brand-primary rounded-xl flex items-center justify-center group-hover:shadow-[0_0_20px_rgba(189,147,56,0.3)] transition-all">
-                        <ArrowRight className="text-white w-5 h-5 rotate-180" />
-                    </div>
-                    <span className="text-[10px] font-black text-white uppercase tracking-[0.3em] hidden sm:block">Voltar ao Site</span>
-                </div>
+        <div className="min-h-screen bg-[#050505] text-white selection:bg-brand-primary/30 font-sans">
+            {/* 1. COVER AREA */}
+            <div className="h-[350px] relative w-full overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent z-10" />
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=2228&auto=format&fit=crop')] bg-cover bg-center opacity-40 group-hover:scale-105 transition-transform duration-1000" />
 
-                <div className="flex items-center gap-6">
-                    <div className="text-right hidden sm:block">
-                        <p className="text-[10px] font-black text-white">{user.name}</p>
-                        <p className="text-[8px] text-brand-primary font-black uppercase tracking-[0.2em]">Leitor Elite | Online</p>
-                    </div>
-                    <button
-                        onClick={() => setActiveTab('settings')}
-                        className="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors border border-white/5"
-                        title="Protocolos de Identidade"
-                    >
-                        <Settings className="w-4 h-4 text-gray-400" />
-                    </button>
+                {/* Top Nav Overlay */}
+                <div className="absolute top-0 left-0 right-0 p-8 flex justify-between items-start z-20">
                     <button
                         onClick={() => navigate('/')}
-                        className="p-3 bg-red-500/10 hover:bg-red-500/20 rounded-xl transition-colors border border-red-500/20 text-red-500"
-                        title="Terminar Sessão"
+                        className="flex items-center gap-3 px-4 py-2 bg-black/40 backdrop-blur-md rounded-full border border-white/10 hover:bg-white/10 transition-all group/back"
+                    >
+                        <ArrowRight className="w-4 h-4 text-white rotate-180 group-hover/back:-translate-x-1 transition-transform" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">Voltar ao Site</span>
+                    </button>
+
+                    <button
+                        onClick={() => navigate('/entrar')}
+                        className="w-10 h-10 flex items-center justify-center bg-red-500/20 backdrop-blur-md rounded-full border border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white transition-all"
+                        title="Sair"
                     >
                         <ArrowRight className="w-4 h-4" />
                     </button>
                 </div>
-            </header>
+            </div>
 
-            {/* Header - Immersive */}
-            <section className="pt-32 pb-24 relative overflow-hidden">
-                {/* Background Decorative Text */}
-                <div className="absolute top-20 left-1/2 -translate-x-1/2 pointer-events-none select-none z-0">
-                    <span className="text-[15rem] md:text-[25rem] font-black text-white/[0.02] leading-none uppercase tracking-tighter">
-                        LEITOR
-                    </span>
+            {/* 2. PROFILE HEADER & NAV DOCK */}
+            <div className="container mx-auto px-4 md:px-8 relative z-20 -mt-24">
+                <div className="flex flex-col md:flex-row items-end gap-8 mb-8">
+                    {/* Avatar */}
+                    <div className="relative group/avatar">
+                        <div className="w-40 h-40 md:w-48 md:h-48 rounded-full border-4 border-[#050505] bg-[#1a1a1a] overflow-hidden shadow-2xl relative z-10">
+                            <div className="w-full h-full flex items-center justify-center bg-brand-primary/10 text-brand-primary font-black text-5xl">
+                                {user.name.charAt(0)}
+                            </div>
+                        </div>
+                        <div className="absolute bottom-4 right-4 z-20 w-8 h-8 bg-blue-500 rounded-full border-4 border-[#050505] flex items-center justify-center shadow-lg" title="Verificado">
+                            <CheckCircle className="w-4 h-4 text-white" />
+                        </div>
+                    </div>
+
+                    {/* Identity Info */}
+                    <div className="flex-1 pb-4 text-center md:text-left">
+                        <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tight mb-2">{user.name}</h1>
+                        <p className="text-gray-400 font-medium text-sm tracking-wide flex items-center justify-center md:justify-start gap-2">
+                            <span className="text-brand-primary font-black uppercase tracking-[0.2em] text-[10px]">@{user.role}</span>
+                            <span className="w-1 h-1 rounded-full bg-gray-600" />
+                            <span className="text-gray-500 italic">Membro desde 2024</span>
+                        </p>
+                    </div>
+
+                    {/* Action Bar */}
+                    <div className="flex gap-3 pb-4">
+                        <button
+                            onClick={() => setActiveTab('settings')}
+                            className="px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] transition-all flex items-center gap-2"
+                        >
+                            <Settings className="w-4 h-4" />
+                            <span>Editar Perfil</span>
+                        </button>
+                    </div>
                 </div>
 
-                {/* Decorative Gradients */}
-                <div className="absolute top-0 right-0 w-[40%] aspect-square bg-brand-primary/10 blur-[150px] rounded-full -translate-y-1/2 translate-x-1/4"></div>
-                <div className="absolute bottom-0 left-0 w-[30%] aspect-square bg-brand-primary/5 blur-[120px] rounded-full translate-y-1/2 -translate-x-1/4"></div>
+                {/* Sticky Nav Dock */}
+                <div className="sticky top-4 z-50 bg-[#050505]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-2 mb-8 shadow-2xl flex flex-wrap justify-center md:justify-start gap-1">
+                    {[
+                        { id: 'library', label: 'Acervo', icon: BookIcon },
+                        { id: 'wishlist', label: 'Desejos', icon: Heart },
+                        { id: 'history', label: 'Logs', icon: Clock },
+                        { id: 'payments', label: 'Financeiro', icon: CreditCard },
+                        { id: 'settings', label: 'Definições', icon: Settings }
+                    ].map((tab) => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id as any)}
+                            className={`px-6 py-3 rounded-xl flex items-center gap-3 transition-all ${activeTab === tab.id
+                                ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/20'
+                                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                }`}
+                        >
+                            <tab.icon className="w-4 h-4" />
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em]">{tab.label}</span>
+                        </button>
+                    ))}
+                </div>
 
-                <div className="container mx-auto px-6 md:px-8 relative z-10">
-                    <div className="flex flex-col xl:flex-row items-center justify-between gap-12 mb-20">
-                        <div className="text-center xl:text-left">
-                            <m.div
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="inline-flex items-center gap-3 px-6 py-2 bg-brand-primary/10 border border-brand-primary/20 rounded-full text-brand-primary font-black text-[10px] uppercase tracking-[0.4em] mb-8"
-                            >
-                                <Sparkles className="w-3.5 h-3.5" />
-                                <span>TERMINAL DE ACESSO</span>
-                            </m.div>
-                            <m.h1
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="text-5xl md:text-8xl font-black tracking-tighter uppercase leading-none mb-6"
-                            >
-                                OLHÁ, <span className="text-brand-primary italic font-light lowercase">{user.name.split(' ')[0]}</span>
-                            </m.h1>
-                            <m.p
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ delay: 0.2 }}
-                                className="text-gray-500 font-bold text-xs uppercase tracking-[0.3em] max-w-lg mx-auto xl:mx-0 leading-relaxed"
-                            >
-                                Gestão de acervo digital e jornada literária personalizada sob protocolo premium.
-                            </m.p>
+                {/* 3. CONTENT GRID */}
+                <div className="grid lg:grid-cols-[350px_1fr] gap-8 pb-20">
+
+                    {/* LEFT SIDEBAR (INTRO) */}
+                    <div className="space-y-6">
+                        {/* Intro Card */}
+                        <div className="bg-white/5 border border-white/5 rounded-3xl p-8 backdrop-blur-sm">
+                            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 mb-6">Identidade</h3>
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-4 text-sm text-gray-300">
+                                    <UserIcon className="w-4 h-4 text-brand-primary" />
+                                    <span className="font-medium">{user.name}</span>
+                                </div>
+                                <div className="flex items-center gap-4 text-sm text-gray-300">
+                                    <Download className="w-4 h-4 text-brand-primary rotate-180" />
+                                    <span className="font-medium truncate">{user.email}</span>
+                                </div>
+                                {user.whatsappNumber && (
+                                    <div className="flex items-center gap-4 text-sm text-gray-300">
+                                        <div className="w-4 h-4 flex items-center justify-center font-serif text-brand-primary text-xs font-bold">W</div>
+                                        <span className="font-medium">{user.whatsappNumber}</span>
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
-                        <m.div
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="flex items-center gap-8 bg-white/[0.03] backdrop-blur-3xl p-8 rounded-[3.5rem] border border-white/5 shadow-2xl relative group"
-                        >
-                            <div className="absolute inset-0 bg-gradient-to-br from-brand-primary/5 to-transparent rounded-[3.5rem] -z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                            <div className="relative">
-                                <div className="w-20 h-20 rounded-2xl bg-brand-primary/10 flex items-center justify-center text-brand-primary font-black text-3xl border border-brand-primary/20 shadow-[0_0_20px_rgba(189,147,56,0.2)]">
-                                    {user.name.charAt(0)}
-                                </div>
-                                <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-brand-primary rounded-xl flex items-center justify-center border-4 border-[#0D0D0D] shadow-lg">
-                                    <CheckCircle className="w-4 h-4 text-white" />
-                                </div>
+                        {/* Stats / Badges */}
+                        <div className="bg-white/5 border border-white/5 rounded-3xl p-8 backdrop-blur-sm">
+                            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 mb-6">Credenciais</h3>
+                            <div className="flex flex-wrap gap-2">
+                                <span className="px-3 py-1.5 bg-brand-primary/10 border border-brand-primary/20 rounded-lg text-[9px] font-black text-brand-primary uppercase tracking-widest">Leitor Elite</span>
+                                <span className="px-3 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-lg text-[9px] font-black text-blue-500 uppercase tracking-widest">Verificado</span>
+                                <span className="px-3 py-1.5 bg-purple-500/10 border border-purple-500/20 rounded-lg text-[9px] font-black text-purple-500 uppercase tracking-widest">Beta Tester</span>
                             </div>
-
-                            <div className="pr-8">
-                                <h2 className="text-white text-xl font-black tracking-tight mb-2 uppercase">{user.name}</h2>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                    <span className="text-brand-primary text-[10px] font-black uppercase tracking-[0.2em]">MEMBRO NIVEL ELITE</span>
-                                </div>
-                                <p className="text-gray-600 text-[9px] mt-2 font-black uppercase tracking-widest">{user.email}</p>
-                            </div>
-                        </m.div>
+                        </div>
                     </div>
 
-                    {/* Tabs - Modernized */}
-                    <div className="flex flex-wrap justify-center xl:justify-start gap-4 p-2 bg-white/[0.02] border border-white/5 rounded-3xl backdrop-blur-xl max-w-fit mx-auto xl:mx-0">
-                        {[
-                            { id: 'library', label: 'ACERVO', icon: BookIcon },
-                            { id: 'wishlist', label: 'DESEJOS', icon: Heart },
-                            { id: 'payments', label: 'TERMINAL FINANCEIRO', icon: CreditCard },
-                            { id: 'history', label: 'LOGS DE COMPRA', icon: Clock },
-                            { id: 'settings', label: 'PROTOCOLOS', icon: UserIcon }
-                        ].map((tab) => (
-                            <m.button
-                                whileHover={{ scale: 1.02, backgroundColor: 'rgba(255,255,255,0.05)' }}
-                                whileTap={{ scale: 0.98 }}
-                                key={tab.id}
-                                onClick={() => setActiveTab(tab.id as any)}
-                                className={`px-8 py-4 rounded-2xl font-black text-[9px] uppercase tracking-[0.3em] transition-all flex items-center gap-4 relative overflow-hidden group
-                                    ${activeTab === tab.id
-                                        ? 'bg-brand-primary text-white shadow-[0_20px_40px_-10px_rgba(189,147,56,0.3)]'
-                                        : 'text-gray-500 hover:text-white'
-                                    }`}
+                    {/* MAIN FEED (CONTENT) */}
+                    <div className="min-h-[500px]">
+                        <AnimatePresence mode="wait">
+                            <m.div
+                                key={activeTab}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.2 }}
                             >
-                                <tab.icon className={`w-4 h-4 transition-transform group-hover:scale-110 ${activeTab === tab.id ? 'text-white' : 'text-brand-primary'}`} />
-                                <span className="relative z-10">{tab.label}</span>
-                                {activeTab === tab.id && (
-                                    <m.div
-                                        layoutId="tab-pill"
-                                        className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"
-                                    />
-                                )}
-                            </m.button>
-                        ))}
-                    </div>
-                </div>
-            </section>
+                                {/* REUSING EXISTING TAB CONTENT LOGIC WITH ADJUSTED STYLING */}
 
-            {/* Content Area */}
-            <section className="py-20 -mt-12 relative z-20">
-                <div className="container mx-auto px-6 md:px-8">
-                    <AnimatePresence mode="wait">
-                        <m.div
-                            key={activeTab}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            className="bg-white/5 backdrop-blur-3xl rounded-[4rem] border border-white/5 p-12 md:p-20 min-h-[700px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.5)] relative overflow-hidden"
-                        >
-                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-primary/20 to-transparent" />
+                                {activeTab === 'library' && (
+                                    <div className="bg-white/5 border border-white/5 rounded-[2.5rem] p-8 md:p-12">
+                                        <div className="mb-10">
+                                            <h2 className="text-3xl font-black uppercase italic tracking-tighter">Acervo Digital</h2>
+                                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">Sua coleção de obras licenciadas</p>
+                                        </div>
 
-                            {/* Library (ACERVO) Tab */}
-                            {activeTab === 'library' && (
-                                <div className="space-y-16">
-                                    <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
-                                        <div>
-                                            <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter uppercase leading-none mb-4 italic">
-                                                Protocolo <span className="text-brand-primary font-light not-italic lowercase">Acervo Digital</span>
-                                            </h2>
-                                            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-gray-500">Sincronização de Licenças Literárias</p>
-                                        </div>
-                                    </div>
-
-                                    {isLoadingLibrary ? (
-                                        <div className="flex flex-col items-center justify-center py-32 space-y-6">
-                                            <Loader2 className="w-12 h-12 text-brand-primary animate-spin" />
-                                            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-600">Sincronizando com Servidor de Ativos...</p>
-                                        </div>
-                                    ) : purchasedBooks.filter(b => b.format === 'digital' && b.digitalFileUrl).length > 0 ? (
-                                        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
-                                            {purchasedBooks.filter(b => b.format === 'digital' && b.digitalFileUrl).map((book) => (
-                                                <m.div
-                                                    key={book.id}
-                                                    initial={{ opacity: 0, y: 20 }}
-                                                    whileInView={{ opacity: 1, y: 0 }}
-                                                    viewport={{ once: true }}
-                                                    className="bg-white/[0.02] rounded-[3rem] border border-white/5 overflow-hidden group hover:bg-white/[0.05] transition-all relative shadow-2xl"
-                                                >
-                                                    <div className="aspect-[3/4.5] overflow-hidden relative">
-                                                        <img
-                                                            src={book.coverUrl}
-                                                            alt={book.title}
-                                                            className="w-full h-full object-cover group-hover:scale-110 group-hover:blur-[2px] transition-all duration-700"
-                                                        />
-                                                        {/* Hover Overlay */}
-                                                        <div className="absolute inset-0 bg-brand-dark/80 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col items-center justify-center p-8 text-center translate-y-4 group-hover:translate-y-0">
-                                                            <div className="w-16 h-16 rounded-2xl bg-brand-primary/20 flex items-center justify-center mb-6">
-                                                                <Download className="w-8 h-8 text-brand-primary" />
-                                                            </div>
-                                                            <h4 className="text-white font-black uppercase tracking-widest text-sm mb-4">Acesso Liberado</h4>
-                                                            <m.button
-                                                                whileHover={{ scale: 1.05, filter: 'brightness(1.1)' }}
-                                                                whileTap={{ scale: 0.95 }}
-                                                                onClick={() => handleDownload(book)}
-                                                                className="px-8 py-3 bg-brand-primary text-white rounded-xl text-[10px] font-black uppercase tracking-[0.3em] shadow-lg shadow-brand-primary/20"
-                                                            >
-                                                                TRANSFERIR AGORA
-                                                            </m.button>
-                                                        </div>
-                                                        <div className="absolute top-6 left-6 px-3 py-1 bg-brand-primary/90 backdrop-blur-md rounded-lg text-[8px] font-black text-white uppercase tracking-widest shadow-xl">
-                                                            DIGITAL .ACERVO
-                                                        </div>
-                                                    </div>
-                                                    <div className="p-8">
-                                                        <div className="mb-4">
-                                                            <h3 className="font-black text-white text-lg leading-tight uppercase tracking-tight group-hover:text-brand-primary transition-colors line-clamp-1 mb-1">{book.title}</h3>
-                                                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest italic">{book.author}</p>
-                                                        </div>
-                                                        <div className="flex items-center gap-3 pt-4 border-t border-white/5">
-                                                            <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
-                                                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400">STATUS: SINCRONIZADO</span>
-                                                        </div>
-                                                    </div>
-                                                </m.div>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <div className="flex flex-col items-center justify-center py-32 text-center">
-                                            <div className="w-32 h-32 bg-white/[0.02] border border-white/5 rounded-[2.5rem] flex items-center justify-center mb-10 relative">
-                                                <BookIcon className="w-12 h-12 text-gray-800" />
-                                                <div className="absolute inset-0 bg-brand-primary/5 blur-2xl rounded-full" />
-                                            </div>
-                                            <h3 className="text-3xl font-black text-white tracking-tighter uppercase mb-4">Acervo Inativo</h3>
-                                            <p className="text-gray-500 font-medium uppercase tracking-[0.2em] text-[10px] max-w-sm leading-relaxed mb-10 italic">
-                                                Nenhum ativo digital foi detectado em sua conta sob os protocolos atuais.
-                                            </p>
-                                            <m.button
-                                                whileHover={{ scale: 1.05, filter: 'brightness(1.1)' }}
-                                                whileTap={{ scale: 0.95 }}
-                                                onClick={() => navigate('/catalogo')}
-                                                className="px-10 py-5 bg-brand-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] shadow-[0_20px_40px_-10px_rgba(189,147,56,0.3)] transition-all"
-                                            >
-                                                EXPLORAR CATALOGO
-                                            </m.button>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-
-                            {/* Wishlist (DESEJOS) Tab */}
-                            {activeTab === 'wishlist' && (
-                                <div className="space-y-16">
-                                    <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
-                                        <div>
-                                            <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter uppercase leading-none mb-4 italic">
-                                                Lista de <span className="text-brand-primary font-light not-italic lowercase">Desejos</span>
-                                            </h2>
-                                            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-gray-500">Curadoria de Futuros Ativos</p>
-                                        </div>
-                                    </div>
-                                    {wishlistBooks.length > 0 ? (
-                                        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
-                                            {wishlistBooks.map((book) => (
-                                                <m.div
-                                                    key={book.id}
-                                                    className="bg-white/[0.02] rounded-[3rem] border border-white/5 overflow-hidden group hover:bg-white/[0.05] transition-all relative shadow-2xl"
-                                                >
-                                                    <div className="aspect-[3/4.5] overflow-hidden relative">
-                                                        <img
-                                                            src={book.coverUrl}
-                                                            alt={book.title}
-                                                            className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700"
-                                                        />
-                                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60" />
-                                                    </div>
-                                                    <div className="p-8">
-                                                        <div className="mb-6">
-                                                            <h3 className="font-black text-white text-lg leading-tight uppercase tracking-tight group-hover:text-brand-primary transition-colors line-clamp-1 mb-1">{book.title}</h3>
-                                                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest italic">{book.author}</p>
-                                                        </div>
-                                                        <div className="flex items-center justify-between mb-8">
-                                                            <div className="text-2xl font-black text-brand-primary tracking-tighter">
-                                                                {book.price.toLocaleString()} <span className="text-xs uppercase ml-1">Kz</span>
+                                        {isLoadingLibrary ? (
+                                            <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 text-brand-primary animate-spin" /></div>
+                                        ) : purchasedBooks.filter(b => b.format === 'digital' && b.digitalFileUrl).length > 0 ? (
+                                            <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                                                {purchasedBooks.filter(b => b.format === 'digital' && b.digitalFileUrl).map((book) => (
+                                                    <div key={book.id} className="bg-black/20 rounded-3xl p-4 border border-white/5 hover:border-brand-primary/30 transition-all group">
+                                                        <div className="aspect-[2/3] rounded-2xl overflow-hidden mb-4 relative">
+                                                            <img src={book.coverUrl} className="w-full h-full object-cover" alt={book.title} />
+                                                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                                <button onClick={() => handleDownload(book)} className="p-3 bg-brand-primary rounded-xl text-white hover:scale-110 transition-transform" title="Baixar Livro" aria-label="Baixar Livro"><Download className="w-5 h-5" /></button>
                                                             </div>
                                                         </div>
-                                                        <m.button
-                                                            whileHover={{ scale: 1.02, filter: 'brightness(1.1)' }}
-                                                            whileTap={{ scale: 0.98 }}
-                                                            className="w-full py-4 bg-white/5 border border-white/10 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] hover:bg-brand-primary hover:border-brand-primary transition-all flex items-center justify-center gap-3"
-                                                        >
-                                                            <CreditCard className="w-4 h-4" />
-                                                            ADQUIRIR AGORA
-                                                        </m.button>
+                                                        <h3 className="font-bold text-sm truncate">{book.title}</h3>
+                                                        <p className="text-xs text-gray-500">{book.author}</p>
                                                     </div>
-                                                </m.div>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <div className="flex flex-col items-center justify-center py-32 text-center">
-                                            <div className="w-32 h-32 bg-white/[0.02] border border-white/5 rounded-[2.5rem] flex items-center justify-center mb-10 relative">
-                                                <Heart className="w-12 h-12 text-gray-800" />
-                                                <div className="absolute inset-0 bg-brand-primary/5 blur-2xl rounded-full" />
+                                                ))}
                                             </div>
-                                            <h3 className="text-3xl font-black text-white tracking-tighter uppercase mb-4">Lista Virtual</h3>
-                                            <p className="text-gray-500 font-medium uppercase tracking-[0.2em] text-[10px] max-w-sm leading-relaxed mb-10 italic">
-                                                O seu radar de desejos literários está em modo standby.
-                                            </p>
-                                            <m.button
-                                                whileHover={{ scale: 1.05, filter: 'brightness(1.1)' }}
-                                                whileTap={{ scale: 0.95 }}
-                                                onClick={() => navigate('/catalogo')}
-                                                className="px-10 py-5 bg-brand-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] shadow-[0_20px_40px_-10px_rgba(189,147,56,0.3)] transition-all"
-                                            >
-                                                MAPEAR CATÁLOGO
-                                            </m.button>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-
-                            {/* History (LOGS DE COMPRA) Tab */}
-                            {activeTab === 'history' && (
-                                <div className="space-y-16">
-                                    <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
-                                        <div>
-                                            <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter uppercase leading-none mb-4 italic">
-                                                Logs de <span className="text-brand-primary font-light not-italic lowercase">Aquisição</span>
-                                            </h2>
-                                            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-gray-500">Histórico de Transações do Terminal</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="bg-white/[0.02] rounded-[3rem] border border-white/5 overflow-hidden shadow-2xl relative">
-                                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-primary/10 to-transparent" />
-                                        <table className="w-full text-left border-collapse">
-                                            <thead>
-                                                <tr className="border-b border-white/5 bg-white/[0.02]">
-                                                    <th className="px-10 py-8 text-[10px] font-black text-gray-500 uppercase tracking-[0.4em]">ESTADO</th>
-                                                    <th className="px-10 py-8 text-[10px] font-black text-gray-500 uppercase tracking-[0.4em]">ATIVO LITERÁRIO</th>
-                                                    <th className="px-10 py-8 text-[10px] font-black text-gray-500 uppercase tracking-[0.4em]">FORMATO</th>
-                                                    <th className="px-10 py-8 text-[10px] font-black text-gray-500 uppercase tracking-[0.4em] text-right">VALOR SINCRONIZADO</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-white/5">
-                                                {isLoadingLibrary ? (
-                                                    <tr>
-                                                        <td colSpan={4} className="px-10 py-20 text-center">
-                                                            <div className="flex flex-col items-center gap-4">
-                                                                <Loader2 className="w-8 h-8 text-brand-primary animate-spin" />
-                                                                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-600">A REDEFINIR LOGS...</p>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                ) : purchasedBooks.length > 0 ? (
-                                                    purchasedBooks.map((book) => (
-                                                        <m.tr
-                                                            key={book.id}
-                                                            whileHover={{ backgroundColor: 'rgba(255,255,255,0.01)' }}
-                                                            className="group transition-colors"
-                                                        >
-                                                            <td className="px-10 py-8">
-                                                                <div className="flex items-center gap-3">
-                                                                    <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.3)]" />
-                                                                    <span className="text-[10px] font-black text-green-500 uppercase tracking-widest">EFETUADO</span>
-                                                                </div>
-                                                            </td>
-                                                            <td className="px-10 py-8">
-                                                                <div>
-                                                                    <p className="font-black text-white text-sm uppercase tracking-tight mb-1">{book.title}</p>
-                                                                    <p className="text-[9px] text-gray-600 font-black uppercase tracking-[0.2em]">{book.author}</p>
-                                                                </div>
-                                                            </td>
-                                                            <td className="px-10 py-8">
-                                                                <span className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-[9px] font-black text-gray-400 uppercase tracking-widest">DIGITAL</span>
-                                                            </td>
-                                                            <td className="px-10 py-8 text-right">
-                                                                <span className="text-sm font-black text-brand-primary tracking-tighter">
-                                                                    {book.price.toLocaleString()} <span className="text-[10px] ml-1">KZ</span>
-                                                                </span>
-                                                            </td>
-                                                        </m.tr>
-                                                    ))
-                                                ) : (
-                                                    <tr>
-                                                        <td colSpan={4} className="px-10 py-32 text-center">
-                                                            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-600 italic">Nenhum registo de aquisição encontrado nos servidores.</p>
-                                                        </td>
-                                                    </tr>
-                                                )}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Settings (PROTOCOLOS) Tab */}
-                            {activeTab === 'settings' && (
-                                <div className="space-y-16">
-                                    <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
-                                        <div>
-                                            <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter uppercase leading-none mb-4 italic">
-                                                Protocolos de <span className="text-brand-primary font-light not-italic lowercase">Identidade</span>
-                                            </h2>
-                                            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-gray-500">Configuração de Acesso e Credenciais</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="grid lg:grid-cols-2 gap-12">
-                                        <div className="bg-white/[0.02] rounded-[3rem] border border-white/5 p-12 space-y-10 shadow-2xl relative overflow-hidden group">
-                                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                                            <div className="space-y-8">
-                                                <div className="space-y-3">
-                                                    <label htmlFor="user-name" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 ml-4">TITULAR DA CONTA</label>
-                                                    <div className="relative">
-                                                        <UserIcon className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-700" />
-                                                        <input
-                                                            id="user-name"
-                                                            type="text"
-                                                            value={user.name}
-                                                            className="w-full pl-16 pr-8 py-6 bg-white/[0.03] border border-white/5 rounded-2xl focus:border-brand-primary/30 outline-none transition-all font-black text-white uppercase tracking-widest text-lg"
-                                                            readOnly
-                                                        />
-                                                    </div>
-                                                </div>
-
-                                                <div className="space-y-3">
-                                                    <label htmlFor="user-email" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 ml-4">TERMINAL DE COMUNICAÇÃO</label>
-                                                    <div className="relative">
-                                                        <Download className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-700 rotate-180" />
-                                                        <input
-                                                            id="user-email"
-                                                            type="email"
-                                                            value={user.email}
-                                                            className="w-full pl-16 pr-8 py-6 bg-white/[0.03] border border-white/5 rounded-2xl focus:border-brand-primary/30 outline-none transition-all font-bold text-gray-400"
-                                                            readOnly
-                                                        />
-                                                    </div>
-                                                </div>
-
-                                                <div className="space-y-3">
-                                                    <label htmlFor="user-role" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 ml-4">NÍVEL DE AUTORIZAÇÃO</label>
-                                                    <div className="relative">
-                                                        <div className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-primary">
-                                                            <Sparkles className="w-full h-full" />
-                                                        </div>
-                                                        <input
-                                                            id="user-role"
-                                                            type="text"
-                                                            value={user.role === 'adm' ? 'ADMINISTRADOR DE SISTEMA' : user.role === 'autor' ? 'AUTOR PREMIUM' : 'LEITOR ELITE'}
-                                                            className="w-full pl-16 pr-8 py-6 bg-brand-primary/5 border border-brand-primary/10 rounded-2xl font-black text-brand-primary uppercase tracking-[0.2em]"
-                                                            readOnly
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <m.button
-                                                whileHover={{ scale: 1.02, filter: 'brightness(1.1)' }}
-                                                whileTap={{ scale: 0.98 }}
-                                                className="w-full py-6 bg-brand-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] shadow-[0_20px_40px_-10px_rgba(189,147,56,0.3)] transition-all flex items-center justify-center gap-4"
-                                            >
-                                                <Settings className="w-5 h-5" />
-                                                REDEFINIR ACESSO
-                                            </m.button>
-                                        </div>
-
-                                        <div className="bg-brand-primary/5 rounded-[3rem] border border-brand-primary/10 p-12 flex flex-col items-center justify-center text-center space-y-8">
-                                            <div className="w-24 h-24 rounded-full bg-brand-primary/10 flex items-center justify-center border border-brand-primary/20 relative">
-                                                <Sparkles className="w-10 h-10 text-brand-primary animate-pulse" />
-                                                <div className="absolute inset-0 bg-brand-primary/5 blur-2xl rounded-full" />
-                                            </div>
-                                            <div>
-                                                <h4 className="text-2xl font-black text-white uppercase tracking-tighter mb-2 italic">Status <span className="text-brand-primary">Privilege</span></h4>
-                                                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 max-w-xs leading-relaxed italic">
-                                                    Sua conta está operando sob os protocolos de segurança e exclusividade mais elevados da Editora Graça.
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Payments (TERMINAL FINANCEIRO) Tab */}
-                            {activeTab === 'payments' && (
-                                <div className="space-y-16">
-                                    <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
-                                        <div>
-                                            <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter uppercase leading-none mb-4 italic">
-                                                Terminal <span className="text-brand-primary font-light not-italic lowercase">Financeiro</span>
-                                            </h2>
-                                            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-gray-500">Monitorização de Fluxo e Liquidação</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="grid gap-10">
-                                        {notifications.length > 0 ? notifications.map((notif) => (
-                                            <m.div
-                                                key={notif.id}
-                                                initial={{ opacity: 0, x: -20 }}
-                                                whileInView={{ opacity: 1, x: 0 }}
-                                                viewport={{ once: true }}
-                                                className="bg-white/[0.02] rounded-[3rem] border border-white/5 p-10 flex flex-col xl:flex-row xl:items-center justify-between gap-10 hover:bg-white/[0.04] transition-all group relative overflow-hidden"
-                                            >
-                                                <div className={`absolute top-0 left-0 w-2 h-full ${notif.status === 'confirmed' ? 'bg-green-500 shadow-[0_0_20px_rgba(34,197,94,0.3)]' :
-                                                    notif.status === 'proof_uploaded' ? 'bg-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.3)]' :
-                                                        'bg-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.3)]'
-                                                    }`} />
-
-                                                <div className="flex-1 space-y-6">
-                                                    <div className="flex items-center gap-4">
-                                                        <span className="text-[10px] font-black text-gray-600 uppercase tracking-[0.4em]">Fatura Protocolo #{notif.orderId}</span>
-                                                        <div className={`px-4 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest border ${notif.status === 'confirmed' ? 'bg-green-500/10 border-green-500/20 text-green-500' :
-                                                            notif.status === 'proof_uploaded' ? 'bg-blue-500/10 border-blue-500/20 text-blue-500' :
-                                                                'bg-yellow-500/10 border-yellow-500/20 text-yellow-500'
-                                                            }`}>
-                                                            {notif.status === 'confirmed' ? 'LIQUIDADO' :
-                                                                notif.status === 'proof_uploaded' ? 'EM AUDITORIA' :
-                                                                    'AGUARDANDO DEPÓSITO'}
-                                                        </div>
-                                                    </div>
-                                                    <div className="space-y-3">
-                                                        {notif.items.map((item, idx) => (
-                                                            <div key={idx} className="flex items-center gap-4">
-                                                                <div className="w-1.5 h-1.5 rounded-full bg-brand-primary/40" />
-                                                                <p className="text-white text-sm font-black uppercase tracking-tight">
-                                                                    {item.bookTitle} <span className="text-gray-600 font-medium lowercase mx-2 italic">by</span> <span className="text-brand-primary">{item.authorName}</span>
-                                                                </p>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-
-                                                <div className="xl:text-right flex flex-col xl:items-end gap-6 pt-8 xl:pt-0 border-t xl:border-t-0 border-white/5">
-                                                    <div>
-                                                        <div className="text-4xl font-black text-white tracking-tighter mb-1 uppercase italic">
-                                                            {notif.totalAmount.toLocaleString()} <span className="text-xs text-brand-primary not-italic font-black">KZ</span>
-                                                        </div>
-                                                        <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest">Registado em {new Date(notif.createdAt).toLocaleDateString('pt-AO')}</p>
-                                                    </div>
-
-                                                    {notif.status === 'pending' && (
-                                                        <div className="relative group/btn">
-                                                            <input
-                                                                type="file"
-                                                                title="Anexar comprovante de pagamento"
-                                                                aria-label="Selecionar ficheiro de comprovante"
-                                                                className="absolute inset-0 opacity-0 cursor-pointer w-full z-10"
-                                                                onChange={(e) => e.target.files && handleUploadProof(notif.id, e.target.files[0])}
-                                                                disabled={isUploading === notif.id}
-                                                            />
-                                                            <m.button
-                                                                whileHover={{ scale: 1.05 }}
-                                                                whileTap={{ scale: 0.95 }}
-                                                                className="px-8 py-4 bg-brand-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] shadow-xl shadow-brand-primary/20 flex items-center gap-3"
-                                                            >
-                                                                <Download className="w-4 h-4" />
-                                                                {isUploading === notif.id ? 'PROCESSANDO...' : 'ENVIAR COMPROVANTE'}
-                                                            </m.button>
-                                                        </div>
-                                                    )}
-
-                                                    {notif.status === 'proof_uploaded' && (
-                                                        <div className="flex items-center gap-3 text-blue-500 font-black text-[10px] uppercase tracking-widest bg-blue-500/5 px-6 py-3 rounded-xl border border-blue-500/10">
-                                                            <Clock className="w-4 h-4 animate-pulse" />
-                                                            Protocolo em Verificação
-                                                        </div>
-                                                    )}
-
-                                                    {notif.status === 'confirmed' && (
-                                                        <div className="flex items-center gap-3 text-green-500 font-black text-[10px] uppercase tracking-widest bg-green-500/5 px-6 py-3 rounded-xl border border-green-500/10">
-                                                            <CheckCircle className="w-4 h-4" />
-                                                            Transação Confirmada
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </m.div>
-                                        )) : (
-                                            <div className="flex flex-col items-center justify-center py-32 text-center">
-                                                <div className="w-32 h-32 bg-white/[0.02] border border-white/5 rounded-[2.5rem] flex items-center justify-center mb-10 relative">
-                                                    <CreditCard className="w-12 h-12 text-gray-800" />
-                                                    <div className="absolute inset-0 bg-brand-primary/5 blur-2xl rounded-full" />
-                                                </div>
-                                                <h3 className="text-3xl font-black text-white tracking-tighter uppercase mb-4">Fluxo Inativo</h3>
-                                                <p className="text-gray-500 font-medium uppercase tracking-[0.2em] text-[10px] max-w-sm leading-relaxed mb-10 italic">
-                                                    Nenhum pedido de liquidação pendente detetado no terminal.
-                                                </p>
-                                                <m.button
-                                                    whileHover={{ scale: 1.05, filter: 'brightness(1.1)' }}
-                                                    whileTap={{ scale: 0.95 }}
-                                                    onClick={() => navigate('/catalogo')}
-                                                    className="px-10 py-5 bg-brand-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] shadow-[0_20px_40px_-10px_rgba(189,147,56,0.3)] transition-all"
-                                                >
-                                                    INICIAR AQUISIÇÃO
-                                                </m.button>
+                                        ) : (
+                                            <div className="text-center py-20 text-gray-600">
+                                                <BookIcon className="w-12 h-12 mx-auto mb-4 opacity-20" />
+                                                <p className="text-sm font-medium">Nenhuma obra no acervo.</p>
                                             </div>
                                         )}
                                     </div>
-                                </div>
-                            )}
-                        </m.div>
-                    </AnimatePresence>
+                                )}
+
+                                {activeTab === 'wishlist' && (
+                                    <div className="bg-white/5 border border-white/5 rounded-[2.5rem] p-8 md:p-12">
+                                        <div className="mb-10">
+                                            <h2 className="text-3xl font-black uppercase italic tracking-tighter">Lista de Desejos</h2>
+                                        </div>
+                                        <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                                            {wishlistBooks.map((book) => (
+                                                <div key={book.id} className="bg-black/20 rounded-3xl p-4 border border-white/5">
+                                                    <div className="aspect-[2/3] rounded-2xl overflow-hidden mb-4 bg-gray-800">
+                                                        <img src={book.coverUrl} className="w-full h-full object-cover opacity-60" alt={book.title} />
+                                                    </div>
+                                                    <div className="flex justify-between items-center">
+                                                        <div>
+                                                            <h3 className="font-bold text-sm truncate w-32">{book.title}</h3>
+                                                            <p className="text-brand-primary font-black text-xs">{book.price.toLocaleString()} Kz</p>
+                                                        </div>
+                                                        <button className="p-2 bg-white/10 rounded-lg hover:bg-brand-primary hover:text-white transition-colors" title="Comprar" aria-label="Comprar"><CreditCard className="w-4 h-4" /></button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === 'payments' && (
+                                    <div className="bg-white/5 border border-white/5 rounded-[2.5rem] p-8 md:p-12">
+                                        <div className="mb-10">
+                                            <h2 className="text-3xl font-black uppercase italic tracking-tighter">Financeiro</h2>
+                                        </div>
+                                        <div className="space-y-4">
+                                            {notifications.map((notif) => (
+                                                <div key={notif.id} className="bg-black/20 p-6 rounded-3xl border border-white/5 flex flex-col sm:flex-row gap-6 items-start sm:items-center justify-between">
+                                                    <div>
+                                                        <div className="flex items-center gap-3 mb-2">
+                                                            <span className="text-xs font-black uppercase text-gray-500">#{notif.orderId}</span>
+                                                            <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase ${notif.status === 'confirmed' ? 'bg-green-500/20 text-green-500' :
+                                                                notif.status === 'proof_uploaded' ? 'bg-blue-500/20 text-blue-500' : 'bg-yellow-500/20 text-yellow-500'
+                                                                }`}>
+                                                                {notif.status === 'confirmed' ? 'PAGO' : notif.status === 'proof_uploaded' ? 'ANÁLISE' : 'PEDENTE'}
+                                                            </span>
+                                                        </div>
+                                                        <p className="text-xl font-black text-white">{notif.totalAmount.toLocaleString()} Kz</p>
+                                                    </div>
+                                                    {notif.status === 'pending' && (
+                                                        <div className="relative">
+                                                            <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => e.target.files && handleUploadProof(notif.id, e.target.files[0])} disabled={isUploading === notif.id} title="Enviar Comprovante" aria-label="Enviar Comprovante" />
+                                                            <button className="px-6 py-3 bg-brand-primary rounded-xl text-[10px] font-black uppercase tracking-widest text-white hover:brightness-110 transition-all">
+                                                                {isUploading === notif.id ? 'ENVIANDO...' : 'ENVIAR COMPROVANTE'}
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                            {notifications.length === 0 && <p className="text-center text-gray-500 py-10">Sem transações recentes.</p>}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === 'history' && (
+                                    <div className="bg-white/5 border border-white/5 rounded-[2.5rem] p-8 md:p-12">
+                                        <div className="mb-10">
+                                            <h2 className="text-3xl font-black uppercase italic tracking-tighter">Logs de Atividade</h2>
+                                        </div>
+                                        <div className="overflow-x-auto">
+                                            <table className="w-full text-left">
+                                                <thead className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-500 border-b border-white/5">
+                                                    <tr>
+                                                        <th className="pb-4 pl-4">Obra</th>
+                                                        <th className="pb-4">Data</th>
+                                                        <th className="pb-4 text-right pr-4">Valor</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-white/5">
+                                                    {purchasedBooks.map(book => (
+                                                        <tr key={book.id}>
+                                                            <td className="py-4 pl-4 font-bold text-sm">{book.title}</td>
+                                                            <td className="py-4 text-xs text-gray-500">Hoje</td>
+                                                            <td className="py-4 text-right pr-4 font-mono text-brand-primary">{book.price.toLocaleString()} Kz</td>
+                                                        </tr>
+                                                    ))}
+                                                    {purchasedBooks.length === 0 && (
+                                                        <tr><td colSpan={3} className="py-8 text-center text-gray-600 text-xs">Sem registos</td></tr>
+                                                    )}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === 'settings' && (
+                                    <div className="bg-white/5 border border-white/5 rounded-[2.5rem] p-8 md:p-12">
+                                        <div className="mb-10">
+                                            <h2 className="text-3xl font-black uppercase italic tracking-tighter">Editar Perfil</h2>
+                                        </div>
+                                        <div className="space-y-6 max-w-lg">
+                                            <div className="space-y-2">
+                                                <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-500 pl-2">Nome</label>
+                                                <input
+                                                    type="text"
+                                                    value={profileData.name}
+                                                    onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
+                                                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-primary outline-none transition-colors font-bold"
+                                                    placeholder="Seu Nome"
+                                                    title="Nome"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-500 pl-2">Email</label>
+                                                <input
+                                                    type="text"
+                                                    value={profileData.email}
+                                                    readOnly
+                                                    className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-3 text-gray-500 cursor-not-allowed font-bold"
+                                                    title="Email"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-500 pl-2">WhatsApp</label>
+                                                <input
+                                                    type="text"
+                                                    value={profileData.whatsapp}
+                                                    onChange={(e) => setProfileData({ ...profileData, whatsapp: e.target.value })}
+                                                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-primary outline-none transition-colors font-bold"
+                                                    placeholder="Seu WhatsApp"
+                                                    title="WhatsApp"
+                                                />
+                                            </div>
+                                            <div className="pt-4">
+                                                <button
+                                                    onClick={handleSaveProfile}
+                                                    disabled={isSavingProfile}
+                                                    className="w-full py-4 bg-brand-primary rounded-xl text-white font-black uppercase tracking-[0.2em] hover:brightness-110 transition-all disabled:opacity-50"
+                                                >
+                                                    {isSavingProfile ? 'Salvando...' : 'Salvar Alterações'}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                            </m.div>
+                        </AnimatePresence>
+                    </div>
+
                 </div>
-            </section>
+            </div>
+
         </div>
     );
 };
 
 export default ReaderDashboard;
+

@@ -192,541 +192,472 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
     }
 
     return (
-        <div className="min-h-screen bg-[#0A0A0A] text-white selection:bg-brand-primary/30">
-            {/* Dashboard Internal Header */}
-            <header className="h-24 bg-brand-dark/80 backdrop-blur-3xl border-b border-white/5 fixed top-0 left-0 right-0 z-[100] px-8 flex items-center justify-between">
-                <div
-                    onClick={() => navigate('/')}
-                    className="flex items-center gap-3 cursor-pointer group"
-                >
-                    <div className="w-10 h-10 bg-brand-primary rounded-xl flex items-center justify-center group-hover:shadow-[0_0_20px_rgba(189,147,56,0.3)] transition-all">
-                        <ArrowRight className="text-white w-5 h-5 rotate-180" />
-                    </div>
-                    <span className="text-[10px] font-black text-white uppercase tracking-[0.3em] hidden sm:block">Voltar ao Site</span>
-                </div>
+        <div className="min-h-screen bg-[#050505] text-white selection:bg-brand-primary/30 font-sans">
+            {/* 1. COVER AREA */}
+            <div className="h-[350px] relative w-full overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent z-10" />
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=2573&auto=format&fit=crop')] bg-cover bg-center opacity-40 group-hover:scale-105 transition-transform duration-1000" />
 
-                <div className="flex items-center gap-6">
-                    <div className="text-right hidden sm:block">
-                        <p className="text-[10px] font-black text-white">{user.name}</p>
-                        <p className="text-[8px] text-brand-primary font-black uppercase tracking-[0.2em]">Escritor Protocol | Online</p>
-                    </div>
+                {/* Top Nav Overlay */}
+                <div className="absolute top-0 left-0 right-0 p-8 flex justify-between items-start z-20">
                     <button
                         onClick={() => navigate('/')}
-                        className="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors border border-white/5"
-                        title="Configurações"
+                        className="flex items-center gap-3 px-4 py-2 bg-black/40 backdrop-blur-md rounded-full border border-white/10 hover:bg-white/10 transition-all group/back"
+                        title="Voltar ao site"
+                        aria-label="Voltar ao site"
                     >
-                        <Settings className="w-4 h-4 text-gray-400" />
+                        <ArrowRight className="w-4 h-4 text-white rotate-180 group-hover/back:-translate-x-1 transition-transform" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">Voltar ao Site</span>
+                    </button>
+
+                    <button
+                        onClick={() => navigate('/entrar')}
+                        className="w-10 h-10 flex items-center justify-center bg-red-500/20 backdrop-blur-md rounded-full border border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white transition-all"
+                        title="Sair"
+                        aria-label="Terminar Sessão"
+                    >
+                        <ArrowRight className="w-4 h-4" />
                     </button>
                 </div>
-            </header>
+            </div>
 
-            {/* Header - Immersive */}
-            <section className="bg-brand-dark text-white pt-32 pb-32 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-[60%] aspect-square bg-brand-primary/10 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/4"></div>
-
-                <div className="container mx-auto px-6 md:px-8 relative z-10">
-                    <div className="flex flex-col md:flex-row items-center justify-between mb-12 gap-8">
-                        <div>
-                            <m.div
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                className="inline-flex items-center gap-3 px-4 py-1.5 bg-brand-primary/10 border border-brand-primary/20 rounded-full text-brand-primary font-black text-[10px] uppercase tracking-[0.3em] mb-6"
-                            >
-                                <Sparkles className="w-3.5 h-3.5" />
-                                <span>Ambiente do Autor</span>
-                            </m.div>
-                            <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase leading-none">
-                                Painel do <span className="text-gradient-gold italic font-light lowercase">Autor</span>
-                            </h1>
-                            <p className="text-gray-400 font-bold mt-4 opacity-70">Sua central de produção e gestão literária.</p>
+            {/* 2. PROFILE HEADER & NAV DOCK */}
+            <div className="container mx-auto px-4 md:px-8 relative z-20 -mt-24">
+                <div className="flex flex-col md:flex-row items-end gap-8 mb-8">
+                    {/* Avatar */}
+                    <div className="relative group/avatar">
+                        <div className="w-40 h-40 md:w-48 md:h-48 rounded-full border-4 border-[#050505] bg-[#1a1a1a] overflow-hidden shadow-2xl relative z-10">
+                            <div className="w-full h-full flex items-center justify-center bg-brand-primary/10 text-brand-primary font-black text-5xl">
+                                {user.name.charAt(0)}
+                            </div>
                         </div>
-
-                        <m.div
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="flex items-center gap-6 bg-white/[0.03] backdrop-blur-3xl p-6 rounded-[2.5rem] border border-white/5 shadow-2xl relative group"
-                        >
-                            <div className="absolute inset-0 bg-gradient-to-br from-brand-primary/5 to-transparent rounded-[2.5rem] -z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                            <div className="relative">
-                                <div className="w-16 h-16 rounded-2xl bg-brand-primary/10 flex items-center justify-center text-brand-primary font-black text-2xl border border-brand-primary/20 shadow-[0_0_20px_rgba(189,147,56,0.2)]">
-                                    {user.name.charAt(0)}
-                                </div>
-                                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-brand-primary rounded-lg flex items-center justify-center border-2 border-[#0D0D0D] shadow-lg">
-                                    <CheckCircle className="w-3 h-3 text-white" />
-                                </div>
-                            </div>
-
-                            <div className="pr-8">
-                                <h2 className="text-white text-lg font-black tracking-tight mb-1 uppercase">{user.name}</h2>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                                    <span className="text-brand-primary text-[8px] font-black uppercase tracking-[0.2em]">ESCRITOR PREMIUM</span>
-                                </div>
-                            </div>
-                        </m.div>
+                        <div className="absolute bottom-4 right-4 z-20 w-8 h-8 bg-brand-primary rounded-full border-4 border-[#050505] flex items-center justify-center shadow-lg" title="Autor Verificado">
+                            <CheckCircle className="w-4 h-4 text-white" />
+                        </div>
                     </div>
 
-                    {/* Tabs - Modernized */}
-                    <div className="flex flex-wrap justify-center md:justify-start gap-4 p-2 bg-white/[0.02] border border-white/5 rounded-3xl backdrop-blur-xl max-w-fit mx-auto md:mx-0">
-                        {[
-                            { id: 'manuscripts', label: 'OBRAS', icon: FileText },
-                            { id: 'submit', label: 'SUBMETER', icon: Upload },
-                            { id: 'royalties', label: 'FINANCEIRO', icon: CreditCard },
-                            { id: 'banking', label: 'PROTOCOLOS', icon: Settings }
-                        ].map((tab) => (
-                            <m.button
-                                whileHover={{ scale: 1.02, backgroundColor: 'rgba(255,255,255,0.05)' }}
-                                whileTap={{ scale: 0.98 }}
-                                key={tab.id}
-                                onClick={() => setActiveTab(tab.id as any)}
-                                className={`px-8 py-4 rounded-2xl font-black text-[9px] uppercase tracking-[0.3em] transition-all flex items-center gap-4 relative overflow-hidden group
-                                    ${activeTab === tab.id
-                                        ? 'bg-brand-primary text-white shadow-[0_20px_40px_-10px_rgba(189,147,56,0.3)]'
-                                        : 'text-gray-500 hover:text-white'
-                                    }`}
-                            >
-                                <tab.icon className={`w-4 h-4 transition-transform group-hover:scale-110 ${activeTab === tab.id ? 'text-white' : 'text-brand-primary'}`} />
-                                <span className="relative z-10">{tab.label}</span>
-                                {activeTab === tab.id && (
-                                    <m.div
-                                        layoutId="tab-pill-auth"
-                                        className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"
-                                    />
-                                )}
-                            </m.button>
-                        ))}
+                    {/* Identity Info */}
+                    <div className="flex-1 pb-4 text-center md:text-left">
+                        <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tight mb-2">{user.name}</h1>
+                        <p className="text-gray-400 font-medium text-sm tracking-wide flex items-center justify-center md:justify-start gap-2">
+                            <span className="text-brand-primary font-black uppercase tracking-[0.2em] text-[10px]">@{user.role}</span>
+                            <span className="w-1 h-1 rounded-full bg-gray-600" />
+                            <span className="text-gray-500 italic">Membro desde 2024</span>
+                        </p>
+                    </div>
+
+                    {/* Action Bar */}
+                    <div className="flex gap-3 pb-4">
+                        <button
+                            onClick={() => setActiveTab('banking')}
+                            className="px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] transition-all flex items-center gap-2"
+                            title="Editar Perfil e Pagamentos"
+                            aria-label="Editar Perfil"
+                        >
+                            <Settings className="w-4 h-4" />
+                            <span>Definições</span>
+                        </button>
                     </div>
                 </div>
-            </section>
 
-            {/* Content Area */}
-            <section className="py-20 md:py-32 -mt-12 md:-mt-16 relative z-20">
-                <div className="container mx-auto px-6 md:px-8">
-                    <AnimatePresence mode="wait">
-                        <m.div
-                            key={activeTab}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            className="bg-white/5 backdrop-blur-3xl rounded-[4rem] border border-white/5 p-12 md:p-20 min-h-[700px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.5)] relative overflow-hidden"
+                {/* Sticky Nav Dock */}
+                <div className="sticky top-4 z-50 bg-[#050505]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-2 mb-8 shadow-2xl flex flex-wrap justify-center md:justify-start gap-1">
+                    {[
+                        { id: 'manuscripts', label: 'Obras', icon: FileText },
+                        { id: 'submit', label: 'Submeter', icon: Upload },
+                        { id: 'royalties', label: 'Financeiro', icon: CreditCard },
+                        { id: 'banking', label: 'Protocolos', icon: Settings }
+                    ].map((tab) => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id as any)}
+                            className={`px-6 py-3 rounded-xl flex items-center gap-3 transition-all ${activeTab === tab.id
+                                    ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/20'
+                                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                }`}
+                            title={tab.label}
+                            aria-label={tab.label}
                         >
-                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-primary/20 to-transparent" />
-                            {/* Manuscripts Tab */}
-                            {activeTab === 'manuscripts' && (
-                                <div className="space-y-12">
-                                    <div className="flex items-center justify-between mb-8">
-                                        <h2 className="text-3xl md:text-5xl font-black text-white tracking-tighter uppercase leading-none">
-                                            Meus <span className="text-brand-primary italic font-light lowercase">Manuscritos</span>
-                                        </h2>
+                            <tab.icon className="w-4 h-4" />
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em]">{tab.label}</span>
+                        </button>
+                    ))}
+                </div>
+
+                {/* 3. CONTENT GRID */}
+                <div className="grid lg:grid-cols-[350px_1fr] gap-8 pb-20">
+
+                    {/* LEFT SIDEBAR (INTRO) */}
+                    <div className="space-y-6">
+                        {/* Intro Card */}
+                        <div className="bg-white/5 border border-white/5 rounded-3xl p-8 backdrop-blur-sm">
+                            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 mb-6">Autor ID</h3>
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-4 text-sm text-gray-300">
+                                    <UserIcon className="w-4 h-4 text-brand-primary" />
+                                    <span className="font-medium">{user.name}</span>
+                                </div>
+                                <div className="flex items-center gap-4 text-sm text-gray-300">
+                                    <Clock className="w-4 h-4 text-brand-primary" />
+                                    <span className="font-medium truncate">Online Agora</span>
+                                </div>
+                                {whatsapp && (
+                                    <div className="flex items-center gap-4 text-sm text-gray-300">
+                                        <div className="w-4 h-4 flex items-center justify-center font-serif text-brand-primary text-xs font-bold">W</div>
+                                        <span className="font-medium">{whatsapp}</span>
                                     </div>
-                                    <div className="grid gap-6">
-                                        {isLoadingManuscripts ? (
-                                            <div className="text-center py-20 text-gray-500 italic font-black uppercase text-[10px] tracking-widest">Sincronizando arquivos...</div>
-                                        ) : manuscripts.length > 0 ? (
-                                            manuscripts.map((manuscript) => (
-                                                <div key={manuscript.id} className="bg-white/[0.03] rounded-3xl border border-white/5 p-8 hover:bg-white/[0.05] transition-all group">
-                                                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-                                                        <div className="flex-1">
-                                                            <h3 className="text-2xl font-black text-white mb-2 group-hover:text-brand-primary transition-colors">{manuscript.title}</h3>
-                                                            <div className="flex flex-wrap gap-4 text-[10px] font-black uppercase tracking-widest text-gray-500">
-                                                                <span className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-lg border border-white/5">
-                                                                    <FileText className="w-3 h-3 text-brand-primary" />
-                                                                    {manuscript.genre}
-                                                                </span>
-                                                                <span className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-lg border border-white/5">
-                                                                    Submetido: {new Date(manuscript.submittedDate).toLocaleDateString('pt-AO')}
-                                                                </span>
-                                                                {manuscript.reviewedDate && (
-                                                                    <span className="flex items-center gap-2 px-3 py-1 bg-brand-primary/10 rounded-lg border border-brand-primary/10 text-brand-primary">
-                                                                        Analisado: {new Date(manuscript.reviewedDate).toLocaleDateString('pt-AO')}
-                                                                    </span>
-                                                                )}
-                                                            </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Quick Stats */}
+                        <div className="bg-white/5 border border-white/5 rounded-3xl p-8 backdrop-blur-sm">
+                            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 mb-6">Performance</h3>
+                            <div className="space-y-6">
+                                <div>
+                                    <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Total Vendas</p>
+                                    <p className="text-2xl font-black text-white">{authorStats.totalSales}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Royalties</p>
+                                    <p className="text-2xl font-black text-brand-primary">{authorStats.totalRoyalties.toLocaleString()} Kz</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Manuscritos</p>
+                                    <p className="text-2xl font-black text-white">{manuscripts.length}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* MAIN FEED (CONTENT) */}
+                    <div className="min-h-[500px]">
+                        <AnimatePresence mode="wait">
+                            <m.div
+                                key={activeTab}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                {/* MANUSCRIPTS TAB */}
+                                {activeTab === 'manuscripts' && (
+                                    <div className="bg-white/5 border border-white/5 rounded-[2.5rem] p-8 md:p-12">
+                                        <div className="mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                                            <div>
+                                                <h2 className="text-3xl font-black uppercase italic tracking-tighter">Minhas Obras</h2>
+                                                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">Gestão de Manuscritos</p>
+                                            </div>
+                                            <button
+                                                onClick={() => setActiveTab('submit')}
+                                                className="px-6 py-3 bg-brand-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:brightness-110 transition-all flex items-center gap-2"
+                                                title="Novo Manuscrito"
+                                                aria-label="Submeter Manuscrito"
+                                            >
+                                                <Upload className="w-4 h-4" />
+                                                Submeter Novo
+                                            </button>
+                                        </div>
+
+                                        <div className="grid gap-4">
+                                            {isLoadingManuscripts ? (
+                                                <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 text-brand-primary animate-spin" /></div>
+                                            ) : manuscripts.length > 0 ? (
+                                                manuscripts.map((item) => (
+                                                    <div key={item.id} className="bg-black/20 rounded-3xl p-6 border border-white/5 flex flex-col md:flex-row gap-6 items-start">
+                                                        <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-gray-500 flex-shrink-0">
+                                                            <FileText className="w-6 h-6" />
                                                         </div>
-                                                        <div className="flex items-center gap-4">
-                                                            <div className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] border ${getStatusColor(manuscript.status)}`}>
-                                                                {getStatusIcon(manuscript.status)}
-                                                                {getStatusText(manuscript.status)}
+                                                        <div className="flex-1">
+                                                            <div className="flex flex-col md:flex-row md:justify-between mb-2">
+                                                                <h3 className="text-xl font-black text-white">{item.title}</h3>
+                                                                <div className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest inline-flex items-center gap-2 w-fit mt-2 md:mt-0 ${item.status === 'approved' ? 'bg-green-500/10 text-green-500' :
+                                                                        item.status === 'rejected' ? 'bg-red-500/10 text-red-500' : 'bg-yellow-500/10 text-yellow-500'
+                                                                    }`}>
+                                                                    {item.status === 'approved' && <CheckCircle className="w-3 h-3" />}
+                                                                    {item.status === 'rejected' && <XCircle className="w-3 h-3" />}
+                                                                    {item.status === 'pending' && <Clock className="w-3 h-3" />}
+                                                                    {getStatusText(item.status)}
+                                                                </div>
                                                             </div>
-                                                            <a
-                                                                href={manuscript.fileUrl}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                title="Ver manuscrito"
-                                                                aria-label="Ver ficheiro do manuscrito"
-                                                                className="w-12 h-12 bg-white/5 hover:bg-brand-primary/20 rounded-xl flex items-center justify-center border border-white/5 text-gray-400 hover:text-brand-primary transition-all"
-                                                            >
-                                                                <Eye className="w-5 h-5" />
-                                                            </a>
+                                                            <p className="text-sm text-gray-400 mb-4 line-clamp-2">{item.description}</p>
+                                                            <div className="flex items-center gap-4 text-xs text-gray-500 font-bold uppercase tracking-wider">
+                                                                <span>{item.genre}</span>
+                                                                <span className="w-1 h-1 bg-gray-700 rounded-full" />
+                                                                <span>{item.pages ? `${item.pages} Páginas` : 'N/A'}</span>
+                                                                <span className="w-1 h-1 bg-gray-700 rounded-full" />
+                                                                <span>{new Date(item.submittedDate).toLocaleDateString()}</span>
+                                                            </div>
+                                                            {item.feedback && (
+                                                                <div className="mt-4 p-4 bg-brand-primary/5 border border-brand-primary/10 rounded-xl">
+                                                                    <p className="text-[9px] font-black text-brand-primary uppercase tracking-widest mb-1">Feedback Editorial</p>
+                                                                    <p className="text-xs text-gray-300 italic">"{item.feedback}"</p>
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     </div>
-
-                                                    {manuscript.feedback && (
-                                                        <div className="mt-6 p-6 bg-brand-primary/5 rounded-2xl border border-brand-primary/10">
-                                                            <p className="text-[9px] font-black text-brand-primary uppercase tracking-[0.3em] mb-2">Comentário Editorial</p>
-                                                            <p className="text-sm text-gray-400 font-medium italic leading-relaxed">"{manuscript.feedback}"</p>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <div className="bg-white/5 rounded-3xl p-20 text-center border-2 border-dashed border-white/10">
-                                                <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-8">
-                                                    <FileText className="w-10 h-10 text-brand-primary opacity-50" />
-                                                </div>
-                                                <p className="text-gray-500 font-black uppercase text-[11px] tracking-[0.3em]">Nenhum manuscrito identificado</p>
-                                                <button
-                                                    onClick={() => setActiveTab('submit')}
-                                                    className="px-10 py-4 mt-10 bg-brand-primary hover:bg-brand-primary/90 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl transition-all shadow-xl shadow-brand-primary/20"
-                                                >
-                                                    Submeter Primeira Obra
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Submit Tab */}
-                            {activeTab === 'submit' && (
-                                <div>
-                                    <h2 className="text-3xl font-black text-brand-dark mb-8">Submeter Novo Manuscrito</h2>
-                                    <div className="bg-white rounded-3xl shadow-lg p-8 max-w-3xl">
-                                        <form onSubmit={handleSubmitManuscript} className="space-y-6">
-                                            {submitErrors.form && (
-                                                <div className="p-4 bg-red-50 border border-red-200 rounded-xl mb-6">
-                                                    <p className="text-red-600 text-sm font-bold flex items-center gap-2">
-                                                        <XCircle className="w-5 h-5" />
-                                                        {submitErrors.form}
-                                                    </p>
+                                                ))
+                                            ) : (
+                                                <div className="text-center py-20 text-gray-600">
+                                                    <FileText className="w-12 h-12 mx-auto mb-4 opacity-20" />
+                                                    <p className="text-sm font-medium">Você ainda não submeteu nenhum manuscrito.</p>
                                                 </div>
                                             )}
-                                            <div className="form-group-premium">
-                                                <label className="label-premium">
-                                                    Título da Obra *
-                                                </label>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* SUBMIT TAB */}
+                                {activeTab === 'submit' && (
+                                    <div className="bg-white/5 border border-white/5 rounded-[2.5rem] p-8 md:p-12">
+                                        <div className="mb-10">
+                                            <h2 className="text-3xl font-black uppercase italic tracking-tighter">Submeter</h2>
+                                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">Envio de Novos Manuscritos</p>
+                                        </div>
+
+                                        <form onSubmit={handleSubmitManuscript} className="space-y-6 max-w-2xl">
+                                            <div className="space-y-2">
+                                                <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-500 pl-2">Título da Obra *</label>
                                                 <input
                                                     type="text"
                                                     required
                                                     value={submitData.title}
-                                                    onChange={e => {
-                                                        setSubmitData(prev => ({ ...prev, title: e.target.value }));
-                                                        if (submitErrors.title) setSubmitErrors(prev => ({ ...prev, title: '' }));
-                                                    }}
-                                                    className={`input-premium ${submitErrors.title ? 'border-red-500 bg-red-50' : ''}`}
-                                                    placeholder="Digite o título"
+                                                    onChange={e => setSubmitData({ ...submitData, title: e.target.value })}
+                                                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-primary outline-none transition-colors font-bold"
+                                                    placeholder="Título do Livro"
+                                                    title="Título da Obra"
                                                 />
-                                                {submitErrors.title && <p className="text-red-500 text-[10px] mt-1 font-bold italic">{submitErrors.title}</p>}
                                             </div>
 
                                             <div className="grid md:grid-cols-2 gap-6">
-                                                <div className="form-group-premium">
-                                                    <label className="label-premium">
-                                                        Género Literário *
-                                                    </label>
+                                                <div className="space-y-2">
+                                                    <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-500 pl-2">Género *</label>
                                                     <select
                                                         required
-                                                        aria-label="Género Literário"
                                                         value={submitData.genre}
-                                                        onChange={e => {
-                                                            setSubmitData(prev => ({ ...prev, genre: e.target.value }));
-                                                            if (submitErrors.genre) setSubmitErrors(prev => ({ ...prev, genre: '' }));
-                                                        }}
-                                                        className={`input-premium ${submitErrors.genre ? 'border-red-500 bg-red-50' : ''}`}
+                                                        onChange={e => setSubmitData({ ...submitData, genre: e.target.value })}
+                                                        className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-primary outline-none transition-colors font-bold appearance-none"
+                                                        title="Género Literário"
+                                                        aria-label="Género Literário"
                                                     >
-                                                        <option value="">Selecione...</option>
-                                                        <option value="Ficção">Ficção</option>
-                                                        <option value="Não-Ficção">Não-Ficção</option>
-                                                        <option value="Técnico">Técnico</option>
-                                                        <option value="Infantil">Infantil</option>
-                                                        <option value="Poesia">Poesia</option>
-                                                        <option value="Literatura Angolana">Literatura Angolana</option>
+                                                        <option value="" className="bg-black text-gray-500">Selecione...</option>
+                                                        <option value="Ficção" className="bg-black">Ficção</option>
+                                                        <option value="Não-Ficção" className="bg-black">Não-Ficção</option>
+                                                        <option value="Poesia" className="bg-black">Poesia</option>
+                                                        <option value="Técnico" className="bg-black">Técnico</option>
                                                     </select>
-                                                    {submitErrors.genre && <p className="text-red-500 text-[10px] mt-1 font-bold italic">{submitErrors.genre}</p>}
                                                 </div>
-
-                                                <div className="form-group-premium">
-                                                    <label className="label-premium">
-                                                        Número de Páginas
-                                                    </label>
+                                                <div className="space-y-2">
+                                                    <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-500 pl-2">Páginas</label>
                                                     <input
                                                         type="number"
                                                         value={submitData.pages}
-                                                        onChange={e => setSubmitData(prev => ({ ...prev, pages: e.target.value }))}
-                                                        className="input-premium"
-                                                        placeholder="Ex: 250"
+                                                        onChange={e => setSubmitData({ ...submitData, pages: e.target.value })}
+                                                        className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-primary outline-none transition-colors font-bold"
+                                                        placeholder="Ex: 200"
+                                                        title="Número de Páginas"
                                                     />
                                                 </div>
                                             </div>
 
-                                            <div className="form-group-premium">
-                                                <label htmlFor="ms-description" className="label-premium">
-                                                    Sinopse *
-                                                </label>
+                                            <div className="space-y-2">
+                                                <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-500 pl-2">Sinopse *</label>
                                                 <textarea
-                                                    id="ms-description"
                                                     required
-                                                    spellCheck="false"
-                                                    autoComplete="off"
-                                                    data-gramm="false"
-                                                    rows={6}
+                                                    rows={5}
                                                     value={submitData.description}
-                                                    onChange={e => {
-                                                        setSubmitData(prev => ({ ...prev, description: e.target.value }));
-                                                        if (submitErrors.description) setSubmitErrors(prev => ({ ...prev, description: '' }));
-                                                    }}
-                                                    className={`input-premium h-32 resize-none ${submitErrors.description ? 'border-red-500 bg-red-50' : ''}`}
-                                                    placeholder="Descreva brevemente a sua obra..."
+                                                    onChange={e => setSubmitData({ ...submitData, description: e.target.value })}
+                                                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-primary outline-none transition-colors font-bold resize-none"
+                                                    placeholder="Breve descrição da obra..."
+                                                    title="Sinopse"
                                                 />
-                                                {submitErrors.description && <p className="text-red-500 text-[10px] mt-1 font-bold italic">{submitErrors.description}</p>}
                                             </div>
 
-                                            <div>
-                                                <label className="block text-sm font-bold text-brand-dark mb-2 uppercase tracking-wider">
-                                                    Manuscrito (PDF, DOCX) *
-                                                </label>
-                                                <div className={`relative border-2 border-dashed rounded-lg p-12 text-center transition-all cursor-pointer ${submitErrors.file ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-brand-primary'}`}>
+                                            <div className="space-y-2">
+                                                <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-500 pl-2">Arquivo (PDF/DOCX) *</label>
+                                                <div className="relative border-2 border-dashed border-white/10 rounded-2xl p-8 text-center hover:border-brand-primary/50 transition-colors group cursor-pointer bg-white/[0.02]">
                                                     <input
                                                         type="file"
                                                         required
                                                         accept=".pdf,.docx,.doc"
-                                                        title="Carregar manuscrito"
-                                                        aria-label="Carregar manuscrito"
-                                                        onChange={e => {
-                                                            if (e.target.files && e.target.files[0]) {
-                                                                setSelectedFile(e.target.files[0]);
-                                                                if (submitErrors.file) setSubmitErrors(prev => ({ ...prev, file: '' }));
-                                                            }
-                                                        }}
+                                                        onChange={e => e.target.files && setSelectedFile(e.target.files[0])}
                                                         className="absolute inset-0 opacity-0 cursor-pointer"
+                                                        title="Carregar Arquivo"
+                                                        aria-label="Carregar Arquivo"
                                                     />
                                                     {selectedFile ? (
-                                                        <div className="space-y-2">
-                                                            <CheckCircle className="w-12 h-12 text-green-500 mx-auto" />
-                                                            <p className="font-bold text-brand-dark">{selectedFile.name}</p>
-                                                            <button type="button" onClick={() => setSelectedFile(null)} className="text-red-500 text-xs hover:underline">Remover ficheiro</button>
+                                                        <div className="flex flex-col items-center">
+                                                            <CheckCircle className="w-8 h-8 text-green-500 mb-2" />
+                                                            <p className="font-bold text-white">{selectedFile.name}</p>
+                                                            <p className="text-xs text-gray-500">Clique para alterar</p>
                                                         </div>
                                                     ) : (
-                                                        <>
-                                                            <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                                                            <p className="text-gray-600 font-medium mb-2">Clique para carregar ou arraste o arquivo</p>
-                                                            <p className="text-sm text-gray-500">Máximo 50MB (PDF, DOCX)</p>
-                                                            {submitErrors.file && <p className="text-red-500 text-[10px] mt-2 font-bold italic">{submitErrors.file}</p>}
-                                                        </>
+                                                        <div className="flex flex-col items-center">
+                                                            <Upload className="w-8 h-8 text-gray-500 group-hover:text-brand-primary transition-colors mb-2" />
+                                                            <p className="font-bold text-gray-400">Carregar Manuscrito</p>
+                                                            <p className="text-xs text-gray-600">Máx 50MB</p>
+                                                        </div>
                                                     )}
                                                 </div>
                                             </div>
 
-                                            <button
-                                                type="submit"
-                                                disabled={submitLoading}
-                                                className="w-full btn-premium py-4 justify-center text-lg disabled:opacity-50"
-                                            >
-                                                {submitLoading ? (
-                                                    <>
-                                                        <Loader2 className="w-5 h-5 animate-spin" />
-                                                        <span>Submetendo...</span>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <Upload className="w-5 h-5" />
-                                                        <span>Submeter Manuscrito</span>
-                                                    </>
-                                                )}
-                                            </button>
+                                            <div className="pt-4">
+                                                <button
+                                                    type="submit"
+                                                    disabled={submitLoading}
+                                                    className="w-full py-4 bg-brand-primary rounded-xl text-white font-black uppercase tracking-[0.2em] hover:brightness-110 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                                                    title="Enviar Manuscrito"
+                                                    aria-label="Enviar Manuscrito"
+                                                >
+                                                    {submitLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Upload className="w-5 h-5" />}
+                                                    {submitLoading ? 'Enviando...' : 'Submeter Obra'}
+                                                </button>
+                                            </div>
                                         </form>
                                     </div>
-                                </div>
-                            )}
+                                )}
 
-                            {/* Royalties Tab */}
-                            {activeTab === 'royalties' && (
-                                <div className="space-y-12">
-                                    <h2 className="text-3xl md:text-5xl font-black text-brand-dark tracking-tighter uppercase leading-none">
-                                        Royalties e <span className="text-gradient-gold italic font-light lowercase">Vendas</span>
-                                    </h2>
-                                    <div className="grid md:grid-cols-3 gap-6 mb-8">
-                                        <div className="bg-gray-50 rounded-2xl p-8 border border-gray-100">
-                                            <p className="text-gray-500 font-bold text-xs uppercase tracking-widest mb-2 opacity-60">Total de Vendas</p>
-                                            <p className="text-4xl font-black text-brand-dark">{isLoadingStats ? '...' : authorStats.totalSales}</p>
+                                {/* FINANCEIRO (ROYALTIES) TAB */}
+                                {activeTab === 'royalties' && (
+                                    <div className="bg-white/5 border border-white/5 rounded-[2.5rem] p-8 md:p-12">
+                                        <div className="mb-10">
+                                            <h2 className="text-3xl font-black uppercase italic tracking-tighter">Financeiro</h2>
+                                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">Relatório de Vendas e Royalties</p>
                                         </div>
-                                        <div className="bg-gray-50 rounded-2xl p-8 border border-gray-100">
-                                            <p className="text-gray-500 font-bold text-xs uppercase tracking-widest mb-2 opacity-60">Royalties Acumulados</p>
-                                            <p className="text-4xl font-black text-brand-primary">{isLoadingStats ? '...' : authorStats.totalRoyalties.toLocaleString()} Kz</p>
-                                        </div>
-                                        <div className="bg-gray-50 rounded-2xl p-8 border border-gray-100">
-                                            <p className="text-gray-500 font-bold text-xs uppercase tracking-widest mb-2 opacity-60">Livros Publicados</p>
-                                            <p className="text-4xl font-black text-brand-dark">{isLoadingStats ? '...' : authorStats.publishedBooks}</p>
-                                        </div>
-                                    </div>
 
-                                    <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden">
-                                        <div className="p-8 border-b border-gray-50 bg-gray-50/50">
-                                            <h3 className="text-lg font-black text-brand-dark uppercase tracking-tight">Histórico de Pagamentos</h3>
+                                        <div className="grid md:grid-cols-3 gap-6 mb-10">
+                                            <div className="bg-black/20 p-6 rounded-2xl border border-white/5">
+                                                <p className="text-[9px] font-black uppercase tracking-widest text-gray-500 mb-2">Total Vendas</p>
+                                                <p className="text-3xl font-black text-white">{authorStats.totalSales}</p>
+                                            </div>
+                                            <div className="bg-black/20 p-6 rounded-2xl border border-white/5">
+                                                <p className="text-[9px] font-black uppercase tracking-widest text-gray-500 mb-2">Royalties</p>
+                                                <p className="text-3xl font-black text-brand-primary">{authorStats.totalRoyalties.toLocaleString()} Kz</p>
+                                            </div>
+                                            <div className="bg-black/20 p-6 rounded-2xl border border-white/5">
+                                                <p className="text-[9px] font-black uppercase tracking-widest text-gray-500 mb-2">Obras Publicadas</p>
+                                                <p className="text-3xl font-black text-white">{authorStats.publishedBooks}</p>
+                                            </div>
                                         </div>
-                                        <div className="overflow-x-auto">
-                                            <table className="w-full">
-                                                <thead className="bg-gray-50/30">
+
+                                        <div className="overflow-x-auto bg-black/20 rounded-2xl border border-white/5 p-2">
+                                            <table className="w-full text-left">
+                                                <thead className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-500 border-b border-white/5">
                                                     <tr>
-                                                        <th className="px-8 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Mês</th>
-                                                        <th className="px-8 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Livro</th>
-                                                        <th className="px-8 py-4 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">Vendas</th>
-                                                        <th className="px-8 py-4 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">Valor</th>
+                                                        <th className="p-4">Data</th>
+                                                        <th className="p-4">Obra</th>
+                                                        <th className="p-4 text-right">Qtd</th>
+                                                        <th className="p-4 text-right">Royalty</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody className="divide-y divide-gray-50">
-                                                    {isLoadingStats ? (
-                                                        <tr>
-                                                            <td colSpan={4} className="px-8 py-12 text-center text-gray-400 italic font-bold">Carregando histórico...</td>
+                                                <tbody className="divide-y divide-white/5">
+                                                    {confirmedSales.length > 0 ? confirmedSales.map((sale) => (
+                                                        <tr key={sale.id} className="hover:bg-white/5 transition-colors">
+                                                            <td className="p-4 text-xs font-bold text-gray-400">{new Date(sale.date).toLocaleDateString()}</td>
+                                                            <td className="p-4 text-sm font-black text-white">{sale.bookTitle}</td>
+                                                            <td className="p-4 text-xs font-bold text-gray-400 text-right">{sale.quantity}</td>
+                                                            <td className="p-4 text-sm font-black text-brand-primary text-right">{sale.royalty.toLocaleString()} Kz</td>
                                                         </tr>
-                                                    ) : confirmedSales.length > 0 ? (
-                                                        confirmedSales.map((sale) => (
-                                                            <tr key={sale.id} className="hover:bg-gray-50/50 transition-colors">
-                                                                <td className="px-8 py-6 text-sm font-bold text-gray-500">
-                                                                    {new Date(sale.date).toLocaleDateString('pt-AO', { month: 'short', year: 'numeric' })}
-                                                                </td>
-                                                                <td className="px-8 py-6 text-sm font-black text-brand-dark">{sale.bookTitle}</td>
-                                                                <td className="px-8 py-6 text-sm text-gray-500 text-right font-bold">{sale.quantity}</td>
-                                                                <td className="px-8 py-6 text-sm font-black text-brand-primary text-right">{sale.royalty.toLocaleString()} Kz</td>
-                                                            </tr>
-                                                        ))
-                                                    ) : (
+                                                    )) : (
                                                         <tr>
-                                                            <td colSpan={4} className="px-8 py-12 text-center text-gray-400 italic font-bold">Nenhuma venda registada até ao momento.</td>
+                                                            <td colSpan={4} className="p-8 text-center text-gray-500 text-xs">Sem registos de vendas confirmadas.</td>
                                                         </tr>
                                                     )}
                                                 </tbody>
                                             </table>
                                         </div>
                                     </div>
-                                </div>
-                            )}
+                                )}
 
-                            {/* Banking Details Tab */}
-                            {activeTab === 'banking' && (
-                                <div className="space-y-12">
-                                    <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-6">
-                                        <h2 className="text-3xl md:text-5xl font-black text-brand-dark tracking-tighter uppercase leading-none">
-                                            Dados <span className="text-gradient-gold italic font-light lowercase">Bancários</span>
-                                        </h2>
-                                        <button
-                                            onClick={handleSaveProfile}
-                                            disabled={isSaving}
-                                            className="btn-premium px-10 py-5 shadow-2xl shadow-brand-primary/20"
-                                        >
-                                            {isSaving ? (
-                                                <>
-                                                    <Loader2 className="w-5 h-5 animate-spin" />
-                                                    <span>Salvando...</span>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Save className="w-5 h-5" />
-                                                    <span>Guardar Alterações</span>
-                                                </>
-                                            )}
-                                        </button>
-                                    </div>
+                                {/* PROTOCOLOS (BANKING/SETTINGS) TAB */}
+                                {activeTab === 'banking' && (
+                                    <div className="bg-white/5 border border-white/5 rounded-[2.5rem] p-8 md:p-12">
+                                        <div className="mb-10">
+                                            <h2 className="text-3xl font-black uppercase italic tracking-tighter">Protocolos</h2>
+                                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">Dados Bancários e Contacto</p>
+                                        </div>
 
-                                    <div className="grid lg:grid-cols-2 gap-12">
-                                        {/* Bank Accounts */}
-                                        <div className="space-y-8">
-                                            <div className="bg-gray-50 rounded-[2.5rem] p-10 border border-gray-100">
-                                                <h3 className="text-xl font-black text-brand-dark mb-8 uppercase tracking-tight">Contas para Recebimento</h3>
-
-                                                <div className="space-y-4 mb-10">
-                                                    {bankAccounts.map((acc: import('../types').BankInfo, index: number) => (
-                                                        <div key={index} className="bg-white rounded-[1.5rem] p-6 shadow-sm border border-gray-100 relative group transition-all hover:shadow-md">
-                                                            <div className="font-black text-brand-dark mb-1">{acc.bankName}</div>
-                                                            <div className="text-sm text-gray-500 font-bold mb-1">Conta: {acc.accountNumber}</div>
-                                                            <div className="text-[10px] text-gray-400 font-mono tracking-tighter break-all">IBAN: {acc.iban}</div>
-                                                            {acc.isPrimary && (
-                                                                <span className="absolute top-6 right-6 bg-brand-primary/10 text-brand-primary text-[9px] px-3 py-1 rounded-full font-black uppercase tracking-widest">Principal</span>
-                                                            )}
-                                                            <button
-                                                                onClick={() => setBankAccounts((prev: import('../types').BankInfo[]) => prev.filter((_: any, i: number) => i !== index))}
-                                                                className="absolute bottom-6 right-6 text-red-500 hover:scale-110 transition-transform opacity-0 group-hover:opacity-100 font-black text-[9px] uppercase tracking-widest"
-                                                            >
-                                                                Eliminar
-                                                            </button>
-                                                        </div>
-                                                    ))}
-                                                    {bankAccounts.length === 0 && (
-                                                        <p className="text-gray-400 text-center py-8 italic font-bold">Nenhuma conta registada.</p>
-                                                    )}
-                                                </div>
-
-                                                <div className="space-y-4 pt-8 border-t border-gray-200">
-                                                    <h4 className="font-black text-brand-dark text-xs uppercase tracking-[0.2em] mb-4">Adicionar Nova Conta</h4>
-                                                    <div className="space-y-4">
-                                                        <input id="new-bank-name" type="text" placeholder="Nome do Banco" className="input-premium" />
-                                                        <input id="new-bank-acc" type="text" placeholder="Número de Conta" className="input-premium" />
-                                                        <input id="new-bank-iban" type="text" placeholder="IBAN" className="input-premium" />
+                                        <div className="grid lg:grid-cols-2 gap-12">
+                                            <div className="space-y-8">
+                                                <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-white/10 pb-2">Contas Bancárias</h3>
+                                                {bankAccounts.map((acc: any, idx: number) => (
+                                                    <div key={idx} className="bg-black/20 p-6 rounded-2xl border border-white/5 relative group">
+                                                        <p className="font-black text-white uppercase">{acc.bankName}</p>
+                                                        <p className="text-xs text-gray-400 font-mono mt-1">{acc.iban}</p>
                                                         <button
-                                                            onClick={() => {
-                                                                const name = (document.getElementById('new-bank-name') as HTMLInputElement).value;
-                                                                const acc = (document.getElementById('new-bank-acc') as HTMLInputElement).value;
-                                                                const iban = (document.getElementById('new-bank-iban') as HTMLInputElement).value;
-                                                                if (name && acc) {
-                                                                    setBankAccounts((prev: import('../types').BankInfo[]) => [...prev, {
-                                                                        id: Math.random().toString(36).substr(2, 9),
-                                                                        bankName: name,
-                                                                        accountNumber: acc,
-                                                                        iban: iban,
-                                                                        isPrimary: prev.length === 0
-                                                                    }]);
-                                                                    (document.getElementById('new-bank-name') as HTMLInputElement).value = '';
-                                                                    (document.getElementById('new-bank-acc') as HTMLInputElement).value = '';
-                                                                    (document.getElementById('new-bank-iban') as HTMLInputElement).value = '';
-                                                                }
-                                                            }}
-                                                            className="w-full py-4 bg-brand-dark text-white rounded-[1.5rem] font-black uppercase text-[10px] tracking-[0.3em] hover:bg-brand-primary transition-all shadow-xl shadow-brand-dark/20"
+                                                            onClick={() => setBankAccounts(prev => prev.filter((_, i) => i !== idx))}
+                                                            className="absolute top-4 right-4 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity text-xs hover:underline"
+                                                            title="Remover Conta"
+                                                            aria-label="Remover Conta"
                                                         >
-                                                            Confirmar Adição
+                                                            Remover
                                                         </button>
                                                     </div>
+                                                ))}
+
+                                                <div className="space-y-4 pt-4">
+                                                    <p className="text-[9px] font-black uppercase tracking-widest text-gray-500">Adicionar Nova Conta</p>
+                                                    <input id="new-bank" placeholder="Nome do Banco" className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white text-xs font-bold" title="Nome do Banco" />
+                                                    <input id="new-acc" placeholder="Número de Conta" className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white text-xs font-bold" title="Número de Conta" />
+                                                    <input id="new-iban" placeholder="IBAN" className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white text-xs font-bold" title="IBAN" />
+                                                    <button
+                                                        onClick={() => {
+                                                            const name = (document.getElementById('new-bank') as HTMLInputElement).value;
+                                                            const acc = (document.getElementById('new-acc') as HTMLInputElement).value;
+                                                            const iban = (document.getElementById('new-iban') as HTMLInputElement).value;
+                                                            if (name && acc) {
+                                                                setBankAccounts([...bankAccounts, { id: Date.now().toString(), bankName: name, accountNumber: acc, iban, isPrimary: false }]);
+                                                                (document.getElementById('new-bank') as HTMLInputElement).value = '';
+                                                                (document.getElementById('new-acc') as HTMLInputElement).value = '';
+                                                                (document.getElementById('new-iban') as HTMLInputElement).value = '';
+                                                            }
+                                                        }}
+                                                        className="w-full py-3 bg-white/10 hover:bg-white/20 rounded-xl text-[10px] font-black uppercase tracking-widest text-white transition-all"
+                                                        title="Adicionar Conta"
+                                                        aria-label="Adicionar Conta"
+                                                    >
+                                                        Adicionar Conta
+                                                    </button>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        {/* Contact Details */}
-                                        <div className="space-y-8">
-                                            <div className="bg-gray-50 rounded-[2.5rem] p-10 border border-gray-100">
-                                                <h3 className="text-xl font-black text-brand-dark mb-8 uppercase tracking-tight">Contacto de Notificação</h3>
-                                                <div className="form-group-premium">
-                                                    <label className="label-premium">Número de WhatsApp *</label>
-                                                    <div className="relative">
-                                                        <span className="absolute left-8 top-1/2 -translate-y-1/2 text-gray-400 font-black">+244</span>
-                                                        <input
-                                                            type="tel"
-                                                            value={whatsapp}
-                                                            onChange={(e) => setWhatsapp(e.target.value)}
-                                                            className="input-premium !pl-20"
-                                                            placeholder="9XX XXX XXX"
-                                                        />
-                                                    </div>
-                                                    <p className="text-xs text-brand-primary font-bold mt-4 italic opacity-80 leading-relaxed">
-                                                        Usaremos este canal para enviar relatórios de vendas e comprovativos.
-                                                    </p>
+                                            <div className="space-y-8">
+                                                <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-white/10 pb-2">Contacto</h3>
+                                                <div className="space-y-2">
+                                                    <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-500 pl-2">WhatsApp</label>
+                                                    <input
+                                                        type="tel"
+                                                        value={whatsapp}
+                                                        onChange={e => setWhatsapp(e.target.value)}
+                                                        className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white font-bold"
+                                                        placeholder="Seu WhatsApp"
+                                                        title="WhatsApp"
+                                                    />
                                                 </div>
-                                            </div>
 
-                                            <div className="bg-brand-primary/5 border border-brand-primary/10 rounded-[2.5rem] p-10 relative overflow-hidden">
-                                                <div className="absolute top-0 right-0 w-32 h-32 bg-brand-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                                                <h4 className="font-black text-brand-primary mb-4 uppercase text-xs tracking-widest">Conselho Editorial</h4>
-                                                <p className="text-sm text-gray-700 leading-relaxed font-bold opacity-80">
-                                                    Mantenha seus dados sempre atualizados. A Editora Graça processa os pagamentos de royalties mensalmente com base nestas informações.
-                                                </p>
+                                                <div className="pt-8">
+                                                    <button
+                                                        onClick={handleSaveProfile}
+                                                        disabled={isSaving}
+                                                        className="w-full py-4 bg-brand-primary rounded-xl text-white font-black uppercase tracking-[0.2em] hover:brightness-110 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                                                        title="Salvar Alterações"
+                                                        aria-label="Salvar Alterações"
+                                                    >
+                                                        {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                                                        {isSaving ? 'Salvando...' : 'Salvar Alterações'}
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            )}
-                        </m.div>
-                    </AnimatePresence>
+                                )}
+
+                            </m.div>
+                        </AnimatePresence>
+                    </div>
+
                 </div>
-            </section>
+            </div>
         </div>
     );
 };
