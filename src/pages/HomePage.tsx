@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Star, Clock, CheckCircle, Mail, Zap, BookOpen } from 'lucide-react';
+import { ArrowRight, Star, Clock, CheckCircle, Mail, Zap, BookOpen, Loader2 } from 'lucide-react';
 import { m, Variants } from 'framer-motion';
 import { Book, BlogPost } from '../types';
 import BookCard from '../components/BookCard';
 import { getPublicStats, getBlogPosts, getSiteContent, getTestimonials } from '../services/dataService';
 import { optimizeImageUrl } from '../components/OptimizedImage';
+import SEO from '../components/SEO';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { useToast } from '../components/Toast';
 
 interface HomePageProps {
     books: Book[];
@@ -16,11 +21,22 @@ interface HomePageProps {
     onNavigate: (view: string) => void;
 }
 
+const newsletterSchema = z.object({
+    email: z.string().email('Introduza um email válido'),
+});
+
+type NewsletterFormData = z.infer<typeof newsletterSchema>;
+
 const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAddToCart, onToggleWishlist, onNavigate }) => {
     const [stats, setStats] = useState({ booksCount: 0, authorsCount: 0, readersCount: 0 });
     const [recentPosts, setRecentPosts] = useState<BlogPost[]>([]);
     const [siteContent, setSiteContent] = useState<any>({});
     const navigate = useNavigate();
+    const { showToast } = useToast();
+
+    const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<NewsletterFormData>({
+        resolver: zodResolver(newsletterSchema)
+    });
 
     useEffect(() => {
         const loadData = async () => {
@@ -52,8 +68,19 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
         visible: { transition: { staggerChildren: 0.1 } }
     };
 
+    const onSubscribe = async (data: NewsletterFormData) => {
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        showToast('Subscrição realizada com sucesso!', 'success');
+        reset();
+    };
+
     return (
         <div className="bg-white overflow-hidden font-sans text-brand-dark">
+            <SEO
+                title="Página Inicial"
+                description={siteContent['hero.description']}
+            />
             {/* 1. HERO SECTION - Bold & Geometric */}
             <section className="min-h-screen pt-24 md:pt-32 pb-20 px-6 md:px-12 flex items-center relative">
                 <div className="absolute top-0 right-0 w-1/2 h-full bg-gray-50 skew-x-12 translate-x-1/3 -z-10"></div>
@@ -202,14 +229,24 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                     <h2 className="text-3xl md:text-5xl font-black text-brand-dark mb-6 uppercase tracking-tight">Fique a par das novidades</h2>
                     <p className="text-gray-500 mb-10 text-lg">Junte-se à nossa lista exclusiva de leitores e receba atualizações sobre lançamentos.</p>
 
-                    <form className="flex flex-col sm:flex-row gap-4">
-                        <input
-                            type="email"
-                            placeholder="Seu melhor email"
-                            className="flex-1 px-6 py-4 bg-gray-50 rounded-xl border border-gray-200 focus:border-brand-dark outline-none font-medium"
-                        />
-                        <button className="px-10 py-4 bg-brand-dark text-white font-bold uppercase tracking-widest rounded-xl hover:bg-brand-primary transition-colors">
-                            Subscrever
+                    <form onSubmit={handleSubmit(onSubscribe)} className="flex flex-col sm:flex-row gap-4">
+                        <div className="flex-1 flex flex-col items-start gap-2">
+                            <input
+                                {...register('email')}
+                                type="email"
+                                placeholder="Seu melhor email"
+                                className={`w-full px-6 py-4 bg-gray-50 rounded-xl border focus:border-brand-dark outline-none font-medium transition-colors ${errors.email ? 'border-red-500 bg-red-50' : 'border-gray-200'}`}
+                            />
+                            {errors.email && (
+                                <span className="text-red-500 text-xs font-bold uppercase tracking-wide ml-2">{errors.email.message}</span>
+                            )}
+                        </div>
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="px-10 py-4 bg-brand-dark text-white font-bold uppercase tracking-widest rounded-xl hover:bg-brand-primary transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
+                        >
+                            {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Subscrever'}
                         </button>
                     </form>
                 </div>

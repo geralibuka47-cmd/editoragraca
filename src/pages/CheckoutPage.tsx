@@ -1,7 +1,24 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShoppingCart, Trash2, Plus, Minus, CreditCard, CheckCircle, ArrowLeft, Loader2 } from 'lucide-react';
-import { ViewState, CartItem } from '../types';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { CartItem } from '../types';
+import { Input } from '../components/ui/Input';
+import { Select } from '../components/ui/Select';
+import { Button } from '../components/ui/Button';
+
+// Validation Schema
+const checkoutSchema = z.object({
+    name: z.string().min(2, 'Nome é obrigatório'),
+    email: z.string().email('Email inválido'),
+    phone: z.string().min(9, 'Telefone inválido'),
+    address: z.string().min(5, 'Endereço é obrigatório'),
+    city: z.string().min(2, 'Cidade é obrigatória'),
+});
+
+type CheckoutFormData = z.infer<typeof checkoutSchema>;
 
 interface CheckoutPageProps {
     cart: CartItem[];
@@ -12,52 +29,40 @@ interface CheckoutPageProps {
 const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onRemoveItem }) => {
     const navigate = useNavigate();
     const [step, setStep] = useState<'cart' | 'details' | 'success'>('cart');
-    const [customerInfo, setCustomerInfo] = useState({
-        name: '',
-        email: '',
-        phone: '',
-        address: '',
-        city: 'Malanje'
+    const [orderError, setOrderError] = useState('');
+    const [confirmedCustomer, setConfirmedCustomer] = useState<{ name: string; email: string } | null>(null);
+
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isSubmitting },
+    } = useForm<CheckoutFormData>({
+        resolver: zodResolver(checkoutSchema),
+        defaultValues: {
+            name: '',
+            email: '',
+            phone: '',
+            address: '',
+            city: 'Malanje',
+        },
     });
-    const [errors, setErrors] = useState<Record<string, string>>({});
 
     const total = cart.reduce((sum, item) => sum + ((Number(item.price) || 0) * item.quantity), 0);
-
-    const validateCustomerInfo = () => {
-        const newErrors: Record<string, string> = {};
-
-        if (!customerInfo.name.trim()) newErrors.name = 'Nome é obrigatório';
-        if (!customerInfo.email.trim()) {
-            newErrors.email = 'Email é obrigatório';
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerInfo.email)) {
-            newErrors.email = 'Email inválido';
-        }
-        if (!customerInfo.phone.trim()) newErrors.phone = 'Telefone é obrigatório';
-        if (!customerInfo.address.trim()) newErrors.address = 'Endereço é obrigatório';
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
 
     const handleCheckout = () => {
         if (cart.length === 0) return;
         setStep('details');
     };
 
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [orderError, setOrderError] = useState('');
-
-    const handleConfirmOrder = async () => {
-        if (!validateCustomerInfo()) return;
-        setIsSubmitting(true);
+    const onSubmit = async (data: CheckoutFormData) => {
         setOrderError('');
 
         try {
             const { createOrder } = await import('../services/dataService');
 
             await createOrder({
-                customerName: customerInfo.name.trim(),
-                customerEmail: customerInfo.email.trim(),
+                customerName: data.name.trim(),
+                customerEmail: data.email.trim(),
                 items: cart.map(item => ({
                     title: item.title,
                     quantity: item.quantity,
@@ -69,20 +74,11 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
                 date: new Date().toISOString()
             });
 
+            setConfirmedCustomer({ name: data.name, email: data.email });
             setStep('success');
         } catch (error) {
             console.error('Erro ao criar pedido:', error);
             setOrderError('Ocorreu um erro ao processar o seu pedido. Por favor, tente novamente.');
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
-        setCustomerInfo(prev => ({ ...prev, [name]: value }));
-        if (errors[name]) {
-            setErrors(prev => ({ ...prev, [name]: '' }));
         }
     };
 
@@ -90,7 +86,6 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
     if (step === 'cart') {
         return (
             <div className="min-h-screen bg-brand-light py-8 md:py-16">
-                {/* Nav Padding Spacer */}
                 <div className="h-20 md:h-24 bg-brand-light"></div>
 
                 <div className="container mx-auto px-4 md:px-8">
@@ -135,7 +130,6 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
                                                         onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))}
                                                         className="w-8 h-8 flex items-center justify-center hover:bg-brand-primary hover:text-white rounded transition-all"
                                                         title="Diminuir"
-                                                        aria-label="Diminuir"
                                                     >
                                                         <Minus className="w-3 h-3" />
                                                     </button>
@@ -144,7 +138,6 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
                                                         onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
                                                         className="w-8 h-8 flex items-center justify-center hover:bg-brand-primary hover:text-white rounded transition-all"
                                                         title="Aumentar"
-                                                        aria-label="Aumentar"
                                                     >
                                                         <Plus className="w-3 h-3" />
                                                     </button>
@@ -156,7 +149,6 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
                                             onClick={() => onRemoveItem(item.id)}
                                             className="absolute top-4 right-4 text-gray-400 hover:text-red-600 transition-colors p-2"
                                             title="Remover"
-                                            aria-label="Remover"
                                         >
                                             <Trash2 className="w-5 h-5" />
                                         </button>
@@ -185,9 +177,9 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
                                         <span>{total.toLocaleString()} Kz</span>
                                     </div>
 
-                                    <button onClick={handleCheckout} className="w-full btn-premium justify-center py-4">
+                                    <Button onClick={handleCheckout} className="w-full py-4 uppercase tracking-widest text-xs">
                                         Finalizar Compra
-                                    </button>
+                                    </Button>
 
                                     <p className="text-[10px] text-gray-500 text-center mt-4">
                                         Pagamento via transferência bancária
@@ -205,7 +197,6 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
     if (step === 'details') {
         return (
             <div className="min-h-screen bg-brand-light py-8 md:py-16">
-                {/* Nav Padding Spacer */}
                 <div className="h-20 md:h-24 bg-brand-light"></div>
 
                 <div className="container mx-auto px-4 md:px-8 max-w-4xl">
@@ -232,93 +223,51 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
                                 </div>
                             )}
 
-                            <form onSubmit={(e) => { e.preventDefault(); handleConfirmOrder(); }} className="space-y-6">
-                                <div className="form-group-premium">
-                                    <label htmlFor="name" className="label-premium">
-                                        Nome Completo *
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="name"
-                                        name="name"
-                                        value={customerInfo.name}
-                                        onChange={handleChange}
-                                        className={`input-premium ${errors.name ? 'input-error-premium' : ''}`}
-                                        placeholder="Ex: João Ferreira"
-                                    />
-                                    {errors.name && <p className="error-text-premium">{errors.name}</p>}
-                                </div>
+                            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                                <Input
+                                    label="Nome Completo *"
+                                    placeholder="Ex: João Ferreira"
+                                    {...register('name')}
+                                    error={errors.name?.message}
+                                />
 
                                 <div className="grid md:grid-cols-2 gap-6">
-                                    <div className="form-group-premium">
-                                        <label htmlFor="email" className="label-premium">
-                                            Email *
-                                        </label>
-                                        <input
-                                            type="email"
-                                            id="email"
-                                            name="email"
-                                            value={customerInfo.email}
-                                            onChange={handleChange}
-                                            className={`input-premium ${errors.email ? 'input-error-premium' : ''}`}
-                                            placeholder="seu@email.com"
-                                        />
-                                        {errors.email && <p className="error-text-premium">{errors.email}</p>}
-                                    </div>
-
-                                    <div className="form-group-premium">
-                                        <label htmlFor="phone" className="label-premium">
-                                            Telefone *
-                                        </label>
-                                        <input
-                                            type="tel"
-                                            id="phone"
-                                            name="phone"
-                                            value={customerInfo.phone}
-                                            onChange={handleChange}
-                                            placeholder="Ex: 923 000 000"
-                                            className={`input-premium ${errors.phone ? 'input-error-premium' : ''}`}
-                                        />
-                                        {errors.phone && <p className="error-text-premium">{errors.phone}</p>}
-                                    </div>
-                                </div>
-
-                                <div className="form-group-premium">
-                                    <label htmlFor="address" className="label-premium">
-                                        Endereço de Entrega *
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="address"
-                                        name="address"
-                                        value={customerInfo.address}
-                                        onChange={handleChange}
-                                        placeholder="Rua, Bairro, Número"
-                                        className={`input-premium ${errors.address ? 'input-error-premium' : ''}`}
+                                    <Input
+                                        type="email"
+                                        label="Email *"
+                                        placeholder="seu@email.com"
+                                        {...register('email')}
+                                        error={errors.email?.message}
                                     />
-                                    {errors.address && <p className="error-text-premium">{errors.address}</p>}
+                                    <Input
+                                        type="tel"
+                                        label="Telefone *"
+                                        placeholder="Ex: 923 000 000"
+                                        {...register('phone')}
+                                        error={errors.phone?.message}
+                                    />
                                 </div>
 
-                                <div className="form-group-premium">
-                                    <label htmlFor="city" className="label-premium">
-                                        Cidade
-                                    </label>
-                                    <select
-                                        id="city"
-                                        name="city"
-                                        value={customerInfo.city}
-                                        onChange={handleChange}
-                                        className="input-premium"
-                                        title="Cidade"
-                                    >
-                                        <option value="Malanje">Malanje</option>
-                                        <option value="Luanda">Luanda</option>
-                                        <option value="Benguela">Benguela</option>
-                                        <option value="Huambo">Huambo</option>
-                                        <option value="Lobito">Lobito</option>
-                                        <option value="Outra">Outra</option>
-                                    </select>
-                                </div>
+                                <Input
+                                    label="Endereço de Entrega *"
+                                    placeholder="Rua, Bairro, Número"
+                                    {...register('address')}
+                                    error={errors.address?.message}
+                                />
+
+                                <Select
+                                    label="Cidade"
+                                    options={[
+                                        { value: 'Malanje', label: 'Malanje' },
+                                        { value: 'Luanda', label: 'Luanda' },
+                                        { value: 'Benguela', label: 'Benguela' },
+                                        { value: 'Huambo', label: 'Huambo' },
+                                        { value: 'Lobito', label: 'Lobito' },
+                                        { value: 'Outra', label: 'Outra' },
+                                    ]}
+                                    {...register('city')}
+                                    error={errors.city?.message}
+                                />
 
                                 <div className="bg-brand-primary/10 rounded-xl p-6">
                                     <div className="flex items-start gap-4">
@@ -337,20 +286,14 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
                                     </div>
                                 </div>
 
-                                <button
+                                <Button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className="w-full btn-premium py-5 text-lg disabled:opacity-50"
+                                    isLoading={isSubmitting}
+                                    className="w-full py-5 text-lg"
                                 >
-                                    {isSubmitting ? (
-                                        <>
-                                            <Loader2 className="w-6 h-6 animate-spin" />
-                                            <span>A processar pedido...</span>
-                                        </>
-                                    ) : (
-                                        <span>Confirmar Pedido</span>
-                                    )}
-                                </button>
+                                    Confirmar Pedido
+                                </Button>
                             </form>
                         </div>
 
@@ -381,7 +324,6 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
     // Success View
     return (
         <div className="min-h-screen bg-brand-light py-12 md:py-16 flex flex-col items-center">
-            {/* Nav Padding Spacer */}
             <div className="h-20 md:h-24 bg-brand-light"></div>
 
             <div className="container mx-auto px-4 md:px-8 max-w-2xl text-center">
@@ -392,8 +334,8 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
 
                     <h1 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">Pedido Confirmado!</h1>
                     <p className="text-base md:text-lg text-gray-600 mb-8">
-                        Obrigado pela sua compra, <strong>{customerInfo.name}</strong>!<br />
-                        Enviámos os detalhes para <strong>{customerInfo.email}</strong>.
+                        Obrigado pela sua compra, <strong>{confirmedCustomer?.name}</strong>!<br />
+                        Enviámos os detalhes para <strong>{confirmedCustomer?.email}</strong>.
                     </p>
 
                     <div className="bg-brand-primary/10 rounded-2xl p-6 mb-8 text-left">

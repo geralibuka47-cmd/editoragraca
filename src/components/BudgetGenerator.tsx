@@ -1,43 +1,59 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
-import { Calculator, Check, ChevronRight, FileText, Send, Sparkles, User, AlertCircle } from 'lucide-react';
+import { Calculator, Check, ChevronRight, FileText, Send, Sparkles, User, AlertCircle, ArrowLeft } from 'lucide-react';
 import { createManuscript } from '../services/dataService';
 import { useToast } from './Toast';
+import { useForm, Controller, SubmitHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Input } from './ui/Input';
+import { Button } from './ui/Button';
 
-interface BudgetState {
-    serviceType: string;
-    wordCount: number;
-    pages: number;
-    genre: string;
-    extras: string[];
-    name: string;
-    email: string;
-    phone: string;
-}
+// Validation Schema
+const budgetSchema = z.object({
+    serviceType: z.string().min(1, 'Selecione um serviço'),
+    wordCount: z.coerce.number().min(0).optional(),
+    pages: z.coerce.number().min(0).optional(),
+    genre: z.string().min(1, 'Selecione um género'),
+    extras: z.array(z.string()).default([]),
+    name: z.string().min(2, 'Nome é obrigatório'),
+    email: z.string().email('Email inválido').optional().or(z.literal('')),
+    phone: z.string().min(9, 'Telefone inválido'),
+}).refine(data => data.email || data.phone, {
+    message: "Forneça pelo menos um contato (Email ou Telefone)",
+    path: ["email"]
+});
 
-const steps = [
-    { number: 1, title: 'Serviço' },
-    { number: 2, title: 'Detalhes' },
-    { number: 3, title: 'Extras' },
-    { number: 4, title: 'Finalizar' }
+type BudgetFormData = z.infer<typeof budgetSchema>;
+
+const steps: { number: number; title: string; fields: (keyof BudgetFormData)[] }[] = [
+    { number: 1, title: 'Serviço', fields: ['serviceType'] },
+    { number: 2, title: 'Detalhes', fields: ['pages', 'wordCount', 'genre'] },
+    { number: 3, title: 'Extras', fields: ['extras'] },
+    { number: 4, title: 'Finalizar', fields: ['name', 'email', 'phone'] }
 ];
 
 const BudgetGenerator: React.FC = () => {
     const { showToast } = useToast();
     const [step, setStep] = useState(1);
-    const [loading, setLoading] = useState(false);
-    const [data, setData] = useState<BudgetState>({
-        serviceType: 'revisao',
-        wordCount: 0,
-        pages: 0,
-        genre: '',
-        extras: [],
-        name: '',
-        email: '',
-        phone: ''
+    const [estimatedPrice, setEstimatedPrice] = useState<{ min: number; max: number } | null>(null);
+
+    // Allowing useForm to infer the type from the resolver to avoid mismatch
+    const { register, handleSubmit, control, watch, trigger, formState: { errors, isSubmitting }, reset, setValue } = useForm<BudgetFormData>({
+        resolver: zodResolver(budgetSchema),
+        defaultValues: {
+            serviceType: 'revisao',
+            extras: [],
+            pages: 0,
+            wordCount: 0,
+            genre: '',
+            name: '',
+            email: '',
+            phone: ''
+        }
     });
 
-    const [estimatedPrice, setEstimatedPrice] = useState<{ min: number; max: number } | null>(null);
+    const formData = watch();
 
     const calculateEstimate = () => {
         let min = 0;
@@ -51,31 +67,21 @@ const BudgetGenerator: React.FC = () => {
             return pages > 250 ? PRICE_PER_PAGE_HIGH : PRICE_PER_PAGE_LOW;
         };
 
-        // Base price per service
-        if (data.serviceType === 'revisao') {
-            // Estimate pages if only word count is given (approx 250 words/page)
-            const estimatedPages = data.pages || Math.ceil(data.wordCount / 250);
-            const rate = getPagePrice(estimatedPages);
+        const pages = formData.pages || (formData.wordCount ? Math.ceil(formData.wordCount / 250) : 0);
+        const rate = getPagePrice(pages);
 
-            // Calculate exact, then range
-            const baseCost = estimatedPages * rate;
+        // Base price per service
+        if (formData.serviceType === 'revisao') {
+            const baseCost = pages * rate;
             min += baseCost;
             max += baseCost * 1.1; // 10% margin
-        } else if (data.serviceType === 'diagramacao') {
-            const estimatedPages = data.pages || Math.ceil(data.wordCount / 250);
-            const rate = getPagePrice(estimatedPages);
-
-            const baseCost = estimatedPages * rate;
+        } else if (formData.serviceType === 'diagramacao') {
+            const baseCost = pages * rate;
             min += baseCost;
             max += baseCost * 1.1;
-        } else if (data.serviceType === 'completo') {
-            // Revisão + Diagramação + Capa + ISBN + Depósito
-            const estimatedPages = data.pages || Math.ceil(data.wordCount / 250);
-            const rate = getPagePrice(estimatedPages);
-
+        } else if (formData.serviceType === 'completo') {
             // Revisão + Diagramação
-            const editorialCost = (estimatedPages * rate) * 2;
-
+            const editorialCost = (pages * rate) * 2;
             // Fixed costs
             const fixedCosts = 10000 + 6000 + 6000; // Capa + ISBN + Depósito
 
@@ -84,67 +90,53 @@ const BudgetGenerator: React.FC = () => {
         }
 
         // Extras
-        if (data.extras.includes('capa')) {
-            min += 10000;
-            max += 15000; // Range for complexity
-        }
-        if (data.extras.includes('isbn')) {
-            min += 6000;
-            max += 6000;
-        }
-        if (data.extras.includes('deposito')) {
-            min += 6000;
-            max += 6000;
-        }
-        if (data.extras.includes('ebook')) {
-            min += 7500;
-            max += 7500;
-        }
-        if (data.extras.includes('marketing')) {
-            min += 5000;
-            max += 5000;
-        }
+        const extras = formData.extras || [];
+        if (extras.includes('capa')) { min += 10000; max += 15000; }
+        if (extras.includes('isbn')) { min += 6000; max += 6000; }
+        if (extras.includes('deposito')) { min += 6000; max += 6000; }
+        if (extras.includes('ebook')) { min += 7500; max += 7500; }
+        if (extras.includes('marketing')) { min += 5000; max += 5000; }
 
         setEstimatedPrice({ min, max });
     };
 
-    React.useEffect(() => {
+    useEffect(() => {
         calculateEstimate();
-    }, [data]);
+    }, [formData.serviceType, formData.pages, formData.wordCount, formData.extras]);
 
-    const handleNext = () => {
-        if (step < 4) setStep(step + 1);
+    const handleNext = async () => {
+        const fieldsToValidate = steps[step - 1].fields;
+        const isStepValid = await trigger(fieldsToValidate);
+        if (isStepValid && step < 4) {
+            setStep(step + 1);
+        }
     };
 
     const handleBack = () => {
         if (step > 1) setStep(step - 1);
     };
 
-    const handleSubmit = async () => {
-        setLoading(true);
+    const onSubmit: SubmitHandler<BudgetFormData> = async (data) => {
         try {
             await createManuscript({
                 title: `Pedido de Orçamento: ${data.serviceType.toUpperCase()}`,
                 authorName: data.name,
-                email: data.email,
+                email: data.email || 'N/A',
                 genre: data.genre,
-                description: `Serviço: ${data.serviceType}, Páginas: ${data.pages}, Palavras: ${data.wordCount}, Tel: ${data.phone}, Extras: ${data.extras.join(', ')}`,
+                description: `Serviço: ${data.serviceType}, Páginas: ${data.pages}, Palavras: ${data.wordCount}, Tel: ${data.phone}, Extras: ${data.extras?.join(', ')}`,
                 fileUrl: '',
                 fileName: 'Formulário Online',
                 authorId: 'guest',
                 status: 'pending'
             });
             showToast('Pedido enviado com sucesso! Entraremos em contacto.', 'success');
-            setStep(1); // Reset or show success screen
-            setData({ ...data, name: '', email: '', phone: '' });
+            setStep(1);
+            reset();
         } catch (error) {
             console.error(error);
             showToast('Erro ao enviar pedido. Tente novamente.', 'error');
-        } finally {
-            setLoading(false);
         }
     };
-
     const formatCurrency = (val: number) => {
         return new Intl.NumberFormat('pt-AO', { style: 'currency', currency: 'AOA' }).format(val);
     };
@@ -174,7 +166,7 @@ const BudgetGenerator: React.FC = () => {
                     ))}
                 </div>
 
-                <div className="min-h-[300px]">
+                <form onSubmit={handleSubmit(onSubmit)} className="min-h-[300px]">
                     <AnimatePresence mode="wait">
                         {step === 1 && (
                             <m.div
@@ -184,23 +176,32 @@ const BudgetGenerator: React.FC = () => {
                                 exit={{ opacity: 0, x: -20 }}
                                 className="grid md:grid-cols-3 gap-6"
                             >
-                                {[
-                                    { id: 'revisao', title: 'Revisão & Edição', desc: 'Correção completa e aprimoramento textual.' },
-                                    { id: 'diagramacao', title: 'Diagramação', desc: 'Layout profissional para impressão.' },
-                                    { id: 'completo', title: 'Publicação Completa', desc: 'Do manuscrito ao livro impresso.' }
-                                ].map((opt) => (
-                                    <button
-                                        key={opt.id}
-                                        onClick={() => setData({ ...data, serviceType: opt.id })}
-                                        className={`p-6 rounded-2xl border-2 text-left transition-all ${data.serviceType === opt.id ? 'border-brand-primary bg-brand-primary/5 shadow-xl ring-1 ring-brand-primary' : 'border-gray-100 hover:border-brand-primary/30'}`}
-                                    >
-                                        <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${data.serviceType === opt.id ? 'bg-brand-primary text-white' : 'bg-gray-100 text-gray-400'}`}>
-                                            <Sparkles className="w-5 h-5" />
-                                        </div>
-                                        <h4 className="font-bold text-brand-dark mb-2">{opt.title}</h4>
-                                        <p className="text-sm text-gray-500 leading-relaxed">{opt.desc}</p>
-                                    </button>
-                                ))}
+                                <Controller
+                                    name="serviceType"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <>
+                                            {[
+                                                { id: 'revisao', title: 'Revisão & Edição', desc: 'Correção completa e aprimoramento textual.' },
+                                                { id: 'diagramacao', title: 'Diagramação', desc: 'Layout profissional para impressão.' },
+                                                { id: 'completo', title: 'Publicação Completa', desc: 'Do manuscrito ao livro impresso.' }
+                                            ].map((opt) => (
+                                                <button
+                                                    key={opt.id}
+                                                    type="button"
+                                                    onClick={() => field.onChange(opt.id)}
+                                                    className={`p-6 rounded-2xl border-2 text-left transition-all ${field.value === opt.id ? 'border-brand-primary bg-brand-primary/5 shadow-xl ring-1 ring-brand-primary' : 'border-gray-100 hover:border-brand-primary/30'}`}
+                                                >
+                                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${field.value === opt.id ? 'bg-brand-primary text-white' : 'bg-gray-100 text-gray-400'}`}>
+                                                        <Sparkles className="w-5 h-5" />
+                                                    </div>
+                                                    <h4 className="font-bold text-brand-dark mb-2">{opt.title}</h4>
+                                                    <p className="text-sm text-gray-500 leading-relaxed">{opt.desc}</p>
+                                                </button>
+                                            ))}
+                                        </>
+                                    )}
+                                />
                             </m.div>
                         )}
 
@@ -213,33 +214,27 @@ const BudgetGenerator: React.FC = () => {
                                 className="space-y-8"
                             >
                                 <div className="grid md:grid-cols-2 gap-8">
-                                    <div className="space-y-4">
-                                        <label className="block text-sm font-bold uppercase tracking-widest text-gray-500">Número de Páginas (Aprox.)</label>
-                                        <input
-                                            type="number"
-                                            value={data.pages || ''}
-                                            onChange={(e) => setData({ ...data, pages: parseInt(e.target.value) || 0 })}
-                                            className="w-full p-4 bg-gray-50 rounded-xl border border-gray-200 focus:border-brand-primary outline-none font-bold text-xl text-brand-dark"
-                                            placeholder="Ex: 150"
-                                        />
-                                    </div>
-                                    <div className="space-y-4">
-                                        <label className="block text-sm font-bold uppercase tracking-widest text-gray-500">Contagem de Palavras (Opcional)</label>
-                                        <input
-                                            type="number"
-                                            value={data.wordCount || ''}
-                                            onChange={(e) => setData({ ...data, wordCount: parseInt(e.target.value) || 0 })}
-                                            className="w-full p-4 bg-gray-50 rounded-xl border border-gray-200 focus:border-brand-primary outline-none font-bold text-xl text-brand-dark"
-                                            placeholder="Ex: 45000"
-                                        />
-                                    </div>
+                                    <Input
+                                        type="number"
+                                        label="Número de Páginas (Aprox.)"
+                                        placeholder="Ex: 150"
+                                        {...register('pages')}
+                                        error={errors.pages?.message}
+                                        className="text-xl font-bold"
+                                    />
+                                    <Input
+                                        type="number"
+                                        label="Contagem de Palavras (Opcional)"
+                                        placeholder="Ex: 45000"
+                                        {...register('wordCount')}
+                                        error={errors.wordCount?.message}
+                                        className="text-xl font-bold"
+                                    />
                                 </div>
                                 <div className="space-y-4">
                                     <label className="block text-sm font-bold uppercase tracking-widest text-gray-500">Género Literário</label>
                                     <select
-                                        title="Selecione o género literário da sua obra"
-                                        value={data.genre}
-                                        onChange={(e) => setData({ ...data, genre: e.target.value })}
+                                        {...register('genre')}
                                         className="w-full p-4 bg-gray-50 rounded-xl border border-gray-200 focus:border-brand-primary outline-none font-medium text-brand-dark"
                                     >
                                         <option value="">Selecione...</option>
@@ -249,6 +244,7 @@ const BudgetGenerator: React.FC = () => {
                                         <option value="Biografia">Biografia</option>
                                         <option value="Infantil">Infantil</option>
                                     </select>
+                                    {errors.genre && <span className="text-red-500 text-xs font-bold">{errors.genre.message}</span>}
                                 </div>
                             </m.div>
                         )}
@@ -261,34 +257,42 @@ const BudgetGenerator: React.FC = () => {
                                 exit={{ opacity: 0, x: -20 }}
                                 className="grid md:grid-cols-2 gap-4"
                             >
-                                {[
-                                    { id: 'capa', title: 'Design de Capa (Físico)', price: '+ 10.000 Kz' },
-                                    { id: 'ebook', title: 'Capa E-book', price: '+ 7.500 Kz' },
-                                    { id: 'isbn', title: 'Registo ISBN', price: '+ 6.000 Kz' },
-                                    { id: 'deposito', title: 'Depósito Legal', price: '+ 6.000 Kz' },
-                                    { id: 'marketing', title: 'Post Publicitário', price: '+ 5.000 Kz' }
-                                ].map((extra) => (
-                                    <label key={extra.id} className={`flex items-center gap-4 p-6 rounded-2xl border-2 cursor-pointer transition-all ${data.extras.includes(extra.id) ? 'border-brand-primary bg-brand-primary/5' : 'border-gray-100 hover:bg-gray-50'}`}>
-                                        <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center ${data.extras.includes(extra.id) ? 'bg-brand-primary border-brand-primary text-white' : 'border-gray-300'}`}>
-                                            {data.extras.includes(extra.id) && <Check className="w-4 h-4" />}
-                                        </div>
-                                        <input
-                                            type="checkbox"
-                                            className="hidden"
-                                            checked={data.extras.includes(extra.id)}
-                                            onChange={() => {
-                                                const newExtras = data.extras.includes(extra.id)
-                                                    ? data.extras.filter(e => e !== extra.id)
-                                                    : [...data.extras, extra.id];
-                                                setData({ ...data, extras: newExtras });
-                                            }}
-                                        />
-                                        <div>
-                                            <p className="font-bold text-brand-dark">{extra.title}</p>
-                                            <p className="text-sm text-brand-primary font-bold">{extra.price}</p>
-                                        </div>
-                                    </label>
-                                ))}
+                                <Controller
+                                    name="extras"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <>
+                                            {[
+                                                { id: 'capa', title: 'Design de Capa (Físico)', price: '+ 10.000 Kz' },
+                                                { id: 'ebook', title: 'Capa E-book', price: '+ 7.500 Kz' },
+                                                { id: 'isbn', title: 'Registo ISBN', price: '+ 6.000 Kz' },
+                                                { id: 'deposito', title: 'Depósito Legal', price: '+ 6.000 Kz' },
+                                                { id: 'marketing', title: 'Post Publicitário', price: '+ 5.000 Kz' }
+                                            ].map((extra) => (
+                                                <label key={extra.id} className={`flex items-center gap-4 p-6 rounded-2xl border-2 cursor-pointer transition-all ${field.value.includes(extra.id) ? 'border-brand-primary bg-brand-primary/5' : 'border-gray-100 hover:bg-gray-50'}`}>
+                                                    <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center ${field.value.includes(extra.id) ? 'bg-brand-primary border-brand-primary text-white' : 'border-gray-300'}`}>
+                                                        {field.value.includes(extra.id) && <Check className="w-4 h-4" />}
+                                                    </div>
+                                                    <input
+                                                        type="checkbox"
+                                                        className="hidden"
+                                                        checked={field.value.includes(extra.id)}
+                                                        onChange={() => {
+                                                            const newExtras = field.value.includes(extra.id)
+                                                                ? field.value.filter(e => e !== extra.id)
+                                                                : [...field.value, extra.id];
+                                                            field.onChange(newExtras);
+                                                        }}
+                                                    />
+                                                    <div>
+                                                        <p className="font-bold text-brand-dark">{extra.title}</p>
+                                                        <p className="text-sm text-brand-primary font-bold">{extra.price}</p>
+                                                    </div>
+                                                </label>
+                                            ))}
+                                        </>
+                                    )}
+                                />
                             </m.div>
                         )}
 
@@ -314,60 +318,63 @@ const BudgetGenerator: React.FC = () => {
                                         Seus Dados para Contato
                                     </h4>
                                     <div className="grid md:grid-cols-2 gap-4">
-                                        <input
-                                            type="text"
+                                        <Input
                                             placeholder="Nome Completo"
-                                            value={data.name}
-                                            onChange={(e) => setData({ ...data, name: e.target.value })}
-                                            className="w-full p-4 bg-gray-50 rounded-xl border border-gray-200 focus:border-brand-primary outline-none"
+                                            {...register('name')}
+                                            error={errors.name?.message}
                                         />
-                                        <input
+                                        <Input
                                             type="tel"
                                             placeholder="WhatsApp / Telefone"
-                                            value={data.phone}
-                                            onChange={(e) => setData({ ...data, phone: e.target.value })}
-                                            className="w-full p-4 bg-gray-50 rounded-xl border border-gray-200 focus:border-brand-primary outline-none"
+                                            {...register('phone')}
+                                            error={errors.phone?.message}
                                         />
-                                        <input
-                                            type="email"
-                                            placeholder="Email"
-                                            value={data.email}
-                                            onChange={(e) => setData({ ...data, email: e.target.value })} // Fix typo e=>e
-                                            className="w-full col-span-2 p-4 bg-gray-50 rounded-xl border border-gray-200 focus:border-brand-primary outline-none"
-                                        />
+                                        <div className="col-span-2">
+                                            <Input
+                                                type="email"
+                                                placeholder="Email"
+                                                {...register('email')}
+                                                error={errors.email?.message}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </m.div>
                         )}
                     </AnimatePresence>
-                </div>
 
-                <div className="flex justify-between items-center mt-12 pt-8 border-t border-gray-100">
-                    <button
-                        onClick={handleBack}
-                        disabled={step === 1}
-                        className={`text-sm font-bold uppercase tracking-widest ${step === 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:text-brand-dark'}`}
-                    >
-                        Voltar
-                    </button>
+                    <div className="flex justify-between items-center mt-12 pt-8 border-t border-gray-100">
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            onClick={handleBack}
+                            disabled={step === 1}
+                            leftIcon={<ArrowLeft className="w-4 h-4" />}
+                            className={step === 1 ? 'opacity-50' : ''}
+                        >
+                            Voltar
+                        </Button>
 
-                    {step < 4 ? (
-                        <button
-                            onClick={handleNext}
-                            className="bg-brand-dark text-white px-8 py-3 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-brand-primary transition-colors flex items-center gap-2"
-                        >
-                            Próximo <ChevronRight className="w-4 h-4" />
-                        </button>
-                    ) : (
-                        <button
-                            onClick={handleSubmit}
-                            disabled={loading || !data.name || (!data.email && !data.phone)}
-                            className="bg-brand-primary text-white px-8 py-3 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-brand-dark transition-all shadow-lg hover:shadow-xl flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {loading ? 'Enviando...' : 'Receber Proposta Formal'} <Send className="w-4 h-4" />
-                        </button>
-                    )}
-                </div>
+                        {step < 4 ? (
+                            <Button
+                                type="button"
+                                onClick={handleNext}
+                                rightIcon={<ChevronRight className="w-4 h-4" />}
+                            >
+                                Próximo
+                            </Button>
+                        ) : (
+                            <Button
+                                type="submit"
+                                isLoading={isSubmitting}
+                                disabled={isSubmitting}
+                                rightIcon={!isSubmitting && <Send className="w-4 h-4" />}
+                            >
+                                Receber Proposta Formal
+                            </Button>
+                        )}
+                    </div>
+                </form>
             </div>
         </div>
     );

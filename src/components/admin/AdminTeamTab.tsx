@@ -1,7 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { motion as m, AnimatePresence } from 'framer-motion';
-import { Plus, Edit, Trash2, Loader2, Save, X, Search, User, Briefcase, Tag, Hash, Image as ImageIcon, FileText, Shield, Crosshair } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, User, Briefcase, Tag, Hash, Image as ImageIcon, FileText, Shield, Crosshair, Save, X, Loader2 } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { useToast } from '../Toast';
+import { Input } from '../ui/Input';
+import { Textarea } from '../ui/Textarea';
+import { Button } from '../ui/Button';
+
+// Validation Schema
+const teamSchema = z.object({
+    name: z.string().min(2, 'Nome é obrigatório'),
+    role: z.string().min(2, 'Cargo é obrigatório'),
+    department: z.string().min(2, 'Departamento é obrigatório'),
+    bio: z.string().min(10, 'A biografia deve ser detalhada'),
+    photoUrl: z.string().url('URL da foto inválida').or(z.string().length(0)), // Allow empty string or valid URL
+    displayOrder: z.coerce.number().min(0, 'Ordem inválida'),
+});
+
+type TeamFormData = z.infer<typeof teamSchema>;
 
 const AdminTeamTab: React.FC = () => {
     const { showToast } = useToast();
@@ -10,9 +28,24 @@ const AdminTeamTab: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [isLoadingTeam, setIsLoadingTeam] = useState(true);
     const [showTeamModal, setShowTeamModal] = useState(false);
-    const [teamForm, setTeamForm] = useState<any>({ name: '', role: '', department: '', bio: '', photoUrl: '', displayOrder: 0 });
-    const [isSavingTeam, setIsSavingTeam] = useState(false);
-    const [teamErrors, setTeamErrors] = useState<Record<string, string>>({});
+    const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
+
+    const {
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors, isSubmitting },
+    } = useForm<TeamFormData>({
+        resolver: zodResolver(teamSchema),
+        defaultValues: {
+            name: '',
+            role: '',
+            department: '',
+            bio: '',
+            photoUrl: '',
+            displayOrder: 0,
+        },
+    });
 
     const fetchTeamMembers = async () => {
         setIsLoadingTeam(true);
@@ -44,39 +77,53 @@ const AdminTeamTab: React.FC = () => {
         );
     }, [searchQuery, teamMembers]);
 
-    const handleSaveTeam = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setTeamErrors({});
+    const handleEdit = (member: any) => {
+        setSelectedMemberId(member.id);
+        reset({
+            name: member.name,
+            role: member.role,
+            department: member.department,
+            bio: member.bio,
+            photoUrl: member.photoUrl,
+            displayOrder: member.displayOrder,
+        });
+        setShowTeamModal(true);
+    };
 
-        if (!teamForm.name.trim() || !teamForm.role.trim()) {
-            setTeamErrors({ form: 'Nome e Cargo são obrigatórios' });
-            return;
-        }
+    const handleCreate = () => {
+        setSelectedMemberId(null);
+        reset({
+            name: '',
+            role: '',
+            department: '',
+            bio: '',
+            photoUrl: '',
+            displayOrder: 0,
+        });
+        setShowTeamModal(true);
+    };
 
-        setIsSavingTeam(true);
+    const onSubmit = async (data: TeamFormData) => {
         try {
             const { saveTeamMember } = await import('../../services/dataService');
 
             const sanitizedMember = {
-                ...teamForm,
-                name: teamForm.name.trim(),
-                role: teamForm.role.trim(),
-                department: teamForm.department.trim(),
-                bio: teamForm.bio.trim(),
-                photoUrl: teamForm.photoUrl.trim()
+                ...data,
+                id: selectedMemberId, // Pass ID if editing
+                name: data.name.trim(),
+                role: data.role.trim(),
+                department: data.department.trim(),
+                bio: data.bio.trim(),
+                photoUrl: data.photoUrl?.trim() || ''
             };
 
             await saveTeamMember(sanitizedMember);
             setShowTeamModal(false);
-            setTeamErrors({});
             fetchTeamMembers();
             showToast('Membro da equipa salvo com sucesso!', 'success');
         } catch (error: any) {
             console.error('Erro ao salvar membro:', error);
-            setTeamErrors({ form: error.message || 'Erro ao salvar membro. Verifique os dados e tente novamente.' });
             showToast('Erro ao salvar membro da equipa.', 'error');
-        } finally {
-            setIsSavingTeam(false);
         }
     };
 
@@ -120,10 +167,7 @@ const AdminTeamTab: React.FC = () => {
                     <m.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        onClick={() => {
-                            setTeamForm({ name: '', role: '', department: '', bio: '', photoUrl: '', displayOrder: 0 });
-                            setShowTeamModal(true);
-                        }}
+                        onClick={handleCreate}
                         className="w-full sm:w-auto px-10 py-5 bg-brand-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] shadow-[0_15px_40px_-10px_rgba(189,147,56,0.3)] hover:brightness-110 transition-all flex items-center justify-center gap-4"
                     >
                         <Plus className="w-5 h-5" />
@@ -208,10 +252,7 @@ const AdminTeamTab: React.FC = () => {
                                                     <m.button
                                                         whileHover={{ scale: 1.1, rotate: -5 }}
                                                         whileTap={{ scale: 0.9 }}
-                                                        onClick={() => {
-                                                            setTeamForm(member);
-                                                            setShowTeamModal(true);
-                                                        }}
+                                                        onClick={() => handleEdit(member)}
                                                         className="w-12 h-12 bg-white/5 border border-white/5 text-gray-400 rounded-2xl hover:bg-white/10 hover:text-white flex items-center justify-center transition-all shadow-xl group/edit"
                                                         title="Editar Operador"
                                                     >
@@ -267,7 +308,7 @@ const AdminTeamTab: React.FC = () => {
                                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-primary to-transparent" />
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <h3 className="text-4xl font-black text-white tracking-tighter uppercase mb-2">{teamForm.id ? 'Refinar Perfil' : 'Integrar Operador'}</h3>
+                                        <h3 className="text-4xl font-black text-white tracking-tighter uppercase mb-2">{selectedMemberId ? 'Refinar Perfil' : 'Integrar Operador'}</h3>
                                         <div className="flex items-center gap-3">
                                             <Crosshair className="w-4 h-4 text-brand-primary" />
                                             <p className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500">Configuração de Payload de Equipa</p>
@@ -286,113 +327,63 @@ const AdminTeamTab: React.FC = () => {
                                 </div>
                             </div>
 
-                            <form onSubmit={handleSaveTeam} className="flex-1 overflow-y-auto p-12 space-y-10 custom-scrollbar">
-                                {teamErrors.form && (
-                                    <m.div
-                                        initial={{ opacity: 0, height: 0 }}
-                                        animate={{ opacity: 1, height: 'auto' }}
-                                        className="p-6 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-4 text-red-500 text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-red-500/5"
-                                    >
-                                        <X className="w-5 h-5" />
-                                        {teamErrors.form}
-                                    </m.div>
-                                )}
+                            <form onSubmit={handleSubmit(onSubmit)} className="flex-1 overflow-y-auto p-12 space-y-10 custom-scrollbar">
 
                                 <div className="grid md:grid-cols-2 gap-10">
-                                    <div className="space-y-4">
-                                        <label htmlFor="team-name" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">NOME CODIFICADO</label>
-                                        <div className="relative">
-                                            <User className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
-                                            <input
-                                                id="team-name"
-                                                type="text"
-                                                required
-                                                value={teamForm.name}
-                                                onChange={(e) => setTeamForm({ ...teamForm, name: e.target.value })}
-                                                className="w-full pl-16 pr-8 py-5 bg-white/5 border border-white/5 rounded-2xl focus:border-brand-primary/30 focus:bg-white/10 outline-none transition-all font-black text-white uppercase tracking-widest placeholder:text-gray-800"
-                                                placeholder="OPERADOR ALFA"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-4">
-                                        <label htmlFor="team-role" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">ESPECIALIZAÇÃO</label>
-                                        <div className="relative">
-                                            <Tag className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
-                                            <input
-                                                id="team-role"
-                                                type="text"
-                                                required
-                                                value={teamForm.role}
-                                                onChange={(e) => setTeamForm({ ...teamForm, role: e.target.value })}
-                                                className="w-full pl-16 pr-8 py-5 bg-white/5 border border-white/5 rounded-2xl focus:border-brand-primary/30 focus:bg-white/10 outline-none transition-all font-black text-white uppercase tracking-widest placeholder:text-gray-800"
-                                                placeholder="ESTRATEGISTA"
-                                            />
-                                        </div>
-                                    </div>
+                                    <Input
+                                        label="NOME CODIFICADO"
+                                        placeholder="OPERADOR ALFA"
+                                        icon={<User className="w-4 h-4" />}
+                                        {...register('name')}
+                                        error={errors.name?.message}
+                                        className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
+                                    />
+                                    <Input
+                                        label="ESPECIALIZAÇÃO"
+                                        placeholder="ESTRATEGISTA"
+                                        icon={<Tag className="w-4 h-4" />}
+                                        {...register('role')}
+                                        error={errors.role?.message}
+                                        className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
+                                    />
                                 </div>
 
                                 <div className="grid md:grid-cols-2 gap-10">
-                                    <div className="space-y-4">
-                                        <label htmlFor="team-department" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">SECTOR DE ATUAÇÃO</label>
-                                        <div className="relative">
-                                            <Briefcase className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
-                                            <input
-                                                id="team-department"
-                                                type="text"
-                                                required
-                                                value={teamForm.department}
-                                                onChange={(e) => setTeamForm({ ...teamForm, department: e.target.value })}
-                                                className="w-full pl-16 pr-8 py-5 bg-white/5 border border-white/5 rounded-2xl focus:border-brand-primary/30 focus:bg-white/10 outline-none transition-all font-black text-white uppercase tracking-widest placeholder:text-gray-800"
-                                                placeholder="NÚCLEO CENTRAL"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-4">
-                                        <label htmlFor="team-order" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">NÍVEL DE ACESSO</label>
-                                        <div className="relative">
-                                            <Hash className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
-                                            <input
-                                                id="team-order"
-                                                type="number"
-                                                required
-                                                value={teamForm.displayOrder || 0}
-                                                onChange={(e) => setTeamForm({ ...teamForm, displayOrder: parseInt(e.target.value) })}
-                                                className="w-full pl-16 pr-8 py-5 bg-white/5 border border-white/5 rounded-2xl focus:border-brand-primary/30 focus:bg-white/10 outline-none transition-all font-black text-white uppercase tracking-widest shadow-inner"
-                                            />
-                                        </div>
-                                    </div>
+                                    <Input
+                                        label="SECTOR DE ATUAÇÃO"
+                                        placeholder="NÚCLEO CENTRAL"
+                                        icon={<Briefcase className="w-4 h-4" />}
+                                        {...register('department')}
+                                        error={errors.department?.message}
+                                        className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
+                                    />
+                                    <Input
+                                        type="number"
+                                        label="NÍVEL DE ACESSO"
+                                        icon={<Hash className="w-4 h-4" />}
+                                        {...register('displayOrder')}
+                                        error={errors.displayOrder?.message}
+                                        className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
+                                    />
                                 </div>
 
-                                <div className="space-y-4">
-                                    <label htmlFor="team-photo" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">BIOMETRIC ASSET (FOTO URL)</label>
-                                    <div className="relative">
-                                        <ImageIcon className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
-                                        <input
-                                            id="team-photo"
-                                            type="url"
-                                            required
-                                            value={teamForm.photoUrl}
-                                            onChange={(e) => setTeamForm({ ...teamForm, photoUrl: e.target.value })}
-                                            className="w-full pl-16 pr-8 py-5 bg-white/5 border border-white/5 rounded-2xl focus:border-brand-primary/30 focus:bg-white/10 outline-none transition-all text-[11px] font-black text-gray-400 uppercase tracking-widest"
-                                            placeholder="HTTPS://..."
-                                        />
-                                    </div>
-                                </div>
+                                <Input
+                                    label="BIOMETRIC ASSET (FOTO URL)"
+                                    placeholder="HTTPS://..."
+                                    icon={<ImageIcon className="w-4 h-4" />}
+                                    {...register('photoUrl')}
+                                    error={errors.photoUrl?.message}
+                                    className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
+                                />
 
-                                <div className="space-y-4">
-                                    <label htmlFor="team-bio" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">DOSSIER TÉCNICO (BIO)</label>
-                                    <div className="relative">
-                                        <FileText className="absolute left-6 top-8 w-4 h-4 text-gray-600" />
-                                        <textarea
-                                            id="team-bio"
-                                            required
-                                            value={teamForm.bio}
-                                            onChange={(e) => setTeamForm({ ...teamForm, bio: e.target.value })}
-                                            className="w-full pl-16 pr-8 py-8 bg-white/5 border border-white/5 rounded-[2.5rem] focus:border-brand-primary/30 focus:bg-white/10 outline-none transition-all h-48 resize-none font-medium text-gray-400 leading-relaxed italic uppercase tracking-wider"
-                                            placeholder="REGISTO DE TRAJECTÓRIA E IMPACTO..."
-                                        />
-                                    </div>
-                                </div>
+                                <Textarea
+                                    label="DOSSIER TÉCNICO (BIO)"
+                                    placeholder="REGISTO DE TRAJECTÓRIA E IMPACTO..."
+                                    rows={5}
+                                    {...register('bio')}
+                                    error={errors.bio?.message}
+                                    className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
+                                />
                             </form>
 
                             <div className="p-12 border-t border-white/5 bg-white/[0.01] flex flex-col sm:flex-row gap-6">
@@ -403,22 +394,15 @@ const AdminTeamTab: React.FC = () => {
                                 >
                                     ABORTAR
                                 </button>
-                                <m.button
-                                    whileHover={{ scale: 1.02, filter: 'brightness(1.1)' }}
-                                    whileTap={{ scale: 0.98 }}
-                                    onClick={handleSaveTeam}
-                                    disabled={isSavingTeam}
-                                    className="flex-[1.5] py-6 px-12 bg-brand-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] shadow-[0_20px_50px_-15px_rgba(189,147,56,0.4)] transition-all flex items-center justify-center gap-4"
+                                <Button
+                                    onClick={handleSubmit(onSubmit)}
+                                    isLoading={isSubmitting}
+                                    disabled={isSubmitting}
+                                    className="flex-[1.5] py-6 px-12"
+                                    leftIcon={!isSubmitting && <Save className="w-5 h-5" />}
                                 >
-                                    {isSavingTeam ? (
-                                        <Loader2 className="w-5 h-5 animate-spin" />
-                                    ) : (
-                                        <>
-                                            <Save className="w-5 h-5 shadow-inner" />
-                                            <span>EFECTUAR REGISTO</span>
-                                        </>
-                                    )}
-                                </m.button>
+                                    EFECTUAR REGISTO
+                                </Button>
                             </div>
                         </m.div>
                     </div>

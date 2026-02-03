@@ -1,7 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { motion as m, AnimatePresence } from 'framer-motion';
-import { Plus, Edit, Trash2, Loader2, Save, X, Search, Briefcase, DollarSign, Hash, List, Tag, Zap, Cpu } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Briefcase, DollarSign, Hash, List, Tag, Zap, Cpu, Save, X, Loader2 } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { useToast } from '../Toast';
+import { Input } from '../ui/Input';
+import { Textarea } from '../ui/Textarea';
+import { Button } from '../ui/Button';
+
+// Validation Schema
+const serviceSchema = z.object({
+    title: z.string().min(2, 'Título é obrigatório'),
+    price: z.string().min(1, 'Preço é obrigatório'),
+    order: z.coerce.number().min(0, 'Ordem inválida'),
+    details: z.string().min(5, 'Especificações são necessárias'),
+});
+
+type ServiceFormData = z.infer<typeof serviceSchema>;
 
 const AdminServicesTab: React.FC = () => {
     const { showToast } = useToast();
@@ -10,9 +26,22 @@ const AdminServicesTab: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [isLoadingServices, setIsLoadingServices] = useState(true);
     const [showServiceModal, setShowServiceModal] = useState(false);
-    const [serviceForm, setServiceForm] = useState<any>({ title: '', price: '', details: [], order: 0 });
-    const [isSavingService, setIsSavingService] = useState(false);
-    const [serviceErrors, setServiceErrors] = useState<Record<string, string>>({});
+    const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
+
+    const {
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors, isSubmitting },
+    } = useForm<ServiceFormData>({
+        resolver: zodResolver(serviceSchema),
+        defaultValues: {
+            title: '',
+            price: '',
+            order: 0,
+            details: '',
+        },
+    });
 
     const fetchServices = async () => {
         setIsLoadingServices(true);
@@ -43,27 +72,42 @@ const AdminServicesTab: React.FC = () => {
         );
     }, [searchQuery, editorialServices]);
 
-    const handleSaveService = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setServiceErrors({});
+    const handleCreate = () => {
+        setSelectedServiceId(null);
+        reset({
+            title: '',
+            price: '',
+            order: 0,
+            details: '',
+        });
+        setShowServiceModal(true);
+    };
 
-        if (!serviceForm.title.trim()) {
-            setServiceErrors({ form: 'O título do serviço é obrigatório.' });
-            return;
-        }
+    const handleEdit = (service: any) => {
+        setSelectedServiceId(service.id);
+        reset({
+            title: service.title,
+            price: service.price.toString(),
+            order: service.order,
+            details: Array.isArray(service.details) ? service.details.join('\n') : service.details,
+        });
+        setShowServiceModal(true);
+    };
 
-        setIsSavingService(true);
+    const onSubmit = async (data: ServiceFormData) => {
         try {
             const { saveEditorialService } = await import('../../services/dataService');
 
             const sanitizedService = {
-                ...serviceForm,
-                title: serviceForm.title.trim(),
-                price: serviceForm.price.toString().trim(),
-                details: serviceForm.details
+                ...data,
+                id: selectedServiceId,
+                title: data.title.trim(),
+                price: data.price.trim(),
+                details: data.details
+                    .split('\n')
                     .map((d: string) => d.trim())
                     .filter((d: string) => d.length > 0),
-                order: Number(serviceForm.order) || 0
+                order: Number(data.order) || 0
             };
 
             await saveEditorialService(sanitizedService);
@@ -72,10 +116,7 @@ const AdminServicesTab: React.FC = () => {
             showToast('Estratégia de serviço actualizada!', 'success');
         } catch (error: any) {
             console.error('Erro ao salvar serviço:', error);
-            setServiceErrors({ form: error.message || 'Falha na actualização do protocolo de serviço.' });
             showToast('Erro ao gravar alterações.', 'error');
-        } finally {
-            setIsSavingService(false);
         }
     };
 
@@ -119,10 +160,7 @@ const AdminServicesTab: React.FC = () => {
                     <m.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        onClick={() => {
-                            setServiceForm({ title: '', price: '', details: [], order: 0 });
-                            setShowServiceModal(true);
-                        }}
+                        onClick={handleCreate}
                         className="w-full sm:w-auto px-10 py-5 bg-brand-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] shadow-[0_15px_40px_-10px_rgba(189,147,56,0.3)] hover:brightness-110 transition-all flex items-center justify-center gap-4"
                     >
                         <Plus className="w-5 h-5" />
@@ -204,10 +242,7 @@ const AdminServicesTab: React.FC = () => {
                                                     <m.button
                                                         whileHover={{ scale: 1.1, rotate: -5 }}
                                                         whileTap={{ scale: 0.9 }}
-                                                        onClick={() => {
-                                                            setServiceForm(service);
-                                                            setShowServiceModal(true);
-                                                        }}
+                                                        onClick={() => handleEdit(service)}
                                                         className="w-12 h-12 bg-white/5 border border-white/5 text-gray-400 rounded-2xl hover:bg-white/10 hover:text-white flex items-center justify-center transition-all shadow-xl group/edit"
                                                         title="Refinar Parâmetros"
                                                     >
@@ -264,7 +299,7 @@ const AdminServicesTab: React.FC = () => {
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <h3 className="text-4xl font-black text-white tracking-tighter uppercase mb-2">
-                                            {serviceForm.id ? 'Refinar Protocolo' : 'Novo Protocolo'}
+                                            {selectedServiceId ? 'Refinar Protocolo' : 'Novo Protocolo'}
                                         </h3>
                                         <div className="flex items-center gap-3">
                                             <Zap className="w-4 h-4 text-brand-primary animate-pulse" />
@@ -284,81 +319,47 @@ const AdminServicesTab: React.FC = () => {
                                 </div>
                             </div>
 
-                            <form onSubmit={handleSaveService} className="flex-1 overflow-y-auto p-12 space-y-12 custom-scrollbar">
-                                {serviceErrors.form && (
-                                    <m.div
-                                        initial={{ opacity: 0, x: -20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        className="p-6 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-4 text-red-500 text-[10px] font-black uppercase tracking-[0.2em]"
-                                    >
-                                        <X className="w-5 h-5" />
-                                        {serviceErrors.form}
-                                    </m.div>
-                                )}
+                            <form onSubmit={handleSubmit(onSubmit)} className="flex-1 overflow-y-auto p-12 space-y-12 custom-scrollbar">
 
                                 <div className="space-y-4">
-                                    <label htmlFor="service-title" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">TITULAÇÃO DO SERVIÇO</label>
-                                    <div className="relative group">
-                                        <Tag className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-brand-primary transition-colors" />
-                                        <input
-                                            id="service-title"
-                                            type="text"
-                                            required
-                                            value={serviceForm.title}
-                                            onChange={(e) => setServiceForm({ ...serviceForm, title: e.target.value })}
-                                            className="w-full pl-16 pr-8 py-6 bg-white/5 border border-white/5 rounded-2xl focus:border-brand-primary/30 focus:bg-white/10 outline-none transition-all font-black text-white uppercase tracking-widest text-lg placeholder:text-gray-800"
-                                            placeholder="EX: DESIGN EDITORIAL AVANÇADO"
-                                        />
-                                    </div>
+                                    <Input
+                                        label="TITULAÇÃO DO SERVIÇO"
+                                        placeholder="EX: DESIGN EDITORIAL AVANÇADO"
+                                        icon={<Tag className="w-4 h-4" />}
+                                        {...register('title')}
+                                        error={errors.title?.message}
+                                        className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
+                                    />
                                 </div>
 
                                 <div className="grid md:grid-cols-2 gap-10">
-                                    <div className="space-y-4">
-                                        <label htmlFor="service-price" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">INVESTIMENTO BASE</label>
-                                        <div className="relative group">
-                                            <DollarSign className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-brand-primary transition-colors" />
-                                            <input
-                                                id="service-price"
-                                                type="text"
-                                                required
-                                                value={serviceForm.price}
-                                                onChange={(e) => setServiceForm({ ...serviceForm, price: e.target.value })}
-                                                className="w-full pl-16 pr-8 py-6 bg-white/5 border border-white/5 rounded-2xl focus:border-brand-primary/30 focus:bg-white/10 outline-none transition-all font-black text-white uppercase tracking-widest placeholder:text-gray-800"
-                                                placeholder="EX: 45.000 KZ"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-4">
-                                        <label htmlFor="service-order" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">SEQUÊNCIA DE EXIBIÇÃO</label>
-                                        <div className="relative group">
-                                            <Hash className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-brand-primary transition-colors" />
-                                            <input
-                                                id="service-order"
-                                                type="number"
-                                                required
-                                                value={serviceForm.order}
-                                                onChange={(e) => setServiceForm({ ...serviceForm, order: parseInt(e.target.value) })}
-                                                className="w-full pl-16 pr-8 py-6 bg-white/5 border border-white/5 rounded-2xl focus:border-brand-primary/30 focus:bg-white/10 outline-none transition-all font-black text-white uppercase tracking-widest"
-                                            />
-                                        </div>
-                                    </div>
+                                    <Input
+                                        label="INVESTIMENTO BASE"
+                                        placeholder="EX: 45.000 KZ"
+                                        icon={<DollarSign className="w-4 h-4" />}
+                                        {...register('price')}
+                                        error={errors.price?.message}
+                                        className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
+                                    />
+                                    <Input
+                                        type="number"
+                                        label="SEQUÊNCIA DE EXIBIÇÃO"
+                                        icon={<Hash className="w-4 h-4" />}
+                                        {...register('order')}
+                                        error={errors.order?.message}
+                                        className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
+                                    />
                                 </div>
 
                                 <div className="space-y-4">
-                                    <label htmlFor="service-details" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">
-                                        ESPECIFICAÇÕES TÉCNICAS (LINHA A LINHA)
-                                    </label>
-                                    <div className="relative group">
-                                        <List className="absolute left-6 top-8 w-4 h-4 text-gray-600 group-focus-within:text-brand-primary transition-colors" />
-                                        <textarea
-                                            id="service-details"
-                                            required
-                                            value={serviceForm.details.join('\n')}
-                                            onChange={(e) => setServiceForm({ ...serviceForm, details: e.target.value.split('\n') })}
-                                            className="w-full pl-16 pr-8 py-8 bg-white/5 border border-white/5 rounded-[2.5rem] focus:border-brand-primary/30 focus:bg-white/10 outline-none transition-all h-56 resize-none font-medium text-gray-400 leading-relaxed italic uppercase tracking-wider custom-scrollbar"
-                                            placeholder="EX:&#10;REVISÃO ORTOGRÁFICA&#10;DIAGRAMAÇÃO DE CAPA&#10;REGISTO DE ISBN"
-                                        />
-                                    </div>
+                                    <Textarea
+                                        label="ESPECIFICAÇÕES TÉCNICAS (LINHA A LINHA)"
+                                        placeholder="EX:&#10;REVISÃO ORTOGRÁFICA&#10;DIAGRAMAÇÃO DE CAPA&#10;REGISTO DE ISBN"
+                                        rows={8}
+                                        {...register('details')}
+                                        error={errors.details?.message}
+                                        className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800 custom-scrollbar"
+                                    />
                                 </div>
                             </form>
 
@@ -370,22 +371,15 @@ const AdminServicesTab: React.FC = () => {
                                 >
                                     ABORTAR
                                 </button>
-                                <m.button
-                                    whileHover={{ scale: 1.02, filter: 'brightness(1.1)' }}
-                                    whileTap={{ scale: 0.98 }}
-                                    onClick={handleSaveService}
-                                    disabled={isSavingService}
-                                    className="flex-[1.5] py-6 px-12 bg-brand-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] shadow-[0_20px_50px_-15px_rgba(189,147,56,0.4)] transition-all flex items-center justify-center gap-4"
+                                <Button
+                                    onClick={handleSubmit(onSubmit)}
+                                    isLoading={isSubmitting}
+                                    disabled={isSubmitting}
+                                    className="flex-[1.5] py-6 px-12"
+                                    leftIcon={!isSubmitting && <Save className="w-5 h-5" />}
                                 >
-                                    {isSavingService ? (
-                                        <Loader2 className="w-5 h-5 animate-spin" />
-                                    ) : (
-                                        <>
-                                            <Save className="w-5 h-5" />
-                                            <span>REGISTAR PROTOCOLO</span>
-                                        </>
-                                    )}
-                                </m.button>
+                                    REGISTAR PROTOCOLO
+                                </Button>
                             </div>
                         </m.div>
                     </div>

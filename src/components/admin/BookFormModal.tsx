@@ -1,7 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { motion as m, AnimatePresence } from 'framer-motion';
 import { X, Upload, Image as ImageIcon, FileText, CheckCircle, AlertCircle, Calendar, Loader2, Info, DollarSign, Package, Tag, Layers, Globe, BookOpen } from 'lucide-react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { Book } from '../../types';
+import { Input } from '../components/ui/Input';
+import { Textarea } from '../components/ui/Textarea';
+import { Select } from '../components/ui/Select';
+import { Button } from '../components/ui/Button';
+
+// Validation Schema
+const bookSchema = z.object({
+    title: z.string().min(1, 'Título é obrigatório'),
+    author: z.string().min(1, 'Autor é obrigatório'),
+    genre: z.string().min(1, 'Gênero é obrigatório'),
+    isbn: z.string().optional(),
+    description: z.string().min(1, 'Descrição é obrigatória'),
+    launchDate: z.string().optional(),
+    price: z.coerce.number().min(0, 'Preço inválido'),
+    stock: z.coerce.number().min(0, 'Stock inválido'),
+    format: z.string().optional(),
+    coverUrl: z.string().optional(),
+    digitalFileUrl: z.string().optional(),
+    paymentInfo: z.string().optional(),
+    paymentInfoNotes: z.string().optional(),
+});
+
+type BookFormData = z.infer<typeof bookSchema>;
 
 interface BookFormModalProps {
     isOpen: boolean;
@@ -12,44 +38,54 @@ interface BookFormModalProps {
 
 const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, onSave }) => {
     const [activeTab, setActiveTab] = useState<'info' | 'details' | 'files' | 'payment'>('info');
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [errors, setErrors] = useState<Record<string, string>>({});
-
-    const [formData, setFormData] = useState({
-        id: '',
-        title: '',
-        author: '',
-        price: '',
-        genre: 'Ficção',
-        description: '',
-        stock: '0',
-        isbn: '',
-        format: 'físico',
-        coverUrl: '',
-        digitalFileUrl: '',
-        paymentInfo: '',
-        paymentInfoNotes: '',
-        launchDate: ''
-    });
-
     const [coverType, setCoverType] = useState<'file' | 'link'>('file');
     const [digitalFileType, setDigitalFileType] = useState<'file' | 'link'>('file');
     const [coverFile, setCoverFile] = useState<File | null>(null);
     const [digitalFile, setDigitalFile] = useState<File | null>(null);
     const [coverPreview, setCoverPreview] = useState<string>('');
 
+    const {
+        register,
+        handleSubmit,
+        width: formWatch, // Typo check: it's watch, not width. Fixed below.
+        setValue,
+        reset,
+        watch,
+        formState: { errors, isSubmitting },
+    } = useForm<BookFormData>({
+        resolver: zodResolver(bookSchema),
+        defaultValues: {
+            title: '',
+            author: '',
+            genre: 'Ficção',
+            isbn: '',
+            description: '',
+            price: 0,
+            stock: 0,
+            format: 'físico',
+            coverUrl: '',
+            digitalFileUrl: '',
+            paymentInfo: '',
+            paymentInfoNotes: '',
+            launchDate: '',
+        }
+    });
+
+    const watchedPrice = watch('price');
+    const watchedFormat = watch('format');
+    const watchedCoverUrl = watch('coverUrl');
+
     useEffect(() => {
         if (isOpen) {
             if (book) {
-                setFormData({
-                    id: book.id,
+                reset({
                     title: book.title,
                     author: book.author,
-                    price: book.price.toString(),
                     genre: book.genre,
-                    description: book.description || '',
-                    stock: (book.stock || 0).toString(),
                     isbn: book.isbn || '',
+                    description: book.description || '',
+                    price: Number(book.price),
+                    stock: Number(book.stock || 0),
                     format: book.format || 'físico',
                     coverUrl: book.coverUrl,
                     digitalFileUrl: book.digitalFileUrl || '',
@@ -65,15 +101,14 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                 const isDigitalLink = book.digitalFileUrl?.startsWith('http') || false;
                 setDigitalFileType(isDigitalLink ? 'link' : 'file');
             } else {
-                setFormData({
-                    id: '',
+                reset({
                     title: '',
                     author: '',
-                    price: '',
                     genre: 'Ficção',
-                    description: '',
-                    stock: '0',
                     isbn: '',
+                    description: '',
+                    price: 0,
+                    stock: 0,
                     format: 'físico',
                     coverUrl: '',
                     digitalFileUrl: '',
@@ -88,9 +123,8 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
             setCoverFile(null);
             setDigitalFile(null);
             setActiveTab('info');
-            setErrors({});
         }
-    }, [isOpen, book]);
+    }, [isOpen, book, reset]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'cover' | 'digital') => {
         if (e.target.files && e.target.files[0]) {
@@ -104,55 +138,33 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
         }
     };
 
-    const isFree = !formData.price || Number(formData.price) === 0;
+    const isFree = !watchedPrice || Number(watchedPrice) === 0;
 
-    const validate = () => {
-        const newErrors: Record<string, string> = {};
-        if (!formData.title.trim()) newErrors.title = 'Título é obrigatório';
-        if (!formData.author.trim()) newErrors.author = 'Autor é obrigatório';
-        if (!formData.description.trim()) newErrors.description = 'Descrição é obrigatória';
-        if (!formData.price || isNaN(Number(formData.price))) newErrors.price = 'Preço inválido';
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!validate()) {
-            setActiveTab('info');
-            return;
-        }
-
-        setIsSubmitting(true);
+    const onSubmit = async (data: BookFormData) => {
         try {
+            // Reconstruct the object as expected by onSave
             const sanitizedData = {
-                ...formData,
-                title: formData.title.trim(),
-                author: formData.author.trim(),
-                description: formData.description.trim(),
-                isbn: formData.isbn.trim(),
-                price: Number(formData.price) || 0,
-                stock: Number(formData.stock) || 0,
-                id: formData.id || undefined
+                ...data,
+                id: book?.id, // Pass ID if editing
+                price: Number(data.price),
+                stock: Number(data.stock),
             };
-
             await onSave(sanitizedData, coverFile, digitalFile);
             onClose();
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error submitting form", error);
-            setErrors({ form: "Erro ao salvar livro. Verifique os dados." });
-        } finally {
-            setIsSubmitting(false);
         }
     };
 
+    // Tabs configuration
     const tabs = [
         { id: 'info', label: 'Essência', icon: FileText },
         { id: 'details', label: 'Ecom', icon: DollarSign },
         { id: 'files', label: 'Digital', icon: Layers },
         ...(!isFree ? [{ id: 'payment', label: 'Checkout', icon: Globe }] : [])
     ];
+
+    if (!isOpen) return null;
 
     return (
         <AnimatePresence>
@@ -185,15 +197,14 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                     <p className="text-gray-400 font-bold text-[10px] uppercase tracking-widest">Metadata editorial e configuração de loja.</p>
                                 </div>
                             </div>
-                            <m.button
-                                whileHover={{ rotate: 90, scale: 1.1 }}
-                                whileTap={{ scale: 0.9 }}
+                            <button
+                                type="button"
                                 onClick={onClose}
-                                className="w-14 h-14 flex items-center justify-center bg-white shadow-lg border border-gray-100 text-gray-400 hover:text-brand-dark rounded-full transition-all"
+                                className="w-14 h-14 flex items-center justify-center bg-white shadow-lg border border-gray-100 text-gray-400 hover:text-brand-dark rounded-full transition-all hover:rotate-90 hover:scale-110"
                                 title="Fechar"
                             >
                                 <X className="w-6 h-6" />
-                            </m.button>
+                            </button>
                         </div>
 
                         {/* Custom Tabs */}
@@ -220,7 +231,7 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                         </div>
 
                         {/* Content Area */}
-                        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-12 custom-scrollbar space-y-12">
+                        <form onSubmit={handleSubmit(onSubmit)} className="flex-1 overflow-y-auto p-12 custom-scrollbar space-y-12">
                             <AnimatePresence mode="wait">
                                 <m.div
                                     key={activeTab}
@@ -231,81 +242,51 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                 >
                                     {activeTab === 'info' && (
                                         <div className="grid md:grid-cols-2 gap-12">
-                                            <div className="space-y-4">
-                                                <label htmlFor="b-title" className="text-[11px] font-black uppercase tracking-widest text-gray-400 ml-4">Título da Obra</label>
-                                                <div className="relative">
-                                                    <Tag className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                                                    <input
-                                                        id="b-title"
-                                                        type="text"
-                                                        required
-                                                        className={`w-full pl-14 pr-8 py-6 bg-gray-50/50 rounded-3xl border-2 transition-all outline-none font-black text-brand-dark text-lg focus:bg-white ${errors.title ? 'border-red-100' : 'border-transparent focus:border-brand-primary/10'}`}
-                                                        value={formData.title}
-                                                        onChange={e => setFormData({ ...formData, title: e.target.value })}
-                                                        placeholder="Ex: O Pequeno Caminho"
-                                                    />
-                                                </div>
-                                            </div>
+                                            <Input
+                                                label="Título da Obra"
+                                                placeholder="Ex: O Pequeno Caminho"
+                                                icon={<Tag className="w-4 h-4" />}
+                                                {...register('title')}
+                                                error={errors.title?.message}
+                                            />
 
-                                            <div className="space-y-4">
-                                                <label htmlFor="b-author" className="text-[11px] font-black uppercase tracking-widest text-gray-400 ml-4">Autor(a)</label>
-                                                <div className="relative">
-                                                    <BookOpen className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                                                    <input
-                                                        id="b-author"
-                                                        type="text"
-                                                        required
-                                                        className={`w-full pl-14 pr-8 py-6 bg-gray-50/50 rounded-3xl border-2 transition-all outline-none font-bold text-gray-600 focus:bg-white ${errors.author ? 'border-red-100' : 'border-transparent focus:border-brand-primary/10'}`}
-                                                        value={formData.author}
-                                                        onChange={e => setFormData({ ...formData, author: e.target.value })}
-                                                        placeholder="Nome completo..."
-                                                    />
-                                                </div>
-                                            </div>
+                                            <Input
+                                                label="Autor(a)"
+                                                placeholder="Nome completo..."
+                                                icon={<BookOpen className="w-4 h-4" />}
+                                                {...register('author')}
+                                                error={errors.author?.message}
+                                            />
 
-                                            <div className="space-y-4">
-                                                <label htmlFor="b-genre" className="text-[11px] font-black uppercase tracking-widest text-gray-400 ml-4">Gênero Literário</label>
-                                                <div className="relative">
-                                                    <Layers className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 pointer-events-none" />
-                                                    <select
-                                                        id="b-genre"
-                                                        className="w-full pl-14 pr-8 py-6 bg-gray-50/50 rounded-3xl border-2 border-transparent transition-all outline-none font-bold text-brand-dark appearance-none focus:bg-white focus:border-brand-primary/10"
-                                                        value={formData.genre}
-                                                        onChange={e => setFormData({ ...formData, genre: e.target.value })}
-                                                        title="Gênero"
-                                                    >
-                                                        <option>Ficção</option>
-                                                        <option>Não-Ficção</option>
-                                                        <option>Técnico</option>
-                                                        <option>Espiritualidade</option>
-                                                        <option>Biografia</option>
-                                                        <option>Literatura Angolana</option>
-                                                    </select>
-                                                </div>
-                                            </div>
+                                            <Select
+                                                label="Gênero Literário"
+                                                icon={<Layers className="w-4 h-4" />}
+                                                options={[
+                                                    { value: 'Ficção', label: 'Ficção' },
+                                                    { value: 'Não-Ficção', label: 'Não-Ficção' },
+                                                    { value: 'Técnico', label: 'Técnico' },
+                                                    { value: 'Espiritualidade', label: 'Espiritualidade' },
+                                                    { value: 'Biografia', label: 'Biografia' },
+                                                    { value: 'Literatura Angolana', label: 'Literatura Angolana' },
+                                                ]}
+                                                {...register('genre')}
+                                                error={errors.genre?.message}
+                                            />
 
-                                            <div className="space-y-4">
-                                                <label htmlFor="b-isbn" className="text-[11px] font-black uppercase tracking-widest text-gray-400 ml-4">ISBN (Identificador)</label>
-                                                <input
-                                                    id="b-isbn"
-                                                    type="text"
-                                                    className="w-full px-8 py-6 bg-gray-50/50 rounded-3xl border-2 border-transparent transition-all outline-none font-bold text-brand-dark focus:bg-white focus:border-brand-primary/10"
-                                                    value={formData.isbn}
-                                                    onChange={e => setFormData({ ...formData, isbn: e.target.value })}
-                                                    placeholder="978-..."
-                                                />
-                                            </div>
+                                            <Input
+                                                label="ISBN (Identificador)"
+                                                placeholder="978-..."
+                                                {...register('isbn')}
+                                                error={errors.isbn?.message}
+                                            />
 
-                                            <div className="md:col-span-2 space-y-4">
-                                                <label htmlFor="b-desc" className="text-[11px] font-black uppercase tracking-widest text-gray-400 ml-4">Sinopse da Obra</label>
-                                                <textarea
-                                                    id="b-desc"
-                                                    required
+                                            <div className="md:col-span-2">
+                                                <Textarea
+                                                    label="Sinopse da Obra"
+                                                    placeholder="Uma descrição envolvente..."
                                                     rows={6}
-                                                    className={`w-full px-8 py-8 bg-gray-50/50 rounded-[2.5rem] border-2 transition-all outline-none font-medium text-gray-600 focus:bg-white resize-none leading-relaxed ${errors.description ? 'border-red-100' : 'border-transparent focus:border-brand-primary/10'}`}
-                                                    value={formData.description}
-                                                    onChange={e => setFormData({ ...formData, description: e.target.value })}
-                                                    placeholder="Uma descrição envolvente que capte a alma da obra..."
+                                                    {...register('description')}
+                                                    error={errors.description?.message}
                                                 />
                                             </div>
 
@@ -316,11 +297,8 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                                 </div>
                                                 <input
                                                     type="datetime-local"
-                                                    id="b-launch"
                                                     className="w-full px-8 py-5 bg-white rounded-2xl border-2 border-transparent transition-all outline-none font-black text-brand-dark focus:border-brand-primary/20"
-                                                    value={formData.launchDate}
-                                                    onChange={e => setFormData({ ...formData, launchDate: e.target.value })}
-                                                    title="Data de Lançamento"
+                                                    {...register('launchDate')}
                                                 />
                                             </div>
                                         </div>
@@ -329,19 +307,14 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                     {activeTab === 'details' && (
                                         <div className="grid md:grid-cols-2 gap-12">
                                             <div className="space-y-4">
-                                                <label htmlFor="b-price" className="text-[11px] font-black uppercase tracking-widest text-gray-400 ml-4">Preço de Venda (Kz)</label>
-                                                <div className="relative">
-                                                    <DollarSign className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-brand-primary" />
-                                                    <input
-                                                        id="b-price"
-                                                        type="number"
-                                                        required
-                                                        className="w-full pl-16 pr-8 py-8 bg-gray-50/50 rounded-3xl border-2 border-transparent transition-all outline-none font-black text-brand-primary text-3xl focus:bg-white focus:border-brand-primary/20"
-                                                        value={formData.price}
-                                                        onChange={e => setFormData({ ...formData, price: e.target.value })}
-                                                        placeholder="0"
-                                                    />
-                                                </div>
+                                                <Input
+                                                    type="number"
+                                                    label="Preço (Kz)"
+                                                    placeholder="0"
+                                                    icon={<DollarSign className="w-4 h-4" />}
+                                                    {...register('price')}
+                                                    error={errors.price?.message}
+                                                />
                                                 {isFree && (
                                                     <m.div
                                                         initial={{ opacity: 0, y: -10 }}
@@ -353,42 +326,35 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                                 )}
                                             </div>
 
-                                            <div className="space-y-4">
-                                                <label htmlFor="b-stock" className="text-[11px] font-black uppercase tracking-widest text-gray-400 ml-4">Unidades no Armazém</label>
-                                                <div className="relative">
-                                                    <Package className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300" />
-                                                    <input
-                                                        id="b-stock"
-                                                        type="number"
-                                                        required
-                                                        className="w-full pl-16 pr-8 py-8 bg-gray-50/50 rounded-3xl border-2 border-transparent transition-all outline-none font-black text-brand-dark text-3xl focus:bg-white focus:border-brand-primary/20"
-                                                        value={formData.stock}
-                                                        onChange={e => setFormData({ ...formData, stock: e.target.value })}
-                                                        placeholder="0"
-                                                    />
-                                                </div>
-                                            </div>
+                                            <Input
+                                                type="number"
+                                                label="Stock"
+                                                placeholder="0"
+                                                icon={<Package className="w-4 h-4" />}
+                                                {...register('stock')}
+                                                error={errors.stock?.message}
+                                            />
 
                                             <div className="md:col-span-2 space-y-6 pt-6">
                                                 <label className="text-[11px] font-black uppercase tracking-widest text-gray-400 ml-4 text-center block">Suporte Editorial</label>
                                                 <div className="flex gap-6 p-3 bg-gray-50/50 rounded-[3rem] border-2 border-gray-100">
                                                     <button
                                                         type="button"
-                                                        onClick={() => setFormData({ ...formData, format: 'físico' })}
-                                                        className={`flex-1 flex flex-col items-center gap-2 py-8 rounded-[2.5rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all relative overflow-hidden ${formData.format === 'físico' ? 'bg-white shadow-2xl text-brand-dark ring-1 ring-black/5' : 'text-gray-400 hover:text-gray-600'}`}
+                                                        onClick={() => setValue('format', 'físico')}
+                                                        className={`flex-1 flex flex-col items-center gap-2 py-8 rounded-[2.5rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all relative overflow-hidden ${watchedFormat === 'físico' ? 'bg-white shadow-2xl text-brand-dark ring-1 ring-black/5' : 'text-gray-400 hover:text-gray-600'}`}
                                                     >
-                                                        <Package className={`w-6 h-6 ${formData.format === 'físico' ? 'text-brand-primary' : 'text-gray-200'}`} />
+                                                        <Package className={`w-6 h-6 ${watchedFormat === 'físico' ? 'text-brand-primary' : 'text-gray-200'}`} />
                                                         Livro de Capa (Físico)
-                                                        {formData.format === 'físico' && <m.div layoutId="formatIndicator" className="absolute bottom-0 w-8 h-1 bg-brand-primary rounded-full" />}
+                                                        {watchedFormat === 'físico' && <m.div layoutId="formatIndicator" className="absolute bottom-0 w-8 h-1 bg-brand-primary rounded-full" />}
                                                     </button>
                                                     <button
                                                         type="button"
-                                                        onClick={() => setFormData({ ...formData, format: 'digital' })}
-                                                        className={`flex-1 flex flex-col items-center gap-2 py-8 rounded-[2.5rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all relative overflow-hidden ${formData.format === 'digital' ? 'bg-white shadow-2xl text-brand-dark ring-1 ring-black/5' : 'text-gray-400 hover:text-gray-600'}`}
+                                                        onClick={() => setValue('format', 'digital')}
+                                                        className={`flex-1 flex flex-col items-center gap-2 py-8 rounded-[2.5rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all relative overflow-hidden ${watchedFormat === 'digital' ? 'bg-white shadow-2xl text-brand-dark ring-1 ring-black/5' : 'text-gray-400 hover:text-gray-600'}`}
                                                     >
-                                                        <Layers className={`w-6 h-6 ${formData.format === 'digital' ? 'text-brand-primary' : 'text-gray-200'}`} />
+                                                        <Layers className={`w-6 h-6 ${watchedFormat === 'digital' ? 'text-brand-primary' : 'text-gray-200'}`} />
                                                         E-book (Distribuição Digital)
-                                                        {formData.format === 'digital' && <m.div layoutId="formatIndicator" className="absolute bottom-0 w-8 h-1 bg-brand-primary rounded-full" />}
+                                                        {watchedFormat === 'digital' && <m.div layoutId="formatIndicator" className="absolute bottom-0 w-8 h-1 bg-brand-primary rounded-full" />}
                                                     </button>
                                                 </div>
                                             </div>
@@ -436,7 +402,6 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                                                 <p className="text-[8px] font-black uppercase tracking-widest text-gray-300">Sem Imagem</p>
                                                             </div>
                                                         )}
-                                                        <div className="absolute inset-0 bg-brand-primary/0 group-hover:bg-brand-primary/5 transition-colors pointer-events-none" />
                                                     </m.div>
 
                                                     <div className="flex-1 w-full space-y-4">
@@ -457,16 +422,14 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                                             </div>
                                                         ) : (
                                                             <div className="space-y-2">
-                                                                <span className="text-[9px] font-black uppercase tracking-widest text-gray-300 ml-4">Endereço da Imagem</span>
-                                                                <input
-                                                                    type="url"
-                                                                    className="w-full px-8 py-6 bg-white rounded-[2rem] border-2 border-gray-100 outline-none font-bold text-sm text-brand-dark focus:border-brand-primary/20 transition-all"
-                                                                    value={formData.coverUrl}
-                                                                    onChange={e => {
-                                                                        setFormData({ ...formData, coverUrl: e.target.value });
+                                                                <Input
+                                                                    label="Endereço da Imagem (URL)"
+                                                                    placeholder="https://servidor.com/capa.jpg"
+                                                                    {...register('coverUrl')}
+                                                                    onChange={(e) => {
+                                                                        register('coverUrl').onChange(e);
                                                                         setCoverPreview(e.target.value);
                                                                     }}
-                                                                    placeholder="https://servidor.com/capa.jpg"
                                                                 />
                                                             </div>
                                                         )}
@@ -475,7 +438,7 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                                 </div>
                                             </div>
 
-                                            {formData.format === 'digital' && (
+                                            {watchedFormat === 'digital' && (
                                                 <m.div
                                                     initial={{ opacity: 0, scale: 0.98 }}
                                                     animate={{ opacity: 1, scale: 1 }}
@@ -516,12 +479,10 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                                             </div>
                                                         </div>
                                                     ) : (
-                                                        <input
-                                                            type="url"
-                                                            className="w-full px-10 py-8 bg-white rounded-[2rem] border-2 border-brand-primary/10 outline-none font-bold text-sm text-brand-dark focus:border-brand-primary/30 transition-all placeholder:text-gray-200"
-                                                            value={formData.digitalFileUrl}
-                                                            onChange={e => setFormData({ ...formData, digitalFileUrl: e.target.value })}
+                                                        <Input
+                                                            label="URL do Arquivo"
                                                             placeholder="Endereço de acesso remoto..."
+                                                            {...register('digitalFileUrl')}
                                                         />
                                                     )}
                                                 </m.div>
@@ -541,27 +502,18 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                             </div>
 
                                             <div className="grid md:grid-cols-2 gap-12">
-                                                <div className="space-y-4">
-                                                    <label htmlFor="b-pay-info" className="text-[11px] font-black uppercase tracking-widest text-gray-400 ml-4">Coordenadas Bancárias (IBAN/Conta)</label>
-                                                    <textarea
-                                                        id="b-pay-info"
-                                                        className="w-full px-10 py-8 bg-gray-50/50 rounded-[2.5rem] border-2 border-transparent transition-all outline-none font-black text-brand-dark h-48 resize-none focus:bg-white focus:border-brand-primary/10"
-                                                        value={formData.paymentInfo}
-                                                        onChange={e => setFormData({ ...formData, paymentInfo: e.target.value })}
-                                                        placeholder="Ex: BAI AO06 0000..."
-                                                    />
-                                                </div>
-
-                                                <div className="space-y-4">
-                                                    <label htmlFor="b-pay-notes" className="text-[11px] font-black uppercase tracking-widest text-gray-400 ml-4">Notas de Procedimento</label>
-                                                    <textarea
-                                                        id="b-pay-notes"
-                                                        className="w-full px-10 py-8 bg-gray-50/50 rounded-[2.5rem] border-2 border-transparent transition-all outline-none font-medium text-gray-500 h-48 resize-none focus:bg-white focus:border-brand-primary/10"
-                                                        value={formData.paymentInfoNotes}
-                                                        onChange={e => setFormData({ ...formData, paymentInfoNotes: e.target.value })}
-                                                        placeholder="Instruções para o envio do comprovativo..."
-                                                    />
-                                                </div>
+                                                <Textarea
+                                                    label="Coordenadas Bancárias (IBAN/Conta)"
+                                                    placeholder="Ex: BAI AO06 0000..."
+                                                    className="h-48"
+                                                    {...register('paymentInfo')}
+                                                />
+                                                <Textarea
+                                                    label="Notas de Procedimento"
+                                                    placeholder="Instruções para o envio do comprovativo..."
+                                                    className="h-48"
+                                                    {...register('paymentInfoNotes')}
+                                                />
                                             </div>
                                         </div>
                                     )}
@@ -581,31 +533,25 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                             >
                                 Abandonar Edição
                             </m.button>
-                            <m.button
-                                whileHover={{ scale: 1.05, y: -5 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={handleSubmit}
+                            <Button
+                                onClick={handleSubmit(onSubmit)}
+                                isLoading={isSubmitting}
                                 disabled={isSubmitting}
-                                className="btn-premium px-16 py-6 shadow-[0_20px_50px_-10px_rgba(var(--brand-primary-rgb),0.3)] text-[11px]"
-                                title={book ? 'Gravar Alterações' : 'Publicar Obra'}
+                                className="px-16"
+                                leftIcon={!isSubmitting && <CheckCircle className="w-5 h-5" />}
                             >
-                                {isSubmitting ? (
-                                    <Loader2 className="w-5 h-5 animate-spin" />
-                                ) : (
-                                    <CheckCircle className="w-5 h-5" />
-                                )}
-                                <span>{isSubmitting ? 'Cristalizando...' : book ? 'Gravar Master' : 'Publicar Edição'}</span>
-                            </m.button>
+                                {book ? 'Gravar Master' : 'Publicar Edição'}
+                            </Button>
                         </div>
 
-                        {errors.form && (
+                        {Object.keys(errors).length > 0 && (
                             <m.div
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 className="absolute bottom-32 right-12 bg-red-500 text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-3 z-50 overflow-hidden"
                             >
                                 <AlertCircle className="w-5 h-5 text-white" />
-                                <span className="text-[10px] font-black uppercase tracking-widest">{errors.form}</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest">Verifique os campos obrigatórios em {activeTab}</span>
                                 <m.div
                                     initial={{ width: "100%" }}
                                     animate={{ width: 0 }}

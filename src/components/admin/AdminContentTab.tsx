@@ -2,6 +2,25 @@ import React, { useState, useEffect } from 'react';
 import { motion as m, AnimatePresence } from 'framer-motion';
 import { Type, MessageSquare, Save, Plus, Trash2, Edit, Users, Star, Loader2, ChevronRight, Globe, Layout, Image as ImageIcon, Briefcase, FileText, CheckCircle2, X, Tag, Zap, Sparkles } from 'lucide-react';
 import { getSiteContent, saveSiteContent, getTestimonials, saveTestimonial, saveEditorialService, saveTeamMember } from '../../services/dataService';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Input } from '../ui/Input';
+import { Textarea } from '../ui/Textarea';
+import { Button } from '../ui/Button';
+
+// Validation Schema for Testimonials
+const testimonialSchema = z.object({
+    name: z.string().min(2, 'Nome é obrigatório'),
+    role: z.string().min(2, 'Cargo/Titulação é obrigatório'),
+    content: z.string().min(10, 'O testemunho deve ter conteúdo'),
+    rating: z.coerce.number().min(1).max(5),
+    photo_url: z.string().url('URL inválida').or(z.string().length(0)).optional(),
+    is_active: z.boolean().optional().default(true),
+});
+
+type TestimonialFormData = z.infer<typeof testimonialSchema>;
+
 
 const AdminContentTab: React.FC = () => {
     const [activeSubTab, setActiveSubTab] = useState<'text' | 'testimonials'>('text');
@@ -12,6 +31,32 @@ const AdminContentTab: React.FC = () => {
     const [isSaving, setIsSaving] = useState(false);
     const [lastSaved, setLastSaved] = useState<string | null>(null);
     const [isSyncing, setIsSyncing] = useState(false);
+
+    // Testimonial Form
+    const [showTestimonialModal, setShowTestimonialModal] = useState(false);
+    const [selectedTestimonialId, setSelectedTestimonialId] = useState<string | null>(null);
+
+    const {
+        register,
+        handleSubmit,
+        reset,
+        setValue,
+        watch,
+        formState: { errors, isSubmitting: isSavingTestimonial },
+    } = useForm<TestimonialFormData>({
+        resolver: zodResolver(testimonialSchema),
+        defaultValues: {
+            name: '',
+            role: '',
+            content: '',
+            rating: 5,
+            photo_url: '',
+            is_active: true,
+        },
+    });
+
+    const currentRating = watch('rating');
+
 
     const PREMIUM_DEFAULTS: Record<string, { section: string; value: any }> = {
         'home.hero.title': { section: 'home', value: "Onde a Arte" },
@@ -36,7 +81,7 @@ const AdminContentTab: React.FC = () => {
             section: 'about', value: [
                 { icon: 'BookOpen', title: 'Excelência Literária', description: 'Compromisso inabalável com a qualidade e rigor editorial em cada publicação.' },
                 { icon: 'Heart', title: 'Paixão pela Cultura', description: 'Promover e preservar a riqueza cultural angolana através da literatura.' },
-                { icon: 'Users', title: 'Valorização de Autores', description: 'Apoio integral a escritores locais, dando voz às suas histórias únicas.' },
+                { icon: 'Users', title: 'Valorização de Autores', description: 'Apoio integral a escritores locais, dando voz aos suas histórias únicas.' },
                 { icon: 'Award', title: 'Reconhecimento', description: 'Busca constante pela excelência reconhecida nacional e internacionalmente.' }
             ]
         },
@@ -109,9 +154,6 @@ const AdminContentTab: React.FC = () => {
         }
     };
 
-    // Testimonial Modal
-    const [showTestimonialModal, setShowTestimonialModal] = useState(false);
-    const [testimonialForm, setTestimonialForm] = useState<any>({ name: '', role: '', content: '', rating: 5, photo_url: '', is_active: true });
 
     useEffect(() => {
         loadData();
@@ -150,21 +192,42 @@ const AdminContentTab: React.FC = () => {
         }
     };
 
-    const handleSaveTestimonial = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleCreateTestimonial = () => {
+        setSelectedTestimonialId(null);
+        reset({
+            name: '',
+            role: '',
+            content: '',
+            rating: 5,
+            photo_url: '',
+            is_active: true,
+        });
+        setShowTestimonialModal(true);
+    };
 
-        if (!testimonialForm.name.trim() || !testimonialForm.content.trim()) {
-            return;
-        }
+    const handleEditTestimonial = (testimonial: any) => {
+        setSelectedTestimonialId(testimonial.id);
+        reset({
+            name: testimonial.name,
+            role: testimonial.role,
+            content: testimonial.content,
+            rating: testimonial.rating || 5,
+            photo_url: testimonial.photo_url || '',
+            is_active: testimonial.is_active !== false,
+        });
+        setShowTestimonialModal(true);
+    };
 
-        setIsSaving(true);
+    const onSubmitTestimonial = async (data: TestimonialFormData) => {
         try {
             const sanitizedTestimonial = {
-                ...testimonialForm,
-                name: testimonialForm.name.trim(),
-                role: testimonialForm.role.trim(),
-                content: testimonialForm.content.trim(),
-                rating: Number(testimonialForm.rating) || 5
+                ...data,
+                id: selectedTestimonialId,
+                name: data.name.trim(),
+                role: data.role.trim(),
+                content: data.content.trim(),
+                rating: Number(data.rating) || 5,
+                photo_url: data.photo_url?.trim() || ''
             };
 
             await saveTestimonial(sanitizedTestimonial);
@@ -172,8 +235,6 @@ const AdminContentTab: React.FC = () => {
             loadData();
         } catch (error) {
             console.error("Error saving testimonial:", error);
-        } finally {
-            setIsSaving(false);
         }
     };
 
@@ -220,6 +281,7 @@ const AdminContentTab: React.FC = () => {
 
     return (
         <div className="space-y-12">
+            {/* Header ... (same as before) */}
             <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-8">
                 <div className="space-y-2">
                     <div className="flex items-center gap-3">
@@ -338,6 +400,8 @@ const AdminContentTab: React.FC = () => {
                                                 </m.button>
                                             </div>
 
+                                            {/* We use standard HTML elements here for flexibility with the dynamic JSON/Text handling, 
+                                                but styled to match our premium components */}
                                             {field.type === 'textarea' || field.type === 'json' ? (
                                                 <div className="relative group/field">
                                                     <textarea
@@ -386,10 +450,7 @@ const AdminContentTab: React.FC = () => {
                             <m.button
                                 whileHover={{ scale: 1.02, filter: 'brightness(1.1)' }}
                                 whileTap={{ scale: 0.98 }}
-                                onClick={() => {
-                                    setTestimonialForm({ name: '', role: '', content: '', rating: 5, photo_url: '', is_active: true });
-                                    setShowTestimonialModal(true);
-                                }}
+                                onClick={handleCreateTestimonial}
                                 className="px-10 py-5 bg-brand-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] shadow-[0_20px_40px_-10px_rgba(189,147,56,0.3)] hover:brightness-110 transition-all flex items-center justify-center gap-4"
                             >
                                 <Plus className="w-5 h-5" />
@@ -414,10 +475,7 @@ const AdminContentTab: React.FC = () => {
                                             <m.button
                                                 whileHover={{ scale: 1.1, rotate: -5 }}
                                                 whileTap={{ scale: 0.9 }}
-                                                onClick={() => {
-                                                    setTestimonialForm(t);
-                                                    setShowTestimonialModal(true);
-                                                }}
+                                                onClick={() => handleEditTestimonial(t)}
                                                 className="p-3 bg-white/5 text-gray-400 rounded-xl opacity-0 group-hover:opacity-100 transition-all hover:bg-white/10 hover:text-white border border-white/5"
                                                 title="Editar Parâmetros"
                                             >
@@ -427,7 +485,7 @@ const AdminContentTab: React.FC = () => {
 
                                         <div className="flex gap-2 mb-8">
                                             {[...Array(5)].map((_, i) => (
-                                                <Star key={i} className={`w-4 h-4 shadow-[0_0_10px_rgba(189,147,56,0.2)] ${i < t.rating ? 'text-brand-primary fill-current' : 'text-white/5'}`} />
+                                                <Star key={i} className={`w-4 h-4 shadow-[0_0_10px_rgba(189,147,56,0.2)] ${i < (t.rating || 5) ? 'text-brand-primary fill-current' : 'text-white/5'}`} />
                                             ))}
                                         </div>
 
@@ -497,81 +555,55 @@ const AdminContentTab: React.FC = () => {
                                 </div>
                             </div>
 
-                            <form onSubmit={handleSaveTestimonial} className="flex-1 overflow-y-auto p-12 space-y-12 custom-scrollbar">
-                                <div className="grid md:grid-cols-2 gap-10">
-                                    <div className="space-y-4">
-                                        <label htmlFor="t-name" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">AUTORIA DO RELATO</label>
-                                        <div className="relative group">
-                                            <Users className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-brand-primary transition-colors" />
-                                            <input
-                                                id="t-name"
-                                                type="text"
-                                                required
-                                                value={testimonialForm.name}
-                                                onChange={(e) => setTestimonialForm({ ...testimonialForm, name: e.target.value })}
-                                                className="w-full pl-16 pr-8 py-6 bg-white/5 border border-white/5 rounded-2xl focus:border-brand-primary/30 focus:bg-white/10 outline-none transition-all font-black text-white uppercase tracking-widest text-lg placeholder:text-gray-800"
-                                                placeholder="EX: PEDRO ALVARES"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-4">
-                                        <label htmlFor="t-role" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">CARGO / TITULAÇÃO</label>
-                                        <div className="relative group">
-                                            <Tag className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-brand-primary transition-colors" />
-                                            <input
-                                                id="t-role"
-                                                type="text"
-                                                required
-                                                value={testimonialForm.role}
-                                                onChange={(e) => setTestimonialForm({ ...testimonialForm, role: e.target.value })}
-                                                className="w-full pl-16 pr-8 py-6 bg-white/5 border border-white/5 rounded-2xl focus:border-brand-primary/30 focus:bg-white/10 outline-none transition-all font-black text-white uppercase tracking-widest placeholder:text-gray-800"
-                                                placeholder="EX: LEITOR ASSÍDUO"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-4">
-                                    <label htmlFor="t-content" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">CORPO DO TESTEMUNHO</label>
-                                    <div className="relative group">
-                                        <MessageSquare className="absolute left-6 top-8 w-4 h-4 text-gray-600 group-focus-within:text-brand-primary transition-colors" />
-                                        <textarea
-                                            id="t-content"
-                                            required
-                                            value={testimonialForm.content}
-                                            onChange={(e) => setTestimonialForm({ ...testimonialForm, content: e.target.value })}
-                                            className="w-full pl-16 pr-8 py-8 bg-white/5 border border-white/5 rounded-[2.5rem] focus:border-brand-primary/30 focus:bg-white/10 outline-none transition-all h-48 resize-none font-medium text-gray-400 leading-relaxed italic uppercase tracking-wider custom-scrollbar placeholder:text-gray-800"
-                                            placeholder="DESCREVA A EXPERIÊNCIA LITERÁRIA..."
-                                        />
-                                    </div>
-                                </div>
+                            <form onSubmit={handleSubmit(onSubmitTestimonial)} className="flex-1 overflow-y-auto p-12 space-y-12 custom-scrollbar">
 
                                 <div className="grid md:grid-cols-2 gap-10">
+                                    <Input
+                                        label="AUTORIA DO RELATO"
+                                        placeholder="EX: PEDRO ALVARES"
+                                        icon={<Users className="w-4 h-4" />}
+                                        {...register('name')}
+                                        error={errors.name?.message}
+                                        className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
+                                    />
+                                    <Input
+                                        label="CARGO / TITULAÇÃO"
+                                        placeholder="EX: LEITOR ASSÍDUO"
+                                        icon={<Tag className="w-4 h-4" />}
+                                        {...register('role')}
+                                        error={errors.role?.message}
+                                        className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
+                                    />
+                                </div>
+
+                                <Textarea
+                                    label="CORPO DO TESTEMUNHO"
+                                    placeholder="DESCREVA A EXPERIÊNCIA LITERÁRIA..."
+                                    rows={5}
+                                    {...register('content')}
+                                    error={errors.content?.message}
+                                    className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
+                                />
+
+                                <div className="grid md:grid-cols-2 gap-10">
+                                    <Input
+                                        label="LOCALIZAÇÃO DA IMAGEM"
+                                        placeholder="HTTPS://..."
+                                        icon={<ImageIcon className="w-4 h-4" />}
+                                        {...register('photo_url')}
+                                        error={errors.photo_url?.message}
+                                        className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
+                                    />
                                     <div className="space-y-4">
-                                        <label htmlFor="t-photo" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">LOCALIZAÇÃO DA IMAGEM</label>
-                                        <div className="relative group">
-                                            <ImageIcon className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-brand-primary transition-colors" />
-                                            <input
-                                                id="t-photo"
-                                                type="url"
-                                                value={testimonialForm.photo_url || ''}
-                                                onChange={(e) => setTestimonialForm({ ...testimonialForm, photo_url: e.target.value })}
-                                                className="w-full pl-16 pr-8 py-6 bg-white/5 border border-white/5 rounded-2xl focus:border-brand-primary/30 focus:bg-white/10 outline-none transition-all text-[10px] font-black uppercase tracking-[0.3em] text-gray-500"
-                                                placeholder="HTTPS://..."
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-4">
-                                        <label htmlFor="t-rating" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">NÍVEL DE SATISFAÇÃO</label>
-                                        <div id="t-rating" className="flex bg-white/5 border border-white/5 p-4 rounded-2xl items-center justify-around">
+                                        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">NÍVEL DE SATISFAÇÃO</label>
+                                        <div className="flex bg-white/5 border border-white/5 p-4 rounded-[2rem] items-center justify-around h-[88px] relative top-[2px]">
                                             {[1, 2, 3, 4, 5].map((star) => (
                                                 <button
                                                     key={star}
                                                     type="button"
                                                     title={`Avaliar com ${star} estrelas`}
-                                                    aria-label={`Avaliar com ${star} estrelas`}
-                                                    onClick={() => setTestimonialForm({ ...testimonialForm, rating: star })}
-                                                    className={`p-2 transition-all transform hover:scale-125 ${testimonialForm.rating >= star ? 'text-brand-primary fill-current shadow-[0_0_15px_rgba(189,147,56,0.3)]' : 'text-gray-800'}`}
+                                                    onClick={() => setValue('rating', star)}
+                                                    className={`p-2 transition-all transform hover:scale-125 ${currentRating >= star ? 'text-brand-primary fill-current shadow-[0_0_15px_rgba(189,147,56,0.3)]' : 'text-gray-800'}`}
                                                 >
                                                     <Star className="w-6 h-6" />
                                                 </button>
@@ -589,23 +621,15 @@ const AdminContentTab: React.FC = () => {
                                 >
                                     ABORTAR
                                 </button>
-                                <m.button
-                                    whileHover={{ scale: 1.02, filter: 'brightness(1.1)' }}
-                                    whileTap={{ scale: 0.98 }}
-                                    type="submit"
-                                    onClick={handleSaveTestimonial}
-                                    disabled={isSaving}
-                                    className="flex-[1.5] py-6 px-12 bg-brand-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] shadow-[0_20px_50px_-15px_rgba(189,147,56,0.4)] transition-all flex items-center justify-center gap-4"
+                                <Button
+                                    onClick={handleSubmit(onSubmitTestimonial)}
+                                    isLoading={isSavingTestimonial}
+                                    disabled={isSavingTestimonial}
+                                    className="flex-[1.5] py-6 px-12"
+                                    leftIcon={!isSavingTestimonial && <Save className="w-5 h-5" />}
                                 >
-                                    {isSaving ? (
-                                        <Loader2 className="w-5 h-5 animate-spin" />
-                                    ) : (
-                                        <>
-                                            <Save className="w-5 h-5" />
-                                            <span>SINCRONIZAR RELATO</span>
-                                        </>
-                                    )}
-                                </m.button>
+                                    SINCRONIZAR RELATO
+                                </Button>
                             </div>
                         </m.div>
                     </div>

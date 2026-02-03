@@ -19,6 +19,7 @@ import {
 } from '../services/dataService';
 import { optimizeImageUrl } from '../components/OptimizedImage';
 import { useToast } from '../components/Toast';
+import SEO from '../components/SEO';
 
 const BookPage: React.FC<{ user?: UserType | null; onAddToCart: (book: Book) => void }> = ({ user, onAddToCart }) => {
     const { id } = useParams<{ id: string }>();
@@ -130,6 +131,12 @@ const BookPage: React.FC<{ user?: UserType | null; onAddToCart: (book: Book) => 
 
     return (
         <div className="min-h-screen bg-white font-sans text-brand-dark overflow-x-hidden">
+            <SEO
+                title={book.title}
+                description={book.description || `Detalhes da obra ${book.title} de ${book.author}`}
+                image={book.coverUrl}
+                type="book"
+            />
             {/* Nav Spacer */}
             <div className="h-20 md:h-24 bg-brand-dark"></div>
 

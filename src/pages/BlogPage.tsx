@@ -5,6 +5,7 @@ import { getBlogPosts, getBlogPostInteractions, toggleBlogPostLike, addBlogPostC
 import { BlogPost, User as UserType, BlogComment } from '../types';
 import { OptimizedImage, optimizeImageUrl } from '../components/OptimizedImage';
 import { useNavigate } from 'react-router-dom';
+import SEO from '../components/SEO';
 
 interface BlogPageProps {
     user: UserType | null;
@@ -101,6 +102,12 @@ const BlogPage: React.FC<BlogPageProps> = ({ user }) => {
 
         return (
             <div className="min-h-screen bg-white">
+                <SEO
+                    title={selectedPost.title}
+                    description={selectedPost.content.substring(0, 160)}
+                    image={selectedPost.imageUrl}
+                    type="article"
+                />
                 {/* 1. CINEMATIC SINGLE POST HEADER */}
                 <section className="relative h-[60vh] md:h-[80vh] bg-brand-dark overflow-hidden">
                     {selectedPost.imageUrl ? (
@@ -278,6 +285,10 @@ const BlogPage: React.FC<BlogPageProps> = ({ user }) => {
 
     return (
         <div className="min-h-screen bg-white">
+            <SEO
+                title="Blog & Imprensa"
+                description="Acompanhe as últimas novidades, lançamentos e críticas literárias da Editora Graça."
+            />
             {/* Nav Padding Spacer */}
             <div className="h-20 md:h-24 bg-brand-dark"></div>
 

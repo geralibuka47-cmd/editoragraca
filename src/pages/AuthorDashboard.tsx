@@ -1,37 +1,91 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Upload, Eye, CheckCircle, Clock, XCircle, User as UserIcon, Loader2, Save, Sparkles, ChevronRight, ArrowRight, CreditCard, Settings } from 'lucide-react';
+import { FileText, Upload, Eye, CheckCircle, Clock, XCircle, User as UserIcon, Loader2, Save, Sparkles, ChevronRight, ArrowRight, CreditCard, Settings, Trash2, Plus } from 'lucide-react';
 import { motion as m, AnimatePresence } from 'framer-motion';
 import { useToast } from '../components/Toast';
-import { ViewState, User } from '../types';
+import { ViewState, User, BankInfo } from '../types';
+import { useForm, useFieldArray } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Input } from '../components/ui/Input';
+import { Textarea } from '../components/ui/Textarea';
+import { Button } from '../components/ui/Button';
 
 interface AuthorDashboardProps {
     user: User | null;
 }
 
+// Schema for Manuscript Submission
+const manuscriptSchema = z.object({
+    title: z.string().min(2, 'Título é obrigatório'),
+    genre: z.string().min(1, 'Selecione um género'),
+    pages: z.coerce.number().min(1, 'Número de páginas deve ser maior que 0').optional(),
+    description: z.string().min(10, 'A sinopse deve ser detalhada'),
+    // File validation is handled separately as it's a File object, but we can validate presence
+});
+
+type ManuscriptFormData = z.infer<typeof manuscriptSchema>;
+
+// Schema for Profile Settings
+const bankAccountSchema = z.object({
+    bankName: z.string().min(1, 'Banco é obrigatório'),
+    accountNumber: z.string().min(1, 'Conta é obrigatória'),
+    iban: z.string().min(1, 'IBAN é obrigatório'),
+    isPrimary: z.boolean().default(false),
+});
+
+const profileSchema = z.object({
+    whatsappNumber: z.string().optional(),
+    paymentMethods: z.array(bankAccountSchema),
+});
+
+type ProfileFormData = z.infer<typeof profileSchema>;
+
+
 const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
     const navigate = useNavigate();
     const { showToast } = useToast();
     const [activeTab, setActiveTab] = useState<'manuscripts' | 'submit' | 'royalties' | 'banking'>('manuscripts');
-    const [bankAccounts, setBankAccounts] = useState<import('../types').BankInfo[]>(user?.paymentMethods || []);
-    const [whatsapp, setWhatsapp] = useState(user?.whatsappNumber || '');
-    const [isSaving, setIsSaving] = useState(false);
     const [manuscripts, setManuscripts] = useState<import('../types').Manuscript[]>([]);
     const [isLoadingManuscripts, setIsLoadingManuscripts] = useState(false);
     const [authorStats, setAuthorStats] = useState({ publishedBooks: 0, totalSales: 0, totalRoyalties: 0 });
     const [confirmedSales, setConfirmedSales] = useState<any[]>([]);
     const [isLoadingStats, setIsLoadingStats] = useState(false);
 
-    // Submit form state
-    const [submitLoading, setSubmitLoading] = useState(false);
-    const [submitData, setSubmitData] = useState({
-        title: '',
-        genre: '',
-        pages: '',
-        description: ''
-    });
-    const [submitErrors, setSubmitErrors] = useState<Record<string, string>>({});
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+    // Manuscript Form
+    const {
+        register: registerManuscript,
+        handleSubmit: handleSubmitManuscript,
+        reset: resetManuscript,
+        formState: { errors: manuscriptErrors, isSubmitting: isSubmittingManuscript }
+    } = useForm<ManuscriptFormData>({
+        resolver: zodResolver(manuscriptSchema)
+    });
+
+    // Profile Form
+    const {
+        register: registerProfile,
+        handleSubmit: handleSubmitProfile,
+        control: controlProfile,
+        formState: { errors: profileErrors, isSubmitting: isSubmittingProfile }
+    } = useForm<ProfileFormData>({
+        resolver: zodResolver(profileSchema),
+        defaultValues: {
+            whatsappNumber: user?.whatsappNumber || '',
+            paymentMethods: user?.paymentMethods || [],
+        }
+    });
+
+    const { fields: bankFields, append: appendBank, remove: removeBank } = useFieldArray({
+        control: controlProfile,
+        name: "paymentMethods"
+    });
+
+    // Temp state for new bank account input
+    const [newBank, setNewBank] = useState({ bankName: '', accountNumber: '', iban: '' });
+
 
     const fetchManuscripts = async () => {
         if (!user) return;
@@ -73,95 +127,75 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
         }
     }, [activeTab, user?.id]);
 
-    const handleSaveProfile = async () => {
+
+    const onSubmitManuscript = async (data: ManuscriptFormData) => {
         if (!user) return;
-        setIsSaving(true);
-        try {
-            const { saveUserProfile } = await import('../services/dataService');
-            await saveUserProfile({
-                ...user,
-                paymentMethods: bankAccounts,
-                whatsappNumber: whatsapp
-            });
-            showToast('Perfil atualizado com sucesso!', 'success');
-        } catch (error) {
-            console.error('Erro ao salvar perfil:', error);
-            showToast('Erro ao salvar alterações.', 'error');
-        } finally {
-            setIsSaving(false);
-        }
-    };
-
-    const validateManuscript = () => {
-        const errors: Record<string, string> = {};
-        if (!submitData.title.trim()) errors.title = 'Título é obrigatório';
-        if (!submitData.genre) errors.genre = 'Género é obrigatório';
-        if (!submitData.description.trim()) errors.description = 'Sinopse é obrigatória';
-        if (!selectedFile) errors.file = 'Ficheiro do manuscrito é obrigatório';
-        setSubmitErrors(errors);
-        return Object.keys(errors).length === 0;
-    };
-
-    const handleSubmitManuscript = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!user) return;
-
-        setSubmitErrors({});
-
-        if (!validateManuscript()) {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (!selectedFile) {
+            showToast('Por favor, carregue o ficheiro do manuscrito.', 'error');
             return;
         }
 
-        setSubmitLoading(true);
         try {
             const { uploadManuscriptFile } = await import('../services/storageService');
             const { createManuscript } = await import('../services/dataService');
 
-            const { fileUrl } = await uploadManuscriptFile(selectedFile as File);
+            const { fileUrl } = await uploadManuscriptFile(selectedFile);
 
             await createManuscript({
                 authorId: user.id,
                 authorName: user.name,
-                title: submitData.title.trim(),
-                genre: submitData.genre,
-                pages: submitData.pages ? parseInt(submitData.pages) : undefined,
-                description: submitData.description.trim(),
+                title: data.title.trim(),
+                genre: data.genre,
+                pages: data.pages,
+                description: data.description.trim(),
                 fileUrl: fileUrl,
-                fileName: (selectedFile as File).name,
+                fileName: selectedFile.name,
                 status: 'pending',
                 submittedDate: new Date().toISOString()
             });
 
             showToast('Manuscrito submetido com sucesso! A nossa equipa irá analisar e entrará em contacto brevemente.', 'success');
-            setSubmitData({ title: '', genre: '', pages: '', description: '' });
+            resetManuscript();
             setSelectedFile(null);
-            setSubmitErrors({});
             setActiveTab('manuscripts');
         } catch (error: any) {
             console.error('Erro ao submeter:', error);
-            setSubmitErrors({
-                form: error.message || 'Ocorreu um erro ao submeter o manuscrito. Por favor, verifique os dados e tente novamente.'
-            });
             showToast('Erro ao submeter manuscrito.', 'error');
-        } finally {
-            setSubmitLoading(false);
         }
     };
+
+    const onSubmitProfile = async (data: ProfileFormData) => {
+        if (!user) return;
+        try {
+            const { saveUserProfile } = await import('../services/dataService');
+            await saveUserProfile({
+                ...user,
+                paymentMethods: data.paymentMethods as BankInfo[],
+                whatsappNumber: data.whatsappNumber || ''
+            });
+            showToast('Perfil atualizado com sucesso!', 'success');
+        } catch (error) {
+            console.error('Erro ao salvar perfil:', error);
+            showToast('Erro ao salvar alterações.', 'error');
+        }
+    };
+
+    // Helper to add bank account from the quick/dumb inputs to the form array
+    const handleAddBank = () => {
+        if (newBank.bankName && newBank.accountNumber && newBank.iban) {
+            appendBank({ ...newBank, isPrimary: false });
+            setNewBank({ bankName: '', accountNumber: '', iban: '' });
+        } else {
+            showToast('Preencha todos os campos bancários', 'error');
+        }
+    };
+
 
     const getStatusColor = (status: 'approved' | 'pending' | 'rejected') => {
         switch (status) {
             case 'approved': return 'text-green-600 bg-green-100';
             case 'pending': return 'text-yellow-600 bg-yellow-100';
             case 'rejected': return 'text-red-600 bg-red-100';
-        }
-    };
-
-    const getStatusIcon = (status: 'approved' | 'pending' | 'rejected') => {
-        switch (status) {
-            case 'approved': return <CheckCircle className="w-5 h-5" />;
-            case 'pending': return <Clock className="w-5 h-5" />;
-            case 'rejected': return <XCircle className="w-5 h-5" />;
         }
     };
 
@@ -182,7 +216,7 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
                     <p className="text-gray-600 mb-8">Esta área é exclusiva para autores registados.</p>
                     <button
                         onClick={() => navigate('/contacto')}
-                        className="btn-premium w-full justify-center"
+                        className="px-8 py-3 bg-brand-primary text-white font-bold rounded-xl"
                     >
                         Tornar-se Autor
                     </button>
@@ -272,8 +306,8 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id as any)}
                             className={`px-6 py-3 rounded-xl flex items-center gap-3 transition-all ${activeTab === tab.id
-                                    ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/20'
-                                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/20'
+                                : 'text-gray-400 hover:text-white hover:bg-white/5'
                                 }`}
                             title={tab.label}
                             aria-label={tab.label}
@@ -301,10 +335,10 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
                                     <Clock className="w-4 h-4 text-brand-primary" />
                                     <span className="font-medium truncate">Online Agora</span>
                                 </div>
-                                {whatsapp && (
+                                {user.whatsappNumber && (
                                     <div className="flex items-center gap-4 text-sm text-gray-300">
                                         <div className="w-4 h-4 flex items-center justify-center font-serif text-brand-primary text-xs font-bold">W</div>
-                                        <span className="font-medium">{whatsapp}</span>
+                                        <span className="font-medium">{user.whatsappNumber}</span>
                                     </div>
                                 )}
                             </div>
@@ -372,7 +406,7 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
                                                             <div className="flex flex-col md:flex-row md:justify-between mb-2">
                                                                 <h3 className="text-xl font-black text-white">{item.title}</h3>
                                                                 <div className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest inline-flex items-center gap-2 w-fit mt-2 md:mt-0 ${item.status === 'approved' ? 'bg-green-500/10 text-green-500' :
-                                                                        item.status === 'rejected' ? 'bg-red-500/10 text-red-500' : 'bg-yellow-500/10 text-yellow-500'
+                                                                    item.status === 'rejected' ? 'bg-red-500/10 text-red-500' : 'bg-yellow-500/10 text-yellow-500'
                                                                     }`}>
                                                                     {item.status === 'approved' && <CheckCircle className="w-3 h-3" />}
                                                                     {item.status === 'rejected' && <XCircle className="w-3 h-3" />}
@@ -415,30 +449,21 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
                                             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">Envio de Novos Manuscritos</p>
                                         </div>
 
-                                        <form onSubmit={handleSubmitManuscript} className="space-y-6 max-w-2xl">
-                                            <div className="space-y-2">
-                                                <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-500 pl-2">Título da Obra *</label>
-                                                <input
-                                                    type="text"
-                                                    required
-                                                    value={submitData.title}
-                                                    onChange={e => setSubmitData({ ...submitData, title: e.target.value })}
-                                                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-primary outline-none transition-colors font-bold"
-                                                    placeholder="Título do Livro"
-                                                    title="Título da Obra"
-                                                />
-                                            </div>
+                                        <form onSubmit={handleSubmitManuscript(onSubmitManuscript)} className="space-y-6 max-w-2xl">
+                                            <Input
+                                                label="Título da Obra *"
+                                                placeholder="Título do Livro"
+                                                {...registerManuscript('title')}
+                                                error={manuscriptErrors.title?.message}
+                                                className="bg-black/20 border-white/10 text-white placeholder:text-gray-500"
+                                            />
 
                                             <div className="grid md:grid-cols-2 gap-6">
                                                 <div className="space-y-2">
                                                     <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-500 pl-2">Género *</label>
                                                     <select
-                                                        required
-                                                        value={submitData.genre}
-                                                        onChange={e => setSubmitData({ ...submitData, genre: e.target.value })}
+                                                        {...registerManuscript('genre')}
                                                         className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-primary outline-none transition-colors font-bold appearance-none"
-                                                        title="Género Literário"
-                                                        aria-label="Género Literário"
                                                     >
                                                         <option value="" className="bg-black text-gray-500">Selecione...</option>
                                                         <option value="Ficção" className="bg-black">Ficção</option>
@@ -446,39 +471,32 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
                                                         <option value="Poesia" className="bg-black">Poesia</option>
                                                         <option value="Técnico" className="bg-black">Técnico</option>
                                                     </select>
+                                                    {manuscriptErrors.genre && <span className="text-red-500 text-xs font-bold">{manuscriptErrors.genre.message}</span>}
                                                 </div>
-                                                <div className="space-y-2">
-                                                    <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-500 pl-2">Páginas</label>
-                                                    <input
-                                                        type="number"
-                                                        value={submitData.pages}
-                                                        onChange={e => setSubmitData({ ...submitData, pages: e.target.value })}
-                                                        className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-primary outline-none transition-colors font-bold"
-                                                        placeholder="Ex: 200"
-                                                        title="Número de Páginas"
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div className="space-y-2">
-                                                <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-500 pl-2">Sinopse *</label>
-                                                <textarea
-                                                    required
-                                                    rows={5}
-                                                    value={submitData.description}
-                                                    onChange={e => setSubmitData({ ...submitData, description: e.target.value })}
-                                                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-primary outline-none transition-colors font-bold resize-none"
-                                                    placeholder="Breve descrição da obra..."
-                                                    title="Sinopse"
+                                                <Input
+                                                    type="number"
+                                                    label="Páginas"
+                                                    placeholder="Ex: 200"
+                                                    {...registerManuscript('pages')}
+                                                    error={manuscriptErrors.pages?.message}
+                                                    className="bg-black/20 border-white/10 text-white placeholder:text-gray-500"
                                                 />
                                             </div>
+
+                                            <Textarea
+                                                label="Sinopse *"
+                                                placeholder="Breve descrição da obra..."
+                                                rows={5}
+                                                {...registerManuscript('description')}
+                                                error={manuscriptErrors.description?.message}
+                                                className="bg-black/20 border-white/10 text-white placeholder:text-gray-500 resize-none"
+                                            />
 
                                             <div className="space-y-2">
                                                 <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-500 pl-2">Arquivo (PDF/DOCX) *</label>
                                                 <div className="relative border-2 border-dashed border-white/10 rounded-2xl p-8 text-center hover:border-brand-primary/50 transition-colors group cursor-pointer bg-white/[0.02]">
                                                     <input
                                                         type="file"
-                                                        required
                                                         accept=".pdf,.docx,.doc"
                                                         onChange={e => e.target.files && setSelectedFile(e.target.files[0])}
                                                         className="absolute inset-0 opacity-0 cursor-pointer"
@@ -502,16 +520,15 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
                                             </div>
 
                                             <div className="pt-4">
-                                                <button
+                                                <Button
                                                     type="submit"
-                                                    disabled={submitLoading}
-                                                    className="w-full py-4 bg-brand-primary rounded-xl text-white font-black uppercase tracking-[0.2em] hover:brightness-110 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                                                    title="Enviar Manuscrito"
-                                                    aria-label="Enviar Manuscrito"
+                                                    isLoading={isSubmittingManuscript}
+                                                    disabled={isSubmittingManuscript}
+                                                    className="w-full py-4 text-white hover:brightness-110"
+                                                    leftIcon={!isSubmittingManuscript && <Upload className="w-5 h-5" />}
                                                 >
-                                                    {submitLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Upload className="w-5 h-5" />}
-                                                    {submitLoading ? 'Enviando...' : 'Submeter Obra'}
-                                                </button>
+                                                    Submeter Obra
+                                                </Button>
                                             </div>
                                         </form>
                                     </div>
@@ -580,12 +597,13 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
                                         <div className="grid lg:grid-cols-2 gap-12">
                                             <div className="space-y-8">
                                                 <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-white/10 pb-2">Contas Bancárias</h3>
-                                                {bankAccounts.map((acc: any, idx: number) => (
-                                                    <div key={idx} className="bg-black/20 p-6 rounded-2xl border border-white/5 relative group">
-                                                        <p className="font-black text-white uppercase">{acc.bankName}</p>
-                                                        <p className="text-xs text-gray-400 font-mono mt-1">{acc.iban}</p>
+                                                {bankFields.map((field, index) => (
+                                                    <div key={field.id} className="bg-black/20 p-6 rounded-2xl border border-white/5 relative group">
+                                                        <p className="font-black text-white uppercase">{field.bankName}</p>
+                                                        <p className="text-xs text-gray-400 font-mono mt-1">{field.iban}</p>
                                                         <button
-                                                            onClick={() => setBankAccounts(prev => prev.filter((_, i) => i !== idx))}
+                                                            type="button"
+                                                            onClick={() => removeBank(index)}
                                                             className="absolute top-4 right-4 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity text-xs hover:underline"
                                                             title="Remover Conta"
                                                             aria-label="Remover Conta"
@@ -597,57 +615,56 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
 
                                                 <div className="space-y-4 pt-4">
                                                     <p className="text-[9px] font-black uppercase tracking-widest text-gray-500">Adicionar Nova Conta</p>
-                                                    <input id="new-bank" placeholder="Nome do Banco" className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white text-xs font-bold" title="Nome do Banco" />
-                                                    <input id="new-acc" placeholder="Número de Conta" className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white text-xs font-bold" title="Número de Conta" />
-                                                    <input id="new-iban" placeholder="IBAN" className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white text-xs font-bold" title="IBAN" />
+                                                    <Input
+                                                        value={newBank.bankName}
+                                                        onChange={(e) => setNewBank({ ...newBank, bankName: e.target.value })}
+                                                        placeholder="Nome do Banco"
+                                                        className="bg-black/20 border-white/10 text-white"
+                                                    />
+                                                    <Input
+                                                        value={newBank.accountNumber}
+                                                        onChange={(e) => setNewBank({ ...newBank, accountNumber: e.target.value })}
+                                                        placeholder="Número de Conta"
+                                                        className="bg-black/20 border-white/10 text-white"
+                                                    />
+                                                    <Input
+                                                        value={newBank.iban}
+                                                        onChange={(e) => setNewBank({ ...newBank, iban: e.target.value })}
+                                                        placeholder="IBAN"
+                                                        className="bg-black/20 border-white/10 text-white"
+                                                    />
                                                     <button
-                                                        onClick={() => {
-                                                            const name = (document.getElementById('new-bank') as HTMLInputElement).value;
-                                                            const acc = (document.getElementById('new-acc') as HTMLInputElement).value;
-                                                            const iban = (document.getElementById('new-iban') as HTMLInputElement).value;
-                                                            if (name && acc) {
-                                                                setBankAccounts([...bankAccounts, { id: Date.now().toString(), bankName: name, accountNumber: acc, iban, isPrimary: false }]);
-                                                                (document.getElementById('new-bank') as HTMLInputElement).value = '';
-                                                                (document.getElementById('new-acc') as HTMLInputElement).value = '';
-                                                                (document.getElementById('new-iban') as HTMLInputElement).value = '';
-                                                            }
-                                                        }}
-                                                        className="w-full py-3 bg-white/10 hover:bg-white/20 rounded-xl text-[10px] font-black uppercase tracking-widest text-white transition-all"
-                                                        title="Adicionar Conta"
-                                                        aria-label="Adicionar Conta"
+                                                        type="button"
+                                                        onClick={handleAddBank}
+                                                        className="w-full py-3 bg-white/10 hover:bg-white/20 rounded-xl text-[10px] font-black uppercase tracking-widest text-white transition-all flex items-center justify-center gap-2"
                                                     >
-                                                        Adicionar Conta
+                                                        <Plus className="w-4 h-4" /> Adicionar Conta
                                                     </button>
                                                 </div>
                                             </div>
 
-                                            <div className="space-y-8">
+                                            <form onSubmit={handleSubmitProfile(onSubmitProfile)} className="space-y-8">
                                                 <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-white/10 pb-2">Contacto</h3>
-                                                <div className="space-y-2">
-                                                    <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-500 pl-2">WhatsApp</label>
-                                                    <input
-                                                        type="tel"
-                                                        value={whatsapp}
-                                                        onChange={e => setWhatsapp(e.target.value)}
-                                                        className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white font-bold"
-                                                        placeholder="Seu WhatsApp"
-                                                        title="WhatsApp"
-                                                    />
-                                                </div>
+                                                <Input
+                                                    label="WhatsApp"
+                                                    placeholder="Seu WhatsApp"
+                                                    {...registerProfile('whatsappNumber')}
+                                                    error={profileErrors.whatsappNumber?.message}
+                                                    className="bg-black/20 border-white/10 text-white text-white"
+                                                />
 
                                                 <div className="pt-8">
-                                                    <button
-                                                        onClick={handleSaveProfile}
-                                                        disabled={isSaving}
-                                                        className="w-full py-4 bg-brand-primary rounded-xl text-white font-black uppercase tracking-[0.2em] hover:brightness-110 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                                                        title="Salvar Alterações"
-                                                        aria-label="Salvar Alterações"
+                                                    <Button
+                                                        type="submit"
+                                                        isLoading={isSubmittingProfile}
+                                                        disabled={isSubmittingProfile}
+                                                        className="w-full py-4 text-white hover:brightness-110"
+                                                        leftIcon={!isSubmittingProfile && <Save className="w-5 h-5" />}
                                                     >
-                                                        {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-                                                        {isSaving ? 'Salvando...' : 'Salvar Alterações'}
-                                                    </button>
+                                                        Salvar Alterações
+                                                    </Button>
                                                 </div>
-                                            </div>
+                                            </form>
                                         </div>
                                     </div>
                                 )}

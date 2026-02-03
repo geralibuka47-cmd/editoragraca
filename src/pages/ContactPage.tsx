@@ -1,8 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Phone, Mail, Clock, Send, CheckCircle, Facebook, Instagram, Twitter, Sparkles, ArrowRight, ArrowUpRight, Loader2 } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Send, CheckCircle, Sparkles, ArrowUpRight } from 'lucide-react';
 import { m, AnimatePresence, Variants } from 'framer-motion';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { getTeamMembers } from '../services/dataService';
+import { Input } from '../components/ui/Input';
+import { Textarea } from '../components/ui/Textarea';
+import { Button } from '../components/ui/Button';
+
+// Validation Schema
+const contactSchema = z.object({
+    name: z.string().min(2, 'Nome muito curto'),
+    email: z.string().email('Email inválido'),
+    subject: z.string().min(3, 'Assunto é obrigatório'),
+    message: z.string().min(10, 'A mensagem deve ter pelo menos 10 caracteres'),
+});
+
+type ContactFormData = z.infer<typeof contactSchema>;
 
 interface TeamMember {
     id: string;
@@ -16,14 +32,24 @@ interface TeamMember {
 
 const ContactPage: React.FC = () => {
     const navigate = useNavigate();
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        subject: '',
-        message: ''
-    });
     const [formStatus, setFormStatus] = useState<'idle' | 'success' | 'error'>('idle');
-    const [errors, setErrors] = useState<Record<string, string>>({});
+    const [submitting, setSubmitting] = useState(false);
+
+    // Form Setup
+    const {
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors },
+    } = useForm<ContactFormData>({
+        resolver: zodResolver(contactSchema),
+        defaultValues: {
+            name: '',
+            email: '',
+            subject: '',
+            message: '',
+        },
+    });
 
     // Team Content States
     const [members, setMembers] = useState<TeamMember[]>([]);
@@ -74,34 +100,19 @@ const ContactPage: React.FC = () => {
         ? members
         : members.filter((m: TeamMember) => m.department === selectedDepartment);
 
-    const validateForm = () => {
-        const newErrors: Record<string, string> = {};
-        if (!formData.name.trim()) newErrors.name = 'Identificação necessária';
-        if (!formData.email.trim()) {
-            newErrors.email = 'Canal digital necessário';
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-            newErrors.email = 'Formato inválido';
-        }
-        if (!formData.subject.trim()) newErrors.subject = 'Tema necessário';
-        if (!formData.message.trim()) newErrors.message = 'Narrativa necessária';
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!validateForm()) return;
-        setFormStatus('success');
+    const onSubmit = (data: ContactFormData) => {
+        setSubmitting(true);
+        // Simulate API call
         setTimeout(() => {
-            setFormData({ name: '', email: '', subject: '', message: '' });
-            setFormStatus('idle');
-        }, 3000);
-    };
+            console.log('Form Submitted:', data);
+            setFormStatus('success');
+            setSubmitting(false);
+            reset();
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-        if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
+            setTimeout(() => {
+                setFormStatus('idle');
+            }, 5000);
+        }, 2000);
     };
 
     const contactInfo = [
@@ -156,27 +167,50 @@ const ContactPage: React.FC = () => {
                                             <CheckCircle className="w-12 h-12" />
                                         </div>
                                         <h3 className="text-3xl font-black text-brand-dark uppercase tracking-tighter mb-4">Sinal Recebido</h3>
+                                        <p className="text-gray-500 font-medium">Sua mensagem foi entregue à nossa equipa.</p>
                                     </m.div>
                                 ) : (
-                                    <form onSubmit={handleSubmit} className="space-y-10">
+                                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
                                         <div className="grid md:grid-cols-2 gap-10">
-                                            <div className="space-y-4">
-                                                <label className="text-[10px] font-black text-brand-primary uppercase tracking-widest ml-6">Identidade Literária</label>
-                                                <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Seu nome" className="w-full bg-gray-50 border-2 border-transparent focus:border-brand-primary/30 rounded-[2rem] px-8 py-6 outline-none transition-all" />
-                                            </div>
-                                            <div className="space-y-4">
-                                                <label className="text-[10px] font-black text-brand-primary uppercase tracking-widest ml-6">Canal de E-mail</label>
-                                                <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="seu@email.com" className="w-full bg-gray-50 border-2 border-transparent focus:border-brand-primary/30 rounded-[2rem] px-8 py-6 outline-none transition-all" />
-                                            </div>
+                                            <Input
+                                                label="Identidade Literária"
+                                                placeholder="Seu nome"
+                                                {...register('name')}
+                                                error={errors.name?.message}
+                                            />
+                                            <Input
+                                                type="email"
+                                                label="Canal de E-mail"
+                                                placeholder="seu@email.com"
+                                                {...register('email')}
+                                                error={errors.email?.message}
+                                            />
                                         </div>
-                                        <div className="space-y-4">
-                                            <label className="text-[10px] font-black text-brand-primary uppercase tracking-widest ml-6">Sua Mensagem</label>
-                                            <textarea name="message" value={formData.message} onChange={handleChange} rows={5} placeholder="Descreva sua visão..." className="w-full bg-gray-50 border-2 border-transparent focus:border-brand-primary/30 rounded-[2.5rem] px-8 py-6 outline-none transition-all resize-none" />
-                                        </div>
-                                        <button type="submit" className="w-full py-8 bg-brand-dark text-white rounded-[2rem] font-black uppercase text-[11px] tracking-[0.4em] hover:bg-brand-primary transition-all shadow-2xl flex items-center justify-center gap-6 group">
-                                            <span>Transmitir Aspiração</span>
-                                            <Send className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
-                                        </button>
+
+                                        <Input
+                                            label="Tema da Conversa"
+                                            placeholder="Sobre o que vamos falar?"
+                                            {...register('subject')}
+                                            error={errors.subject?.message}
+                                        />
+
+                                        <Textarea
+                                            label="Sua Mensagem"
+                                            placeholder="Descreva sua visão..."
+                                            rows={5}
+                                            {...register('message')}
+                                            error={errors.message?.message}
+                                        />
+
+                                        <Button
+                                            type="submit"
+                                            variant="secondary"
+                                            className="w-full py-8 rounded-[2rem] text-[11px] tracking-[0.4em] flex items-center justify-center gap-6 group"
+                                            rightIcon={!submitting && <Send className="w-5 h-5 group-hover:translate-x-2 transition-transform" />}
+                                            isLoading={submitting}
+                                        >
+                                            Transmitir Aspiração
+                                        </Button>
                                     </form>
                                 )}
                             </AnimatePresence>
@@ -220,8 +254,8 @@ const ContactPage: React.FC = () => {
                                 key={dept}
                                 onClick={() => setSelectedDepartment(dept)}
                                 className={`px-12 py-5 rounded-[1.5rem] font-black text-[10px] uppercase tracking-widest transition-all border-2 ${selectedDepartment === dept
-                                        ? 'bg-brand-dark border-brand-dark text-white'
-                                        : 'bg-white border-gray-100 text-gray-400 hover:border-brand-primary/30 hover:text-brand-primary'
+                                    ? 'bg-brand-dark border-brand-dark text-white'
+                                    : 'bg-white border-gray-100 text-gray-400 hover:border-brand-primary/30 hover:text-brand-primary'
                                     }`}
                             >
                                 {dept}

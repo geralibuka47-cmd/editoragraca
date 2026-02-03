@@ -9,9 +9,11 @@
         "preview": "vite preview"
     },
     "dependencies": {
+        "@hookform/resolvers": "^5.2.2",
         "@sentry/browser": "^10.38.0",
         "@sentry/react": "^10.38.0",
         "@tailwindcss/vite": "^4.1.18",
+        "clsx": "^2.1.1",
         "dotenv": "^17.2.3",
         "firebase": "^12.8.0",
         "firebase-admin": "^13.6.0",
@@ -19,7 +21,11 @@
         "lucide-react": "^0.555.0",
         "react": "^19.2.1",
         "react-dom": "^19.2.1",
-        "react-router-dom": "^7.12.0"
+        "react-helmet-async": "^2.0.5",
+        "react-hook-form": "^7.71.1",
+        "react-router-dom": "^7.12.0",
+        "tailwind-merge": "^3.4.0",
+        "zod": "^4.3.6"
     },
     "devDependencies": {
         "@tailwindcss/postcss": "^4.1.18",
