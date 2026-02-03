@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { motion as m, AnimatePresence } from 'framer-motion';
-import { X, Upload, Image as ImageIcon, FileText, CheckCircle, AlertCircle, Calendar, Loader2, Info, DollarSign, Package, Tag, Layers, Globe, BookOpen } from 'lucide-react';
+import { X, Upload, Image as ImageIcon, FileText, CheckCircle, AlertCircle, Calendar, Loader2, Info, DollarSign, Package, Tag, Layers, Globe, BookOpen, Sparkles, RefreshCw } from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Book } from '../../types';
-import { Input } from '../components/ui/Input';
-import { Textarea } from '../components/ui/Textarea';
-import { Select } from '../components/ui/Select';
-import { Button } from '../components/ui/Button';
+import { Input } from '../ui/Input';
+import { Textarea } from '../ui/Textarea';
+import { Select } from '../ui/Select';
+import { Button } from '../ui/Button';
+import { fetchBookByISBN } from '../../services/googleBooksService';
 
 // Validation Schema
 const bookSchema = z.object({
@@ -43,16 +44,16 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
     const [coverFile, setCoverFile] = useState<File | null>(null);
     const [digitalFile, setDigitalFile] = useState<File | null>(null);
     const [coverPreview, setCoverPreview] = useState<string>('');
+    const [isFetchingGoogle, setIsFetchingGoogle] = useState(false);
 
     const {
         register,
         handleSubmit,
-        width: formWatch, // Typo check: it's watch, not width. Fixed below.
         setValue,
         reset,
         watch,
         formState: { errors, isSubmitting },
-    } = useForm<BookFormData>({
+    } = useForm<any>({
         resolver: zodResolver(bookSchema),
         defaultValues: {
             title: '',
@@ -139,6 +140,40 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
     };
 
     const isFree = !watchedPrice || Number(watchedPrice) === 0;
+
+    const handleGoogleFetch = async () => {
+        const isbn = watch('isbn');
+        if (!isbn || isbn.length < 10) return;
+
+        setIsFetchingGoogle(true);
+        try {
+            const data = await fetchBookByISBN(isbn);
+            if (data) {
+                if (data.title) setValue('title', data.title);
+                if (data.authors?.[0]) setValue('author', data.authors[0]);
+                if (data.description) setValue('description', data.description);
+
+                // Map Google categories to local genres if possible
+                if (data.categories?.[0]) {
+                    const category = data.categories[0];
+                    if (category.includes('Fiction')) setValue('genre', 'Ficção');
+                    else if (category.includes('Biography')) setValue('genre', 'Biografia');
+                    else if (category.includes('Spirituality') || category.includes('Religion')) setValue('genre', 'Espiritualidade');
+                    // Add more mappings as needed
+                }
+
+                if (data.imageLinks?.thumbnail) {
+                    setCoverType('link');
+                    setValue('coverUrl', data.imageLinks.thumbnail.replace('http:', 'https:'));
+                    setCoverPreview(data.imageLinks.thumbnail.replace('http:', 'https:'));
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching from Google:', error);
+        } finally {
+            setIsFetchingGoogle(false);
+        }
+    };
 
     const onSubmit = async (data: BookFormData) => {
         try {
@@ -247,7 +282,7 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                                 placeholder="Ex: O Pequeno Caminho"
                                                 icon={<Tag className="w-4 h-4" />}
                                                 {...register('title')}
-                                                error={errors.title?.message}
+                                                error={errors.title?.message as string}
                                             />
 
                                             <Input
@@ -255,7 +290,7 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                                 placeholder="Nome completo..."
                                                 icon={<BookOpen className="w-4 h-4" />}
                                                 {...register('author')}
-                                                error={errors.author?.message}
+                                                error={errors.author?.message as string}
                                             />
 
                                             <Select
@@ -270,15 +305,30 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                                     { value: 'Literatura Angolana', label: 'Literatura Angolana' },
                                                 ]}
                                                 {...register('genre')}
-                                                error={errors.genre?.message}
+                                                error={errors.genre?.message as string}
                                             />
 
-                                            <Input
-                                                label="ISBN (Identificador)"
-                                                placeholder="978-..."
-                                                {...register('isbn')}
-                                                error={errors.isbn?.message}
-                                            />
+                                            <div className="relative group">
+                                                <Input
+                                                    label="ISBN (Identificador)"
+                                                    placeholder="978-..."
+                                                    {...register('isbn')}
+                                                    error={errors.isbn?.message as string}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={handleGoogleFetch}
+                                                    disabled={isFetchingGoogle}
+                                                    className="absolute right-4 top-[38px] p-2 bg-brand-primary/10 text-brand-primary rounded-xl hover:bg-brand-primary hover:text-white transition-all group/fetch disabled:opacity-50"
+                                                    title="Procurar no Google Books"
+                                                >
+                                                    {isFetchingGoogle ? (
+                                                        <RefreshCw className="w-4 h-4 animate-spin" />
+                                                    ) : (
+                                                        <Sparkles className="w-4 h-4 group-hover/fetch:scale-110 transition-transform" />
+                                                    )}
+                                                </button>
+                                            </div>
 
                                             <div className="md:col-span-2">
                                                 <Textarea
@@ -286,7 +336,7 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                                     placeholder="Uma descrição envolvente..."
                                                     rows={6}
                                                     {...register('description')}
-                                                    error={errors.description?.message}
+                                                    error={errors.description?.message as string}
                                                 />
                                             </div>
 
@@ -313,7 +363,7 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                                     placeholder="0"
                                                     icon={<DollarSign className="w-4 h-4" />}
                                                     {...register('price')}
-                                                    error={errors.price?.message}
+                                                    error={errors.price?.message as string}
                                                 />
                                                 {isFree && (
                                                     <m.div
@@ -332,7 +382,7 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                                 placeholder="0"
                                                 icon={<Package className="w-4 h-4" />}
                                                 {...register('stock')}
-                                                error={errors.stock?.message}
+                                                error={errors.stock?.message as string}
                                             />
 
                                             <div className="md:col-span-2 space-y-6 pt-6">

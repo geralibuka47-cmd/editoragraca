@@ -9,6 +9,7 @@ import { getTeamMembers } from '../services/dataService';
 import { Input } from '../components/ui/Input';
 import { Textarea } from '../components/ui/Textarea';
 import { Button } from '../components/ui/Button';
+import { sendEmail } from '../services/emailService';
 
 // Validation Schema
 const contactSchema = z.object({
@@ -100,19 +101,34 @@ const ContactPage: React.FC = () => {
         ? members
         : members.filter((m: TeamMember) => m.department === selectedDepartment);
 
-    const onSubmit = (data: ContactFormData) => {
+
+
+    const onSubmit = async (data: ContactFormData) => {
         setSubmitting(true);
-        // Simulate API call
-        setTimeout(() => {
-            console.log('Form Submitted:', data);
+        try {
+            // Using a placeholder template ID. User will need to replace this.
+            const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_CONTACT_TEMPLATE_ID || 'contact_placeholder';
+
+            await sendEmail(TEMPLATE_ID, {
+                from_name: data.name,
+                from_email: data.email,
+                subject: data.subject,
+                message: data.message,
+                to_name: 'Editora Graça',
+            });
+
             setFormStatus('success');
-            setSubmitting(false);
             reset();
 
             setTimeout(() => {
                 setFormStatus('idle');
             }, 5000);
-        }, 2000);
+        } catch (error) {
+            console.error('Submission Error:', error);
+            setFormStatus('error');
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     const contactInfo = [

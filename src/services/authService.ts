@@ -4,7 +4,9 @@ import {
     signOut as firebaseSignOut,
     onAuthStateChanged,
     User as FirebaseUser,
-    sendPasswordResetEmail
+    sendPasswordResetEmail,
+    GoogleAuthProvider,
+    signInWithPopup
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from './firebase';
@@ -59,6 +61,43 @@ export const login = async (email: string, password: string): Promise<User | nul
             throw new Error('Muitas tentativas. Tente novamente mais tarde');
         } else if (error.code === 'auth/network-request-failed') {
             throw new Error('Erro de rede. Verifique sua conexão');
+        }
+
+        throw error;
+    }
+};
+
+/**
+ * Login with Google
+ */
+export const loginWithGoogle = async (): Promise<User | null> => {
+    try {
+        const provider = new GoogleAuthProvider();
+        const userCredential = await signInWithPopup(auth, provider);
+        const firebaseUser = userCredential.user;
+
+        // Check if user already exists in Firestore
+        const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+
+        if (!userDoc.exists()) {
+            // First time logging in with Google: create the doc
+            await setDoc(doc(db, 'users', firebaseUser.uid), {
+                name: firebaseUser.displayName || 'Utilizador',
+                email: firebaseUser.email,
+                role: 'leitor', // Default role for Google login
+                avatarUrl: firebaseUser.photoURL,
+                createdAt: new Date().toISOString()
+            });
+        }
+
+        return await convertFirebaseUser(firebaseUser);
+    } catch (error: any) {
+        console.error('Erro ao fazer login com Google:', error);
+
+        if (error.code === 'auth/popup-closed-by-user') {
+            throw new Error('O login foi cancelado pelo utilizador');
+        } else if (error.code === 'auth/network-request-failed') {
+            throw new Error('Erro de rede ao contactar o Google');
         }
 
         throw error;

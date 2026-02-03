@@ -60,7 +60,7 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
         handleSubmit: handleSubmitManuscript,
         reset: resetManuscript,
         formState: { errors: manuscriptErrors, isSubmitting: isSubmittingManuscript }
-    } = useForm<ManuscriptFormData>({
+    } = useForm<any>({
         resolver: zodResolver(manuscriptSchema)
     });
 
@@ -70,7 +70,7 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
         handleSubmit: handleSubmitProfile,
         control: controlProfile,
         formState: { errors: profileErrors, isSubmitting: isSubmittingProfile }
-    } = useForm<ProfileFormData>({
+    } = useForm<any>({
         resolver: zodResolver(profileSchema),
         defaultValues: {
             whatsappNumber: user?.whatsappNumber || '',
@@ -454,7 +454,7 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
                                                 label="Título da Obra *"
                                                 placeholder="Título do Livro"
                                                 {...registerManuscript('title')}
-                                                error={manuscriptErrors.title?.message}
+                                                error={manuscriptErrors.title?.message as string}
                                                 className="bg-black/20 border-white/10 text-white placeholder:text-gray-500"
                                             />
 
@@ -471,14 +471,14 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
                                                         <option value="Poesia" className="bg-black">Poesia</option>
                                                         <option value="Técnico" className="bg-black">Técnico</option>
                                                     </select>
-                                                    {manuscriptErrors.genre && <span className="text-red-500 text-xs font-bold">{manuscriptErrors.genre.message}</span>}
+                                                    {manuscriptErrors.genre && <span className="text-red-500 text-xs font-bold">{manuscriptErrors.genre.message as string}</span>}
                                                 </div>
                                                 <Input
                                                     type="number"
                                                     label="Páginas"
                                                     placeholder="Ex: 200"
                                                     {...registerManuscript('pages')}
-                                                    error={manuscriptErrors.pages?.message}
+                                                    error={manuscriptErrors.pages?.message as string}
                                                     className="bg-black/20 border-white/10 text-white placeholder:text-gray-500"
                                                 />
                                             </div>
@@ -488,7 +488,7 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
                                                 placeholder="Breve descrição da obra..."
                                                 rows={5}
                                                 {...registerManuscript('description')}
-                                                error={manuscriptErrors.description?.message}
+                                                error={manuscriptErrors.description?.message as string}
                                                 className="bg-black/20 border-white/10 text-white placeholder:text-gray-500 resize-none"
                                             />
 
@@ -597,7 +597,7 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
                                         <div className="grid lg:grid-cols-2 gap-12">
                                             <div className="space-y-8">
                                                 <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-white/10 pb-2">Contas Bancárias</h3>
-                                                {bankFields.map((field, index) => (
+                                                {bankFields.map((field: any, index) => (
                                                     <div key={field.id} className="bg-black/20 p-6 rounded-2xl border border-white/5 relative group">
                                                         <p className="font-black text-white uppercase">{field.bankName}</p>
                                                         <p className="text-xs text-gray-400 font-mono mt-1">{field.iban}</p>
@@ -649,7 +649,7 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
                                                     label="WhatsApp"
                                                     placeholder="Seu WhatsApp"
                                                     {...registerProfile('whatsappNumber')}
-                                                    error={profileErrors.whatsappNumber?.message}
+                                                    error={profileErrors.whatsappNumber?.message as string}
                                                     className="bg-black/20 border-white/10 text-white text-white"
                                                 />
 

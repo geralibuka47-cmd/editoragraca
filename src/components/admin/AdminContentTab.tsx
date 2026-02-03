@@ -43,7 +43,7 @@ const AdminContentTab: React.FC = () => {
         setValue,
         watch,
         formState: { errors, isSubmitting: isSavingTestimonial },
-    } = useForm<TestimonialFormData>({
+    } = useForm<any>({
         resolver: zodResolver(testimonialSchema),
         defaultValues: {
             name: '',
@@ -563,7 +563,7 @@ const AdminContentTab: React.FC = () => {
                                         placeholder="EX: PEDRO ALVARES"
                                         icon={<Users className="w-4 h-4" />}
                                         {...register('name')}
-                                        error={errors.name?.message}
+                                        error={errors.name?.message as string}
                                         className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
                                     />
                                     <Input
@@ -571,7 +571,7 @@ const AdminContentTab: React.FC = () => {
                                         placeholder="EX: LEITOR ASSÍDUO"
                                         icon={<Tag className="w-4 h-4" />}
                                         {...register('role')}
-                                        error={errors.role?.message}
+                                        error={errors.role?.message as string}
                                         className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
                                     />
                                 </div>
@@ -581,7 +581,7 @@ const AdminContentTab: React.FC = () => {
                                     placeholder="DESCREVA A EXPERIÊNCIA LITERÁRIA..."
                                     rows={5}
                                     {...register('content')}
-                                    error={errors.content?.message}
+                                    error={errors.content?.message as string}
                                     className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
                                 />
 
@@ -591,7 +591,7 @@ const AdminContentTab: React.FC = () => {
                                         placeholder="HTTPS://..."
                                         icon={<ImageIcon className="w-4 h-4" />}
                                         {...register('photo_url')}
-                                        error={errors.photo_url?.message}
+                                        error={errors.photo_url?.message as string}
                                         className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
                                     />
                                     <div className="space-y-4">

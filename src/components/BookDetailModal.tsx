@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, ShoppingCart, Heart, Share2, Check, Star, Eye, Download, Send, Loader2 } from 'lucide-react';
+import { X, ShoppingCart, Heart, Share2, Check, Star, Eye, Download, Send, Loader2, Sparkles } from 'lucide-react';
+import { m } from 'framer-motion';
 import { Book, User as UserType } from '../types';
 import {
     getBookReviews,
@@ -10,6 +11,7 @@ import {
     toggleFavorite,
     checkDownloadAccess
 } from '../services/dataService';
+import { fetchBookByISBN, GoogleBookVolumeInfo } from '../services/googleBooksService';
 
 interface BookDetailModalProps {
     book: any;
@@ -27,6 +29,8 @@ const BookDetailModal: React.FC<BookDetailModalProps & { user?: UserType | null;
     const [reviewContent, setReviewContent] = useState('');
     const [reviewRating, setReviewRating] = useState(5);
     const [reviews, setReviews] = useState<any[]>([]);
+    const [googleData, setGoogleData] = useState<GoogleBookVolumeInfo | null>(null);
+    const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
 
     useEffect(() => {
         if (isOpen && book) {
@@ -45,6 +49,14 @@ const BookDetailModal: React.FC<BookDetailModalProps & { user?: UserType | null;
 
                 // Track view
                 await incrementBookView(book.id);
+
+                // Fetch Google Books data if ISBN is available
+                if (book.isbn) {
+                    setIsLoadingGoogle(true);
+                    const gData = await fetchBookByISBN(book.isbn);
+                    setGoogleData(gData);
+                    setIsLoadingGoogle(false);
+                }
             };
             loadData();
         }
@@ -193,8 +205,26 @@ const BookDetailModal: React.FC<BookDetailModalProps & { user?: UserType | null;
                                 </div>
 
                                 <p className="text-reading py-4 border-y border-gray-100">
-                                    {book.description || "Uma obra literária excepcional que promete envolver o leitor do início ao fim."}
+                                    {book.description || googleData?.description || "Uma obra literária excepcional que promete envolver o leitor do início ao fim."}
                                 </p>
+
+                                {googleData?.previewLink && (
+                                    <m.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className="flex items-center gap-2"
+                                    >
+                                        <a
+                                            href={googleData.previewLink}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-[10px] font-black text-brand-primary uppercase tracking-[0.2em] flex items-center gap-2 hover:underline"
+                                        >
+                                            <Sparkles className="w-3 h-3" />
+                                            Ler Prévia no Google Books
+                                        </a>
+                                    </m.div>
+                                )}
 
                                 <div className="flex items-center justify-between pt-2">
                                     <div className="flex flex-col">

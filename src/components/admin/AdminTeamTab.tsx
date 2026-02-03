@@ -35,7 +35,7 @@ const AdminTeamTab: React.FC = () => {
         handleSubmit,
         reset,
         formState: { errors, isSubmitting },
-    } = useForm<TeamFormData>({
+    } = useForm<any>({
         resolver: zodResolver(teamSchema),
         defaultValues: {
             name: '',
@@ -335,7 +335,7 @@ const AdminTeamTab: React.FC = () => {
                                         placeholder="OPERADOR ALFA"
                                         icon={<User className="w-4 h-4" />}
                                         {...register('name')}
-                                        error={errors.name?.message}
+                                        error={errors.name?.message as string}
                                         className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
                                     />
                                     <Input
@@ -343,7 +343,7 @@ const AdminTeamTab: React.FC = () => {
                                         placeholder="ESTRATEGISTA"
                                         icon={<Tag className="w-4 h-4" />}
                                         {...register('role')}
-                                        error={errors.role?.message}
+                                        error={errors.role?.message as string}
                                         className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
                                     />
                                 </div>
@@ -354,7 +354,7 @@ const AdminTeamTab: React.FC = () => {
                                         placeholder="NÚCLEO CENTRAL"
                                         icon={<Briefcase className="w-4 h-4" />}
                                         {...register('department')}
-                                        error={errors.department?.message}
+                                        error={errors.department?.message as string}
                                         className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
                                     />
                                     <Input
@@ -362,7 +362,7 @@ const AdminTeamTab: React.FC = () => {
                                         label="NÍVEL DE ACESSO"
                                         icon={<Hash className="w-4 h-4" />}
                                         {...register('displayOrder')}
-                                        error={errors.displayOrder?.message}
+                                        error={errors.displayOrder?.message as string}
                                         className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
                                     />
                                 </div>
@@ -372,7 +372,7 @@ const AdminTeamTab: React.FC = () => {
                                     placeholder="HTTPS://..."
                                     icon={<ImageIcon className="w-4 h-4" />}
                                     {...register('photoUrl')}
-                                    error={errors.photoUrl?.message}
+                                    error={errors.photoUrl?.message as string}
                                     className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
                                 />
 
@@ -381,7 +381,7 @@ const AdminTeamTab: React.FC = () => {
                                     placeholder="REGISTO DE TRAJECTÓRIA E IMPACTO..."
                                     rows={5}
                                     {...register('bio')}
-                                    error={errors.bio?.message}
+                                    error={errors.bio?.message as string}
                                     className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
                                 />
                             </form>

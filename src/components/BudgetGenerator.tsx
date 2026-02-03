@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Input } from './ui/Input';
 import { Button } from './ui/Button';
+import { sendEmail } from '../services/emailService';
 
 // Validation Schema
 const budgetSchema = z.object({
@@ -38,8 +39,8 @@ const BudgetGenerator: React.FC = () => {
     const [step, setStep] = useState(1);
     const [estimatedPrice, setEstimatedPrice] = useState<{ min: number; max: number } | null>(null);
 
-    // Allowing useForm to infer the type from the resolver to avoid mismatch
-    const { register, handleSubmit, control, watch, trigger, formState: { errors, isSubmitting }, reset, setValue } = useForm<BudgetFormData>({
+    // Simplified useForm call to avoid complex inference issues with zodResolver + refine
+    const { register, handleSubmit, control, watch, trigger, formState: { errors, isSubmitting }, reset } = useForm<any>({
         resolver: zodResolver(budgetSchema),
         defaultValues: {
             serviceType: 'revisao',
@@ -116,19 +117,39 @@ const BudgetGenerator: React.FC = () => {
         if (step > 1) setStep(step - 1);
     };
 
-    const onSubmit: SubmitHandler<BudgetFormData> = async (data) => {
+
+
+    const onSubmit = async (data: any) => {
         try {
+            const validatedData = data as BudgetFormData;
+            // Save to database as before
             await createManuscript({
-                title: `Pedido de Orçamento: ${data.serviceType.toUpperCase()}`,
-                authorName: data.name,
-                email: data.email || 'N/A',
-                genre: data.genre,
-                description: `Serviço: ${data.serviceType}, Páginas: ${data.pages}, Palavras: ${data.wordCount}, Tel: ${data.phone}, Extras: ${data.extras?.join(', ')}`,
+                title: `Pedido de Orçamento: ${validatedData.serviceType.toUpperCase()}`,
+                authorName: validatedData.name,
+                email: validatedData.email || 'N/A',
+                genre: validatedData.genre,
+                description: `Serviço: ${validatedData.serviceType}, Páginas: ${validatedData.pages}, Palavras: ${validatedData.wordCount}, Tel: ${validatedData.phone}, Extras: ${validatedData.extras?.join(', ')}`,
                 fileUrl: '',
                 fileName: 'Formulário Online',
                 authorId: 'guest',
                 status: 'pending'
             });
+
+            // Send Email via EmailJS
+            const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_BUDGET_TEMPLATE_ID || 'budget_placeholder';
+            await sendEmail(TEMPLATE_ID, {
+                service_type: validatedData.serviceType,
+                author_name: validatedData.name,
+                author_email: validatedData.email,
+                author_phone: validatedData.phone,
+                genre: validatedData.genre,
+                pages: validatedData.pages,
+                word_count: validatedData.wordCount,
+                extras: validatedData.extras?.join(', '),
+                estimate_min: estimatedPrice?.min,
+                estimate_max: estimatedPrice?.max,
+            });
+
             showToast('Pedido enviado com sucesso! Entraremos em contacto.', 'success');
             setStep(1);
             reset();
@@ -219,7 +240,7 @@ const BudgetGenerator: React.FC = () => {
                                         label="Número de Páginas (Aprox.)"
                                         placeholder="Ex: 150"
                                         {...register('pages')}
-                                        error={errors.pages?.message}
+                                        error={errors.pages?.message as string}
                                         className="text-xl font-bold"
                                     />
                                     <Input
@@ -227,7 +248,7 @@ const BudgetGenerator: React.FC = () => {
                                         label="Contagem de Palavras (Opcional)"
                                         placeholder="Ex: 45000"
                                         {...register('wordCount')}
-                                        error={errors.wordCount?.message}
+                                        error={errors.wordCount?.message as string}
                                         className="text-xl font-bold"
                                     />
                                 </div>
@@ -244,7 +265,7 @@ const BudgetGenerator: React.FC = () => {
                                         <option value="Biografia">Biografia</option>
                                         <option value="Infantil">Infantil</option>
                                     </select>
-                                    {errors.genre && <span className="text-red-500 text-xs font-bold">{errors.genre.message}</span>}
+                                    {errors.genre && <span className="text-red-500 text-xs font-bold">{errors.genre.message as string}</span>}
                                 </div>
                             </m.div>
                         )}
@@ -278,9 +299,9 @@ const BudgetGenerator: React.FC = () => {
                                                         className="hidden"
                                                         checked={field.value.includes(extra.id)}
                                                         onChange={() => {
-                                                            const newExtras = field.value.includes(extra.id)
-                                                                ? field.value.filter(e => e !== extra.id)
-                                                                : [...field.value, extra.id];
+                                                            const newExtras = (field.value as string[]).includes(extra.id)
+                                                                ? (field.value as string[]).filter(e => e !== extra.id)
+                                                                : [...(field.value as string[]), extra.id];
                                                             field.onChange(newExtras);
                                                         }}
                                                     />
@@ -321,20 +342,20 @@ const BudgetGenerator: React.FC = () => {
                                         <Input
                                             placeholder="Nome Completo"
                                             {...register('name')}
-                                            error={errors.name?.message}
+                                            error={errors.name?.message as string}
                                         />
                                         <Input
                                             type="tel"
                                             placeholder="WhatsApp / Telefone"
                                             {...register('phone')}
-                                            error={errors.phone?.message}
+                                            error={errors.phone?.message as string}
                                         />
                                         <div className="col-span-2">
                                             <Input
                                                 type="email"
                                                 placeholder="Email"
                                                 {...register('email')}
-                                                error={errors.email?.message}
+                                                error={errors.email?.message as string}
                                             />
                                         </div>
                                     </div>
