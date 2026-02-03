@@ -4,6 +4,9 @@ import { User as UserIcon, Download, Sparkles, Settings, Save, Loader2 } from 'l
 import { User } from '../../types';
 import { useToast } from '../Toast';
 import { saveUserProfile } from '../../services/dataService';
+import { Input } from '../ui/Input';
+import { Textarea } from '../ui/Textarea';
+import { Button } from '../ui/Button';
 
 interface AdminSettingsTabProps {
     user: User;
@@ -52,86 +55,54 @@ const AdminSettingsTab: React.FC<AdminSettingsTabProps> = ({ user, onUpdate }) =
 
             <div className="grid lg:grid-cols-2 gap-12">
                 <div className="bg-white/[0.02] rounded-[3rem] border border-white/5 p-12 space-y-10 shadow-xl">
-                    <div className="space-y-6">
-                        <div className="space-y-3">
-                            <label htmlFor="admin-name" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 ml-4">IDENTIDADE (NOME)</label>
-                            <div className="relative">
-                                <UserIcon className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-700" />
-                                <input
-                                    id="admin-name"
-                                    type="text"
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full pl-16 pr-8 py-5 bg-black/20 border border-white/5 rounded-2xl focus:border-brand-primary/30 outline-none transition-all font-black text-white uppercase tracking-widest"
-                                    placeholder="NOME DO ADMINISTRADOR"
-                                />
-                            </div>
-                        </div>
+                    <div className="space-y-8">
+                        <Input
+                            label="IDENTIDADE (NOME)"
+                            variant="glass"
+                            icon={<UserIcon className="w-4 h-4" />}
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            placeholder="NOME DO ADMINISTRADOR"
+                        />
 
-                        <div className="space-y-3">
-                            <label htmlFor="admin-email" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 ml-4">CREDENCIAL (EMAIL)</label>
-                            <div className="relative">
-                                <Download className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-700 rotate-180" />
-                                <input
-                                    id="admin-email"
-                                    type="email"
-                                    value={formData.email}
-                                    className="w-full pl-16 pr-8 py-5 bg-black/20 border border-white/5 rounded-2xl focus:border-brand-primary/30 outline-none transition-all font-bold text-gray-500 cursor-not-allowed opacity-60"
-                                    readOnly
-                                    title="Email não modificável"
-                                />
-                            </div>
-                        </div>
+                        <Input
+                            label="CREDENCIAL (EMAIL)"
+                            variant="glass"
+                            icon={<Download className="w-4 h-4 rotate-180" />}
+                            value={formData.email}
+                            readOnly
+                            title="Email não modificável"
+                            className="cursor-not-allowed opacity-60"
+                        />
 
-                        <div className="space-y-3">
-                            <label htmlFor="admin-whatsapp" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 ml-4">COMUNICAÇÃO (WHATSAPP)</label>
-                            <div className="relative">
-                                <span className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-xs">+244</span>
-                                <input
-                                    id="admin-whatsapp"
-                                    type="tel"
-                                    value={formData.whatsapp}
-                                    onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
-                                    className="w-full pl-16 pr-8 py-5 bg-black/20 border border-white/5 rounded-2xl focus:border-brand-primary/30 outline-none transition-all font-bold text-white tracking-widest"
-                                    placeholder="9XX XXX XXX"
-                                />
-                            </div>
-                        </div>
+                        <Input
+                            label="COMUNICAÇÃO (WHATSAPP)"
+                            variant="glass"
+                            icon={<span className="text-gray-500 font-bold text-[10px]">+244</span>}
+                            value={formData.whatsapp}
+                            onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
+                            placeholder="9XX XXX XXX"
+                        />
 
-                        <div className="space-y-3">
-                            <label htmlFor="admin-bio" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 ml-4">BIO / NOTAS</label>
-                            <div className="relative">
-                                <textarea
-                                    id="admin-bio"
-                                    rows={4}
-                                    value={formData.bio}
-                                    onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                                    className="w-full px-8 py-5 bg-black/20 border border-white/5 rounded-2xl focus:border-brand-primary/30 outline-none transition-all font-medium text-gray-300 text-sm leading-relaxed"
-                                    placeholder="Notas do sistema ou bio..."
-                                />
-                            </div>
-                        </div>
+                        <Textarea
+                            label="BIO / NOTAS"
+                            variant="glass"
+                            rows={4}
+                            value={formData.bio}
+                            onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                            placeholder="Notas do sistema ou bio..."
+                        />
                     </div>
 
-                    <m.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
+                    <Button
                         onClick={handleSave}
                         disabled={isSaving}
-                        className="w-full py-5 bg-brand-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] shadow-[0_20px_40px_-10px_rgba(189,147,56,0.3)] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                        isLoading={isSaving}
+                        className="w-full py-6 rounded-2xl"
+                        leftIcon={!isSaving && <Save className="w-4 h-4" />}
                     >
-                        {isSaving ? (
-                            <>
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                                ATUALIZANDO...
-                            </>
-                        ) : (
-                            <>
-                                <Save className="w-4 h-4" />
-                                GRAVAR ALTERAÇÕES
-                            </>
-                        )}
-                    </m.button>
+                        {isSaving ? 'ATUALIZANDO...' : 'GRAVAR ALTERAÇÕES'}
+                    </Button>
                 </div>
 
                 <div className="space-y-8">

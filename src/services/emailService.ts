@@ -22,3 +22,14 @@ export const sendEmail = async (templateId: string, params: EmailParams) => {
         throw error;
     }
 };
+
+export const sendPaymentConfirmationToReader = async (readerEmail: string, readerName: string, bookTitles: string[]) => {
+    const templateId = import.meta.env.VITE_EMAILJS_CONFIRM_TEMPLATE_ID || 'template_placeholder';
+    const params = {
+        to_email: readerEmail,
+        to_name: readerName,
+        book_titles: bookTitles.join(', '),
+        confirmation_date: new Date().toLocaleDateString()
+    };
+    return sendEmail(templateId, params);
+};

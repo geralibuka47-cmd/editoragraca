@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Star, Clock, CheckCircle, Mail, Zap, BookOpen, Loader2, TrendingUp } from 'lucide-react';
-import { m, Variants } from 'framer-motion';
+import { BookOpen, ShoppingCart, Star, ChevronLeft, ChevronRight, Play, Download, Loader2, ArrowRight, Clock, CheckCircle, Mail, Zap, TrendingUp } from 'lucide-react';
+import { m, AnimatePresence, Variants } from 'framer-motion';
+import { Input } from '../components/ui/Input';
+import { Button } from '../components/ui/Button';
+import { useBookSearch } from '../hooks/useBookSearch';
 import { Book, BlogPost } from '../types';
 import BookCard from '../components/BookCard';
 import { getPublicStats, getBlogPosts, getSiteContent, getTestimonials, getTeamMembers } from '../services/dataService';
@@ -93,10 +96,15 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
     };
 
     const onSubscribe = async (data: NewsletterFormData) => {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        showToast('Subscrição realizada com sucesso!', 'success');
-        reset();
+        const { subscribeToNewsletter } = await import('../services/newsletterService');
+        const success = await subscribeToNewsletter(data.email);
+
+        if (success) {
+            showToast('Subscrição realizada com sucesso!', 'success');
+            reset();
+        } else {
+            showToast('Erro ao realizar subscrição. Tente novamente.', 'error');
+        }
     };
 
     return (
@@ -121,7 +129,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                             <span>Nova Era Editorial</span>
                         </m.div>
 
-                        <m.h1 variants={fadeInUp} className="text-6xl md:text-8xl font-black uppercase leading-[0.9] tracking-tighter">
+                        <m.h1 variants={fadeInUp} className="text-5xl sm:text-7xl md:text-8xl font-black uppercase leading-[0.9] tracking-tighter">
                             {siteContent['home.hero.title'] || "Onde a Arte"} <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-amber-600">
                                 {siteContent['home.hero.subtitle'] || "Encontra o Legado"}
@@ -379,18 +387,18 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-5 gap-8 items-center relative z-10">
-                                <div className="col-span-2">
+                            <div className="grid grid-cols-1 sm:grid-cols-5 gap-8 items-center relative z-10">
+                                <div className="sm:col-span-2">
                                     <img
                                         src={optimizeImageUrl(mostDownloaded.coverUrl)}
                                         alt={mostDownloaded.title}
-                                        className="w-full rounded-2xl shadow-2xl rotate-[-5deg] hover:rotate-0 transition-transform duration-500"
+                                        className="w-full max-w-[200px] sm:max-w-none mx-auto rounded-2xl shadow-2xl rotate-[-5deg] hover:rotate-0 transition-transform duration-500"
                                     />
                                 </div>
-                                <div className="col-span-3 space-y-4">
-                                    <h3 className="text-3xl font-black uppercase leading-tight line-clamp-2">{mostDownloaded.title}</h3>
+                                <div className="sm:col-span-3 space-y-4 text-center sm:text-left">
+                                    <h3 className="text-2xl sm:text-3xl font-black uppercase leading-tight line-clamp-2">{mostDownloaded.title}</h3>
                                     <p className="text-white/80 font-bold uppercase tracking-widest text-xs italic">{mostDownloaded.author}</p>
-                                    <div className="pt-4 flex flex-col gap-2 text-[10px] font-black uppercase tracking-widest">
+                                    <div className="pt-4 flex flex-col items-center sm:items-start gap-2 text-[10px] font-black uppercase tracking-widest">
                                         <div className="flex items-center gap-2">
                                             <div className="w-2 h-2 bg-white rounded-full"></div>
                                             <span>{mostDownloaded.stats?.downloads || 0}+ Downloads</span>
@@ -432,13 +440,13 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                             ))}
                         </ul>
                     </div>
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div className="bg-white/5 p-8 rounded-3xl backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-colors">
                             <Star className="w-10 h-10 text-brand-primary mb-6" />
                             <h4 className="text-2xl font-black mb-2">{siteContent['home.experience.premium_title'] || "Premium"}</h4>
                             <p className="text-sm text-gray-400">{siteContent['home.experience.premium_desc'] || "Qualidade inegociável em cada página impressa."}</p>
                         </div>
-                        <div className="bg-white/5 p-8 rounded-3xl backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-colors translate-y-12">
+                        <div className="bg-white/5 p-8 rounded-3xl backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-colors sm:translate-y-12">
                             <Clock className="w-10 h-10 text-brand-primary mb-6" />
                             <h4 className="text-2xl font-black mb-2">{siteContent['home.experience.eternal_title'] || "Eterno"}</h4>
                             <p className="text-sm text-gray-400">{siteContent['home.experience.eternal_desc'] || "Obras feitas para durar gerações."}</p>
@@ -455,24 +463,23 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                     <p className="text-gray-500 mb-10 text-lg">Junte-se à nossa lista exclusiva de leitores e receba atualizações sobre lançamentos.</p>
 
                     <form onSubmit={handleSubmit(onSubscribe)} className="flex flex-col sm:flex-row gap-4">
-                        <div className="flex-1 flex flex-col items-start gap-2">
-                            <input
-                                {...register('email')}
+                        <div className="flex-1">
+                            <Input
+                                variant="light"
                                 type="email"
                                 placeholder="Seu melhor email"
-                                className={`w-full px-6 py-4 bg-gray-50 rounded-xl border focus:border-brand-dark outline-none font-medium transition-colors ${errors.email ? 'border-red-500 bg-red-50' : 'border-gray-200'}`}
+                                {...register('email')}
+                                error={errors.email?.message}
+                                className="h-14"
                             />
-                            {errors.email && (
-                                <span className="text-red-500 text-xs font-bold uppercase tracking-wide ml-2">{errors.email.message}</span>
-                            )}
                         </div>
-                        <button
+                        <Button
                             type="submit"
-                            disabled={isSubmitting}
-                            className="px-10 py-4 bg-brand-dark text-white font-bold uppercase tracking-widest rounded-xl hover:bg-brand-primary transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
+                            isLoading={isSubmitting}
+                            className="px-10 h-14"
                         >
-                            {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Subscrever'}
-                        </button>
+                            Subscrever
+                        </Button>
                     </form>
                 </div>
             </section>

@@ -3,6 +3,9 @@ import { motion as m, AnimatePresence } from 'framer-motion';
 import { Loader2, CheckCircle, XCircle, FileText, ExternalLink, MessageSquare, Search, Calendar, User as UserIcon, X, Send, BookOpen, AlertCircle } from 'lucide-react';
 import { Manuscript } from '../../types';
 import { useToast } from '../Toast';
+import { Input } from '../ui/Input';
+import { Textarea } from '../ui/Textarea';
+import { Button } from '../ui/Button';
 
 const AdminManuscriptsTab: React.FC = () => {
     const { showToast } = useToast();
@@ -72,16 +75,14 @@ const AdminManuscriptsTab: React.FC = () => {
                     <p className="text-gray-500 font-bold text-xs uppercase tracking-widest pl-4">Avaliação de Novas Propostas Literárias</p>
                 </div>
 
-                <div className="relative group w-full xl:w-96">
-                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-brand-primary transition-colors" />
-                    <input
-                        type="text"
-                        placeholder="LOCALIZAR PROPOSTA..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-12 pr-6 py-4 bg-white/5 border border-white/5 focus:border-brand-primary/20 focus:bg-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white outline-none transition-all shadow-xl"
-                    />
-                </div>
+                <Input
+                    placeholder="LOCALIZAR PROPOSTA..."
+                    variant="glass"
+                    icon={<Search className="w-4 h-4" />}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="md:w-96"
+                />
             </div>
 
             {/* Content Display */}
@@ -234,39 +235,36 @@ const AdminManuscriptsTab: React.FC = () => {
                                     Download Manuscrito (PDF)
                                 </m.a>
 
-                                <div className="space-y-4">
-                                    <label htmlFor="manuscript-feedback" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-2">Parecer do Conselho Editorial</label>
-                                    <textarea
-                                        id="manuscript-feedback"
-                                        className="w-full px-8 py-6 bg-white/5 rounded-[2rem] border border-white/5 transition-all outline-none font-medium text-gray-300 focus:bg-white/10 focus:border-brand-primary/20 h-40 resize-none shadow-inner"
-                                        placeholder="Descreva as razões fundamentais para a decisão final..."
-                                        value={feedback}
-                                        onChange={(e) => setFeedback(e.target.value)}
-                                    />
-                                </div>
+                                <Textarea
+                                    label="Parecer do Conselho Editorial"
+                                    variant="glass"
+                                    placeholder="Descreva as razões fundamentais para a decisão final..."
+                                    value={feedback}
+                                    onChange={(e) => setFeedback(e.target.value)}
+                                    className="h-40"
+                                />
                             </div>
 
                             <div className="p-12 bg-white/[0.02] flex flex-wrap justify-end gap-6 border-t border-white/5">
-                                <m.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
+                                <Button
                                     onClick={() => handleReviewManuscript('rejected')}
                                     disabled={isSubmitting}
-                                    className="px-8 py-4 bg-red-500/10 text-red-400 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-red-500/20 transition-all flex items-center gap-3 border border-red-500/20 disabled:opacity-50"
+                                    isLoading={isSubmitting}
+                                    variant="outline"
+                                    className="px-8 border-red-500/20 text-red-400 hover:bg-red-500/10"
+                                    leftIcon={!isSubmitting && <XCircle className="w-4 h-4" />}
                                 >
-                                    {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
                                     Rejeitar Obra
-                                </m.button>
-                                <m.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
+                                </Button>
+                                <Button
                                     onClick={() => handleReviewManuscript('approved')}
                                     disabled={isSubmitting}
-                                    className="px-12 py-4 bg-brand-primary text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.25em] hover:brightness-110 transition-all flex items-center gap-3 shadow-[0_10px_40px_-10px_rgba(189,147,56,0.4)] disabled:opacity-50"
+                                    isLoading={isSubmitting}
+                                    className="px-12"
+                                    leftIcon={!isSubmitting && <CheckCircle className="w-4 h-4" />}
                                 >
-                                    {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-                                    <span>Homologar Proposta</span>
-                                </m.button>
+                                    Homologar Proposta
+                                </Button>
                             </div>
                         </m.div>
                     </div>

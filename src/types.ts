@@ -88,10 +88,11 @@ export interface EditorialService {
 
 export interface Order {
   id: string;
+  orderNumber?: string;
   customerName: string;
   customerEmail: string;
   customerId?: string;
-  items: { title: string; quantity: number; price: number; authorId?: string }[];
+  items: { bookId: string; title: string; quantity: number; price: number; authorId?: string }[];
   total: number;
   status: 'Pendente' | 'Validado' | 'Cancelado';
   date: string;

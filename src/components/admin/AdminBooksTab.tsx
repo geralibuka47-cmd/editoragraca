@@ -4,6 +4,7 @@ import { Plus, Edit, Trash2, Search, Filter, BookOpen, Package, DollarSign, Arro
 import { Book } from '../../types';
 import { useToast } from '../Toast';
 import BookFormModal from './BookFormModal';
+import { Input } from '../ui/Input';
 import { saveBook, getBooks, deleteBook } from '../../services/dataService';
 import { uploadFile } from '../../services/storageService';
 
@@ -130,16 +131,14 @@ const AdminBooksTab: React.FC<AdminBooksTabProps> = ({ onStatsRefresh }) => {
                 </div>
 
                 <div className="flex flex-col md:flex-row gap-4 w-full xl:w-auto">
-                    <div className="relative group flex-1 md:w-80">
-                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-brand-primary transition-colors" />
-                        <input
-                            type="text"
-                            placeholder="LOCALIZAR OBRA..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-12 pr-6 py-4 bg-white/5 border border-white/5 focus:border-brand-primary/20 focus:bg-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white outline-none transition-all shadow-xl"
-                        />
-                    </div>
+                    <Input
+                        placeholder="LOCALIZAR OBRA..."
+                        variant="glass"
+                        icon={<Search className="w-4 h-4" />}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="md:w-80"
+                    />
                     <m.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
@@ -153,12 +152,12 @@ const AdminBooksTab: React.FC<AdminBooksTabProps> = ({ onStatsRefresh }) => {
             </div>
 
             {/* 2. Micro Stats Row */}
-            <div className="flex bg-white/5 p-2 rounded-2xl border border-white/5 w-fit">
+            <div className="flex bg-white/5 p-2 rounded-2xl border border-white/5 w-fit max-w-full overflow-x-auto no-scrollbar">
                 {(['all', 'físico', 'digital'] as const).map((format) => (
                     <button
                         key={format}
                         onClick={() => setFilterFormat(format)}
-                        className={`px-10 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${filterFormat === format
+                        className={`px-6 sm:px-10 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${filterFormat === format
                             ? 'bg-brand-primary text-white shadow-lg'
                             : 'text-gray-500 hover:text-white'
                             }`}
@@ -237,8 +236,8 @@ const AdminBooksTab: React.FC<AdminBooksTabProps> = ({ onStatsRefresh }) => {
                                                     <span className="text-[10px] text-gray-600 ml-1.5 uppercase tracking-widest">Kz</span>
                                                 </div>
                                             </td>
-                                            <td className="px-10 py-8 text-right">
-                                                <div className="flex flex-col items-end gap-1.5">
+                                            <td className="px-6 sm:px-10 py-8 text-right">
+                                                <div className="flex flex-col items-end gap-1.5 min-w-[80px]">
                                                     <div className={`text-md font-black ${Number(book.stock ?? 0) < 10 ? 'text-red-500' : 'text-white'}`}>
                                                         {book.stock ?? 0}
                                                         {Number(book.stock ?? 0) < 5 && <AlertCircle className="w-3 h-3 inline ml-2 animate-bounce" />}

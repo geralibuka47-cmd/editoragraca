@@ -1,6 +1,8 @@
 import React from 'react';
 import logo from '../assets/imagens/logo.png';
-import { ShoppingBag, Search, User, LogOut, Menu, X, Bell } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ShoppingBag, Search, User, LogOut, Menu, X, Bell, Loader2, ShoppingCart, ChevronRight } from 'lucide-react';
+import { Input } from './ui/Input';
 import { motion as m, AnimatePresence } from 'framer-motion';
 import { User as UserType, Notification } from '../types';
 import { getNotifications, markNotificationAsRead } from '../services/dataService';
@@ -17,8 +19,26 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
     const [isSearchOpen, setIsSearchOpen] = React.useState(false);
     const [searchQuery, setSearchQuery] = React.useState('');
+    const [searchResults, setSearchResults] = React.useState<any[]>([]);
+    const [isSearching, setIsSearching] = React.useState(false);
     const [isNotificationsOpen, setIsNotificationsOpen] = React.useState(false);
     const [notifications, setNotifications] = React.useState<Notification[]>([]);
+
+    React.useEffect(() => {
+        const delaySearch = setTimeout(async () => {
+            if (searchQuery.length >= 2) {
+                setIsSearching(true);
+                const { instantSearch } = await import('../services/searchService');
+                const results = await instantSearch(searchQuery);
+                setSearchResults(results);
+                setIsSearching(false);
+            } else {
+                setSearchResults([]);
+            }
+        }, 300);
+
+        return () => clearTimeout(delaySearch);
+    }, [searchQuery]);
 
     React.useEffect(() => {
         if (user) {
@@ -54,6 +74,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
         { name: 'Catálogo', path: '/livros' },
         { name: 'Blog', path: '/blog' },
         { name: 'Serviços', path: '/servicos' },
+        { name: 'Projetos', path: '/projetos' },
         { name: 'Sobre', path: '/sobre' },
         { name: 'Contacto', path: '/contacto' },
     ];
@@ -174,17 +195,70 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                         className="absolute top-full left-0 right-0 bg-white border-b border-gray-100 shadow-xl py-6 px-4 md:px-12 flex justify-center"
                     >
                         <form onSubmit={handleSearch} className="w-full max-w-3xl relative">
-                            <input
+                            <Input
                                 autoFocus
                                 type="text"
+                                variant="light"
                                 placeholder="O que procura..."
                                 value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-6 pr-14 py-4 bg-gray-50 rounded-xl text-lg font-medium outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all font-sans"
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                                className="pr-14"
+                                icon={<Search className="w-5 h-5" />}
                             />
-                            <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 text-brand-primary font-bold uppercase text-xs tracking-widest">
-                                Buscar
-                            </button>
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                                {isSearching && <Loader2 className="w-4 h-4 animate-spin text-brand-primary" />}
+                                <button
+                                    type="submit"
+                                    className="text-brand-primary font-bold uppercase text-xs tracking-widest px-2 hover:brightness-110 transition-all"
+                                    title="Efetuar Pesquisa"
+                                    aria-label="Efetuar Pesquisa"
+                                >
+                                    Buscar
+                                </button>
+                            </div>
+
+                            {/* Instant Results Dropdown */}
+                            <AnimatePresence>
+                                {searchResults.length > 0 && (
+                                    <m.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 10 }}
+                                        className="absolute top-full mt-4 left-0 right-0 bg-white rounded-3xl overflow-hidden shadow-2xl border border-gray-100 z-50 p-4"
+                                    >
+                                        <div className="px-6 pt-4 pb-2">
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Resultados Rápidos</span>
+                                        </div>
+                                        <div className="space-y-2">
+                                            {searchResults.map((result) => (
+                                                <button
+                                                    key={result.id}
+                                                    onClick={() => {
+                                                        onNavigate(result.url);
+                                                        setIsSearchOpen(false);
+                                                        setSearchQuery('');
+                                                    }}
+                                                    className="w-full flex items-center gap-4 p-4 hover:bg-gray-50 rounded-2xl transition-all text-left group"
+                                                >
+                                                    <div className="w-12 h-16 bg-gray-100 rounded-lg overflow-hidden shrink-0">
+                                                        {result.image && (
+                                                            <img src={result.image} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                                                        )}
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <h4 className="font-black text-brand-dark leading-tight group-hover:text-brand-primary transition-colors">{result.title}</h4>
+                                                        <p className="text-xs text-gray-500 font-medium">{result.subtitle}</p>
+                                                    </div>
+                                                    <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest ${result.type === 'book' ? 'bg-brand-primary/10 text-brand-primary' : 'bg-brand-dark/10 text-brand-dark'
+                                                        }`}>
+                                                        {result.type === 'book' ? 'Livro' : 'Post'}
+                                                    </span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </m.div>
+                                )}
+                            </AnimatePresence>
                         </form>
                     </m.div>
                 )}

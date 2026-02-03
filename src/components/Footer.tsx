@@ -1,18 +1,76 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import logo from '../assets/imagens/logo.png';
-import { Facebook, Instagram, Twitter, Linkedin, Heart, ArrowRight } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Linkedin, Heart, ArrowRight, Loader2 } from 'lucide-react';
+import { getInstagramPosts, InstagramPost } from '../services/instagramService';
 
 const Footer: React.FC = () => {
+    const [posts, setPosts] = useState<InstagramPost[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchPosts = async () => {
+            try {
+                const data = await getInstagramPosts(4);
+                setPosts(data);
+            } catch (error) {
+                console.error("Error loading Instagram posts:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchPosts();
+    }, []);
+
     return (
         <footer className="bg-brand-dark text-white pt-24 pb-12 border-t border-white/5 font-sans">
             <div className="container mx-auto px-6 md:px-12">
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-20">
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-20 border-b border-white/5 pb-20">
+                    <div className="md:col-span-12">
+                        <div className="flex justify-between items-end mb-12">
+                            <div>
+                                <span className="text-brand-primary text-[10px] font-black uppercase tracking-[0.4em] mb-4 block">@editoragraca</span>
+                                <h3 className="text-3xl font-black uppercase tracking-tighter">Galeria de Inspiração</h3>
+                            </div>
+                            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-xs font-black uppercase tracking-widest text-gray-400 hover:text-white transition-colors border-b border-gray-700 hover:border-white pb-1">
+                                Seguir no Instagram
+                            </a>
+                        </div>
 
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                            {loading ? (
+                                Array(4).fill(0).map((_, i) => (
+                                    <div key={i} className="aspect-square bg-white/5 animate-pulse rounded-2xl" />
+                                ))
+                            ) : (
+                                posts.map(post => (
+                                    <a
+                                        key={post.id}
+                                        href={post.permalink}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="group relative aspect-square overflow-hidden rounded-2xl bg-white/5"
+                                    >
+                                        <img
+                                            src={post.media_url}
+                                            alt={post.caption || 'Instagram post'}
+                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-70 group-hover:opacity-100"
+                                        />
+                                        <div className="absolute inset-0 bg-brand-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                            <Instagram className="w-8 h-8 text-white scale-75 group-hover:scale-100 transition-transform" />
+                                        </div>
+                                    </a>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-20">
                     {/* Brand Column */}
                     <div className="md:col-span-4 space-y-8">
                         <div className="flex items-center gap-3">
                             <img src={logo} alt="Editora Graça" className="h-10 w-auto brightness-0 invert" />
-                            <span className="font-serif font-black text-2xl tracking-tight">EDITORA <span className="text-brand-primary">GRAÇA</span></span>
+                            <span className="font-serif font-black text-2xl tracking-tight uppercase">EDITORA <span className="text-brand-primary">GRAÇA</span></span>
                         </div>
                         <p className="text-gray-400 leading-relaxed max-w-sm font-medium">
                             Elevando a literatura angolana ao mundo. Obras de excelência para leitores exigentes.
@@ -29,7 +87,7 @@ const Footer: React.FC = () => {
                     {/* Links Grid */}
                     <div className="md:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-8">
                         {[
-                            { title: "Empresa", links: ["Sobre Nós", "Carreiras", "Imprensa", "Contactos"] },
+                            { title: "Empresa", links: ["Sobre Nós", "Projetos", "Carreiras", "Imprensa", "Contactos"] },
                             { title: "Catálogo", links: ["Lançamentos", "Mais Vendidos", "eBooks", "Autores"] },
                             { title: "Suporte", links: ["Minha Conta", "Envios", "Devoluções", "FAQ"] },
                             { title: "Legal", links: ["Privacidade", "Termos", "Cookies", "Licenças"] }

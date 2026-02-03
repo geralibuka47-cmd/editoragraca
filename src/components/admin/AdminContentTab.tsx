@@ -403,34 +403,29 @@ const AdminContentTab: React.FC = () => {
                                             {/* We use standard HTML elements here for flexibility with the dynamic JSON/Text handling, 
                                                 but styled to match our premium components */}
                                             {field.type === 'textarea' || field.type === 'json' ? (
-                                                <div className="relative group/field">
-                                                    <textarea
-                                                        id={`field-ctrl-${key}`}
-                                                        title={field.label}
-                                                        placeholder={`Insira aqui os parâmetros para ${field.label.toLowerCase()}...`}
-                                                        className="w-full px-10 py-8 bg-white/[0.03] rounded-[2.5rem] border border-white/5 focus:border-brand-primary/30 focus:bg-white/[0.05] outline-none transition-all h-64 min-h-[180px] font-medium text-gray-400 leading-relaxed shadow-2xl placeholder:text-gray-800 custom-scrollbar uppercase tracking-wider italic"
-                                                        value={field.type === 'json' ? JSON.stringify(siteContent[key] || [], null, 2) : (siteContent[key] || '')}
-                                                        onChange={(e) => {
-                                                            let val = e.target.value;
-                                                            if (field.type === 'json') {
-                                                                try { val = JSON.parse(e.target.value); } catch { return; }
-                                                            }
-                                                            setSiteContent({ ...siteContent, [key]: val });
-                                                        }}
-                                                    />
-                                                </div>
+                                                <Textarea
+                                                    id={`field-ctrl-${key}`}
+                                                    variant="glass"
+                                                    placeholder={`Insira aqui os parâmetros para ${field.label.toLowerCase()}...`}
+                                                    className="h-64 min-h-[180px] text-gray-400 leading-relaxed custom-scrollbar uppercase tracking-wider italic pt-6"
+                                                    value={field.type === 'json' ? JSON.stringify(siteContent[key] || [], null, 2) : (siteContent[key] || '')}
+                                                    onChange={(e) => {
+                                                        let val = e.target.value;
+                                                        if (field.type === 'json') {
+                                                            try { val = JSON.parse(e.target.value); } catch { return; }
+                                                        }
+                                                        setSiteContent({ ...siteContent, [key]: val });
+                                                    }}
+                                                />
                                             ) : (
-                                                <div className="relative group/field">
-                                                    <input
-                                                        type="text"
-                                                        id={`field-ctrl-${key}`}
-                                                        title={field.label}
-                                                        placeholder={`Definição para ${field.label.toLowerCase()}...`}
-                                                        className="w-full px-10 py-6 bg-white/[0.03] rounded-2xl border border-white/5 focus:border-brand-primary/30 focus:bg-white/[0.05] outline-none transition-all font-black text-white uppercase tracking-[0.2em] shadow-2xl text-lg placeholder:text-gray-800"
-                                                        value={siteContent[key] || ''}
-                                                        onChange={(e) => setSiteContent({ ...siteContent, [key]: e.target.value })}
-                                                    />
-                                                </div>
+                                                <Input
+                                                    id={`field-ctrl-${key}`}
+                                                    variant="glass"
+                                                    placeholder={`Definição para ${field.label.toLowerCase()}...`}
+                                                    className="text-white uppercase tracking-[0.2em] shadow-2xl text-lg min-h-[80px]"
+                                                    value={siteContent[key] || ''}
+                                                    onChange={(e) => setSiteContent({ ...siteContent, [key]: e.target.value })}
+                                                />
                                             )}
                                         </m.div>
                                     );
@@ -560,39 +555,39 @@ const AdminContentTab: React.FC = () => {
                                 <div className="grid md:grid-cols-2 gap-10">
                                     <Input
                                         label="AUTORIA DO RELATO"
+                                        variant="glass"
                                         placeholder="EX: PEDRO ALVARES"
                                         icon={<Users className="w-4 h-4" />}
                                         {...register('name')}
                                         error={errors.name?.message as string}
-                                        className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
                                     />
                                     <Input
                                         label="CARGO / TITULAÇÃO"
+                                        variant="glass"
                                         placeholder="EX: LEITOR ASSÍDUO"
                                         icon={<Tag className="w-4 h-4" />}
                                         {...register('role')}
                                         error={errors.role?.message as string}
-                                        className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
                                     />
                                 </div>
 
                                 <Textarea
                                     label="CORPO DO TESTEMUNHO"
+                                    variant="glass"
                                     placeholder="DESCREVA A EXPERIÊNCIA LITERÁRIA..."
                                     rows={5}
                                     {...register('content')}
                                     error={errors.content?.message as string}
-                                    className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
                                 />
 
                                 <div className="grid md:grid-cols-2 gap-10">
                                     <Input
                                         label="LOCALIZAÇÃO DA IMAGEM"
+                                        variant="glass"
                                         placeholder="HTTPS://..."
                                         icon={<ImageIcon className="w-4 h-4" />}
                                         {...register('photo_url')}
                                         error={errors.photo_url?.message as string}
-                                        className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
                                     />
                                     <div className="space-y-4">
                                         <label className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">NÍVEL DE SATISFAÇÃO</label>

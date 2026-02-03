@@ -334,17 +334,17 @@ const AdminTeamTab: React.FC = () => {
                                         label="NOME CODIFICADO"
                                         placeholder="OPERADOR ALFA"
                                         icon={<User className="w-4 h-4" />}
+                                        variant="glass"
                                         {...register('name')}
                                         error={errors.name?.message as string}
-                                        className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
                                     />
                                     <Input
                                         label="ESPECIALIZAÇÃO"
                                         placeholder="ESTRATEGISTA"
                                         icon={<Tag className="w-4 h-4" />}
+                                        variant="glass"
                                         {...register('role')}
                                         error={errors.role?.message as string}
-                                        className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
                                     />
                                 </div>
 
@@ -353,17 +353,17 @@ const AdminTeamTab: React.FC = () => {
                                         label="SECTOR DE ATUAÇÃO"
                                         placeholder="NÚCLEO CENTRAL"
                                         icon={<Briefcase className="w-4 h-4" />}
+                                        variant="glass"
                                         {...register('department')}
                                         error={errors.department?.message as string}
-                                        className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
                                     />
                                     <Input
                                         type="number"
                                         label="NÍVEL DE ACESSO"
                                         icon={<Hash className="w-4 h-4" />}
+                                        variant="glass"
                                         {...register('displayOrder')}
                                         error={errors.displayOrder?.message as string}
-                                        className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
                                     />
                                 </div>
 
@@ -371,18 +371,18 @@ const AdminTeamTab: React.FC = () => {
                                     label="BIOMETRIC ASSET (FOTO URL)"
                                     placeholder="HTTPS://..."
                                     icon={<ImageIcon className="w-4 h-4" />}
+                                    variant="glass"
                                     {...register('photoUrl')}
                                     error={errors.photoUrl?.message as string}
-                                    className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
                                 />
 
                                 <Textarea
                                     label="DOSSIER TÉCNICO (BIO)"
                                     placeholder="REGISTO DE TRAJECTÓRIA E IMPACTO..."
                                     rows={5}
+                                    variant="glass"
                                     {...register('bio')}
                                     error={errors.bio?.message as string}
-                                    className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
                                 />
                             </form>
 

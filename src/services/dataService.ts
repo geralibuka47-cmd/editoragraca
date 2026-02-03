@@ -15,7 +15,8 @@ import {
     Query,
     DocumentData,
     increment,
-    writeBatch
+    writeBatch,
+    runTransaction
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { Book, Order, User } from '../types';
@@ -221,14 +222,57 @@ export const getOrders = async (userId?: string): Promise<Order[]> => {
     }
 };
 
-export const createOrder = async (order: Omit<Order, 'id'>): Promise<string> => {
+export const createOrder = async (order: Omit<Order, 'id'>): Promise<{ id: string; orderNumber: string }> => {
     try {
-        const orderData = prepareForFirestore(order);
-        const docRef = await addDoc(collection(db, COLLECTIONS.ORDERS), {
-            ...orderData,
-            createdAt: Timestamp.now()
+        const orderNumber = `#GRA-${Date.now().toString().slice(-6)}`;
+        const orderData = prepareForFirestore({
+            ...order,
+            orderNumber
         });
-        return docRef.id;
+
+        // Use a transaction to create the order AND decrement stock
+        const resultId = await runTransaction(db, async (transaction) => {
+            // 1. Check stock for all items
+            for (const item of order.items) {
+                if (!item.bookId) continue;
+
+                const bookRef = doc(db, COLLECTIONS.BOOKS, item.bookId);
+                const bookDoc = await transaction.get(bookRef);
+
+                if (!bookDoc.exists()) {
+                    throw new Error(`Livro não encontrado: ${item.title}`);
+                }
+
+                const currentStock = bookDoc.data().stock;
+                // If stock is defined and less than requested quantity
+                if (currentStock !== undefined && currentStock !== null && currentStock < item.quantity) {
+                    throw new Error(`Stock insuficiente para: ${item.title} (Disponível: ${currentStock})`);
+                }
+
+                // 2. Decrement stock if it exists
+                if (currentStock !== undefined && currentStock !== null) {
+                    transaction.update(bookRef, {
+                        stock: currentStock - item.quantity,
+                        updatedAt: Timestamp.now()
+                    });
+                }
+            }
+
+            // 3. Create the order document
+            const orderRef = doc(collection(db, COLLECTIONS.ORDERS));
+            transaction.set(orderRef, {
+                ...orderData,
+                createdAt: Timestamp.now()
+            });
+
+            return orderRef.id;
+        });
+
+        // Clear cache as books stock changed
+        booksCache = null;
+        lastBooksFetch = 0;
+
+        return { id: resultId, orderNumber };
     } catch (error) {
         console.error('Erro ao criar pedido:', error);
         throw error;
@@ -237,14 +281,78 @@ export const createOrder = async (order: Omit<Order, 'id'>): Promise<string> => 
 
 export const updateOrderStatus = async (orderId: string, status: Order['status']) => {
     try {
-        const docRef = doc(db, COLLECTIONS.ORDERS, orderId);
-        await updateDoc(docRef, {
-            status,
-            updatedAt: Timestamp.now()
+        const orderRef = doc(db, COLLECTIONS.ORDERS, orderId);
+
+        await runTransaction(db, async (transaction) => {
+            const orderDoc = await transaction.get(orderRef);
+            if (!orderDoc.exists()) throw new Error("Pedido não encontrado");
+
+            const orderData = orderDoc.data() as Order;
+            const currentStatus = orderData.status;
+
+            // If we are cancelling an order that wasn't already cancelled
+            if (status === 'Cancelado' && currentStatus !== 'Cancelado') {
+                for (const item of orderData.items) {
+                    if (!item.bookId) continue;
+                    const bookRef = doc(db, COLLECTIONS.BOOKS, item.bookId);
+                    const bookDoc = await transaction.get(bookRef);
+                    if (bookDoc.exists()) {
+                        const stock = bookDoc.data().stock;
+                        if (stock !== undefined && stock !== null) {
+                            transaction.update(bookRef, {
+                                stock: stock + item.quantity,
+                                updatedAt: Timestamp.now()
+                            });
+                        }
+                    }
+                }
+            }
+            // If we are restoring an order from cancelled status
+            else if (currentStatus === 'Cancelado' && status !== 'Cancelado') {
+                // Should probably check stock again here, but let's keep it simple for now or prevent this in UI
+                for (const item of orderData.items) {
+                    if (!item.bookId) continue;
+                    const bookRef = doc(db, COLLECTIONS.BOOKS, item.bookId);
+                    const bookDoc = await transaction.get(bookRef);
+                    if (bookDoc.exists()) {
+                        const stock = bookDoc.data().stock;
+                        if (stock !== undefined && stock !== null) {
+                            if (stock < item.quantity) throw new Error(`Stock insuficiente para reativar: ${item.title}`);
+                            transaction.update(bookRef, {
+                                stock: stock - item.quantity,
+                                updatedAt: Timestamp.now()
+                            });
+                        }
+                    }
+                }
+            }
+
+            transaction.update(orderRef, {
+                status,
+                updatedAt: Timestamp.now()
+            });
         });
+
+        // Clear cache as books stock might have changed
+        booksCache = null;
+        lastBooksFetch = 0;
     } catch (error) {
         console.error('Erro ao atualizar status do pedido:', error);
         throw error;
+    }
+};
+
+export const getAllOrders = async (): Promise<Order[]> => {
+    try {
+        const q = query(
+            collection(db, COLLECTIONS.ORDERS),
+            orderBy('createdAt', 'desc')
+        );
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => parseFirestoreDoc(doc.data(), doc.id)) as Order[];
+    } catch (error) {
+        console.error('Erro ao buscar todos os pedidos:', error);
+        return [];
     }
 };
 
@@ -1026,32 +1134,48 @@ export const getAdminStats = async () => {
     try {
         const booksSnapshot = await getDocs(collection(db, COLLECTIONS.BOOKS));
         const usersSnapshot = await getDocs(collection(db, COLLECTIONS.USERS));
-        const pendingQuery = query(
-            collection(db, COLLECTIONS.PAYMENT_NOTIFICATIONS),
-            where('status', '==', 'proof_uploaded')
-        );
-        const pendingSnapshot = await getDocs(pendingQuery);
 
-        const confirmedQuery = query(
+        // New Orders tracking
+        const ordersSnapshot = await getDocs(collection(db, COLLECTIONS.ORDERS));
+
+        let pendingOrders = 0;
+        let revenue = 0;
+        let lowStockCount = 0;
+
+        ordersSnapshot.docs.forEach(doc => {
+            const data = doc.data();
+            if (data.status === 'Pendente') pendingOrders++;
+            if (data.status === 'Validado') revenue += Number(data.total || 0);
+        });
+
+        // Add legacy confirmed sales to revenue
+        const confirmedLegacyQuery = query(
             collection(db, COLLECTIONS.PAYMENT_NOTIFICATIONS),
             where('status', '==', 'confirmed')
         );
-        const confirmedSnapshot = await getDocs(confirmedQuery);
-
-        let revenue = 0;
-        confirmedSnapshot.docs.forEach(doc => {
+        const legacySnapshot = await getDocs(confirmedLegacyQuery);
+        legacySnapshot.docs.forEach(doc => {
             revenue += Number(doc.data().totalAmount || 0);
+        });
+
+        // Count low stock books
+        booksSnapshot.docs.forEach(doc => {
+            const data = doc.data();
+            if (data.format === 'físico' && (data.stock ?? 0) < 5) {
+                lowStockCount++;
+            }
         });
 
         return {
             totalBooks: booksSnapshot.size,
             totalUsers: usersSnapshot.size,
-            pendingOrders: pendingSnapshot.size,
-            revenue
+            pendingOrders,
+            revenue,
+            lowStockCount
         };
     } catch (error) {
         console.error('Error fetching admin stats:', error);
-        return { totalBooks: 0, totalUsers: 0, pendingOrders: 0, revenue: 0 };
+        return { totalBooks: 0, totalUsers: 0, pendingOrders: 0, revenue: 0, lowStockCount: 0 };
     }
 };
 
@@ -1063,15 +1187,27 @@ export const getAuthorStats = async (authorId: string) => {
         );
         const booksSnapshot = await getDocs(booksQuery);
 
-        const salesQuery = query(
-            collection(db, COLLECTIONS.PAYMENT_NOTIFICATIONS),
-            where('status', '==', 'confirmed')
-        );
-        const salesSnapshot = await getDocs(salesQuery);
+        // Both new Orders and legacy Notifications for author stats
+        const ordersSnapshot = await getDocs(collection(db, COLLECTIONS.ORDERS));
+        const salesSnapshot = await getDocs(query(collection(db, COLLECTIONS.PAYMENT_NOTIFICATIONS), where('status', '==', 'confirmed')));
 
         let totalSales = 0;
         let revenue = 0;
 
+        // Process new Orders
+        ordersSnapshot.docs.forEach(doc => {
+            const data = doc.data();
+            if (data.status !== 'Validado') return;
+            const items = data.items || [];
+            items.forEach((item: any) => {
+                if (item.authorId === authorId) {
+                    totalSales += item.quantity || 1;
+                    revenue += (item.price || 0) * (item.quantity || 1);
+                }
+            });
+        });
+
+        // Process legacy Sales
         salesSnapshot.docs.forEach(doc => {
             const items = doc.data().items || [];
             items.forEach((item: any) => {

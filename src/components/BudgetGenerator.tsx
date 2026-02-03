@@ -7,6 +7,7 @@ import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Input } from './ui/Input';
+import { Select } from './ui/Select';
 import { Button } from './ui/Button';
 import { sendEmail } from '../services/emailService';
 
@@ -237,6 +238,7 @@ const BudgetGenerator: React.FC = () => {
                                 <div className="grid md:grid-cols-2 gap-8">
                                     <Input
                                         type="number"
+                                        variant="light"
                                         label="Número de Páginas (Aprox.)"
                                         placeholder="Ex: 150"
                                         {...register('pages')}
@@ -245,6 +247,7 @@ const BudgetGenerator: React.FC = () => {
                                     />
                                     <Input
                                         type="number"
+                                        variant="light"
                                         label="Contagem de Palavras (Opcional)"
                                         placeholder="Ex: 45000"
                                         {...register('wordCount')}
@@ -252,21 +255,19 @@ const BudgetGenerator: React.FC = () => {
                                         className="text-xl font-bold"
                                     />
                                 </div>
-                                <div className="space-y-4">
-                                    <label className="block text-sm font-bold uppercase tracking-widest text-gray-500">Género Literário</label>
-                                    <select
-                                        {...register('genre')}
-                                        className="w-full p-4 bg-gray-50 rounded-xl border border-gray-200 focus:border-brand-primary outline-none font-medium text-brand-dark"
-                                    >
-                                        <option value="">Selecione...</option>
-                                        <option value="Romance">Romance</option>
-                                        <option value="Poesia">Poesia</option>
-                                        <option value="Técnico/Académico">Técnico/Académico</option>
-                                        <option value="Biografia">Biografia</option>
-                                        <option value="Infantil">Infantil</option>
-                                    </select>
-                                    {errors.genre && <span className="text-red-500 text-xs font-bold">{errors.genre.message as string}</span>}
-                                </div>
+                                <Select
+                                    label="Género Literário"
+                                    variant="light"
+                                    options={[
+                                        { value: 'Romance', label: 'Romance' },
+                                        { value: 'Poesia', label: 'Poesia' },
+                                        { value: 'Técnico/Académico', label: 'Técnico/Académico' },
+                                        { value: 'Biografia', label: 'Biografia' },
+                                        { value: 'Infantil', label: 'Infantil' },
+                                    ]}
+                                    {...register('genre')}
+                                    error={errors.genre?.message as string}
+                                />
                             </m.div>
                         )}
 
@@ -340,11 +341,15 @@ const BudgetGenerator: React.FC = () => {
                                     </h4>
                                     <div className="grid md:grid-cols-2 gap-4">
                                         <Input
+                                            label="NOME COMPLETO"
+                                            variant="light"
                                             placeholder="Nome Completo"
                                             {...register('name')}
                                             error={errors.name?.message as string}
                                         />
                                         <Input
+                                            label="WHATSAPP / TELEFONE"
+                                            variant="light"
                                             type="tel"
                                             placeholder="WhatsApp / Telefone"
                                             {...register('phone')}
@@ -352,6 +357,8 @@ const BudgetGenerator: React.FC = () => {
                                         />
                                         <div className="col-span-2">
                                             <Input
+                                                label="ENDEREÇO DE EMAIL"
+                                                variant="light"
                                                 type="email"
                                                 placeholder="Email"
                                                 {...register('email')}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion as m, AnimatePresence } from 'framer-motion';
-import { Edit, Search, User as UserIcon, Shield, PenTool, Mail, Calendar, Activity } from 'lucide-react';
+import { Edit, Search, User as UserIcon, Shield, PenTool, Mail, Calendar } from 'lucide-react';
+import { Input } from '../ui/Input';
 
 const AdminUsersTab: React.FC = () => {
     const [users, setUsers] = useState<any[]>([]);
@@ -60,16 +61,14 @@ const AdminUsersTab: React.FC = () => {
                     <p className="text-gray-500 font-bold text-xs uppercase tracking-widest pl-4">Gestão de Utilizadores e Privilégios</p>
                 </div>
 
-                <div className="relative group w-full xl:w-96">
-                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-brand-primary transition-colors" />
-                    <input
-                        type="text"
-                        placeholder="LOCALIZAR UTILIZADOR..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-12 pr-6 py-4 bg-white/5 border border-white/5 focus:border-brand-primary/20 focus:bg-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white outline-none transition-all shadow-xl"
-                    />
-                </div>
+                <Input
+                    placeholder="PESQUISAR UTILIZADORES..."
+                    variant="glass"
+                    icon={<Search className="w-4 h-4" />}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="md:w-96"
+                />
             </div>
 
             {/* Content Display */}

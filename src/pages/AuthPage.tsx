@@ -198,7 +198,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
             <m.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="w-full max-w-6xl glass-premium rounded-[4rem] shadow-2xl overflow-hidden flex flex-col lg:flex-row shadow-brand-dark/5 border border-white relative z-10"
+                className="w-full max-w-6xl glass-premium rounded-3xl md:rounded-[4rem] shadow-2xl overflow-hidden flex flex-col lg:flex-row shadow-brand-dark/5 border border-white relative z-10"
             >
                 {/* Back Link */}
                 <div className="absolute top-10 left-10 z-[60]">
@@ -213,7 +213,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
                 </div>
 
                 {/* Left Side: Narrative */}
-                <div className="lg:w-[45%] bg-brand-dark p-12 md:p-24 flex flex-col justify-center relative overflow-hidden text-white min-h-[400px]">
+                <div className="hidden lg:flex lg:w-[45%] bg-brand-dark p-12 md:p-24 flex-col justify-center relative overflow-hidden text-white min-h-[400px]">
                     <div className="absolute top-0 right-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center opacity-10 grayscale"></div>
                     <div className="absolute inset-0 bg-gradient-to-br from-brand-dark via-brand-dark/90 to-brand-primary/20"></div>
 
@@ -248,7 +248,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
                             <m.span className="inline-block px-5 py-2 bg-brand-primary/10 text-brand-primary text-[10px] font-black uppercase tracking-[0.4em] rounded-full mb-8 shadow-sm">
                                 {isLogin ? 'Retorno de Elite' : 'Novo Horizonte'}
                             </m.span>
-                            <h2 className="text-5xl md:text-6xl font-black text-brand-dark tracking-tighter leading-tight mb-4 uppercase">
+                            <h2 className="text-4xl md:text-6xl font-black text-brand-dark tracking-tighter leading-tight mb-4 uppercase">
                                 {isLogin ? 'Bem-vindo de Volta' : 'Começar Jornada'}
                             </h2>
                             <p className="text-gray-400 font-bold text-lg leading-relaxed">
@@ -279,6 +279,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
                                     id="name"
                                     label="Identidade Literária"
                                     placeholder="Seu nome completo"
+                                    variant="light"
                                     icon={<User className="w-5 h-5" />}
                                     {...register('name')}
                                     error={errors.name?.message as string}
@@ -290,6 +291,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
                                 type="email"
                                 label="Canal Digital (E-mail)"
                                 placeholder="seu@email.com"
+                                variant="light"
                                 icon={<Mail className="w-5 h-5" />}
                                 {...register('email')}
                                 error={errors.email?.message as string}
@@ -300,6 +302,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
                                 type="password"
                                 label="Chave de Acesso"
                                 placeholder="••••••••"
+                                variant="light"
                                 icon={<Lock className="w-5 h-5" />}
                                 {...register('password')}
                                 error={errors.password?.message as string}

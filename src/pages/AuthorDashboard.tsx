@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Upload, Eye, CheckCircle, Clock, XCircle, User as UserIcon, Loader2, Save, Sparkles, ChevronRight, ArrowRight, CreditCard, Settings, Trash2, Plus } from 'lucide-react';
+import { Upload, FileText, CheckCircle2, Clock, XCircle, Trash2, Send, Save, User as UserIcon, LogOut, Plus, ChevronRight, Download, CreditCard, Landmark, PiggyBank, Briefcase, FileSignature, Wallet, History, AlertCircle, Loader2, Settings, ArrowRight } from 'lucide-react';
 import { motion as m, AnimatePresence } from 'framer-motion';
 import { useToast } from '../components/Toast';
 import { ViewState, User, BankInfo } from '../types';
@@ -8,6 +8,7 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Input } from '../components/ui/Input';
+import { Select } from '../components/ui/Select';
 import { Textarea } from '../components/ui/Textarea';
 import { Button } from '../components/ui/Button';
 
@@ -36,6 +37,8 @@ const bankAccountSchema = z.object({
 
 const profileSchema = z.object({
     whatsappNumber: z.string().optional(),
+    alternativePhone: z.string().optional(), // Added new field
+    iban: z.string().optional(), // Added new field
     paymentMethods: z.array(bankAccountSchema),
 });
 
@@ -74,6 +77,8 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
         resolver: zodResolver(profileSchema),
         defaultValues: {
             whatsappNumber: user?.whatsappNumber || '',
+            alternativePhone: user?.alternativePhone || '', // Default value for new field
+            iban: user?.iban || '', // Default value for new field
             paymentMethods: user?.paymentMethods || [],
         }
     });
@@ -171,7 +176,9 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
             await saveUserProfile({
                 ...user,
                 paymentMethods: data.paymentMethods as BankInfo[],
-                whatsappNumber: data.whatsappNumber || ''
+                whatsappNumber: data.whatsappNumber || '',
+                alternativePhone: data.alternativePhone || '', // Save new field
+                iban: data.iban || '' // Save new field
             });
             showToast('Perfil atualizado com sucesso!', 'success');
         } catch (error) {
@@ -266,7 +273,7 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
                             </div>
                         </div>
                         <div className="absolute bottom-4 right-4 z-20 w-8 h-8 bg-brand-primary rounded-full border-4 border-[#050505] flex items-center justify-center shadow-lg" title="Autor Verificado">
-                            <CheckCircle className="w-4 h-4 text-white" />
+                            <CheckCircle2 className="w-4 h-4 text-white" />
                         </div>
                     </div>
 
@@ -408,7 +415,7 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
                                                                 <div className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest inline-flex items-center gap-2 w-fit mt-2 md:mt-0 ${item.status === 'approved' ? 'bg-green-500/10 text-green-500' :
                                                                     item.status === 'rejected' ? 'bg-red-500/10 text-red-500' : 'bg-yellow-500/10 text-yellow-500'
                                                                     }`}>
-                                                                    {item.status === 'approved' && <CheckCircle className="w-3 h-3" />}
+                                                                    {item.status === 'approved' && <CheckCircle2 className="w-3 h-3" />}
                                                                     {item.status === 'rejected' && <XCircle className="w-3 h-3" />}
                                                                     {item.status === 'pending' && <Clock className="w-3 h-3" />}
                                                                     {getStatusText(item.status)}
@@ -452,44 +459,44 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
                                         <form onSubmit={handleSubmitManuscript(onSubmitManuscript)} className="space-y-6 max-w-2xl">
                                             <Input
                                                 label="Título da Obra *"
+                                                variant="glass"
                                                 placeholder="Título do Livro"
                                                 {...registerManuscript('title')}
                                                 error={manuscriptErrors.title?.message as string}
-                                                className="bg-black/20 border-white/10 text-white placeholder:text-gray-500"
                                             />
 
                                             <div className="grid md:grid-cols-2 gap-6">
-                                                <div className="space-y-2">
-                                                    <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-500 pl-2">Género *</label>
-                                                    <select
-                                                        {...registerManuscript('genre')}
-                                                        className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-primary outline-none transition-colors font-bold appearance-none"
-                                                    >
-                                                        <option value="" className="bg-black text-gray-500">Selecione...</option>
-                                                        <option value="Ficção" className="bg-black">Ficção</option>
-                                                        <option value="Não-Ficção" className="bg-black">Não-Ficção</option>
-                                                        <option value="Poesia" className="bg-black">Poesia</option>
-                                                        <option value="Técnico" className="bg-black">Técnico</option>
-                                                    </select>
-                                                    {manuscriptErrors.genre && <span className="text-red-500 text-xs font-bold">{manuscriptErrors.genre.message as string}</span>}
-                                                </div>
+                                                <Select
+                                                    label="Género *"
+                                                    variant="glass"
+                                                    options={[
+                                                        { value: '', label: 'Selecione...' },
+                                                        { value: 'Ficção', label: 'Ficção' },
+                                                        { value: 'Não-Ficção', label: 'Não-Ficção' },
+                                                        { value: 'Poesia', label: 'Poesia' },
+                                                        { value: 'Técnico', label: 'Técnico' },
+                                                    ]}
+                                                    {...registerManuscript('genre')}
+                                                    error={manuscriptErrors.genre?.message as string}
+                                                />
                                                 <Input
                                                     type="number"
                                                     label="Páginas"
+                                                    variant="glass"
                                                     placeholder="Ex: 200"
                                                     {...registerManuscript('pages')}
                                                     error={manuscriptErrors.pages?.message as string}
-                                                    className="bg-black/20 border-white/10 text-white placeholder:text-gray-500"
                                                 />
                                             </div>
 
                                             <Textarea
                                                 label="Sinopse *"
+                                                variant="glass"
                                                 placeholder="Breve descrição da obra..."
                                                 rows={5}
                                                 {...registerManuscript('description')}
                                                 error={manuscriptErrors.description?.message as string}
-                                                className="bg-black/20 border-white/10 text-white placeholder:text-gray-500 resize-none"
+                                                className="resize-none"
                                             />
 
                                             <div className="space-y-2">
@@ -505,7 +512,7 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
                                                     />
                                                     {selectedFile ? (
                                                         <div className="flex flex-col items-center">
-                                                            <CheckCircle className="w-8 h-8 text-green-500 mb-2" />
+                                                            <CheckCircle2 className="w-8 h-8 text-green-500 mb-2" />
                                                             <p className="font-bold text-white">{selectedFile.name}</p>
                                                             <p className="text-xs text-gray-500">Clique para alterar</p>
                                                         </div>
@@ -619,19 +626,19 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
                                                         value={newBank.bankName}
                                                         onChange={(e) => setNewBank({ ...newBank, bankName: e.target.value })}
                                                         placeholder="Nome do Banco"
-                                                        className="bg-black/20 border-white/10 text-white"
+                                                        variant="glass"
                                                     />
                                                     <Input
                                                         value={newBank.accountNumber}
                                                         onChange={(e) => setNewBank({ ...newBank, accountNumber: e.target.value })}
                                                         placeholder="Número de Conta"
-                                                        className="bg-black/20 border-white/10 text-white"
+                                                        variant="glass"
                                                     />
                                                     <Input
                                                         value={newBank.iban}
                                                         onChange={(e) => setNewBank({ ...newBank, iban: e.target.value })}
                                                         placeholder="IBAN"
-                                                        className="bg-black/20 border-white/10 text-white"
+                                                        variant="glass"
                                                     />
                                                     <button
                                                         type="button"
@@ -645,13 +652,31 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
 
                                             <form onSubmit={handleSubmitProfile(onSubmitProfile)} className="space-y-8">
                                                 <h3 className="text-sm font-black text-white uppercase tracking-widest border-b border-white/10 pb-2">Contacto</h3>
-                                                <Input
-                                                    label="WhatsApp"
-                                                    placeholder="Seu WhatsApp"
-                                                    {...registerProfile('whatsappNumber')}
-                                                    error={profileErrors.whatsappNumber?.message as string}
-                                                    className="bg-black/20 border-white/10 text-white text-white"
-                                                />
+                                                <div className="grid md:grid-cols-2 gap-4">
+                                                    <Input
+                                                        label="WhatsApp"
+                                                        variant="glass"
+                                                        placeholder="Seu WhatsApp"
+                                                        {...registerProfile('whatsappNumber')}
+                                                        error={profileErrors.whatsappNumber?.message as string}
+                                                    />
+                                                    <Input
+                                                        label="Telefone Alternativo"
+                                                        variant="glass"
+                                                        placeholder="Outro contacto"
+                                                        {...registerProfile('alternativePhone')}
+                                                        error={profileErrors.alternativePhone?.message as string}
+                                                    />
+                                                    <div className="col-span-2">
+                                                        <Input
+                                                            label="IBAN para Royalties"
+                                                            variant="glass"
+                                                            placeholder="AO06 0000 0000 0000 0000 0"
+                                                            {...registerProfile('iban')}
+                                                            error={profileErrors.iban?.message as string}
+                                                        />
+                                                    </div>
+                                                </div>
 
                                                 <div className="pt-8">
                                                     <Button

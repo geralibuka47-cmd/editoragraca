@@ -4,6 +4,9 @@ import { Image as ImageIcon, Calendar, MapPin, Users, X, Plus, Smile, Loader2, S
 import { BlogPost } from '../../types';
 import { saveBlogPost, deleteBlogPost } from '../../services/dataService';
 import { useToast } from '../Toast';
+import { Input } from '../ui/Input';
+import { Textarea } from '../ui/Textarea';
+import { Button } from '../ui/Button';
 
 interface AdminBlogTabProps {
     posts: BlogPost[];
@@ -207,30 +210,23 @@ const AdminBlogTab: React.FC<AdminBlogTabProps> = ({ posts: initialPosts, onRefr
                         </div>
 
                         {contentType === 'post' && (
-                            <div className="space-y-8">
-                                <textarea
-                                    id="blog-content"
+                            <div className="space-y-10">
+                                <Textarea
+                                    variant="glass"
                                     value={postContent}
                                     onChange={(e) => setPostContent(e.target.value)}
                                     placeholder="QUAL A NOVIDADE DO DIA?"
-                                    autoFocus
-                                    className="w-full h-48 bg-transparent text-2xl font-black placeholder:text-gray-800 outline-none resize-none border-b border-white/5 pb-6 text-white uppercase tracking-tighter"
+                                    className="h-64 text-2xl font-black placeholder:text-gray-800 border-none bg-transparent pt-0"
                                 />
 
-                                <div className="space-y-4">
-                                    <label htmlFor="blog-image" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">MEDIA ASSET (URL)</label>
-                                    <div className="relative">
-                                        <ImageIcon className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
-                                        <input
-                                            id="blog-image"
-                                            type="url"
-                                            value={postImage}
-                                            onChange={(e) => setPostImage(e.target.value)}
-                                            placeholder="HTTPS://IMAGES.UNSPLASH.COM/..."
-                                            className="w-full pl-16 pr-8 py-5 bg-white/5 rounded-[1.5rem] border border-white/5 focus:border-brand-primary/30 focus:bg-white/10 outline-none transition-all text-[11px] font-black text-gray-300 uppercase tracking-widest"
-                                        />
-                                    </div>
-                                </div>
+                                <Input
+                                    label="MEDIA ASSET (URL)"
+                                    variant="glass"
+                                    icon={<ImageIcon className="w-4 h-4" />}
+                                    value={postImage}
+                                    onChange={(e) => setPostImage(e.target.value)}
+                                    placeholder="HTTPS://IMAGES.UNSPLASH.COM/..."
+                                />
 
                                 {postImage && (
                                     <m.div
@@ -252,100 +248,80 @@ const AdminBlogTab: React.FC<AdminBlogTabProps> = ({ posts: initialPosts, onRefr
                                     </m.div>
                                 )}
 
-                                <m.button
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
+                                <Button
                                     onClick={handleCreatePost}
                                     disabled={isSubmitting}
-                                    className="w-full py-6 bg-brand-primary text-white rounded-[1.5rem] text-[11px] font-black uppercase tracking-[0.3em] shadow-[0_15px_40px_-10px_rgba(189,147,56,0.3)] hover:brightness-110 transition-all disabled:opacity-50 flex items-center justify-center gap-4"
+                                    isLoading={isSubmitting}
+                                    className="w-full py-6 rounded-[1.5rem]"
+                                    leftIcon={!isSubmitting && <Send className="w-4 h-4" />}
                                 >
-                                    {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Send className="w-4 h-4" /> Transmitir Publicação</>}
-                                </m.button>
+                                    Transmitir Publicação
+                                </Button>
                             </div>
                         )}
 
                         {contentType === 'event' && (
-                            <div className="space-y-8">
-                                <div className="grid md:grid-cols-2 gap-8">
-                                    <div className="space-y-4">
-                                        <label htmlFor="event-title" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">DESIGNAÇÃO DO EVENTO</label>
-                                        <input
-                                            id="event-title"
-                                            type="text"
-                                            value={eventData.title}
-                                            onChange={(e) => setEventData({ ...eventData, title: e.target.value })}
-                                            className="w-full px-8 py-5 bg-white/5 border border-white/5 rounded-[1.5rem] focus:border-brand-primary/30 outline-none text-[12px] font-black text-white uppercase tracking-widest"
-                                        />
-                                    </div>
-                                    <div className="space-y-4">
-                                        <label htmlFor="event-location" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">LOCALIZAÇÃO / COORDENADAS</label>
-                                        <div className="relative">
-                                            <MapPin className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
-                                            <input
-                                                id="event-location"
-                                                type="text"
-                                                value={eventData.location}
-                                                onChange={(e) => setEventData({ ...eventData, location: e.target.value })}
-                                                className="w-full pl-16 pr-8 py-5 bg-white/5 border border-white/5 rounded-[1.5rem] focus:border-brand-primary/30 outline-none text-[11px] font-black text-gray-300 uppercase tracking-widest"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="grid md:grid-cols-2 gap-8">
-                                    <div className="space-y-4">
-                                        <label htmlFor="event-date" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">DATA DO SISTEMA</label>
-                                        <input
-                                            id="event-date"
-                                            type="date"
-                                            value={eventData.date}
-                                            onChange={(e) => setEventData({ ...eventData, date: e.target.value })}
-                                            className="w-full px-8 py-5 bg-white/5 border border-white/5 rounded-[1.5rem] focus:border-brand-primary/30 outline-none text-white font-black uppercase text-[11px] tracking-widest"
-                                        />
-                                    </div>
-                                    <div className="space-y-4">
-                                        <label htmlFor="event-time" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">THRONOS (TIME)</label>
-                                        <input
-                                            id="event-time"
-                                            type="time"
-                                            value={eventData.time}
-                                            onChange={(e) => setEventData({ ...eventData, time: e.target.value })}
-                                            className="w-full px-8 py-5 bg-white/5 border border-white/5 rounded-[1.5rem] focus:border-brand-primary/30 outline-none text-white font-black uppercase text-[11px] tracking-widest"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="space-y-4">
-                                    <label htmlFor="event-description" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">SÍNTESE DA MISSÃO</label>
-                                    <textarea
-                                        id="event-description"
-                                        value={eventData.description}
-                                        onChange={(e) => setEventData({ ...eventData, description: e.target.value })}
-                                        className="w-full h-32 bg-white/5 border border-white/5 rounded-[2rem] focus:border-brand-primary/30 outline-none px-8 py-6 text-[11px] font-medium text-gray-300 resize-none shadow-inner uppercase tracking-wider leading-relaxed"
+                            <div className="space-y-10">
+                                <div className="grid md:grid-cols-2 gap-10">
+                                    <Input
+                                        label="DESIGNAÇÃO DO EVENTO"
+                                        variant="glass"
+                                        value={eventData.title}
+                                        onChange={(e) => setEventData({ ...eventData, title: e.target.value })}
+                                        placeholder="EX: NOITE DE AUTÓGRAFOS"
+                                    />
+                                    <Input
+                                        label="LOCALIZAÇÃO / COORDENADAS"
+                                        variant="glass"
+                                        icon={<MapPin className="w-4 h-4" />}
+                                        value={eventData.location}
+                                        onChange={(e) => setEventData({ ...eventData, location: e.target.value })}
+                                        placeholder="LOCAL DO EVENTO..."
                                     />
                                 </div>
 
-                                <div className="space-y-4">
-                                    <label htmlFor="event-image" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 ml-4">ASSET VISUAL DO EVENTO</label>
-                                    <input
-                                        id="event-image"
-                                        type="url"
-                                        value={eventData.imageUrl}
-                                        onChange={(e) => setEventData({ ...eventData, imageUrl: e.target.value })}
-                                        placeholder="URL DA IMAGEM OPTIMIZADA..."
-                                        className="w-full px-8 py-5 bg-white/5 border border-white/5 rounded-[1.5rem] focus:border-brand-primary/30 outline-none text-[10px] font-black text-gray-500 uppercase tracking-widest"
+                                <div className="grid md:grid-cols-2 gap-10">
+                                    <Input
+                                        type="date"
+                                        label="DATA DO SISTEMA"
+                                        variant="glass"
+                                        value={eventData.date}
+                                        onChange={(e) => setEventData({ ...eventData, date: e.target.value })}
+                                    />
+                                    <Input
+                                        type="time"
+                                        label="THRONOS (TIME)"
+                                        variant="glass"
+                                        value={eventData.time}
+                                        onChange={(e) => setEventData({ ...eventData, time: e.target.value })}
                                     />
                                 </div>
 
-                                <m.button
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
+                                <Textarea
+                                    label="SÍNTESE DA MISSÃO"
+                                    variant="glass"
+                                    value={eventData.description}
+                                    onChange={(e) => setEventData({ ...eventData, description: e.target.value })}
+                                    className="h-32"
+                                />
+
+                                <Input
+                                    label="ASSET VISUAL DO EVENTO"
+                                    variant="glass"
+                                    value={eventData.imageUrl}
+                                    onChange={(e) => setEventData({ ...eventData, imageUrl: e.target.value })}
+                                    placeholder="URL DA IMAGEM OPTIMIZADA..."
+                                />
+
+                                <Button
                                     onClick={handleCreateEvent}
                                     disabled={isSubmitting}
-                                    className="w-full py-6 bg-brand-primary text-white rounded-[1.5rem] text-[11px] font-black uppercase tracking-[0.3em] shadow-[0_15px_40px_-10px_rgba(189,147,56,0.3)] hover:brightness-110 transition-all flex items-center justify-center gap-4"
+                                    isLoading={isSubmitting}
+                                    className="w-full py-6 rounded-[1.5rem]"
+                                    leftIcon={!isSubmitting && <Zap className="w-4 h-4" />}
                                 >
-                                    {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Zap className="w-4 h-4" /> Marcar no Calendário Global</>}
-                                </m.button>
+                                    Marcar no Calendário Global
+                                </Button>
                             </div>
                         )}
                     </m.div>

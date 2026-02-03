@@ -143,7 +143,7 @@ const AboutPage: React.FC = () => {
             <div className="h-20 md:h-24 bg-brand-dark"></div>
 
             {/* 1. CINEMATIC HERO */}
-            <section className="relative bg-brand-dark text-white pt-24 pb-48 md:pt-32 md:pb-64 overflow-hidden">
+            <section className="relative bg-brand-dark text-white pt-24 pb-32 md:pt-32 md:pb-64 overflow-hidden">
                 {/* Background Decorative Text */}
                 <div className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-1/4 select-none pointer-events-none opacity-[0.03] whitespace-nowrap">
                     <span className="text-[30rem] font-black uppercase tracking-tighter leading-none">
@@ -163,9 +163,9 @@ const AboutPage: React.FC = () => {
                             <span>Vanguardismo Literário Angolano</span>
                         </m.div>
 
-                        <m.h1 variants={itemVariants} className="text-6xl md:text-[10rem] font-black uppercase leading-[0.8] tracking-tighter mb-12">
+                        <m.h1 variants={itemVariants} className="text-4xl sm:text-6xl md:text-[10rem] font-black uppercase leading-[0.8] tracking-tighter mb-12">
                             A Arte de <br />
-                            <span className="text-brand-primary italic font-serif lowercase font-normal md:text-[8rem]">Eternizar</span>
+                            <span className="text-brand-primary italic font-serif lowercase font-normal text-4xl sm:text-6xl md:text-[8rem]">Eternizar</span>
                         </m.h1>
 
                         <m.p variants={itemVariants} className="text-xl md:text-3xl text-gray-400 font-light leading-relaxed max-w-4xl mx-auto lg:mx-0 opacity-80 mb-20">
@@ -206,7 +206,7 @@ const AboutPage: React.FC = () => {
                                     whileInView="visible"
                                     viewport={{ once: true }}
                                     variants={itemVariants}
-                                    className="group relative flex flex-col gap-8 bg-white p-12 md:p-16 rounded-[4rem] border border-gray-100 hover:border-brand-primary/20 hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.1)] transition-all duration-700"
+                                    className="group relative flex flex-col gap-8 bg-white p-8 sm:p-12 md:p-16 rounded-[3rem] sm:rounded-[4rem] border border-gray-100 hover:border-brand-primary/20 hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.1)] transition-all duration-700"
                                 >
                                     <div className="w-20 h-20 bg-brand-dark text-brand-primary rounded-[1.5rem] flex items-center justify-center mb-4 group-hover:bg-brand-primary group-hover:text-white transition-all duration-500 group-hover:rotate-12">
                                         <Icon className="w-10 h-10" />
@@ -234,9 +234,9 @@ const AboutPage: React.FC = () => {
                         className="text-center max-w-5xl mx-auto mb-32"
                     >
                         <span className="text-brand-primary font-black text-[10px] uppercase tracking-[0.5em] mb-8 block">Bússola Axiológica</span>
-                        <m.h2 variants={itemVariants} className="text-6xl md:text-[8rem] font-black text-brand-dark tracking-tighter mb-10 leading-[0.85] uppercase">
+                        <m.h2 variants={itemVariants} className="text-5xl sm:text-6xl md:text-[8rem] font-black text-brand-dark tracking-tighter mb-10 leading-[0.85] uppercase">
                             Pilares de <br />
-                            <span className="text-brand-primary italic font-serif lowercase font-normal md:text-[7rem]">Prestígio</span>
+                            <span className="text-brand-primary italic font-serif lowercase font-normal text-4xl sm:text-7xl">Prestígio</span>
                         </m.h2>
                     </m.div>
 
@@ -247,7 +247,7 @@ const AboutPage: React.FC = () => {
                                 <m.div
                                     key={index}
                                     variants={itemVariants}
-                                    className="p-12 rounded-[3.5rem] bg-white border border-transparent hover:border-brand-primary/20 transition-all duration-700 group flex flex-col items-center text-center hover:shadow-2xl"
+                                    className="p-8 sm:p-12 rounded-[2.5rem] sm:rounded-[3.5rem] bg-white border border-transparent hover:border-brand-primary/20 transition-all duration-700 group flex flex-col items-center text-center hover:shadow-2xl"
                                 >
                                     <div className="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center mb-10 group-hover:bg-brand-primary transition-all duration-500">
                                         <Icon className="w-10 h-10 text-brand-primary group-hover:text-white" />
@@ -277,7 +277,7 @@ const AboutPage: React.FC = () => {
 
                         <div className="grid lg:grid-cols-2 gap-24 items-center">
                             <div className="space-y-16">
-                                <h3 className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-[0.9] uppercase italic font-serif">
+                                <h3 className="text-3xl sm:text-4xl md:text-6xl font-black text-white tracking-tighter leading-[0.9] uppercase italic font-serif">
                                     {siteContent['about.vision.quote'] || (
                                         <>"Acreditamos que o talento angolano não merece apenas uma voz; merece um <span className="text-brand-primary not-italic font-sans">Palco Mundial</span> de magnitude absoluta."</>
                                     )}
@@ -318,9 +318,9 @@ const AboutPage: React.FC = () => {
                         className="text-center mb-48"
                     >
                         <span className="text-brand-primary font-black text-[10px] uppercase tracking-[0.5em] mb-8 block">Cronologia da Excelência</span>
-                        <m.h2 variants={itemVariants} className="text-6xl md:text-[8rem] font-black text-brand-dark tracking-tighter mb-10 leading-[0.85] uppercase">
+                        <m.h2 variants={itemVariants} className="text-5xl sm:text-6xl md:text-[8rem] font-black text-brand-dark tracking-tighter mb-10 leading-[0.85] uppercase">
                             Génese do <br />
-                            <span className="text-brand-primary italic font-serif lowercase font-normal md:text-[7rem]">Impossível</span>
+                            <span className="text-brand-primary italic font-serif lowercase font-normal text-4xl sm:text-7xl">Impossível</span>
                         </m.h2>
                     </m.div>
 
@@ -402,9 +402,9 @@ const AboutPage: React.FC = () => {
                         viewport={{ once: true }}
                         className="max-w-6xl mx-auto space-y-20"
                     >
-                        <h2 className="text-6xl md:text-[10rem] font-black text-brand-dark tracking-tighter leading-[0.8] uppercase">
+                        <h2 className="text-4xl sm:text-6xl md:text-[10rem] font-black text-brand-dark tracking-tighter leading-[0.8] uppercase">
                             Faça Parte <br />
-                            <span className="text-brand-primary italic font-serif lowercase font-normal md:text-[9rem]">do Futuro</span>
+                            <span className="text-brand-primary italic font-serif lowercase font-normal text-4xl sm:text-9xl">do Futuro</span>
                         </h2>
 
                         <div className="flex flex-col sm:flex-row gap-10 justify-center items-center">

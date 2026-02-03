@@ -170,6 +170,7 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user }) => {
                         onClick={() => navigate('/entrar')}
                         className="w-10 h-10 flex items-center justify-center bg-red-500/20 backdrop-blur-md rounded-full border border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white transition-all"
                         title="Sair"
+                        aria-label="Sair"
                     >
                         <ArrowRight className="w-4 h-4" />
                     </button>
@@ -193,7 +194,7 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user }) => {
 
                     {/* Identity Info */}
                     <div className="flex-1 pb-4 text-center md:text-left">
-                        <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tight mb-2">{user.name}</h1>
+                        <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight mb-2 truncate max-w-full">{user.name}</h1>
                         <p className="text-gray-400 font-medium text-sm tracking-wide flex items-center justify-center md:justify-start gap-2">
                             <span className="text-brand-primary font-black uppercase tracking-[0.2em] text-[10px]">@{user.role}</span>
                             <span className="w-1 h-1 rounded-full bg-gray-600" />
@@ -214,7 +215,7 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user }) => {
                 </div>
 
                 {/* Sticky Nav Dock */}
-                <div className="sticky top-4 z-50 bg-[#050505]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-2 mb-8 shadow-2xl flex flex-wrap justify-center md:justify-start gap-1">
+                <div className="sticky top-4 z-50 bg-[#050505]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-2 mb-8 shadow-2xl flex md:flex-wrap overflow-x-auto no-scrollbar justify-start gap-1">
                     {[
                         { id: 'library', label: 'Acervo', icon: BookIcon },
                         { id: 'wishlist', label: 'Desejos', icon: Heart },
@@ -225,7 +226,7 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user }) => {
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id as any)}
-                            className={`px-6 py-3 rounded-xl flex items-center gap-3 transition-all ${activeTab === tab.id
+                            className={`px-4 sm:px-6 py-3 rounded-xl flex items-center gap-2 sm:gap-3 transition-all flex-shrink-0 ${activeTab === tab.id
                                 ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/20'
                                 : 'text-gray-400 hover:text-white hover:bg-white/5'
                                 }`}

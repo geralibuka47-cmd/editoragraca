@@ -14,11 +14,11 @@
 
   <!-- Security Hardening -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; 
-             script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com https://www.googletagmanager.com https://browser.sentry-cdn.com; 
-             style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
-             img-src 'self' data: https:; 
+             script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com https://www.googletagmanager.com https://browser.sentry-cdn.com https://unpkg.com; 
+             style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; 
+             img-src 'self' data: https: https://*.tile.openstreetmap.org https://*.openlibrary.org; 
              font-src 'self' https://fonts.gstatic.com; 
-             connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.supabase.co https://api.emailjs.com https://*.sentry.io;
+             connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.supabase.co https://api.emailjs.com https://*.sentry.io https://api.brevo.com https://*.tile.openstreetmap.org https://graph.instagram.com https://*.algolia.net https://*.algolianet.com https://openlibrary.org;
              frame-src 'self' https://googleads.g.doubleclick.net https://*.google.com;
              object-src 'none';
              base-uri 'self';

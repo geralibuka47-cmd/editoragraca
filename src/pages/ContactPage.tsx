@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Phone, Mail, Clock, Send, CheckCircle, Sparkles, ArrowUpRight } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, MessageSquare, Clock, ArrowRight, Loader2, CheckCircle, Sparkles, ArrowUpRight } from 'lucide-react';
 import { m, AnimatePresence, Variants } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,6 +10,9 @@ import { Input } from '../components/ui/Input';
 import { Textarea } from '../components/ui/Textarea';
 import { Button } from '../components/ui/Button';
 import { sendEmail } from '../services/emailService';
+import Map from '../components/Map';
+import { useToast } from '../components/Toast';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 
 // Validation Schema
 const contactSchema = z.object({
@@ -41,7 +44,7 @@ const ContactPage: React.FC = () => {
         register,
         handleSubmit,
         reset,
-        formState: { errors },
+        formState: { errors, isSubmitting },
     } = useForm<ContactFormData>({
         resolver: zodResolver(contactSchema),
         defaultValues: {
@@ -187,45 +190,46 @@ const ContactPage: React.FC = () => {
                                     </m.div>
                                 ) : (
                                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
-                                        <div className="grid md:grid-cols-2 gap-10">
+                                        <div className="space-y-4">
                                             <Input
-                                                label="Identidade Literária"
+                                                label="NOME COMPLETO"
+                                                variant="light"
                                                 placeholder="Seu nome"
                                                 {...register('name')}
-                                                error={errors.name?.message}
+                                                error={errors.name?.message as string}
                                             />
                                             <Input
+                                                label="ENDEREÇO DE EMAIL"
+                                                variant="light"
                                                 type="email"
-                                                label="Canal de E-mail"
                                                 placeholder="seu@email.com"
                                                 {...register('email')}
-                                                error={errors.email?.message}
+                                                error={errors.email?.message as string}
+                                            />
+                                            <Input
+                                                label="ASSUNTO"
+                                                variant="light"
+                                                placeholder="No que podemos ajudar?"
+                                                {...register('subject')}
+                                                error={errors.subject?.message as string}
+                                            />
+                                            <Textarea
+                                                label="MENSAGEM"
+                                                variant="light"
+                                                placeholder="Escreva sua mensagem aqui..."
+                                                rows={5}
+                                                {...register('message')}
+                                                error={errors.message?.message as string}
                                             />
                                         </div>
 
-                                        <Input
-                                            label="Tema da Conversa"
-                                            placeholder="Sobre o que vamos falar?"
-                                            {...register('subject')}
-                                            error={errors.subject?.message}
-                                        />
-
-                                        <Textarea
-                                            label="Sua Mensagem"
-                                            placeholder="Descreva sua visão..."
-                                            rows={5}
-                                            {...register('message')}
-                                            error={errors.message?.message}
-                                        />
-
                                         <Button
                                             type="submit"
-                                            variant="secondary"
-                                            className="w-full py-8 rounded-[2rem] text-[11px] tracking-[0.4em] flex items-center justify-center gap-6 group"
-                                            rightIcon={!submitting && <Send className="w-5 h-5 group-hover:translate-x-2 transition-transform" />}
-                                            isLoading={submitting}
+                                            isLoading={isSubmitting}
+                                            className="w-full h-14"
+                                            rightIcon={!isSubmitting && <Send className="w-4 h-4" />}
                                         >
-                                            Transmitir Aspiração
+                                            Enviar Mensagem
                                         </Button>
                                     </form>
                                 )}
@@ -253,7 +257,26 @@ const ContactPage: React.FC = () => {
                 </div>
             </section>
 
-            {/* 3. TEAM SECTION */}
+            {/* 3. MAP SECTION */}
+            <section className="pb-24 bg-white px-6 md:px-12">
+                <div className="container mx-auto">
+                    <div className="h-[500px] w-full relative">
+                        <Map
+                            center={[-9.540, 16.347]}
+                            zoom={15}
+                            markerLabel="Editora Graça - Sede da Inspiração"
+                        />
+                        <div className="absolute bottom-10 left-10 z-[1000] bg-brand-dark/90 backdrop-blur-xl p-8 rounded-[2rem] text-white border border-white/10 hidden md:block max-w-xs transition-hover hover:bg-brand-primary/90">
+                            <h4 className="text-xl font-black uppercase tracking-tighter mb-2">Visite-nos</h4>
+                            <p className="text-gray-400 text-sm leading-relaxed">
+                                Estamos localizados no coração de Malanje, prontos para transformar sua visão em legado.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* 4. TEAM SECTION */}
             <section className="py-24 md:py-48 bg-gray-50 relative overflow-hidden">
                 <div className="container mx-auto px-6 md:px-12 relative z-10">
                     <m.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={containerVariants} className="text-center mb-32">

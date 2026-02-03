@@ -326,9 +326,9 @@ const AdminServicesTab: React.FC = () => {
                                         label="TITULAÇÃO DO SERVIÇO"
                                         placeholder="EX: DESIGN EDITORIAL AVANÇADO"
                                         icon={<Tag className="w-4 h-4" />}
+                                        variant="glass"
                                         {...register('title')}
                                         error={errors.title?.message as string}
-                                        className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
                                     />
                                 </div>
 
@@ -337,17 +337,17 @@ const AdminServicesTab: React.FC = () => {
                                         label="INVESTIMENTO BASE"
                                         placeholder="EX: 45.000 KZ"
                                         icon={<DollarSign className="w-4 h-4" />}
+                                        variant="glass"
                                         {...register('price')}
                                         error={errors.price?.message as string}
-                                        className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
                                     />
                                     <Input
                                         type="number"
                                         label="SEQUÊNCIA DE EXIBIÇÃO"
                                         icon={<Hash className="w-4 h-4" />}
+                                        variant="glass"
                                         {...register('order')}
                                         error={errors.order?.message as string}
-                                        className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800"
                                     />
                                 </div>
 
@@ -356,9 +356,10 @@ const AdminServicesTab: React.FC = () => {
                                         label="ESPECIFICAÇÕES TÉCNICAS (LINHA A LINHA)"
                                         placeholder="EX:&#10;REVISÃO ORTOGRÁFICA&#10;DIAGRAMAÇÃO DE CAPA&#10;REGISTO DE ISBN"
                                         rows={8}
+                                        variant="glass"
                                         {...register('details')}
                                         error={errors.details?.message as string}
-                                        className="bg-white/5 border-white/5 focus:bg-white/10 text-white placeholder:text-gray-800 custom-scrollbar"
+                                        className="custom-scrollbar"
                                     />
                                 </div>
                             </form>

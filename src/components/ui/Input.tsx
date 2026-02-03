@@ -5,10 +5,11 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     error?: string;
     label?: string;
     icon?: React.ReactNode;
+    variant?: 'light' | 'glass';
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-    ({ className, error, label, icon, ...props }, ref) => {
+    ({ className, error, label, icon, variant = 'light', ...props }, ref) => {
         return (
             <div className="w-full space-y-2">
                 {label && (
@@ -25,11 +26,13 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                     <input
                         ref={ref}
                         className={cn(
-                            'w-full bg-gray-50 border-2 border-transparent rounded-[2rem] text-brand-dark font-bold transition-all outline-none placeholder:text-gray-300',
-                            'focus:bg-white focus:border-brand-primary/20 focus:shadow-sm',
+                            'w-full border-2 border-transparent rounded-[2rem] font-bold transition-all outline-none placeholder:text-gray-400',
+                            variant === 'light'
+                                ? 'bg-gray-50 text-brand-dark focus:bg-white focus:border-brand-primary/20 focus:shadow-sm placeholder:text-gray-300'
+                                : 'bg-white/5 text-white border-white/5 focus:bg-white/10 focus:border-brand-primary/20 placeholder:text-gray-600',
                             icon ? 'pl-14 pr-6' : 'px-8',
                             'py-5 text-sm',
-                            error && 'border-red-200 bg-red-50 focus:border-red-300',
+                            error && (variant === 'light' ? 'border-red-200 bg-red-50 focus:border-red-300' : 'border-red-500/50 bg-red-500/10 focus:border-red-500'),
                             className
                         )}
                         {...props}

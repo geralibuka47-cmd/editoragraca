@@ -7,10 +7,12 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
     label?: string;
     options: { value: string; label: string }[];
     icon?: React.ReactNode;
+    variant?: 'light' | 'glass';
+    placeholder?: string;
 }
 
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
-    ({ className, error, label, options, icon, placeholder, ...props }, ref) => {
+    ({ className, error, label, options, icon, placeholder, variant = 'light', ...props }, ref) => {
         return (
             <div className="w-full space-y-2">
                 {label && (
@@ -27,22 +29,24 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
                     <select
                         ref={ref}
                         className={cn(
-                            'w-full bg-gray-50 border-2 border-transparent rounded-[2rem] text-brand-dark font-bold transition-all outline-none appearance-none cursor-pointer',
-                            'focus:bg-white focus:border-brand-primary/20 focus:shadow-sm',
+                            'w-full border-2 border-transparent rounded-[2rem] font-bold transition-all outline-none appearance-none cursor-pointer',
+                            variant === 'light'
+                                ? 'bg-gray-50 text-brand-dark focus:bg-white focus:border-brand-primary/20 focus:shadow-sm'
+                                : 'bg-white/5 text-white border-white/5 focus:bg-white/10 focus:border-brand-primary/20',
                             icon ? 'pl-14 pr-12' : 'pl-8 pr-12',
                             'py-5 text-sm',
-                            error && 'border-red-200 bg-red-50 focus:border-red-300',
+                            error && (variant === 'light' ? 'border-red-200 bg-red-50 focus:border-red-300' : 'border-red-500/50 bg-red-500/10 focus:border-red-500'),
                             className
                         )}
                         {...props}
                     >
                         {placeholder && (
-                            <option value="" disabled className="text-gray-400">
+                            <option value="" disabled className={variant === 'light' ? 'text-gray-400' : 'text-gray-600 bg-brand-dark'}>
                                 {placeholder}
                             </option>
                         )}
                         {options.map((option) => (
-                            <option key={option.value} value={option.value}>
+                            <option key={option.value} value={option.value} className={variant === 'glass' ? 'bg-brand-dark text-white' : ''}>
                                 {option.label}
                             </option>
                         ))}

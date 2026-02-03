@@ -7,6 +7,7 @@ import { subscribeToAuthChanges } from './services/authService';
 import { getBooks } from './services/dataService';
 import { Book, User } from './types';
 import { Loader2 } from 'lucide-react';
+import WhatsAppBubble from './components/WhatsAppBubble';
 
 // Lazy loading pages
 // Lazy loading pages
@@ -23,6 +24,7 @@ const AuthorDashboard = React.lazy(() => import('./pages/AuthorDashboard'));
 const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard'));
 const BookPage = React.lazy(() => import('./pages/BookPage'));
 const MemberDetailPage = React.lazy(() => import('./pages/MemberDetailPage'));
+const ProjectsPage = React.lazy(() => import('./pages/ProjectsPage'));
 
 // Scroll to top on route change
 const ScrollToTop = () => {
@@ -220,6 +222,7 @@ const AppContent: React.FC = () => {
                         <Route path="/blog" element={<BlogPage user={user} />} />
                         <Route path="/servicos" element={<ServicesPage />} />
                         <Route path="/sobre" element={<AboutPage />} />
+                        <Route path="/projetos" element={<ProjectsPage />} />
                         <Route path="/contacto" element={<ContactPage />} />
 
                         <Route path="/carrinho" element={
@@ -264,6 +267,7 @@ const AppContent: React.FC = () => {
             </main>
 
             {!isDashboard && <Footer />}
+            <WhatsAppBubble />
         </div>
     );
 };

@@ -32,11 +32,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user }) => {
         totalBooks: 0,
         totalUsers: 0,
         pendingOrders: 0,
-        revenue: 0
+        revenue: 0,
+        lowStockCount: 0
     });
     const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
     const [isLoadingData, setIsLoadingData] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const fetchData = async () => {
         setIsLoadingData(true);
@@ -93,7 +95,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user }) => {
         <div className="flex h-screen bg-[#050505] text-white overflow-hidden font-sans">
             {/* 1. SIDEBAR NAVIGATION (Glassmorphism App Style) */}
             <aside
-                className={`${isSidebarOpen ? 'w-80' : 'w-24'} flex-shrink-0 transition-all duration-500 bg-[#0A0A0A] border-r border-white/5 flex flex-col z-50`}
+                className={`${isSidebarOpen ? 'w-80' : 'w-24'} hidden lg:flex flex-shrink-0 transition-all duration-500 bg-[#0A0A0A] border-r border-white/5 flex-col z-50`}
             >
                 {/* Logo Area */}
                 <div className="p-8 flex items-center justify-between mb-8">
@@ -164,19 +166,77 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user }) => {
                 </div>
             </aside>
 
+            {/* Mobile Sidebar (Drawer Overlay) */}
+            <AnimatePresence>
+                {isMobileMenuOpen && (
+                    <m.div
+                        initial={{ x: '-100%' }}
+                        animate={{ x: 0 }}
+                        exit={{ x: '-100%' }}
+                        className="fixed inset-0 z-[60] bg-[#0A0A0A] flex flex-col w-80 shadow-2xl lg:hidden"
+                    >
+                        <div className="p-8 flex items-center justify-between mb-8">
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 bg-brand-primary rounded-xl flex items-center justify-center shadow-lg shadow-brand-primary/20">
+                                    <Shield className="text-white w-6 h-6" />
+                                </div>
+                                <div className="font-black text-xl tracking-tighter uppercase">
+                                    Admin<span className="text-brand-primary">Hub</span>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="p-3 bg-white/5 rounded-xl border border-white/5 text-gray-400 hover:text-white transition-colors"
+                                title="Fechar Menu"
+                                aria-label="Fechar Menu"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
+                        <nav className="flex-1 px-4 space-y-2 overflow-y-auto">
+                            {navItems.map((item) => (
+                                <button
+                                    key={item.id}
+                                    onClick={() => { setActiveTab(item.id as any); setIsMobileMenuOpen(false); }}
+                                    className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all ${activeTab === item.id ? 'bg-brand-primary text-white' : 'text-gray-500 hover:text-white'}`}
+                                >
+                                    <item.icon className="w-5 h-5" />
+                                    <span className="text-[10px] font-black uppercase tracking-widest">{item.label}</span>
+                                </button>
+                            ))}
+                        </nav>
+                        <div className="p-6">
+                            <button onClick={() => navigate('/')} className="w-full py-4 bg-white/5 rounded-xl text-[9px] font-black uppercase flex items-center justify-center gap-2">
+                                <LogOut className="w-3 h-3" /> Terminar Sessão
+                            </button>
+                        </div>
+                    </m.div>
+                )}
+            </AnimatePresence>
+
             {/* 2. MAIN CONTENT AREA (Social Protocol Layout) */}
             <main className="flex-1 overflow-y-auto bg-[#050505] relative custom-scrollbar">
 
                 {/* 2.1 COVER AREA */}
-                <div className="h-[250px] relative w-full overflow-hidden group">
+                <div className="h-[200px] md:h-[250px] relative w-full overflow-hidden group">
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050505]/50 to-[#050505] z-10" />
                     <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center opacity-30 group-hover:scale-105 transition-transform duration-1000" />
 
                     {/* Top Action Bar (Absolute) */}
                     <div className="absolute top-0 left-0 right-0 p-8 flex justify-between items-start z-20">
-                        <div className="flex items-center gap-3 px-4 py-2 bg-black/40 backdrop-blur-md rounded-full border border-white/10">
-                            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">Sistema Online</span>
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={() => setIsMobileMenuOpen(true)}
+                                className="lg:hidden w-10 h-10 bg-black/40 hover:bg-white/10 backdrop-blur-md rounded-full border border-white/10 flex items-center justify-center text-gray-300 mr-2"
+                                title="Abrir Menu"
+                                aria-label="Abrir Menu"
+                            >
+                                <Menu className="w-4 h-4" />
+                            </button>
+                            <div className="flex items-center gap-3 px-4 py-2 bg-black/40 backdrop-blur-md rounded-full border border-white/10">
+                                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">Online</span>
+                            </div>
                         </div>
 
                         <div className="flex gap-2">
@@ -212,10 +272,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user }) => {
                         </div>
 
                         {/* Identity Info */}
-                        <div className="flex-1 pb-2">
-                            <div className="flex items-center gap-3 mb-1">
-                                <h1 className="text-4xl font-black uppercase tracking-tight text-white">Central de Comando</h1>
-                                <Activity className="w-5 h-5 text-brand-primary animate-pulse" />
+                        <div className="flex-1 pb-2 text-center md:text-left">
+                            <div className="flex items-center justify-center md:justify-start gap-3 mb-1">
+                                <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight text-white">Central de Comando</h1>
+                                <Activity className="w-5 h-5 text-brand-primary animate-pulse hidden md:block" />
                             </div>
                             <p className="text-gray-400 font-medium text-sm tracking-wide flex items-center gap-2">
                                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Editora Graça</span>

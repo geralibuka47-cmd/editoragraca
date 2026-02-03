@@ -9,7 +9,7 @@ import { Input } from '../ui/Input';
 import { Textarea } from '../ui/Textarea';
 import { Select } from '../ui/Select';
 import { Button } from '../ui/Button';
-import { fetchBookByISBN } from '../../services/googleBooksService';
+import { fetchBookMetadata } from '../../services/bookMetadataService';
 
 // Validation Schema
 const bookSchema = z.object({
@@ -44,7 +44,7 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
     const [coverFile, setCoverFile] = useState<File | null>(null);
     const [digitalFile, setDigitalFile] = useState<File | null>(null);
     const [coverPreview, setCoverPreview] = useState<string>('');
-    const [isFetchingGoogle, setIsFetchingGoogle] = useState(false);
+    const [isFetchingMetadata, setIsFetchingMetadata] = useState(false);
 
     const {
         register,
@@ -141,46 +141,45 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
 
     const isFree = !watchedPrice || Number(watchedPrice) === 0;
 
-    const handleGoogleFetch = async () => {
+    const handleFetchMetadata = async () => {
         const isbn = watch('isbn');
         if (!isbn || isbn.length < 10) return;
 
-        setIsFetchingGoogle(true);
+        setIsFetchingMetadata(true);
         try {
-            const data = await fetchBookByISBN(isbn);
+            const data = await fetchBookMetadata(isbn);
             if (data) {
                 if (data.title) setValue('title', data.title);
                 if (data.authors?.[0]) setValue('author', data.authors[0]);
                 if (data.description) setValue('description', data.description);
 
-                // Map Google categories to local genres if possible
+                // Map categories to local genres if possible
                 if (data.categories?.[0]) {
                     const category = data.categories[0];
                     if (category.includes('Fiction')) setValue('genre', 'Ficção');
                     else if (category.includes('Biography')) setValue('genre', 'Biografia');
                     else if (category.includes('Spirituality') || category.includes('Religion')) setValue('genre', 'Espiritualidade');
-                    // Add more mappings as needed
                 }
 
-                if (data.imageLinks?.thumbnail) {
+                if (data.coverUrl) {
                     setCoverType('link');
-                    setValue('coverUrl', data.imageLinks.thumbnail.replace('http:', 'https:'));
-                    setCoverPreview(data.imageLinks.thumbnail.replace('http:', 'https:'));
+                    const secureUrl = data.coverUrl.replace('http:', 'https:');
+                    setValue('coverUrl', secureUrl);
+                    setCoverPreview(secureUrl);
                 }
             }
         } catch (error) {
-            console.error('Error fetching from Google:', error);
+            console.error('Error fetching metadata:', error);
         } finally {
-            setIsFetchingGoogle(false);
+            setIsFetchingMetadata(false);
         }
     };
 
     const onSubmit = async (data: BookFormData) => {
         try {
-            // Reconstruct the object as expected by onSave
             const sanitizedData = {
                 ...data,
-                id: book?.id, // Pass ID if editing
+                id: book?.id,
                 price: Number(data.price),
                 stock: Number(data.stock),
             };
@@ -191,7 +190,6 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
         }
     };
 
-    // Tabs configuration
     const tabs = [
         { id: 'info', label: 'Essência', icon: FileText },
         { id: 'details', label: 'Ecom', icon: DollarSign },
@@ -217,25 +215,25 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="bg-white rounded-[4rem] w-full max-w-5xl max-h-[90vh] overflow-hidden shadow-[0_40px_100px_-20px_rgba(0,0,0,0.3)] flex flex-col relative z-20 border border-white/20"
+                        className="bg-[#050505] rounded-[4rem] w-full max-w-5xl max-h-[90vh] overflow-hidden shadow-[0_40px_100px_-20px_rgba(0,0,0,0.5)] flex flex-col relative z-20 border border-white/5"
                     >
                         {/* Header */}
-                        <div className="flex justify-between items-center p-12 border-b border-gray-100 bg-gray-50/30">
+                        <div className="flex justify-between items-center p-12 border-b border-white/5 bg-white/[0.02]">
                             <div className="flex items-center gap-6">
-                                <div className="w-16 h-16 bg-white rounded-3xl shadow-xl flex items-center justify-center">
+                                <div className="w-16 h-16 bg-white/[0.05] rounded-3xl border border-white/10 shadow-2xl flex items-center justify-center">
                                     <BookOpen className="w-8 h-8 text-brand-primary" />
                                 </div>
-                                <div>
-                                    <h2 className="text-4xl font-black text-brand-dark tracking-tighter uppercase leading-none mb-2">
+                                <div className="space-y-1">
+                                    <h2 className="text-4xl font-black text-white tracking-tighter uppercase leading-none">
                                         {book ? 'Lapidar' : 'Esculpir'} <span className="text-brand-primary lowercase italic font-light">Obra</span>
                                     </h2>
-                                    <p className="text-gray-400 font-bold text-[10px] uppercase tracking-widest">Metadata editorial e configuração de loja.</p>
+                                    <p className="text-gray-500 font-bold text-[10px] uppercase tracking-[0.3em]">Metadata editorial e configuração de loja.</p>
                                 </div>
                             </div>
                             <button
                                 type="button"
                                 onClick={onClose}
-                                className="w-14 h-14 flex items-center justify-center bg-white shadow-lg border border-gray-100 text-gray-400 hover:text-brand-dark rounded-full transition-all hover:rotate-90 hover:scale-110"
+                                className="w-14 h-14 flex items-center justify-center bg-white/5 border border-white/5 text-gray-500 hover:text-white rounded-full transition-all hover:rotate-90 hover:scale-110 shadow-2xl"
                                 title="Fechar"
                             >
                                 <X className="w-6 h-6" />
@@ -243,14 +241,14 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                         </div>
 
                         {/* Custom Tabs */}
-                        <div className="flex px-12 gap-2 border-b border-gray-100 bg-gray-50/50">
+                        <div className="flex px-12 gap-2 border-b border-white/5 bg-white/[0.01]">
                             {tabs.map(tab => (
                                 <button
                                     key={tab.id}
                                     type="button"
                                     onClick={() => setActiveTab(tab.id as any)}
                                     className={`px-10 py-8 text-[11px] font-black uppercase tracking-[0.2em] relative transition-all flex items-center gap-3 overflow-hidden
-                                        ${activeTab === tab.id ? 'text-brand-primary' : 'text-gray-400 hover:text-brand-dark'}
+                                        ${activeTab === tab.id ? 'text-brand-primary' : 'text-gray-600 hover:text-white'}
                                     `}
                                 >
                                     <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? 'text-brand-primary' : 'text-gray-300'}`} />
@@ -279,6 +277,7 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                         <div className="grid md:grid-cols-2 gap-12">
                                             <Input
                                                 label="Título da Obra"
+                                                variant="glass"
                                                 placeholder="Ex: O Pequeno Caminho"
                                                 icon={<Tag className="w-4 h-4" />}
                                                 {...register('title')}
@@ -287,6 +286,7 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
 
                                             <Input
                                                 label="Autor(a)"
+                                                variant="glass"
                                                 placeholder="Nome completo..."
                                                 icon={<BookOpen className="w-4 h-4" />}
                                                 {...register('author')}
@@ -295,6 +295,7 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
 
                                             <Select
                                                 label="Gênero Literário"
+                                                variant="glass"
                                                 icon={<Layers className="w-4 h-4" />}
                                                 options={[
                                                     { value: 'Ficção', label: 'Ficção' },
@@ -311,18 +312,19 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                             <div className="relative group">
                                                 <Input
                                                     label="ISBN (Identificador)"
+                                                    variant="glass"
                                                     placeholder="978-..."
                                                     {...register('isbn')}
                                                     error={errors.isbn?.message as string}
                                                 />
                                                 <button
                                                     type="button"
-                                                    onClick={handleGoogleFetch}
-                                                    disabled={isFetchingGoogle}
+                                                    onClick={handleFetchMetadata}
+                                                    disabled={isFetchingMetadata}
                                                     className="absolute right-4 top-[38px] p-2 bg-brand-primary/10 text-brand-primary rounded-xl hover:bg-brand-primary hover:text-white transition-all group/fetch disabled:opacity-50"
-                                                    title="Procurar no Google Books"
+                                                    title="Procurar metadados (Google/Open Library)"
                                                 >
-                                                    {isFetchingGoogle ? (
+                                                    {isFetchingMetadata ? (
                                                         <RefreshCw className="w-4 h-4 animate-spin" />
                                                     ) : (
                                                         <Sparkles className="w-4 h-4 group-hover/fetch:scale-110 transition-transform" />
@@ -333,6 +335,7 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                             <div className="md:col-span-2">
                                                 <Textarea
                                                     label="Sinopse da Obra"
+                                                    variant="glass"
                                                     placeholder="Uma descrição envolvente..."
                                                     rows={6}
                                                     {...register('description')}
@@ -340,14 +343,14 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                                 />
                                             </div>
 
-                                            <div className="md:col-span-2 p-10 bg-brand-primary/[0.03] rounded-[3rem] border-2 border-dashed border-brand-primary/10">
+                                            <div className="md:col-span-2 p-10 bg-brand-primary/[0.03] rounded-[3rem] border border-white/5">
                                                 <div className="flex items-center gap-4 mb-6">
                                                     <Calendar className="w-5 h-5 text-brand-primary" />
                                                     <span className="text-[11px] font-black uppercase tracking-widest text-brand-primary">Lançamento & Destaque</span>
                                                 </div>
                                                 <input
                                                     type="datetime-local"
-                                                    className="w-full px-8 py-5 bg-white rounded-2xl border-2 border-transparent transition-all outline-none font-black text-brand-dark focus:border-brand-primary/20"
+                                                    className="w-full px-8 py-5 bg-white/5 rounded-2xl border-2 border-transparent transition-all outline-none font-black text-white focus:border-brand-primary/20"
                                                     {...register('launchDate')}
                                                 />
                                             </div>
@@ -360,6 +363,7 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                                 <Input
                                                     type="number"
                                                     label="Preço (Kz)"
+                                                    variant="glass"
                                                     placeholder="0"
                                                     icon={<DollarSign className="w-4 h-4" />}
                                                     {...register('price')}
@@ -379,6 +383,7 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                             <Input
                                                 type="number"
                                                 label="Stock"
+                                                variant="glass"
                                                 placeholder="0"
                                                 icon={<Package className="w-4 h-4" />}
                                                 {...register('stock')}
@@ -386,23 +391,23 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                             />
 
                                             <div className="md:col-span-2 space-y-6 pt-6">
-                                                <label className="text-[11px] font-black uppercase tracking-widest text-gray-400 ml-4 text-center block">Suporte Editorial</label>
-                                                <div className="flex gap-6 p-3 bg-gray-50/50 rounded-[3rem] border-2 border-gray-100">
+                                                <label className="text-[11px] font-black uppercase tracking-widest text-gray-500 ml-4 text-center block">Suporte Editorial</label>
+                                                <div className="flex gap-6 p-3 bg-white/5 rounded-[3rem] border border-white/10">
                                                     <button
                                                         type="button"
                                                         onClick={() => setValue('format', 'físico')}
-                                                        className={`flex-1 flex flex-col items-center gap-2 py-8 rounded-[2.5rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all relative overflow-hidden ${watchedFormat === 'físico' ? 'bg-white shadow-2xl text-brand-dark ring-1 ring-black/5' : 'text-gray-400 hover:text-gray-600'}`}
+                                                        className={`flex-1 flex flex-col items-center gap-2 py-8 rounded-[2.5rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all relative overflow-hidden ${watchedFormat === 'físico' ? 'bg-white/10 shadow-2xl text-white ring-1 ring-white/10' : 'text-gray-600 hover:text-gray-400'}`}
                                                     >
-                                                        <Package className={`w-6 h-6 ${watchedFormat === 'físico' ? 'text-brand-primary' : 'text-gray-200'}`} />
+                                                        <Package className={`w-6 h-6 ${watchedFormat === 'físico' ? 'text-brand-primary' : 'text-gray-800'}`} />
                                                         Livro de Capa (Físico)
                                                         {watchedFormat === 'físico' && <m.div layoutId="formatIndicator" className="absolute bottom-0 w-8 h-1 bg-brand-primary rounded-full" />}
                                                     </button>
                                                     <button
                                                         type="button"
                                                         onClick={() => setValue('format', 'digital')}
-                                                        className={`flex-1 flex flex-col items-center gap-2 py-8 rounded-[2.5rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all relative overflow-hidden ${watchedFormat === 'digital' ? 'bg-white shadow-2xl text-brand-dark ring-1 ring-black/5' : 'text-gray-400 hover:text-gray-600'}`}
+                                                        className={`flex-1 flex flex-col items-center gap-2 py-8 rounded-[2.5rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all relative overflow-hidden ${watchedFormat === 'digital' ? 'bg-white/10 shadow-2xl text-white ring-1 ring-white/10' : 'text-gray-600 hover:text-gray-400'}`}
                                                     >
-                                                        <Layers className={`w-6 h-6 ${watchedFormat === 'digital' ? 'text-brand-primary' : 'text-gray-200'}`} />
+                                                        <Layers className={`w-6 h-6 ${watchedFormat === 'digital' ? 'text-brand-primary' : 'text-gray-800'}`} />
                                                         E-book (Distribuição Digital)
                                                         {watchedFormat === 'digital' && <m.div layoutId="formatIndicator" className="absolute bottom-0 w-8 h-1 bg-brand-primary rounded-full" />}
                                                     </button>
@@ -413,19 +418,19 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
 
                                     {activeTab === 'files' && (
                                         <div className="space-y-12">
-                                            <div className="p-10 bg-gray-50/50 rounded-[3rem] border-2 border-gray-100">
+                                            <div className="p-10 bg-white/5 rounded-[3rem] border border-white/5">
                                                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-10">
-                                                    <h4 className="text-[12px] font-black uppercase tracking-widest text-brand-dark flex items-center gap-3">
+                                                    <h4 className="text-[12px] font-black uppercase tracking-widest text-white flex items-center gap-3">
                                                         <ImageIcon className="w-5 h-5 text-brand-primary" />
                                                         Veste da Obra (Capa)
                                                     </h4>
-                                                    <div className="flex bg-white p-1.5 rounded-full shadow-sm border border-gray-100">
+                                                    <div className="flex bg-white/5 p-1.5 rounded-full border border-white/5 shadow-2xl">
                                                         {(['file', 'link'] as const).map(type => (
                                                             <button
                                                                 key={type}
                                                                 type="button"
                                                                 onClick={() => setCoverType(type)}
-                                                                className={`px-6 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${coverType === type ? 'bg-brand-primary text-white shadow-lg' : 'text-gray-400 hover:text-brand-dark'}`}
+                                                                className={`px-6 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${coverType === type ? 'bg-brand-primary text-white shadow-lg' : 'text-gray-600 hover:text-white'}`}
                                                             >
                                                                 {type === 'file' ? 'Upload Local' : 'Link Remoto'}
                                                             </button>
@@ -436,7 +441,7 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                                 <div className="flex flex-col lg:flex-row gap-12 items-center lg:items-end">
                                                     <m.div
                                                         whileHover={{ scale: 1.05 }}
-                                                        className="w-48 h-64 bg-white rounded-3xl border-2 border-dashed border-brand-primary/20 flex flex-col items-center justify-center overflow-hidden shadow-2xl flex-shrink-0 relative group"
+                                                        className="w-48 h-64 bg-white/5 rounded-3xl border border-white/10 flex flex-col items-center justify-center overflow-hidden shadow-2xl flex-shrink-0 relative group"
                                                     >
                                                         {coverPreview ? (
                                                             <m.img
@@ -448,8 +453,8 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                                             />
                                                         ) : (
                                                             <div className="text-center p-8">
-                                                                <ImageIcon className="w-10 h-10 text-brand-primary/10 mx-auto mb-4" />
-                                                                <p className="text-[8px] font-black uppercase tracking-widest text-gray-300">Sem Imagem</p>
+                                                                <ImageIcon className="w-10 h-10 text-white/5 mx-auto mb-4" />
+                                                                <p className="text-[8px] font-black uppercase tracking-widest text-gray-700">Sem Imagem</p>
                                                             </div>
                                                         )}
                                                     </m.div>
@@ -465,15 +470,16 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                                                     accept="image/*"
                                                                     title="Mudar Capa"
                                                                 />
-                                                                <div className="px-10 py-8 bg-white rounded-[2rem] border-2 border-gray-100 text-[11px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center justify-center gap-4 group-hover:border-brand-primary/30 group-hover:text-brand-primary transition-all shadow-sm">
+                                                                <div className="px-10 py-8 bg-white/5 rounded-[2rem] border border-white/5 text-[11px] font-black uppercase tracking-[0.2em] text-gray-600 flex items-center justify-center gap-4 group-hover:border-brand-primary/30 group-hover:text-brand-primary transition-all shadow-sm">
                                                                     <Upload className="w-5 h-5" />
                                                                     {coverFile ? coverFile.name : 'Vincular Novo Arquivo Visual'}
                                                                 </div>
                                                             </div>
                                                         ) : (
-                                                            <div className="space-y-2">
+                                                            <div className="space-y-4">
                                                                 <Input
                                                                     label="Endereço da Imagem (URL)"
+                                                                    variant="glass"
                                                                     placeholder="https://servidor.com/capa.jpg"
                                                                     {...register('coverUrl')}
                                                                     onChange={(e) => {
@@ -492,20 +498,20 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                                 <m.div
                                                     initial={{ opacity: 0, scale: 0.98 }}
                                                     animate={{ opacity: 1, scale: 1 }}
-                                                    className="p-10 bg-brand-primary/[0.03] rounded-[3.5rem] border-2 border-dashed border-brand-primary/10"
+                                                    className="p-10 bg-brand-primary/[0.03] rounded-[3.5rem] border border-white/5 shadow-2xl overflow-hidden"
                                                 >
                                                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-10">
                                                         <h4 className="text-[12px] font-black uppercase tracking-widest text-brand-primary flex items-center gap-3">
                                                             <FileText className="w-5 h-5 text-brand-primary" />
                                                             Cesto de Dados (PDF/EPUB)
                                                         </h4>
-                                                        <div className="flex bg-white p-1.5 rounded-full shadow-sm border border-brand-primary/5">
+                                                        <div className="flex bg-white/5 p-1.5 rounded-full border border-white/5 shadow-inner">
                                                             {(['file', 'link'] as const).map(type => (
                                                                 <button
                                                                     key={type}
                                                                     type="button"
                                                                     onClick={() => setDigitalFileType(type)}
-                                                                    className={`px-6 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${digitalFileType === type ? 'bg-brand-primary text-white shadow-lg' : 'text-gray-400 hover:text-brand-primary/60'}`}
+                                                                    className={`px-6 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${digitalFileType === type ? 'bg-brand-primary text-white shadow-lg' : 'text-gray-600 hover:text-white'}`}
                                                                 >
                                                                     {type === 'file' ? 'Upload' : 'URL'}
                                                                 </button>
@@ -516,21 +522,22 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                                     {digitalFileType === 'file' ? (
                                                         <div className="relative group">
                                                             <input type="file" onChange={e => handleFileChange(e, 'digital')} className="absolute inset-0 opacity-0 cursor-pointer z-10" accept=".pdf,.epub" title="Upload" />
-                                                            <div className="p-16 bg-white rounded-[2.5rem] border-2 border-dashed border-brand-primary/10 flex flex-col items-center gap-6 text-center group-hover:bg-brand-primary/[0.01] transition-all">
-                                                                <div className="w-16 h-16 bg-brand-primary/5 rounded-full flex items-center justify-center text-brand-primary shadow-inner">
+                                                            <div className="p-16 bg-white/10 rounded-[2.5rem] border border-white/10 flex flex-col items-center gap-6 text-center group-hover:bg-white/[0.15] transition-all">
+                                                                <div className="w-16 h-16 bg-brand-primary/10 rounded-full flex items-center justify-center text-brand-primary shadow-[0_0_30px_rgba(189,147,56,0.2)]">
                                                                     <Upload className="w-6 h-6" />
                                                                 </div>
                                                                 <div>
-                                                                    <p className="text-[11px] font-black uppercase tracking-[0.2em] text-brand-dark mb-2">
+                                                                    <p className="text-[11px] font-black uppercase tracking-[0.2em] text-white mb-2">
                                                                         {digitalFile ? digitalFile.name : 'Derrame o arquivo aqui'}
                                                                     </p>
-                                                                    <p className="text-[9px] font-bold text-gray-300 uppercase tracking-widest">Formatos Aceites: PDF ou EPUB</p>
+                                                                    <p className="text-[9px] font-bold text-gray-600 uppercase tracking-widest">Formatos Aceites: PDF ou EPUB</p>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     ) : (
                                                         <Input
                                                             label="URL do Arquivo"
+                                                            variant="glass"
                                                             placeholder="Endereço de acesso remoto..."
                                                             {...register('digitalFileUrl')}
                                                         />
@@ -542,11 +549,11 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
 
                                     {activeTab === 'payment' && (
                                         <div className="space-y-12">
-                                            <div className="p-10 bg-brand-dark/5 rounded-[3rem] border border-brand-dark/10 flex gap-6 items-start">
-                                                <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm flex-shrink-0">
-                                                    <Info className="w-6 h-6 text-brand-dark" />
+                                            <div className="p-10 bg-white/[0.03] rounded-[3rem] border border-white/10 flex gap-6 items-start">
+                                                <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center shadow-2xl flex-shrink-0 border border-white/5">
+                                                    <Info className="w-6 h-6 text-brand-primary" />
                                                 </div>
-                                                <p className="text-[11px] font-bold text-brand-dark/70 leading-relaxed uppercase tracking-wider italic">
+                                                <p className="text-[11px] font-bold text-gray-400 leading-relaxed uppercase tracking-wider italic">
                                                     Fluxo de Liquidação Manual: Estes dados serão exibidos no checkout quando o leitor optar por pagamento direto. Mantenha os detalhes do IBAN atualizados.
                                                 </p>
                                             </div>
@@ -554,12 +561,14 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                             <div className="grid md:grid-cols-2 gap-12">
                                                 <Textarea
                                                     label="Coordenadas Bancárias (IBAN/Conta)"
+                                                    variant="glass"
                                                     placeholder="Ex: BAI AO06 0000..."
                                                     className="h-48"
                                                     {...register('paymentInfo')}
                                                 />
                                                 <Textarea
                                                     label="Notas de Procedimento"
+                                                    variant="glass"
                                                     placeholder="Instruções para o envio do comprovativo..."
                                                     className="h-48"
                                                     {...register('paymentInfoNotes')}
@@ -572,13 +581,13 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                         </form>
 
                         {/* Footer Actions */}
-                        <div className="p-12 border-t border-gray-100 flex justify-end gap-8 bg-gray-50/30">
+                        <div className="p-12 border-t border-white/5 flex justify-end gap-8 bg-white/[0.02]">
                             <m.button
                                 whileHover={{ x: -10 }}
                                 whileTap={{ scale: 0.95 }}
                                 type="button"
                                 onClick={onClose}
-                                className="px-10 py-5 rounded-2xl font-black text-[11px] uppercase tracking-[0.3em] text-gray-400 hover:text-brand-dark transition-all"
+                                className="px-10 py-5 rounded-2xl font-black text-[11px] uppercase tracking-[0.3em] text-gray-600 hover:text-white transition-all"
                                 disabled={isSubmitting}
                             >
                                 Abandonar Edição
