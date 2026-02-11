@@ -11,48 +11,32 @@ export interface PodcastEpisode {
 const RSS_URL = 'https://anchor.fm/s/10838fbcc/podcast/rss';
 
 /**
- * Fetches and parses the podcast RSS feed from Anchor.fm.
+ * Fetches and parses the podcast RSS feed from Anchor.fm using a JSON converter.
  */
 export const getPodcastEpisodes = async (): Promise<PodcastEpisode[]> => {
     try {
-        // Note: Direct fetch to anchor.fm might encounter CORS issues in some environments.
-        // We use a try/catch and could potentially use a proxy if needed.
-        const response = await fetch(RSS_URL);
-        if (!response.ok) throw new Error('Failed to fetch RSS feed');
+        // Use rss2json for robust cross-origin fetching and parsing
+        const API_KEY = ''; // Free tier usually works without one for low traffic
+        const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(RSS_URL)}&api_key=${API_KEY}`);
 
-        const xmlText = await response.text();
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+        if (!response.ok) throw new Error('Failed to fetch podcast JSON');
 
-        const items = xmlDoc.querySelectorAll("item");
-        const episodes: PodcastEpisode[] = [];
+        const data = await response.json();
 
-        items.forEach((item, index) => {
-            const title = item.querySelector("title")?.textContent || "Sem título";
-            const description = item.querySelector("description")?.textContent || "";
-            const pubDate = item.querySelector("pubDate")?.textContent || "";
-            const link = item.querySelector("link")?.textContent || "";
-            const audioUrl = item.querySelector("enclosure")?.getAttribute("url") || "";
-            const duration = item.querySelector("itunes\\:duration, duration")?.textContent || "";
+        if (data.status !== 'ok') {
+            console.warn('RSS2JSON status failed:', data.message);
+            return [];
+        }
 
-            // Generate a simple ID if none exists
-            const id = item.querySelector("guid")?.textContent || `ep-${index}`;
-
-            // Clean up description (remove HTML if necessary)
-            const cleanDescription = description.replace(/<[^>]*>?/gm, '').substring(0, 150) + '...';
-
-            episodes.push({
-                id,
-                title,
-                description: cleanDescription,
-                pubDate,
-                audioUrl,
-                link,
-                duration
-            });
-        });
-
-        return episodes;
+        return data.items.map((item: any, index: number) => ({
+            id: item.guid || `ep-${index}`,
+            title: item.title || "Sem título",
+            description: (item.description || "").replace(/<[^>]*>?/gm, '').substring(0, 150) + '...',
+            pubDate: item.pubDate || "",
+            audioUrl: item.enclosure?.link || "",
+            link: item.link || "",
+            duration: item.itunes_duration || ""
+        }));
     } catch (error) {
         console.error('Error fetching podcast feed:', error);
         return [];

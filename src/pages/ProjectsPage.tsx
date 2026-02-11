@@ -254,10 +254,17 @@ const ProjectsPage: React.FC = () => {
                                                     frameBorder="0"
                                                     scrolling="no"
                                                     title="GraçaPlay FM"
-                                                    className="rounded-2xl shadow-2xl"
+                                                    className="rounded-2xl shadow-2xl relative z-10"
                                                 ></iframe>
                                                 <div className="mt-4 flex justify-between items-center px-4">
-                                                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">A Zeno.FM Station</span>
+                                                    <a
+                                                        href="https://zeno.fm/radio/graceplay"
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-[10px] font-bold text-gray-500 hover:text-brand-primary uppercase tracking-[0.2em] transition-colors"
+                                                    >
+                                                        A Zeno.FM Station
+                                                    </a>
                                                     <div className="flex items-center gap-2">
                                                         <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
                                                         <span className="text-[10px] font-black uppercase tracking-widest text-red-500">On Air</span>
