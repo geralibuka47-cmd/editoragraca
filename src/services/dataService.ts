@@ -70,45 +70,56 @@ const parseFirestoreDoc = (docData: any, id: string): any => {
     return parsed;
 };
 
-// Helper: Prepare data for Firestore (convert dates, remove undefined)
+// Helper: Prepare data for Firestore (convert dates, remove undefined recursively)
 const prepareForFirestore = (data: any): any => {
-    const clean: any = {};
+    if (data === null || data === undefined) return data;
 
-    Object.keys(data).forEach(key => {
-        let value = data[key];
+    // Handle Arrays
+    if (Array.isArray(data)) {
+        return data.map(item => prepareForFirestore(item)).filter(item => item !== undefined);
+    }
 
-        // Skip undefined values
-        if (value === undefined) return;
+    // Handle Objects
+    if (typeof data === 'object' && !(data instanceof Timestamp) && !(data instanceof Date)) {
+        const clean: any = {};
+        Object.keys(data).forEach(key => {
+            const value = data[key];
 
-        // Skip temporary IDs
-        if (key === 'id' && typeof value === 'string' && value.startsWith('temp_')) return;
+            // Skip undefined values
+            if (value === undefined) return;
 
-        // Convert ISO strings to Timestamps
-        if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(value)) {
-            try {
-                clean[key] = Timestamp.fromDate(new Date(value));
-                return;
-            } catch (e) {
-                // Keep as string if conversion fails
+            // Skip temporary IDs
+            if (key === 'id' && typeof value === 'string' && value.startsWith('temp_')) return;
+
+            // Convert ISO strings to Timestamps
+            if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(value)) {
+                try {
+                    clean[key] = Timestamp.fromDate(new Date(value));
+                    return;
+                } catch (e) {
+                    // Keep as string if conversion fails
+                }
             }
-        }
 
-        // Handle numbers
-        if (['price', 'total', 'rating', 'pages', 'displayOrder'].includes(key)) {
-            clean[key] = Number(value) || 0;
-        } else if (key === 'stock') {
-            // Allow stock to be null for digital books, otherwise default to 0
-            if (value === null || value === undefined) {
-                clean[key] = data.format === 'digital' ? null : 0;
+            // Handle numbers for specific keys
+            if (['price', 'total', 'rating', 'pages', 'displayOrder'].includes(key)) {
+                clean[key] = Number(value) || 0;
+            } else if (key === 'stock') {
+                // Allow stock to be null for digital books, otherwise default to 0
+                if (value === null) {
+                    clean[key] = data.format === 'digital' ? null : 0;
+                } else {
+                    clean[key] = Number(value) || 0;
+                }
             } else {
-                clean[key] = Number(value);
+                // Recurse for nested objects/arrays
+                clean[key] = prepareForFirestore(value);
             }
-        } else {
-            clean[key] = value;
-        }
-    });
+        });
+        return clean;
+    }
 
-    return clean;
+    return data;
 };
 
 // ==================== BOOKS ====================
