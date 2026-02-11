@@ -252,26 +252,17 @@ const BookDetailModal: React.FC<BookDetailModalProps & { user?: UserType | null;
                                 <div className="pt-4 md:pt-6 space-y-3">
                                     {/* Download Button for Digital Books */}
                                     {book.format === 'digital' && book.digitalFileUrl && (
-                                        <div>
-                                            {book.price === 0 ? (
-                                                <a
-                                                    href={book.digitalFileUrl}
-                                                    download
-                                                    className="w-full btn-premium py-4 md:py-5 justify-center text-base md:text-lg rounded-xl md:rounded-2xl shadow-xl shadow-green-500/30 !bg-green-600 hover:!bg-green-700"
-                                                >
-                                                    <Download className="w-5 h-5 md:w-6 md:h-6" />
-                                                    Download Gratuito
-                                                </a>
-                                            ) : hasDownloadAccess ? (
-                                                <a
-                                                    href={book.digitalFileUrl}
-                                                    download
-                                                    className="w-full btn-premium py-4 md:py-5 justify-center text-base md:text-lg rounded-xl md:rounded-2xl shadow-xl shadow-blue-500/30 !bg-blue-600 hover:!bg-blue-700"
-                                                >
-                                                    <Download className="w-5 h-5 md:w-6 md:h-6" />
-                                                    Fazer Download
-                                                </a>
-                                            ) : (
+                                        <div className="space-y-3">
+                                            <a
+                                                href={book.digitalFileUrl}
+                                                download
+                                                className={`w-full btn-premium py-4 md:py-5 justify-center text-base md:text-lg rounded-xl md:rounded-2xl shadow-xl ${book.price === 0 ? 'shadow-green-500/30 !bg-green-600 hover:!bg-green-700' : 'shadow-blue-500/30 !bg-blue-600 hover:!bg-blue-700'} ${!hasDownloadAccess && book.price > 0 ? 'hidden' : 'flex'}`}
+                                            >
+                                                <Download className="w-5 h-5 md:w-6 md:h-6" />
+                                                {book.price === 0 ? 'Download Gratuito' : 'Fazer Download'}
+                                            </a>
+
+                                            {(!hasDownloadAccess || book.price === 0) && (
                                                 <button
                                                     onClick={() => {
                                                         onAddToCart(book);
@@ -280,13 +271,13 @@ const BookDetailModal: React.FC<BookDetailModalProps & { user?: UserType | null;
                                                     className="w-full btn-premium py-4 md:py-5 justify-center text-base md:text-lg rounded-xl md:rounded-2xl shadow-xl shadow-brand-primary/30"
                                                 >
                                                     <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
-                                                    Comprar para Download
+                                                    {book.price === 0 ? 'Adicionar à Minha Biblioteca' : 'Comprar para Download'}
                                                 </button>
                                             )}
                                         </div>
                                     )}
 
-                                    {/* Add to Cart Button (for physical books or digital without download access) */}
+                                    {/* Add to Cart Button (for physical books or digital without direct file) */}
                                     {(book.format !== 'digital' || !book.digitalFileUrl) && (
                                         <button
                                             onClick={() => {
@@ -296,7 +287,7 @@ const BookDetailModal: React.FC<BookDetailModalProps & { user?: UserType | null;
                                             className="w-full btn-premium py-4 md:py-5 justify-center text-base md:text-lg rounded-xl md:rounded-2xl shadow-xl shadow-brand-primary/30"
                                         >
                                             <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
-                                            Adicionar ao Carrinho
+                                            {book.price === 0 ? 'Adicionar ao Carrinho (Grátis)' : 'Adicionar ao Carrinho'}
                                         </button>
                                     )}
                                 </div>

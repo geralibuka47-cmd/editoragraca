@@ -21,7 +21,7 @@ import { optimizeImageUrl } from '../components/OptimizedImage';
 import { useToast } from '../components/Toast';
 import SEO from '../components/SEO';
 
-const BookPage: React.FC<{ user?: UserType | null; onAddToCart: (book: Book) => void }> = ({ user, onAddToCart }) => {
+const BookPage: React.FC<{ user?: UserType | null; cart: any[]; onAddToCart: (book: Book) => void }> = ({ user, cart, onAddToCart }) => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { showToast } = useToast();
@@ -234,33 +234,47 @@ const BookPage: React.FC<{ user?: UserType | null; onAddToCart: (book: Book) => 
                             {/* CTAs */}
                             <div className="flex flex-col sm:flex-row gap-6 pt-4">
                                 {book.format === 'digital' && book.digitalFileUrl ? (
-                                    <>
-                                        {hasDownloadAccess ? (
-                                            <a
-                                                href={book.digitalFileUrl}
-                                                download
-                                                className="px-12 py-6 bg-brand-dark text-white font-black uppercase tracking-widest text-sm rounded-2xl hover:bg-brand-primary transition-all shadow-2xl shadow-brand-dark/20 flex items-center justify-center gap-4 group"
-                                            >
-                                                <Download className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                                                Baixar Obra Digital
-                                            </a>
-                                        ) : (
-                                            <button
-                                                onClick={() => onAddToCart(book)}
-                                                className="px-12 py-6 bg-brand-dark text-white font-black uppercase tracking-widest text-sm rounded-2xl hover:bg-brand-primary transition-all shadow-2xl shadow-brand-dark/20 flex items-center justify-center gap-4 group"
-                                            >
-                                                <ShoppingCart className="w-5 h-5 group-hover:-translate-y-1 transition-transform" />
-                                                Adquirir E-Book
-                                            </button>
-                                        )}
-                                    </>
+                                    <div className="flex flex-col gap-4 w-full">
+                                        <div className="flex flex-col sm:flex-row gap-6">
+                                            {hasDownloadAccess ? (
+                                                <a
+                                                    href={book.digitalFileUrl}
+                                                    download
+                                                    className="flex-1 px-12 py-6 bg-brand-dark text-white font-black uppercase tracking-widest text-sm rounded-2xl hover:bg-brand-primary transition-all shadow-2xl shadow-brand-dark/20 flex items-center justify-center gap-4 group"
+                                                >
+                                                    <Download className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                                                    Baixar Obra Digital
+                                                </a>
+                                            ) : (
+                                                <button
+                                                    onClick={() => onAddToCart(book)}
+                                                    className="flex-1 px-12 py-6 bg-brand-dark text-white font-black uppercase tracking-widest text-sm rounded-2xl hover:bg-brand-primary transition-all shadow-2xl shadow-brand-dark/20 flex items-center justify-center gap-4 group"
+                                                >
+                                                    <ShoppingCart className="w-5 h-5 group-hover:-translate-y-1 transition-transform" />
+                                                    Adquirir E-Book
+                                                </button>
+                                            )}
+
+                                            {/* Allow adding free books to cart even if downloadable, so they can "own" it in dashboard */}
+                                            {book.price === 0 && !cart.some(item => item.id === book.id) && (
+                                                <button
+                                                    onClick={() => onAddToCart(book)}
+                                                    className="p-6 border-2 border-brand-primary/20 text-brand-primary rounded-2xl hover:bg-brand-primary hover:text-white transition-all flex items-center justify-center gap-2 group"
+                                                    title="Adicionar à Minha Biblioteca"
+                                                >
+                                                    <ShoppingCart className="w-6 h-6" />
+                                                    <span className="text-[10px] font-black uppercase tracking-widest">Adicionar ao Carrinho</span>
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
                                 ) : (
                                     <button
                                         onClick={() => onAddToCart(book)}
                                         className="px-12 py-6 bg-brand-dark text-white font-black uppercase tracking-widest text-sm rounded-2xl hover:bg-brand-primary transition-all shadow-2xl shadow-brand-dark/20 flex items-center justify-center gap-4 group"
                                     >
                                         <ShoppingCart className="w-5 h-5 group-hover:-translate-y-1 transition-transform" />
-                                        Adicionar ao Carrinho
+                                        {book.price === 0 ? 'Adicionar Grátis ao Carrinho' : 'Adicionar ao Carrinho'}
                                     </button>
                                 )}
 
