@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
+import { getPodcastEpisodes, PodcastEpisode } from '../services/podcastService';
 import {
     GraduationCap,
     PlayCircle,
@@ -20,6 +21,20 @@ import {
 
 const ProjectsPage: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'academia' | 'fundacao' | 'play'>('academia');
+    const [episodes, setEpisodes] = useState<PodcastEpisode[]>([]);
+    const [loadingEpisodes, setLoadingEpisodes] = useState(false);
+
+    useEffect(() => {
+        if (activeTab === 'play') {
+            const loadEpisodes = async () => {
+                setLoadingEpisodes(true);
+                const data = await getPodcastEpisodes();
+                setEpisodes(data.slice(0, 6)); // Show latest 6
+                setLoadingEpisodes(false);
+            };
+            loadEpisodes();
+        }
+    }, [activeTab]);
 
     const academiaContent = {
         title: "Academia Graça",
@@ -225,35 +240,87 @@ const ProjectsPage: React.FC = () => {
                                             "{playContent.quote}"
                                         </p>
 
+                                        {/* Radio Player Widget */}
+                                        <div className="space-y-6">
+                                            <h3 className="text-xl font-black uppercase tracking-widest text-brand-primary flex items-center gap-3">
+                                                <Zap className="w-5 h-5" />
+                                                GraçaPlay FM (Ao Vivo)
+                                            </h3>
+                                            <div className="relative w-full overflow-hidden rounded-3xl bg-white/5 border border-white/10 p-4 backdrop-blur-md">
+                                                <iframe
+                                                    src="https://zeno.fm/player/graceplay"
+                                                    width="100%"
+                                                    height="250"
+                                                    frameBorder="0"
+                                                    scrolling="no"
+                                                    title="GraçaPlay FM"
+                                                    className="rounded-2xl shadow-2xl"
+                                                ></iframe>
+                                                <div className="mt-4 flex justify-between items-center px-4">
+                                                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">A Zeno.FM Station</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                                                        <span className="text-[10px] font-black uppercase tracking-widest text-red-500">On Air</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <p className="text-lg text-gray-400 leading-relaxed">
                                             {playContent.presentation}
                                         </p>
-
-                                        <div className="flex gap-4">
-                                            <button className="px-10 py-5 bg-brand-primary text-white font-black rounded-2xl hover:scale-105 transition-all text-[10px] uppercase tracking-widest flex items-center gap-3">
-                                                <Mic className="w-5 h-5" />
-                                                Ouvir episódios
-                                            </button>
-                                            <button
-                                                className="p-5 border border-white/10 rounded-2xl hover:bg-white/5 transition-all"
-                                                title="Ver mais sobre Graça Play"
-                                                aria-label="Ver mais sobre Graça Play"
-                                            >
-                                                <ArrowRight className="w-5 h-5" />
-                                            </button>
-                                        </div>
                                     </div>
 
                                     <div className="space-y-12">
-                                        <div className="bg-white/5 backdrop-blur-xl p-10 rounded-[3rem] border border-white/10">
-                                            <h3 className="text-2xl font-black mb-8 uppercase tracking-widest text-brand-primary">Conteúdos</h3>
-                                            <div className="grid sm:grid-cols-2 gap-6">
-                                                {playContent.content.map((item, i) => (
-                                                    <div key={i} className="flex gap-4 items-start">
-                                                        <div className="w-1.5 h-1.5 bg-brand-primary rounded-full mt-2 shrink-0"></div>
-                                                        <p className="text-sm font-medium text-gray-300">{item}</p>
+                                        {/* Podcast Episodes List */}
+                                        <div className="bg-white/5 backdrop-blur-xl p-8 md:p-12 rounded-[3rem] border border-white/10">
+                                            <h3 className="text-2xl font-black mb-8 uppercase tracking-widest text-brand-primary flex items-center justify-between">
+                                                <span>Últimos Episódios</span>
+                                                <Mic className="w-6 h-6" />
+                                            </h3>
+
+                                            <div className="space-y-6 max-h-[500px] overflow-y-auto pr-4 custom-scrollbar">
+                                                {loadingEpisodes ? (
+                                                    <div className="flex justify-center py-12">
+                                                        <span className="w-8 h-8 border-4 border-brand-primary border-t-transparent rounded-full animate-spin"></span>
                                                     </div>
-                                                ))}
+                                                ) : episodes.length > 0 ? (
+                                                    episodes.map((ep) => (
+                                                        <a
+                                                            key={ep.id}
+                                                            href={ep.link}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="block p-6 bg-white/5 rounded-2xl hover:bg-brand-primary/20 border border-white/5 hover:border-brand-primary/30 transition-all group"
+                                                        >
+                                                            <div className="flex justify-between items-start mb-2">
+                                                                <h4 className="font-bold text-white group-hover:text-brand-primary transition-colors line-clamp-1">{ep.title}</h4>
+                                                                <span className="text-[10px] font-bold text-gray-500 uppercase shrink-0 ml-4">
+                                                                    {ep.duration}
+                                                                </span>
+                                                            </div>
+                                                            <p className="text-xs text-gray-400 line-clamp-2 mb-4 leading-relaxed italic">
+                                                                {ep.description}
+                                                            </p>
+                                                            <div className="flex items-center gap-2 text-[10px] font-black text-brand-primary uppercase tracking-widest group-hover:gap-3 transition-all">
+                                                                Ouvir Agora <ArrowRight className="w-3 h-3" />
+                                                            </div>
+                                                        </a>
+                                                    ))
+                                                ) : (
+                                                    <p className="text-gray-500 text-center py-8 font-medium">Nenhum episódio encontrado.</p>
+                                                )}
+                                            </div>
+
+                                            <div className="mt-10 pt-8 border-t border-white/10 flex justify-center">
+                                                <a
+                                                    href="https://anchor.fm/editoragraca"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 hover:text-brand-primary transition-colors flex items-center gap-2"
+                                                >
+                                                    Ver todos no Anchor.fm <ArrowUpRight className="w-4 h-4" />
+                                                </a>
                                             </div>
                                         </div>
 

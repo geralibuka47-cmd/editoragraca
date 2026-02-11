@@ -124,13 +124,33 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                         <Search className="w-5 h-5" />
                     </button>
 
-                    <button
-                        onClick={() => user ? onNavigate(user.role === 'adm' ? 'ADMIN' : 'READER_DASHBOARD') : onNavigate('/login?mode=login')}
-                        className="p-2 text-brand-dark/80 hover:text-brand-primary transition-colors rounded-full hover:bg-gray-50"
-                        title={user ? "Minha Conta" : "Entrar"}
-                    >
-                        <User className="w-5 h-5" />
-                    </button>
+                    {user ? (
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => onNavigate(user.role === 'adm' ? 'ADMIN' : (user.role === 'autor' ? 'AUTHOR_DASHBOARD' : 'READER_DASHBOARD'))}
+                                className="p-2 text-brand-dark/80 hover:text-brand-primary transition-colors rounded-full hover:bg-gray-50 flex items-center gap-2"
+                                title="Minha Conta"
+                            >
+                                <User className="w-5 h-5" />
+                                <span className="text-[10px] font-black uppercase tracking-widest hidden lg:block">Painel</span>
+                            </button>
+                            <button
+                                onClick={onLogout}
+                                className="p-2 text-red-500/80 hover:text-red-500 transition-colors rounded-full hover:bg-red-50"
+                                title="Sair"
+                            >
+                                <LogOut className="w-5 h-5" />
+                            </button>
+                        </div>
+                    ) : (
+                        <button
+                            onClick={() => onNavigate('/login?mode=login')}
+                            className="p-2 text-brand-dark/80 hover:text-brand-primary transition-colors rounded-full hover:bg-gray-50"
+                            title="Entrar"
+                        >
+                            <User className="w-5 h-5" />
+                        </button>
+                    )}
 
                     <button
                         onClick={() => onNavigate('CHECKOUT')}

@@ -201,7 +201,7 @@ const BookDetailModal: React.FC<BookDetailModalProps & { user?: UserType | null;
 
                                 <div className="flex items-center gap-2 text-green-600 font-bold text-[10px] md:text-xs uppercase tracking-widest">
                                     <Check className="w-3 h-3 md:w-4 md:h-4" />
-                                    <span>{book.format === 'digital' ? 'Download Imediato' : 'Disponível em Stock'}</span>
+                                    <span>{book.format === 'digital' ? 'Acesso Imediato' : (book.stock > 0 ? 'Disponível em Stock' : 'Sob Encomenda')}</span>
                                 </div>
 
                                 <p className="text-reading py-4 border-y border-gray-100">
@@ -230,7 +230,7 @@ const BookDetailModal: React.FC<BookDetailModalProps & { user?: UserType | null;
                                     <div className="flex flex-col">
                                         <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Preço Online</span>
                                         <span className="text-2xl md:text-4xl font-black text-brand-dark">
-                                            {book.price === 0 ? 'GRATUITO' : `${book.price?.toLocaleString()} Kz`}
+                                            {Number(book.price) === 0 ? 'GRATUITO' : `${Number(book.price).toLocaleString()} Kz`}
                                         </span>
                                     </div>
 

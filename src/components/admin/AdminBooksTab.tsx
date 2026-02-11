@@ -238,17 +238,25 @@ const AdminBooksTab: React.FC<AdminBooksTabProps> = ({ onStatsRefresh }) => {
                                             </td>
                                             <td className="px-6 sm:px-10 py-8 text-right">
                                                 <div className="flex flex-col items-end gap-1.5 min-w-[80px]">
-                                                    <div className={`text-md font-black ${Number(book.stock ?? 0) < 10 ? 'text-red-500' : 'text-white'}`}>
-                                                        {book.stock ?? 0}
-                                                        {Number(book.stock ?? 0) < 5 && <AlertCircle className="w-3 h-3 inline ml-2 animate-bounce" />}
-                                                    </div>
-                                                    <div className="h-1 w-20 bg-white/5 rounded-full overflow-hidden">
-                                                        <m.div
-                                                            initial={{ width: 0 }}
-                                                            animate={{ width: `${Math.min(((book.stock ?? 0) / 50) * 100, 100)}%` }}
-                                                            className={`h-full ${Number(book.stock ?? 0) < 10 ? 'bg-red-500' : 'bg-brand-primary'}`}
-                                                        />
-                                                    </div>
+                                                    {book.format === 'digital' ? (
+                                                        <div className="text-[10px] font-black uppercase tracking-widest text-blue-400 bg-blue-500/10 px-3 py-1 rounded-lg border border-blue-500/20">
+                                                            Ilimitado
+                                                        </div>
+                                                    ) : (
+                                                        <>
+                                                            <div className={`text-md font-black ${Number(book.stock ?? 0) < 10 ? 'text-red-500' : 'text-white'}`}>
+                                                                {book.stock ?? 0}
+                                                                {Number(book.stock ?? 0) < 5 && <AlertCircle className="w-3 h-3 inline ml-2 animate-bounce" />}
+                                                            </div>
+                                                            <div className="h-1 w-20 bg-white/5 rounded-full overflow-hidden">
+                                                                <m.div
+                                                                    initial={{ width: 0 }}
+                                                                    animate={{ width: `${Math.min(((book.stock ?? 0) / 50) * 100, 100)}%` }}
+                                                                    className={`h-full ${Number(book.stock ?? 0) < 10 ? 'bg-red-500' : 'bg-brand-primary'}`}
+                                                                />
+                                                            </div>
+                                                        </>
+                                                    )}
                                                 </div>
                                             </td>
                                             <td className="px-10 py-8">

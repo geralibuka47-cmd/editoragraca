@@ -181,7 +181,7 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                 ...data,
                 id: book?.id,
                 price: Number(data.price),
-                stock: Number(data.stock),
+                stock: data.format === 'digital' ? null : Number(data.stock),
             };
             await onSave(sanitizedData, coverFile, digitalFile);
             onClose();
@@ -380,15 +380,29 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                                 )}
                                             </div>
 
-                                            <Input
-                                                type="number"
-                                                label="Stock"
-                                                variant="glass"
-                                                placeholder="0"
-                                                icon={<Package className="w-4 h-4" />}
-                                                {...register('stock')}
-                                                error={errors.stock?.message as string}
-                                            />
+                                            {watchedFormat !== 'digital' && (
+                                                <Input
+                                                    type="number"
+                                                    label="Stock em Armazém"
+                                                    variant="glass"
+                                                    placeholder="0"
+                                                    icon={<Package className="w-4 h-4" />}
+                                                    {...register('stock')}
+                                                    error={errors.stock?.message as string}
+                                                />
+                                            )}
+
+                                            {watchedFormat === 'digital' && (
+                                                <div className="flex flex-col gap-2 p-10 bg-blue-500/5 rounded-[2.5rem] border border-blue-500/10">
+                                                    <div className="flex items-center gap-3 mb-2">
+                                                        <Zap className="w-5 h-5 text-blue-500" />
+                                                        <span className="text-[11px] font-black uppercase tracking-widest text-blue-500">Distribuição Infinita</span>
+                                                    </div>
+                                                    <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wider leading-relaxed">
+                                                        O formato digital não requer controlo de stock físico. A obra estará sempre disponível para download após a validação do pagamento.
+                                                    </p>
+                                                </div>
+                                            )}
 
                                             <div className="md:col-span-2 space-y-6 pt-6">
                                                 <label className="text-[11px] font-black uppercase tracking-widest text-gray-500 ml-4 text-center block">Suporte Editorial</label>

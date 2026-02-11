@@ -31,7 +31,7 @@ const Footer: React.FC = () => {
                                 <span className="text-brand-primary text-[10px] font-black uppercase tracking-[0.4em] mb-4 block">@editoragraca</span>
                                 <h3 className="text-3xl font-black uppercase tracking-tighter">Galeria de Inspiração</h3>
                             </div>
-                            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-xs font-black uppercase tracking-widest text-gray-400 hover:text-white transition-colors border-b border-gray-700 hover:border-white pb-1">
+                            <a href="https://www.instagram.com/editoragraca/" target="_blank" rel="noopener noreferrer" className="text-xs font-black uppercase tracking-widest text-gray-400 hover:text-white transition-colors border-b border-gray-700 hover:border-white pb-1">
                                 Seguir no Instagram
                             </a>
                         </div>

@@ -65,6 +65,7 @@ const parseFirestoreDoc = (docData: any, id: string): any => {
     if (parsed.launchDate) parsed.launchDate = timestampToString(parsed.launchDate);
     if (parsed.uploadedAt) parsed.uploadedAt = timestampToString(parsed.uploadedAt);
     if (parsed.confirmedAt) parsed.confirmedAt = timestampToString(parsed.confirmedAt);
+    if (parsed.date) parsed.date = timestampToString(parsed.date);
 
     return parsed;
 };
@@ -93,8 +94,15 @@ const prepareForFirestore = (data: any): any => {
         }
 
         // Handle numbers
-        if (['price', 'stock', 'total', 'rating', 'pages', 'displayOrder'].includes(key)) {
+        if (['price', 'total', 'rating', 'pages', 'displayOrder'].includes(key)) {
             clean[key] = Number(value) || 0;
+        } else if (key === 'stock') {
+            // Allow stock to be null for digital books, otherwise default to 0
+            if (value === null || value === undefined) {
+                clean[key] = data.format === 'digital' ? null : 0;
+            } else {
+                clean[key] = Number(value);
+            }
         } else {
             clean[key] = value;
         }
@@ -243,7 +251,13 @@ export const createOrder = async (order: Omit<Order, 'id'>): Promise<{ id: strin
                     throw new Error(`Livro não encontrado: ${item.title}`);
                 }
 
-                const currentStock = bookDoc.data().stock;
+                const bookData = bookDoc.data() as Book;
+                const currentStock = bookData.stock;
+                const isDigital = bookData.format === 'digital';
+
+                // Skip stock check for digital books
+                if (isDigital) continue;
+
                 // If stock is defined and less than requested quantity
                 if (currentStock !== undefined && currentStock !== null && currentStock < item.quantity) {
                     throw new Error(`Stock insuficiente para: ${item.title} (Disponível: ${currentStock})`);
