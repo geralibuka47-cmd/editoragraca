@@ -63,7 +63,7 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
         handleSubmit: handleSubmitManuscript,
         reset: resetManuscript,
         formState: { errors: manuscriptErrors, isSubmitting: isSubmittingManuscript }
-    } = useForm<any>({
+    } = useForm<ManuscriptFormData>({
         resolver: zodResolver(manuscriptSchema)
     });
 
@@ -73,7 +73,7 @@ const AuthorDashboard: React.FC<AuthorDashboardProps> = ({ user }) => {
         handleSubmit: handleSubmitProfile,
         control: controlProfile,
         formState: { errors: profileErrors, isSubmitting: isSubmittingProfile }
-    } = useForm<any>({
+    } = useForm<ProfileFormData>({
         resolver: zodResolver(profileSchema),
         defaultValues: {
             whatsappNumber: user?.whatsappNumber || '',

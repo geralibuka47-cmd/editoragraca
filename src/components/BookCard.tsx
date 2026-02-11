@@ -10,7 +10,7 @@ interface BookCardProps {
     onViewDetails: (book: Book) => void;
 }
 
-const BookCard: React.FC<BookCardProps> = ({ book, onAddToCart, onViewDetails }) => {
+const BookCard: React.FC<BookCardProps> = ({ book, onAddToCart, onViewDetails, onToggleWishlist }) => {
     return (
         <div
             className="group relative flex flex-col gap-6 cursor-pointer"

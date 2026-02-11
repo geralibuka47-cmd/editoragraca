@@ -4,7 +4,7 @@ import { BookOpen, ShoppingCart, Star, ChevronLeft, ChevronRight, Play, Download
 import { m, AnimatePresence, Variants } from 'framer-motion';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { useBookSearch } from '../hooks/useBookSearch';
+
 import { Book, BlogPost } from '../types';
 import BookCard from '../components/BookCard';
 import { getPublicStats, getBlogPosts, getSiteContent, getTestimonials, getTeamMembers } from '../services/dataService';
