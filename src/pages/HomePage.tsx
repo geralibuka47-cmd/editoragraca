@@ -8,7 +8,7 @@ import { Button } from '../components/ui/Button';
 import { Book, BlogPost } from '../types';
 import BookCard from '../components/BookCard';
 import { getPublicStats, getBlogPosts, getSiteContent, getTestimonials, getTeamMembers } from '../services/dataService';
-import { optimizeImageUrl } from '../components/OptimizedImage';
+import { OptimizedImage, optimizeImageUrl } from '../components/OptimizedImage';
 import SEO from '../components/SEO';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
