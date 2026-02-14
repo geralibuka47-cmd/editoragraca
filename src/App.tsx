@@ -304,7 +304,7 @@ const getBasename = () => {
     return '/';
 };
 
-import { LazyMotion, domMax } from 'framer-motion';
+import { LazyMotion, domAnimation } from 'framer-motion';
 
 const App: React.FC = () => {
     // Check version before render
@@ -314,7 +314,7 @@ const App: React.FC = () => {
 
     return (
         <ErrorBoundary>
-            <LazyMotion features={domMax} strict>
+            <LazyMotion features={domAnimation} strict>
                 <Router basename={getBasename()}>
                     <ToastProvider>
                         <ScrollToTop />

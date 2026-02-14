@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion as m, AnimatePresence } from 'framer-motion';
-import { Edit, Search, User as UserIcon, Shield, PenTool, Mail, Calendar } from 'lucide-react';
+import { Edit, Search, User as UserIcon, Shield, PenTool, Mail, Calendar, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
 import { Input } from '../ui/Input';
+import { UserRole } from '../../types';
+import { useToast } from '../Toast';
+import { updateUserRole } from '../../services/dataService';
 
 const AdminUsersTab: React.FC = () => {
     const [users, setUsers] = useState<any[]>([]);
@@ -26,6 +29,34 @@ const AdminUsersTab: React.FC = () => {
     useEffect(() => {
         fetchUsers();
     }, []);
+
+    const { showToast } = useToast();
+
+    const handleUpdateRole = async (userId: string, currentRole: string, action: 'promote' | 'demote') => {
+        let newRole: UserRole = 'leitor';
+
+        if (action === 'promote') {
+            if (currentRole === 'leitor') newRole = 'autor';
+            else if (currentRole === 'autor' || currentRole === 'autor') newRole = 'adm';
+            else return; // Already admin
+        } else {
+            if (currentRole === 'adm' || currentRole === 'admin') newRole = 'autor';
+            else if (currentRole === 'autor') newRole = 'leitor';
+            else return; // Already reader
+        }
+
+        if (!window.confirm(`Tem certeza que deseja ${action === 'promote' ? 'promover' : 'despromover'} este utilizador para ${newRole}?`)) {
+            return;
+        }
+
+        try {
+            await updateUserRole(userId, newRole);
+            showToast('Nível de acesso atualizado com sucesso!', 'success');
+            fetchUsers();
+        } catch (error) {
+            showToast('Erro ao atualizar nível de acesso.', 'error');
+        }
+    };
 
     useEffect(() => {
         const query = searchQuery.toLowerCase();
@@ -136,11 +167,31 @@ const AdminUsersTab: React.FC = () => {
                                                 </div>
                                             </td>
                                             <td className="px-10 py-8">
-                                                <div className="flex items-center justify-center">
+                                                <div className="flex items-center justify-center gap-3">
+                                                    {(u.role === 'leitor' || u.role === 'autor') && (
+                                                        <button
+                                                            onClick={() => handleUpdateRole(u.id, u.role, 'promote')}
+                                                            title="Promover Utilizador"
+                                                            aria-label="Promover Utilizador"
+                                                            className="w-10 h-10 bg-green-500/10 hover:bg-green-500/20 text-green-500 rounded-xl transition-all flex items-center justify-center border border-green-500/10 group/promote"
+                                                        >
+                                                            <ArrowUpCircle className="w-4 h-4 transition-transform group-hover/promote:-translate-y-1" />
+                                                        </button>
+                                                    )}
+                                                    {(u.role === 'adm' || u.role === 'admin' || u.role === 'autor') && (
+                                                        <button
+                                                            onClick={() => handleUpdateRole(u.id, u.role, 'demote')}
+                                                            title="Despromover Utilizador"
+                                                            aria-label="Despromover Utilizador"
+                                                            className="w-10 h-10 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl transition-all flex items-center justify-center border border-red-500/10 group/demote"
+                                                        >
+                                                            <ArrowDownCircle className="w-4 h-4 transition-transform group-hover/demote:translate-y-1" />
+                                                        </button>
+                                                    )}
                                                     <button
-                                                        title="Aceder Perfil Completo"
-                                                        aria-label="Aceder Perfil Completo"
-                                                        className="w-12 h-12 bg-white/5 hover:bg-brand-primary/10 text-gray-500 hover:text-brand-primary rounded-xl transition-all flex items-center justify-center border border-white/5 group/btn"
+                                                        title="Editar Perfil"
+                                                        aria-label="Editar Perfil"
+                                                        className="w-10 h-10 bg-white/5 hover:bg-brand-primary/10 text-gray-500 hover:text-brand-primary rounded-xl transition-all flex items-center justify-center border border-white/5 group/btn"
                                                     >
                                                         <Edit className="w-4 h-4 transition-transform group-hover/btn:scale-110" />
                                                     </button>

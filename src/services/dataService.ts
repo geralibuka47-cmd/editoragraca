@@ -19,7 +19,7 @@ import {
     runTransaction
 } from 'firebase/firestore';
 import { db } from './firebase';
-import { Book, Order, User } from '../types';
+import { Book, Order, User, UserRole } from '../types';
 
 // Firestore Collections
 const COLLECTIONS = {
@@ -129,22 +129,32 @@ let booksCache: Book[] | null = null;
 let lastBooksFetch = 0;
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-export const getBooks = async (forceRefresh = false): Promise<Book[]> => {
+export const getBooks = async (forceRefresh = false, limitCount?: number): Promise<Book[]> => {
     const now = Date.now();
+
+    // If not forcing refresh, and we have cache, and it's not expired, and we're not asking for a restricted subset that cache might not satisfy
     if (!forceRefresh && booksCache && (now - lastBooksFetch < CACHE_DURATION)) {
-        return booksCache;
+        if (!limitCount || booksCache.length >= limitCount) {
+            return limitCount ? booksCache.slice(0, limitCount) : booksCache;
+        }
     }
 
     try {
-        const q = query(collection(db, COLLECTIONS.BOOKS), orderBy('createdAt', 'desc'));
+        let q = query(collection(db, COLLECTIONS.BOOKS), orderBy('createdAt', 'desc'));
+        if (limitCount) {
+            q = query(q, limit(limitCount));
+        }
         const snapshot = await getDocs(q);
 
         const books = snapshot.docs.map(doc =>
             parseFirestoreDoc(doc.data(), doc.id)
         ) as Book[];
 
-        booksCache = books;
-        lastBooksFetch = now;
+        // Only update global cache if we fetched the full list
+        if (!limitCount) {
+            booksCache = books;
+            lastBooksFetch = now;
+        }
 
         return books;
     } catch (error) {
@@ -154,9 +164,8 @@ export const getBooks = async (forceRefresh = false): Promise<Book[]> => {
 };
 
 export const getBooksMinimal = async (forceRefresh = false): Promise<Book[]> => {
-    // For Firestore, we fetch all since there's no SELECT equivalent
-    // But we could optimize by using a separate minimal collection if needed
-    return getBooks(forceRefresh);
+    // Fetch a smaller subset initially for faster first paint
+    return getBooks(forceRefresh, 12);
 };
 
 export const getBookById = async (id: string): Promise<Book | null> => {
@@ -1384,6 +1393,18 @@ export const createNotification = async (notification: any) => {
         });
     } catch (error) {
         console.error('Error creating notification:', error);
+        throw error;
+    }
+};
+
+// ==================== USER MANAGEMENT ====================
+
+export const updateUserRole = async (userId: string, newRole: UserRole) => {
+    try {
+        const docRef = doc(db, COLLECTIONS.USERS, userId);
+        await updateDoc(docRef, { role: newRole });
+    } catch (error) {
+        console.error('Error updating user role:', error);
         throw error;
     }
 };

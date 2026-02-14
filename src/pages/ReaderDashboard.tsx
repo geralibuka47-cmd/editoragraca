@@ -119,18 +119,6 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user }) => {
         }
     };
 
-    // Mock data - in real app would come from database
-
-    const wishlistBooks = [
-        {
-            id: '3',
-            title: 'Mayombe',
-            author: 'Pepetela',
-            coverUrl: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=300&h=400&fit=crop',
-            price: 8500
-        }
-    ];
-
     if (!user) {
         return (
             <div className="min-h-screen bg-brand-light flex items-center justify-center p-8">
@@ -284,8 +272,6 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user }) => {
                                 exit={{ opacity: 0, y: -10 }}
                                 transition={{ duration: 0.2 }}
                             >
-                                {/* REUSING EXISTING TAB CONTENT LOGIC WITH ADJUSTED STYLING */}
-
                                 {activeTab === 'library' && (
                                     <div className="bg-white/5 border border-white/5 rounded-[2.5rem] p-8 md:p-12">
                                         <div className="mb-10">
@@ -323,22 +309,11 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user }) => {
                                     <div className="bg-white/5 border border-white/5 rounded-[2.5rem] p-8 md:p-12">
                                         <div className="mb-10">
                                             <h2 className="text-3xl font-black uppercase italic tracking-tighter">Lista de Desejos</h2>
+                                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">Obras que pretende adquirir futuramente</p>
                                         </div>
-                                        <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                                            {wishlistBooks.map((book) => (
-                                                <div key={book.id} className="bg-black/20 rounded-3xl p-4 border border-white/5">
-                                                    <div className="aspect-[2/3] rounded-2xl overflow-hidden mb-4 bg-gray-800">
-                                                        <img src={book.coverUrl} className="w-full h-full object-cover opacity-60" alt={book.title} />
-                                                    </div>
-                                                    <div className="flex justify-between items-center">
-                                                        <div>
-                                                            <h3 className="font-bold text-sm truncate w-32">{book.title}</h3>
-                                                            <p className="text-brand-primary font-black text-xs">{book.price.toLocaleString()} Kz</p>
-                                                        </div>
-                                                        <button className="p-2 bg-white/10 rounded-lg hover:bg-brand-primary hover:text-white transition-colors" title="Comprar" aria-label="Comprar"><CreditCard className="w-4 h-4" /></button>
-                                                    </div>
-                                                </div>
-                                            ))}
+                                        <div className="text-center py-20 text-gray-600">
+                                            <Heart className="w-12 h-12 mx-auto mb-4 opacity-20" />
+                                            <p className="text-sm font-medium uppercase tracking-[0.2em]">Sua lista de desejos está vazia.</p>
                                         </div>
                                     </div>
                                 )}
@@ -458,7 +433,6 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user }) => {
                                         </div>
                                     </div>
                                 )}
-
                             </m.div>
                         </AnimatePresence>
                     </div>
@@ -471,4 +445,3 @@ const ReaderDashboard: React.FC<ReaderDashboardProps> = ({ user }) => {
 };
 
 export default ReaderDashboard;
-

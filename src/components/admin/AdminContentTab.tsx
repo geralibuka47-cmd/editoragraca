@@ -30,7 +30,6 @@ const AdminContentTab: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [lastSaved, setLastSaved] = useState<string | null>(null);
-    const [isSyncing, setIsSyncing] = useState(false);
 
     // Testimonial Form
     const [showTestimonialModal, setShowTestimonialModal] = useState(false);
@@ -58,101 +57,6 @@ const AdminContentTab: React.FC = () => {
     const currentRating = watch('rating');
 
 
-    const PREMIUM_DEFAULTS: Record<string, { section: string; value: any }> = {
-        'home.hero.title': { section: 'home', value: "Onde a Arte" },
-        'home.hero.subtitle': { section: 'home', value: "Encontra o Legado" },
-        'home.hero.description': { section: 'home', value: "Curadoria de excelência para leitores que exigem o extraordinário." },
-        'home.experience.list': { section: 'home', value: ["Acabamentos de luxo em cada edição.", "Curadoria internacional de autores.", "Eventos exclusivos para membros."] },
-        'home.experience.premium_title': { section: 'home', value: "Premium" },
-        'home.experience.premium_desc': { section: 'home', value: "Qualidade inegociável em cada página impressa." },
-        'home.experience.eternal_title': { section: 'home', value: "Eterno" },
-        'home.experience.eternal_desc': { section: 'home', value: "Obras feitas para durar gerações." },
-
-        'about.hero.text': { section: 'about', value: "Uma casa editorial de elite comprometida com a sofisticação intelectual e a preservação do património cultural através da curadoria literária de alta performance." },
-        'about.vision.quote': { section: 'about', value: "Acreditamos que o talento angolano não merece apenas uma voz; merece um Palco Mundial de magnitude absoluta." },
-        'about.philosophy': {
-            section: 'about', value: [
-                { icon: 'Target', label: 'Filosofia Principal', title: 'Rigor & Estética', description: 'Cada obra é submetida a uma auditoria editorial implacável para garantir o status de obra-prima.' },
-                { icon: 'Sparkles', label: 'Visão Futurista', title: 'Inovação Nativa', description: 'Lideramos a evolução da narrativa em Angola, mesclando tradição impressa com tecnologia imersiva.' },
-                { icon: 'Zap', label: 'Impacto Cultural', title: 'Legado Atemporal', description: 'Construímos o cânone literário do futuro, dando voz aos pensadores que definem o nosso tempo.' }
-            ]
-        },
-        'about.values': {
-            section: 'about', value: [
-                { icon: 'BookOpen', title: 'Excelência Literária', description: 'Compromisso inabalável com a qualidade e rigor editorial em cada publicação.' },
-                { icon: 'Heart', title: 'Paixão pela Cultura', description: 'Promover e preservar a riqueza cultural angolana através da literatura.' },
-                { icon: 'Users', title: 'Valorização de Autores', description: 'Apoio integral a escritores locais, dando voz aos suas histórias únicas.' },
-                { icon: 'Award', title: 'Reconhecimento', description: 'Busca constante pela excelência reconhecida nacional e internacionalmente.' }
-            ]
-        },
-        'about.stats': {
-            section: 'about', value: [
-                { number: '26+', label: 'Obras Publicadas', icon: 'BookOpen' },
-                { number: '100%', label: 'Autores Angolanos', icon: 'Star' },
-                { number: '5+', label: 'Anos de Actividade', icon: 'Zap' },
-                { number: '18', label: 'Províncias Alcançadas', icon: 'MapPin' }
-            ]
-        },
-        'about.timeline': {
-            section: 'about', value: [
-                { year: '2020', title: 'Fundação', description: 'Fundada pelo designer literário Nilton Graça, com o propósito de fortalecer o setor editorial e promover a literautra lusófona.' },
-                { year: '2021', title: 'Início Editorial', description: 'Início das operações de edição, diagramação e design, servindo autores independentes e parceiros.' },
-                { year: '2023', title: 'Crescimento', description: 'Marca de 26+ obras publicadas sob selo próprio e através de colaborações institucionais.' },
-                { year: '2026', title: 'Reestruturação', description: 'Reorganização estratégica, consolidação da comunidade e expansão para formatos digitais.' }
-            ]
-        },
-
-        'services.methodology': {
-            section: 'services', value: [
-                { icon: 'MessageSquare', title: 'Consulta Inicial', description: 'Conversamos sobre a sua obra, objetivos e público-alvo para definir a melhor estratégia.' },
-                { icon: 'Search', title: 'Análise Editorial', description: 'A nossa equipa avalia o seu manuscrito e sugere os serviços ideais para o seu sucesso.' },
-                { icon: 'Zap', title: 'Execução Criativa', description: 'Transformamos o seu texto com revisão, diagramação e design de capa de nível mundial.' },
-                { icon: 'Award', title: 'Publicação Final', description: 'Entregamos a sua obra pronta para o mercado, com toda a qualidade da Editora Graça.' }
-            ]
-        }
-    };
-
-    const PREMIUM_SERVICES = [
-        { title: 'Revisão e Edição', price: '250 Kz / página', details: ['Correção ortográfica e gramatical', 'Adequação ao acordo ortográfico', 'Edição profissional completa'], order: 1 },
-        { title: 'Diagramação', price: '250 Kz / página', details: ['Layout profissional para impressão', 'Tipografia avançada', 'Arquivo pronto para a gráfica'], order: 2 },
-        { title: 'Design de Capa', price: '10.000 Kz', details: ['Design exclusivo para livro físico', 'Opção E-book por 7.500 Kz', 'Revisões ilimitadas'], order: 3 },
-        { title: 'Legalização', price: '6.000 Kz', details: ['Registo Internacional ISBN', 'Depósito Legal obrigatório', 'Proteção de direitos autorais'], order: 4 },
-        { title: 'Impressão', price: 'Desde 3.500 Kz', details: ['Valor varia conforme formato', 'Acabamento premium', 'Sem tiragem mínima'], order: 5 },
-        { title: 'Marketing Digital', price: '5.000 Kz / post', details: ['Criação de post publicitário', 'Copywriting persuasivo', 'Foco em conversão'], order: 6 }
-    ];
-
-    const PREMIUM_TEAM = [
-        { name: 'Geral Ibuka', role: 'Director-Geral', department: 'Administração', bio: 'Com mais de 15 anos de experiência no setor editorial, Geral lidera a visão estratégica da Editora Graça.', photoUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=800&q=80', displayOrder: 1 },
-        { name: 'Maria Santos', role: 'Editora-Chefe', department: 'Editorial', bio: 'Responsável pela curadoria e revisão editorial de todas as obras publicadas.', photoUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=800&q=80', displayOrder: 2 },
-        { name: 'João Ferreira', role: 'Designer Gráfico', department: 'Design', bio: 'Especialista em design de capas e diagramação, João transforma manuscritos em obras visuais.', photoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&q=80', displayOrder: 3 }
-    ];
-
-    const handleSyncPremium = async () => {
-        if (!window.confirm("Isso irá sincronizar os textos 'Premium' padrão, serviços e membros da equipa para o banco de dados. Deseja continuar?")) return;
-
-        setIsSyncing(true);
-        try {
-            // 1. Sync Site Content
-            const contentPromises = Object.entries(PREMIUM_DEFAULTS).map(([key, data]) =>
-                saveSiteContent(key, data.section, data.value)
-            );
-
-            // 2. Sync Editorial Services
-            const servicesPromises = PREMIUM_SERVICES.map(s => saveEditorialService(s));
-
-            // 3. Sync Team Members
-            const teamPromises = PREMIUM_TEAM.map(m => saveTeamMember(m));
-
-            await Promise.all([...contentPromises, ...servicesPromises, ...teamPromises]);
-            alert("Sincronização profunda concluída com sucesso! Todo o acervo premium está agora no banco de dados.");
-            loadData();
-        } catch (error) {
-            console.error("Erro na sincronização profunda:", error);
-            alert("Erro ao sincronizar dados premium completos.");
-        } finally {
-            setIsSyncing(false);
-        }
-    };
 
 
     useEffect(() => {
@@ -292,16 +196,6 @@ const AdminContentTab: React.FC = () => {
                 </div>
 
                 <div className="flex bg-white/5 p-2 rounded-2xl border border-white/5 backdrop-blur-xl self-stretch xl:self-auto gap-2">
-                    <button
-                        onClick={handleSyncPremium}
-                        disabled={isSyncing}
-                        className="px-6 py-3.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 bg-brand-primary/10 text-brand-primary hover:bg-brand-primary hover:text-white disabled:opacity-50 group"
-                        title="Sincronizar Padrões Premium"
-                    >
-                        {isSyncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4 text-brand-primary group-hover:text-white" />}
-                        SYNC PREMIUM
-                    </button>
-                    <div className="w-px h-8 bg-white/10 self-center mx-2 hidden xl:block"></div>
                     <button
                         onClick={() => setActiveSubTab('text')}
                         className={`flex-1 xl:flex-none px-8 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 ${activeSubTab === 'text' ? 'bg-brand-primary text-white shadow-[0_10px_25px_-5px_rgba(189,147,56,0.3)]' : 'text-gray-500 hover:text-white'}`}

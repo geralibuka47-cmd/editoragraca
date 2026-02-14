@@ -7,6 +7,8 @@ interface OptimizedImageProps {
     className?: string;
     fallbackSrc?: string;
     onError?: () => void;
+    width?: number;
+    height?: number;
 }
 
 export const OptimizedImage: React.FC<OptimizedImageProps> = ({
@@ -14,17 +16,19 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     alt,
     className = '',
     fallbackSrc = 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&h=500&fit=crop',
-    onError
+    onError,
+    width,
+    height
 }) => {
     const [imgSrc, setImgSrc] = useState(src);
     const [isLoading, setIsLoading] = useState(true);
     const [hasError, setHasError] = useState(false);
 
     useEffect(() => {
-        setImgSrc(src);
+        setImgSrc(optimizeImageUrl(src, width, height));
         setIsLoading(true);
         setHasError(false);
-    }, [src]);
+    }, [src, width, height]);
 
     const handleError = () => {
         if (imgSrc !== fallbackSrc) {
@@ -59,7 +63,10 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
             <img
                 src={imgSrc}
                 alt={alt}
+                width={width}
+                height={height}
                 loading="lazy"
+                decoding="async"
                 className={`${className} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
                 onError={handleError}
                 onLoad={handleLoad}
