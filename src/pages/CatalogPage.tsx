@@ -4,7 +4,7 @@ import { Search, SlidersHorizontal, X, ArrowRight, Filter, BookOpen, Loader2, Sp
 import { m, AnimatePresence, Variants } from 'framer-motion';
 import { Book } from '../types';
 import BookCard from '../components/BookCard';
-import { BookCardSkeleton } from '../components/SkeletonLoader';
+import { BookCardSkeleton } from '../components/Skeleton';
 
 interface CatalogPageProps {
     books: Book[];

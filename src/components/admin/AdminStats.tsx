@@ -1,6 +1,7 @@
 import React from 'react';
 import { BookOpen, Users, ShoppingCart, TrendingUp, Zap, Activity, AlertCircle } from 'lucide-react';
 import { m } from 'framer-motion';
+import { Skeleton } from '../Skeleton';
 
 interface AdminStatsProps {
     stats: {
@@ -42,7 +43,7 @@ const AdminStats: React.FC<AdminStatsProps> = ({ stats, isLoading }) => {
                     <div className="space-y-0.5">
                         <p className="text-xl sm:text-2xl font-black text-white tracking-tighter">
                             {isLoading ? (
-                                <span className="inline-block w-8 h-6 bg-white/5 animate-pulse rounded" />
+                                <Skeleton className="h-8 w-16 bg-white/10" />
                             ) : (
                                 stat.label.includes('Receita')
                                     ? (stats.revenue >= 1000000

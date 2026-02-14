@@ -4,7 +4,7 @@ import { BookOpen, Pencil, Palette, Shield, Megaphone, Printer, Check, ArrowRigh
 import { m, AnimatePresence, Variants } from 'framer-motion';
 import { ViewState, EditorialService } from '../types';
 import { getEditorialServices, getSiteContent } from '../services/dataService';
-import { ServiceCardSkeleton } from '../components/SkeletonLoader';
+import { ServiceCardSkeleton } from '../components/Skeleton';
 import BudgetGenerator from '../components/BudgetGenerator';
 
 const ServicesPage: React.FC = () => {

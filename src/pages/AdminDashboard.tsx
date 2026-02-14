@@ -5,7 +5,7 @@ import {
     Users, ShoppingCart, BookOpen, FileText, Layout,
     User as UserIcon, Type, ArrowRight, Activity,
     Shield, Globe, Zap, Settings, LogOut, Menu, X,
-    Bell, Search, Clock
+    Bell, Search, Clock, ChevronRight, TrendingUp, Monitor
 } from 'lucide-react';
 import { User, BlogPost } from '../types';
 
@@ -62,354 +62,285 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user }) => {
 
     if (!user || user.role !== 'adm') {
         return (
-            <div className="min-h-screen bg-brand-light flex items-center justify-center p-8">
-                <div className="bg-white rounded-3xl shadow-xl p-12 text-center max-w-md">
-                    <UserIcon className="w-16 h-16 text-gray-300 mx-auto mb-6" />
-                    <h2 className="text-3xl font-black text-brand-dark mb-4">Acesso Restrito</h2>
-                    <p className="text-gray-600 mb-8">Esta área é exclusiva para administradores.</p>
+            <div className="min-h-screen bg-[#050505] flex items-center justify-center p-8">
+                <m.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="bg-white/5 border border-white/10 rounded-[2.5rem] p-12 text-center max-w-md backdrop-blur-xl"
+                >
+                    <Shield className="w-16 h-16 text-brand-primary mx-auto mb-6" />
+                    <h2 className="text-3xl font-black text-white uppercase tracking-tighter mb-4">Acesso Restrito</h2>
+                    <p className="text-gray-400 mb-8 font-medium">Esta área é exclusiva para administradores.</p>
                     <button
                         onClick={() => navigate('/')}
-                        className="btn-premium w-full justify-center"
+                        className="w-full py-5 bg-brand-primary text-white font-black uppercase tracking-widest rounded-2xl hover:brightness-110 transition-all shadow-xl shadow-brand-primary/20"
                     >
                         Voltar ao Início
                     </button>
-                </div>
+                </m.div>
             </div>
         );
     }
 
     const navItems = [
-        { id: 'stats', label: 'Dashboard', icon: Activity },
+        { id: 'stats', label: 'Consola', icon: Monitor },
         { id: 'books', label: 'Acervo', icon: BookOpen },
-        { id: 'users', label: 'Utilizadores', icon: Users },
+        { id: 'users', label: 'Gestores', icon: Users },
         { id: 'orders', label: 'Vendas', icon: ShoppingCart },
-        { id: 'content', label: 'Gestão de Site', icon: Layout },
+        { id: 'content', label: 'Portal', icon: Globe },
         { id: 'team', label: 'Equipa', icon: Shield },
-        { id: 'blog', label: 'Blog', icon: Type },
-        { id: 'services', label: 'Serviços', icon: Zap },
+        { id: 'blog', label: 'Editorial', icon: Type },
+        { id: 'services', label: 'Módulos', icon: Zap },
         { id: 'manuscripts', label: 'Manuscritos', icon: FileText },
-        { id: 'settings', label: 'Configurações', icon: Settings },
+        { id: 'settings', label: 'Terminal', icon: Settings },
     ];
 
+    const fadeInUp = {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: -20 }
+    };
+
     return (
-        <div className="flex h-screen bg-[#050505] text-white overflow-hidden font-sans">
-            {/* 1. SIDEBAR NAVIGATION (Glassmorphism App Style) */}
+        <div className="flex h-screen bg-[#050505] text-white overflow-hidden font-sans selection:bg-brand-primary/30">
+            {/* KINETIC BACKGROUND */}
+            <div className="fixed inset-0 pointer-events-none overflow-hidden">
+                <div className="absolute top-[-5%] left-[-5%] w-[50%] h-[50%] bg-brand-primary/5 blur-[150px] rounded-full" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-blue-600/5 blur-[200px] rounded-full" />
+            </div>
+
+            {/* 1. SIDEBAR (Premium Monolith Style) */}
             <aside
-                className={`${isSidebarOpen ? 'w-80' : 'w-24'} hidden lg:flex flex-shrink-0 transition-all duration-500 bg-[#0A0A0A] border-r border-white/5 flex-col z-50`}
+                className={`${isSidebarOpen ? 'w-80' : 'w-24'} hidden lg:flex flex-shrink-0 transition-all duration-700 bg-black/40 backdrop-blur-3xl border-r border-white/5 flex-col z-50 relative`}
             >
                 {/* Logo Area */}
-                <div className="p-8 flex items-center justify-between mb-8">
-                    <div className={`flex items-center gap-4 ${!isSidebarOpen && 'hidden'}`}>
-                        <div className="w-10 h-10 bg-brand-primary rounded-xl flex items-center justify-center shadow-lg shadow-brand-primary/20">
+                <div className="p-10 flex items-center justify-between">
+                    <div className={`flex items-center gap-4 ${!isSidebarOpen && 'opacity-0 scale-90 translate-x-[-20px] absolute'} transition-all duration-500`}>
+                        <div className="w-10 h-10 bg-brand-primary rounded-xl flex items-center justify-center shadow-2xl shadow-brand-primary/20">
                             <Shield className="text-white w-6 h-6" />
                         </div>
-                        <div className="font-black text-xl tracking-tighter uppercase">
-                            Admin<span className="text-brand-primary">Hub</span>
+                        <div className="font-black text-2xl tracking-tighter uppercase italic">
+                            Editora<span className="text-brand-primary">G.</span>
                         </div>
                     </div>
                     <button
                         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                        className="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors border border-white/5"
-                        aria-label={isSidebarOpen ? "Fechar Menu" : "Abrir Menu"}
+                        className={`p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-all border border-white/5 ${!isSidebarOpen && 'mx-auto'}`}
                     >
-                        {isSidebarOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+                        {isSidebarOpen ? <X className="w-4 h-4 text-gray-400" /> : <Menu className="w-4 h-4 text-brand-primary" />}
                     </button>
                 </div>
 
-                {/* Nav Links */}
-                <nav className="flex-1 px-4 space-y-2 overflow-y-auto custom-scrollbar">
+                {/* Navigation Links */}
+                <nav className="flex-1 px-4 space-y-1.5 overflow-y-auto no-scrollbar py-6">
                     {navItems.map((item) => (
                         <button
                             key={item.id}
                             onClick={() => setActiveTab(item.id as any)}
-                            className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all group overflow-hidden relative
+                            className={`w-full flex items-center gap-5 px-6 py-4.5 rounded-[1.5rem] transition-all relative group overflow-hidden
                                 ${activeTab === item.id
-                                    ? 'bg-brand-primary text-white shadow-[0_0_40px_-10px_rgba(189,147,56,0.3)]'
+                                    ? 'bg-brand-primary text-white shadow-3xl shadow-brand-primary/20'
                                     : 'text-gray-500 hover:text-white hover:bg-white/5'
                                 }`}
                             title={item.label}
                         >
-                            <item.icon className={`flex-shrink-0 w-5 h-5 transition-colors ${activeTab === item.id ? 'text-white' : 'text-gray-600 group-hover:text-brand-primary'}`} />
-                            <span className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 ${!isSidebarOpen && 'opacity-0 translate-x-10 hidden'}`}>
+                            <item.icon className={`flex-shrink-0 w-5 h-5 transition-all duration-500 ${activeTab === item.id ? 'scale-110' : 'group-hover:text-brand-primary'}`} />
+                            <span className={`text-[10px] font-black uppercase tracking-[0.25em] transition-all duration-500 ${!isSidebarOpen && 'opacity-0 translate-x-10 scale-50 pointer-events-none'}`}>
                                 {item.label}
                             </span>
+
+                            {/* Active Indicator Glow */}
                             {activeTab === item.id && (
                                 <m.div
-                                    layoutId="navGlow"
-                                    className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent pointer-events-none"
+                                    layoutId="sidebarActiveGlow"
+                                    className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-50"
                                 />
                             )}
                         </button>
                     ))}
                 </nav>
 
-                {/* Footer Sidebar info */}
-                <div className="p-6 mt-auto">
-                    <div className={`bg-white/5 rounded-3xl p-6 border border-white/5 transition-all duration-500 ${!isSidebarOpen && 'opacity-0 scale-90 translate-y-10'}`}>
-                        <div className="flex items-center gap-4 mb-4">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-primary to-amber-600 flex items-center justify-center font-black shadow-lg">
+                {/* Sidebar Footer */}
+                <div className="p-6">
+                    <div className={`bg-gradient-to-br from-white/5 to-transparent rounded-[2.5rem] p-6 border border-white/5 transition-all duration-700 ${!isSidebarOpen ? 'opacity-0 scale-90 translate-y-10' : 'opacity-100'}`}>
+                        <div className="flex items-center gap-4 mb-6">
+                            <div className="w-12 h-12 rounded-2xl bg-[#111] border border-white/10 flex items-center justify-center font-black text-xl text-brand-primary rotate-3">
                                 {user.name.charAt(0)}
                             </div>
-                            <div>
-                                <p className="text-xs font-black uppercase truncate max-w-[120px]">{user.name}</p>
-                                <p className="text-[9px] text-brand-primary font-black uppercase tracking-widest">{user.role}</p>
+                            <div className="flex-1 min-w-0">
+                                <p className="text-[10px] font-black uppercase text-white truncate">{user.name}</p>
+                                <p className="text-[8px] font-black uppercase tracking-widest text-brand-primary/60">Sénior Admin</p>
                             </div>
                         </div>
                         <button
-                            onClick={() => navigate('/')}
-                            className="w-full py-3 bg-white/5 hover:bg-red-500/10 hover:text-red-500 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 border border-white/5"
-                            title="Terminar Sessão"
+                            onClick={async () => {
+                                const { logout } = await import('../services/authService');
+                                await logout();
+                                navigate('/');
+                            }}
+                            className="w-full py-4 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all"
                         >
-                            <LogOut className="w-3 h-3" /> Terminar Sessão
+                            Log Out
                         </button>
                     </div>
                 </div>
             </aside>
 
-            {/* Mobile Sidebar (Drawer Overlay) */}
+            {/* 2. MAIN CONSOLE AREA */}
+            <main className="flex-1 overflow-y-auto relative no-scrollbar flex flex-col">
+
+                {/* Top Terminal Bar */}
+                <header className="sticky top-0 z-40 bg-[#050505]/60 backdrop-blur-3xl border-b border-white/5 px-8 sm:px-12 py-6 flex items-center justify-between">
+                    <div className="flex items-center gap-6">
+                        <button
+                            onClick={() => setIsMobileMenuOpen(true)}
+                            className="lg:hidden p-3 bg-white/5 rounded-xl border border-white/5"
+                            title="Abrir Menu"
+                            aria-label="Abrir Menu"
+                        >
+                            <Menu className="w-5 h-5 text-brand-primary" />
+                        </button>
+                        <div className="hidden md:flex items-center gap-4 px-5 py-2.5 bg-white/5 rounded-full border border-white/5">
+                            <Activity className="w-4 h-4 text-brand-primary animate-pulse" />
+                            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400">Sistema Operacional</span>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                        <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl border border-white/5 text-[10px] font-mono text-brand-primary/60">
+                            <Clock className="w-3.5 h-3.5" />
+                            {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                        <button
+                            className="p-3 bg-white/5 hover:bg-white/10 rounded-xl border border-white/5 transition-all"
+                            title="Notificações"
+                            aria-label="Notificações"
+                        >
+                            <Bell className="w-4 h-4 text-gray-400" />
+                        </button>
+                    </div>
+                </header>
+
+                <div className="flex-1 container mx-auto px-8 sm:px-12 py-12">
+                    <AnimatePresence mode="wait">
+                        <m.div
+                            key={activeTab}
+                            {...fadeInUp}
+                            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                            className="space-y-12"
+                        >
+                            {/* Page Identity Block */}
+                            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="px-3 py-1 bg-brand-primary/10 rounded-lg text-brand-primary border border-brand-primary/20 text-[9px] font-black uppercase tracking-widest">
+                                            Mod: {activeTab}
+                                        </div>
+                                    </div>
+                                    <h2 className="text-6xl md:text-8xl font-black uppercase italic tracking-tighter leading-none">
+                                        {navItems.find(i => i.id === activeTab)?.label}
+                                    </h2>
+                                    <p className="text-[10px] font-black uppercase tracking-[0.5em] text-gray-500 max-w-xl">
+                                        Interface de gestão centralizada para controlo total da infraestrutura digital da Editora Graça.
+                                    </p>
+                                </div>
+                                {activeTab === 'stats' && (
+                                    <button
+                                        onClick={fetchData}
+                                        className="px-8 py-4 bg-white text-black rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-brand-primary hover:text-white transition-all shadow-3xl shadow-white/5"
+                                    >
+                                        Sincronizar Dados
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* TAB CONTENT */}
+                            <div className="min-h-[600px] bg-white/5 border border-white/10 rounded-[3.5rem] p-8 md:p-12 backdrop-blur-3xl shadow-5xl relative overflow-hidden">
+                                {activeTab === 'stats' && (
+                                    <div className="space-y-12">
+                                        <AdminStats stats={stats} isLoading={isLoadingData} />
+
+                                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                            {[
+                                                { id: 'books', title: 'Inventário Literário', desc: 'Gerir títulos, stock e categorias.', icon: BookOpen, color: 'blue' },
+                                                { id: 'users', title: 'Controle de Acessos', desc: 'Gerir permissões e perfis de utilizadores.', icon: Users, color: 'brand-primary' },
+                                                { id: 'content', title: 'Experience Design', desc: 'Configurar elementos visuais do portal.', icon: Globe, color: 'purple' }
+                                            ].map((card) => (
+                                                <m.button
+                                                    key={card.id}
+                                                    whileHover={{ y: -10 }}
+                                                    onClick={() => setActiveTab(card.id as any)}
+                                                    className="p-10 bg-black/40 rounded-[2.5rem] border border-white/5 text-left group hover:border-brand-primary/30 transition-all"
+                                                >
+                                                    <div className={`w-14 h-14 bg-${card.color}/10 rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 transition-transform`}>
+                                                        <card.icon className={`w-6 h-6 text-${card.color}`} />
+                                                    </div>
+                                                    <h4 className="text-2xl font-black uppercase tracking-tight mb-3 group-hover:text-brand-primary transition-colors">{card.title}</h4>
+                                                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-8">{card.desc}</p>
+                                                    <div className="flex items-center gap-3 text-brand-primary font-black uppercase tracking-widest text-[9px]">
+                                                        Gerir Agora <ChevronRight className="w-4 h-4" />
+                                                    </div>
+                                                </m.button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === 'books' && <AdminBooksTab onStatsRefresh={fetchData} />}
+                                {activeTab === 'users' && <AdminUsersTab />}
+                                {activeTab === 'orders' && <AdminOrdersTab user={user} />}
+                                {activeTab === 'manuscripts' && <AdminManuscriptsTab />}
+                                {activeTab === 'blog' && <AdminBlogTab posts={blogPosts} onRefresh={fetchData} />}
+                                {activeTab === 'team' && <AdminTeamTab />}
+                                {activeTab === 'services' && <AdminServicesTab />}
+                                {activeTab === 'content' && <AdminContentTab />}
+                                {activeTab === 'settings' && <AdminSettingsTab user={user} onUpdate={() => { }} />}
+                            </div>
+                        </m.div>
+                    </AnimatePresence>
+                </div>
+            </main>
+
+            {/* MOBILE MENU MODAL */}
             <AnimatePresence>
                 {isMobileMenuOpen && (
                     <m.div
-                        initial={{ x: '-100%' }}
-                        animate={{ x: 0 }}
-                        exit={{ x: '-100%' }}
-                        className="fixed inset-0 z-[60] bg-[#0A0A0A] flex flex-col w-80 shadow-2xl lg:hidden"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] bg-[#050505]/95 backdrop-blur-2xl lg:hidden flex flex-col"
                     >
-                        <div className="p-8 flex items-center justify-between mb-8">
-                            <div className="flex items-center gap-4">
-                                <div className="w-10 h-10 bg-brand-primary rounded-xl flex items-center justify-center shadow-lg shadow-brand-primary/20">
-                                    <Shield className="text-white w-6 h-6" />
-                                </div>
-                                <div className="font-black text-xl tracking-tighter uppercase">
-                                    Admin<span className="text-brand-primary">Hub</span>
-                                </div>
-                            </div>
+                        <div className="p-8 flex justify-between items-center border-b border-white/5">
+                            <div className="font-black text-2xl uppercase tracking-tighter">Terminal <span className="text-brand-primary">Móvel</span></div>
                             <button
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className="p-3 bg-white/5 rounded-xl border border-white/5 text-gray-400 hover:text-white transition-colors"
+                                className="p-4 bg-white/5 rounded-2xl"
                                 title="Fechar Menu"
                                 aria-label="Fechar Menu"
                             >
-                                <X className="w-4 h-4" />
+                                <X className="w-6 h-6 text-brand-primary" />
                             </button>
                         </div>
-                        <nav className="flex-1 px-4 space-y-2 overflow-y-auto">
+                        <nav className="flex-1 p-8 overflow-y-auto space-y-4">
                             {navItems.map((item) => (
                                 <button
                                     key={item.id}
                                     onClick={() => { setActiveTab(item.id as any); setIsMobileMenuOpen(false); }}
-                                    className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all ${activeTab === item.id ? 'bg-brand-primary text-white' : 'text-gray-500 hover:text-white'}`}
+                                    className={`w-full p-6 bg-white/5 rounded-[2rem] flex items-center gap-6 border border-white/5 transition-all ${activeTab === item.id ? 'bg-brand-primary text-white border-brand-primary' : 'text-gray-400'}`}
                                 >
-                                    <item.icon className="w-5 h-5" />
-                                    <span className="text-[10px] font-black uppercase tracking-widest">{item.label}</span>
+                                    <item.icon className="w-6 h-6" />
+                                    <span className="text-xs font-black uppercase tracking-widest">{item.label}</span>
                                 </button>
                             ))}
                         </nav>
-                        <div className="p-6">
-                            <button onClick={() => navigate('/')} className="w-full py-4 bg-white/5 rounded-xl text-[9px] font-black uppercase flex items-center justify-center gap-2">
-                                <LogOut className="w-3 h-3" /> Terminar Sessão
-                            </button>
+                        <div className="p-8">
+                            <button onClick={() => navigate('/')} className="w-full py-6 bg-brand-primary text-white rounded-[2rem] font-black uppercase tracking-widest">Sair do Dashboard</button>
                         </div>
                     </m.div>
                 )}
             </AnimatePresence>
-
-            {/* 2. MAIN CONTENT AREA (Social Protocol Layout) */}
-            <main className="flex-1 overflow-y-auto bg-[#050505] relative custom-scrollbar">
-
-                {/* 2.1 COVER AREA */}
-                <div className="h-[200px] md:h-[250px] relative w-full overflow-hidden group">
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050505]/50 to-[#050505] z-10" />
-                    <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center opacity-30 group-hover:scale-105 transition-transform duration-1000" />
-
-                    {/* Top Action Bar (Absolute) */}
-                    <div className="absolute top-0 left-0 right-0 p-8 flex justify-between items-start z-20">
-                        <div className="flex items-center gap-3">
-                            <button
-                                onClick={() => setIsMobileMenuOpen(true)}
-                                className="lg:hidden w-10 h-10 bg-black/40 hover:bg-white/10 backdrop-blur-md rounded-full border border-white/10 flex items-center justify-center text-gray-300 mr-2"
-                                title="Abrir Menu"
-                                aria-label="Abrir Menu"
-                            >
-                                <Menu className="w-4 h-4" />
-                            </button>
-                            <div className="flex items-center gap-3 px-4 py-2 bg-black/40 backdrop-blur-md rounded-full border border-white/10">
-                                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">Online</span>
-                            </div>
-                        </div>
-
-                        <div className="flex gap-2">
-                            <button
-                                className="w-10 h-10 bg-black/40 hover:bg-white/10 backdrop-blur-md rounded-full border border-white/10 flex items-center justify-center text-gray-300 hover:text-white transition-colors relative"
-                                title="Notificações"
-                            >
-                                <Bell className="w-4 h-4" />
-                                <span className="absolute top-2 right-2 w-2 h-2 bg-brand-primary rounded-full border-2 border-[#050505]" />
-                            </button>
-                            <button
-                                onClick={() => setActiveTab('settings')}
-                                className="w-10 h-10 bg-black/40 hover:bg-white/10 backdrop-blur-md rounded-full border border-white/10 flex items-center justify-center text-gray-300 hover:text-white transition-colors"
-                                title="Configurações"
-                            >
-                                <Settings className="w-4 h-4" />
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                {/* 2.2 PAGE HEADER & IDENTITY */}
-                <div className="container mx-auto px-8 relative z-20 -mt-16">
-                    <div className="flex flex-col md:flex-row items-end gap-8 mb-8">
-                        {/* Avatar/Logo */}
-                        <div className="relative">
-                            <div className="w-32 h-32 rounded-3xl border-4 border-[#050505] bg-[#111] overflow-hidden shadow-2xl relative z-10 flex items-center justify-center group-hover:rotate-3 transition-transform">
-                                <Shield className="w-12 h-12 text-brand-primary" />
-                            </div>
-                            <div className="absolute -bottom-2 -right-2 z-20 px-3 py-1 bg-brand-primary rounded-lg border-4 border-[#050505] flex items-center justify-center shadow-lg">
-                                <span className="text-[9px] font-black uppercase tracking-widest text-white">Admin</span>
-                            </div>
-                        </div>
-
-                        {/* Identity Info */}
-                        <div className="flex-1 pb-2 text-center md:text-left">
-                            <div className="flex items-center justify-center md:justify-start gap-3 mb-1">
-                                <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight text-white">Central de Comando</h1>
-                                <Activity className="w-5 h-5 text-brand-primary animate-pulse hidden md:block" />
-                            </div>
-                            <p className="text-gray-400 font-medium text-sm tracking-wide flex items-center gap-2">
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Editora Graça</span>
-                                <span className="w-1 h-1 rounded-full bg-gray-600" />
-                                <span className="text-gray-500 italic">v2.4.0 (Stable)</span>
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* 2.3 SOCIAL PAGE GRID LAYOUT */}
-                    <div className="grid lg:grid-cols-[300px_1fr] gap-8 pb-20">
-                        {/* LEFT SIDEBAR (System Health & Quick Actions) */}
-                        <div className="space-y-6">
-                            {/* System Health Card */}
-                            <div className="bg-white/5 border border-white/5 rounded-3xl p-8 backdrop-blur-sm">
-                                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 mb-6">Estado do Sistema</h3>
-                                <div className="space-y-4">
-                                    <div className="flex items-center justify-between text-sm">
-                                        <span className="text-gray-400">Servidor</span>
-                                        <span className="font-bold text-green-500 flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-green-500" /> Online</span>
-                                    </div>
-                                    <div className="flex items-center justify-between text-sm">
-                                        <span className="text-gray-400">Base de Dados</span>
-                                        <span className="font-bold text-green-500 flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-green-500" /> Conectado</span>
-                                    </div>
-                                    <div className="flex items-center justify-between text-sm">
-                                        <span className="text-gray-400">Latência</span>
-                                        <span className="font-bold text-white">24ms</span>
-                                    </div>
-                                    <div className="h-px bg-white/5 my-2" />
-                                    <div className="flex items-center justify-between text-sm">
-                                        <span className="text-gray-400">Último Backup</span>
-                                        <span className="font-bold text-gray-300">Hoje, 04:00</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Quick Stats Mini */}
-                            <div className="bg-white/5 border border-white/5 rounded-3xl p-8 backdrop-blur-sm">
-                                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 mb-6">Hoje</h3>
-                                <div className="space-y-6">
-                                    <div>
-                                        <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Vendas Novas</p>
-                                        <p className="text-2xl font-black text-white">{stats.pendingOrders > 0 ? `+${stats.pendingOrders}` : '0'}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Receita</p>
-                                        <p className="text-2xl font-black text-brand-primary">{(stats.revenue / 30).toFixed(0)} Kz</p>
-                                        <p className="text-[10px] text-gray-600 mt-1">*Estimativa diária</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* MAIN FEED (Context Driven) */}
-                        <div className="min-h-[500px]">
-                            <AnimatePresence mode="wait">
-                                <m.div
-                                    key={activeTab}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -10 }}
-                                    transition={{ duration: 0.2 }}
-                                    className="h-full"
-                                >
-                                    {/* DYNAMIC TITLE FOR TAB */}
-                                    <div className="bg-white/5 border border-white/5 rounded-[2rem] p-8 mb-6 flex items-center justify-between backdrop-blur-md">
-                                        <div>
-                                            <h2 className="text-2xl font-black uppercase tracking-tight text-white">
-                                                {navItems.find(i => i.id === activeTab)?.label}
-                                            </h2>
-                                            <p className="text-[10px] font-black text-brand-primary uppercase tracking-[0.3em]">
-                                                {activeTab === 'stats' ? 'Visão Geral' : 'Gestão de Recursos'}
-                                            </p>
-                                        </div>
-                                        <div className="hidden md:block">
-                                            <div className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center">
-                                                {React.createElement(navItems.find(i => i.id === activeTab)?.icon || Activity, { className: "w-5 h-5 text-gray-400" })}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* CONTENT */}
-                                    {activeTab === 'stats' && (
-                                        <div className="space-y-6">
-                                            <AdminStats stats={stats} isLoading={isLoadingData} />
-                                            {/* Shortcuts Grid */}
-                                            <div className="grid md:grid-cols-2 gap-6">
-                                                <div
-                                                    onClick={() => setActiveTab('books')}
-                                                    className="bg-white/5 p-8 rounded-[2rem] border border-white/5 hover:bg-white/10 hover:border-brand-primary/30 transition-all cursor-pointer group"
-                                                >
-                                                    <div className="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                                                        <BookOpen className="w-6 h-6 text-blue-500" />
-                                                    </div>
-                                                    <h4 className="text-xl font-black uppercase tracking-tight mb-2">Acervo</h4>
-                                                    <p className="text-sm text-gray-400 mb-6">Gerir livros, categorias e stocks da livraria.</p>
-                                                    <span className="text-[10px] font-black uppercase tracking-widest text-blue-500 flex items-center gap-2">Aceder <ArrowRight className="w-3 h-3" /></span>
-                                                </div>
-
-                                                <div
-                                                    onClick={() => setActiveTab('orders')}
-                                                    className="bg-white/5 p-8 rounded-[2rem] border border-white/5 hover:bg-white/10 hover:border-brand-primary/30 transition-all cursor-pointer group"
-                                                >
-                                                    <div className="w-12 h-12 bg-green-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                                                        <ShoppingCart className="w-6 h-6 text-green-500" />
-                                                    </div>
-                                                    <h4 className="text-xl font-black uppercase tracking-tight mb-2">Pedidos</h4>
-                                                    <p className="text-sm text-gray-400 mb-6">Processar encomendas e verificar pagamentos.</p>
-                                                    <span className="text-[10px] font-black uppercase tracking-widest text-green-500 flex items-center gap-2">Aceder <ArrowRight className="w-3 h-3" /></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {activeTab === 'books' && <div className="bg-white/5 border border-white/5 rounded-[2rem] p-6 md:p-8"><AdminBooksTab onStatsRefresh={fetchData} /></div>}
-                                    {activeTab === 'users' && <div className="bg-white/5 border border-white/5 rounded-[2rem] p-6 md:p-8"><AdminUsersTab /></div>}
-                                    {activeTab === 'orders' && <div className="bg-white/5 border border-white/5 rounded-[2rem] p-6 md:p-8"><AdminOrdersTab user={user} /></div>}
-                                    {activeTab === 'manuscripts' && <div className="bg-white/5 border border-white/5 rounded-[2rem] p-6 md:p-8"><AdminManuscriptsTab /></div>}
-                                    {activeTab === 'blog' && <div className="bg-white/5 border border-white/5 rounded-[2rem] p-6 md:p-8"><AdminBlogTab posts={blogPosts} onRefresh={fetchData} /></div>}
-                                    {activeTab === 'team' && <div className="bg-white/5 border border-white/5 rounded-[2rem] p-6 md:p-8"><AdminTeamTab /></div>}
-                                    {activeTab === 'services' && <div className="bg-white/5 border border-white/5 rounded-[2rem] p-6 md:p-8"><AdminServicesTab /></div>}
-                                    {activeTab === 'content' && <div className="bg-white/5 border border-white/5 rounded-[2rem] p-6 md:p-8"><AdminContentTab /></div>}
-                                    {activeTab === 'settings' && <div className="bg-white/5 border border-white/5 rounded-[2rem] p-6 md:p-8"><AdminSettingsTab user={user} onUpdate={() => { }} /></div>}
-
-                                </m.div>
-                            </AnimatePresence>
-                        </div>
-                    </div>
-                </div>
-            </main>
         </div>
     );
 };
 
 export default AdminDashboard;
-

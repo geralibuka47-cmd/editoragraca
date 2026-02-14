@@ -165,7 +165,7 @@ export interface Manuscript {
   description: string;
   fileUrl: string;
   fileName: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: 'pending' | 'review' | 'approved' | 'rejected' | 'published';
   submittedDate: string;
   reviewedDate?: string | null;
   feedback?: string;
@@ -181,6 +181,16 @@ export interface Notification {
   link?: string;
   isRead: boolean;
   createdAt: string;
+}
+
+
+export interface Royalties {
+  id: string;
+  authorId: string;
+  totalSales: number;
+  pendingAmount: number;
+  paidAmount: number;
+  lastPaymentDate?: string;
 }
 
 export type ViewState = 'HOME' | 'CATALOG' | 'DETAILS' | 'ABOUT' | 'SERVICES' | 'CHECKOUT' | 'CONTACT' | 'ADMIN' | 'AUTH' | 'AUTHOR_DASHBOARD' | 'READER_DASHBOARD' | 'BLOG';

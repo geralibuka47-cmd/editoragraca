@@ -1408,3 +1408,34 @@ export const updateUserRole = async (userId: string, newRole: UserRole) => {
         throw error;
     }
 };
+
+export const getAuthorManuscripts = async (authorId: string): Promise<Manuscript[]> => {
+    try {
+        const q = query(
+            collection(db, COLLECTIONS.MANUSCRIPTS),
+            where('authorId', '==', authorId),
+            orderBy('submittedDate', 'desc')
+        );
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => parseFirestoreDoc(doc.data(), doc.id));
+    } catch (error) {
+        console.error('Error fetching author manuscripts:', error);
+        return [];
+    }
+};
+
+export const getAuthorRoyalties = async (authorId: string): Promise<Royalties | null> => {
+    try {
+        const q = query(
+            collection(db, 'royalties'),
+            where('authorId', '==', authorId),
+            limit(1)
+        );
+        const snapshot = await getDocs(q);
+        if (snapshot.empty) return null;
+        return parseFirestoreDoc(snapshot.docs[0].data(), snapshot.docs[0].id);
+    } catch (error) {
+        console.error('Error fetching author royalties:', error);
+        return null;
+    }
+};
