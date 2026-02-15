@@ -30,9 +30,9 @@ const AdminDashboard: React.FC = () => {
     const [stats, setStats] = useState({
         totalBooks: 0,
         totalUsers: 0,
-        totalOrders: 0,
+        pendingOrders: 0,
         revenue: 0,
-        pendingManuscripts: 0
+        lowStockCount: 0
     });
     const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
     const [isLoading, setIsLoading] = useState(true);

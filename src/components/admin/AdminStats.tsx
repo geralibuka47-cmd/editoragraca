@@ -7,9 +7,9 @@ interface AdminStatsProps {
     stats: {
         totalBooks: number;
         totalUsers: number;
-        totalOrders: number;
+        pendingOrders: number;
         revenue: number;
-        pendingManuscripts?: number;
+        lowStockCount: number;
     };
     isLoading: boolean;
 }
@@ -18,9 +18,9 @@ const AdminStats: React.FC<AdminStatsProps> = ({ stats, isLoading }) => {
     const statCards = [
         { label: 'Obras Ativas', value: stats.totalBooks, icon: BookOpen, color: 'text-brand-primary', glow: 'shadow-brand-primary/20' },
         { label: 'Utilizadores', value: stats.totalUsers, icon: Users, color: 'text-blue-500', glow: 'shadow-blue-500/20' },
-        { label: 'Encomendas', value: stats.totalOrders, icon: ShoppingCart, color: 'text-emerald-500', glow: 'shadow-emerald-500/20' },
+        { label: 'Pendentes', value: stats.pendingOrders, icon: ShoppingCart, color: 'text-emerald-500', glow: 'shadow-emerald-500/20' },
         { label: 'Receita', value: `${stats.revenue.toLocaleString('pt-AO')} Kz`, icon: TrendingUp, color: 'text-purple-500', glow: 'shadow-purple-500/20' },
-        { label: 'Receita Est.', value: stats.revenue, icon: TrendingUp, color: 'text-green-400', glow: 'shadow-green-500/20' },
+        { label: 'Baixo Stock', value: stats.lowStockCount, icon: AlertCircle, color: 'text-amber-400', glow: 'shadow-amber-500/20' },
     ];
 
     return (

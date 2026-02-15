@@ -30,6 +30,10 @@ interface CheckoutPageProps {
 const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onRemoveItem }) => {
     const navigate = useNavigate();
     const [step, setStep] = useState<'cart' | 'details' | 'success'>('cart');
+    const stepperWidth = step === 'cart' ? 'w-0' : step === 'details' ? 'w-1/2' : 'w-full';
+    const step1Style = step === 'cart' ? 'bg-brand-primary text-white scale-110 shadow-lg' : 'bg-brand-primary text-white';
+    const step2Style = step === 'details' ? 'bg-brand-primary text-white scale-110 shadow-lg' : step === 'success' ? 'bg-brand-primary text-white' : 'bg-gray-200 text-gray-500';
+    const step3Style = step === 'success' ? 'bg-brand-primary text-white scale-110 shadow-lg' : 'bg-gray-200 text-gray-500';
     const [orderError, setOrderError] = useState('');
     const [confirmedOrder, setConfirmedOrder] = useState<{ name: string; email: string; orderNumber: string; total: number } | null>(null);
 
@@ -111,24 +115,24 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
                     {/* Stepper */}
                     <div className="flex items-center justify-between max-w-2xl mx-auto mb-12 relative">
                         <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 -translate-y-1/2 z-0"></div>
-                        <div className={`stepper-line ${step === 'cart' ? 'w-0' : step === 'details' ? 'w-1/2' : 'w-full'}`}></div>
+                        <div className={`stepper-line ${stepperWidth}`}></div>
 
                         <div className="relative z-10 flex flex-col items-center gap-2">
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm transition-all duration-500 ${step === 'cart' ? 'bg-brand-primary text-white scale-110 shadow-lg' : 'bg-brand-primary text-white'}`}>
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm transition-all duration-500 ${step1Style}`}>
                                 1
                             </div>
                             <span className="text-[10px] font-black uppercase tracking-widest text-brand-dark">Carrinho</span>
                         </div>
 
                         <div className="relative z-10 flex flex-col items-center gap-2">
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm transition-all duration-500 ${step === 'details' ? 'bg-brand-primary text-white scale-110 shadow-lg' : step === 'success' ? 'bg-brand-primary text-white' : 'bg-gray-200 text-gray-500'}`}>
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm transition-all duration-500 ${step2Style}`}>
                                 2
                             </div>
                             <span className="text-[10px] font-black uppercase tracking-widest text-brand-dark">Detalhes</span>
                         </div>
 
                         <div className="relative z-10 flex flex-col items-center gap-2">
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm transition-all duration-500 ${step === 'success' ? 'bg-brand-primary text-white scale-110 shadow-lg' : 'bg-gray-200 text-gray-500'}`}>
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm transition-all duration-500 ${step3Style}`}>
                                 3
                             </div>
                             <span className="text-[10px] font-black uppercase tracking-widest text-brand-dark">Sucesso</span>
