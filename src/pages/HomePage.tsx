@@ -458,31 +458,30 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                 </div>
             </section>
 
-            {/* 4. NEWSLETTER - Minimal Line */}
-            <section className="py-24 bg-white px-6 md:px-12 border-t border-gray-100">
+            {/* 4. NEWSLETTER - Minimal Line (Dark Theme) */}
+            <section className="py-24 bg-brand-dark px-6 md:px-12 border-t border-white/10">
                 <div className="container mx-auto text-center max-w-3xl">
-                    <Mail className="w-12 h-12 text-brand-dark mx-auto mb-6" />
-                    <h2 className="text-3xl md:text-5xl font-black text-brand-dark mb-6 uppercase tracking-tight">Fique a par das novidades</h2>
-                    <p className="text-gray-500 mb-10 text-lg">Junte-se à nossa lista exclusiva de leitores e receba atualizações sobre lançamentos.</p>
+                    <Mail className="w-12 h-12 text-brand-primary mx-auto mb-6" />
+                    <h2 className="text-3xl md:text-5xl font-black text-white mb-6 uppercase tracking-tight">Fique a par das novidades</h2>
+                    <p className="text-gray-400 mb-10 text-lg">Junte-se à nossa lista exclusiva de leitores e receba atualizações sobre lançamentos.</p>
 
-                    <form onSubmit={handleSubmit(onSubscribe)} className="flex flex-col sm:flex-row gap-4">
+                    <form onSubmit={handleSubmit(onSubscribe)} className="flex flex-col sm:flex-row gap-4 relative z-10">
                         <div className="flex-1">
-                            <Input
-                                variant="light"
+                            <input
                                 type="email"
                                 placeholder="Seu melhor email"
                                 {...register('email')}
-                                error={errors.email?.message}
-                                className="h-14"
+                                className="w-full h-14 px-6 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-brand-primary transition-colors"
                             />
+                            {errors.email && <p className="text-red-500 text-sm mt-1 text-left">{errors.email.message}</p>}
                         </div>
-                        <Button
+                        <button
                             type="submit"
-                            isLoading={isSubmitting}
-                            className="px-10 h-14"
+                            disabled={isSubmitting}
+                            className="h-14 px-10 bg-brand-primary text-white font-bold uppercase tracking-widest rounded-xl hover:bg-white hover:text-brand-dark transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Subscrever
-                        </Button>
+                            {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Subscrever'}
+                        </button>
                     </form>
                 </div>
             </section>
