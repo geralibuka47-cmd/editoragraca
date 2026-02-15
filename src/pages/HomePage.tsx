@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, ShoppingCart, Star, ChevronLeft, ChevronRight, Play, Download, Loader2, ArrowRight, Clock, CheckCircle, Mail, Zap, TrendingUp } from 'lucide-react';
-import { m, AnimatePresence, Variants } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 
@@ -119,45 +119,45 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                 <div className="absolute top-0 right-0 w-1/2 h-full bg-gray-50 skew-x-12 translate-x-1/3 -z-10"></div>
 
                 <div className="container mx-auto grid lg:grid-cols-2 gap-16 items-center">
-                    <m.div
+                    <motion.div
                         initial="hidden"
                         animate="visible"
                         variants={stagger}
                         className="space-y-8"
                     >
-                        <m.div variants={fadeInUp} className="inline-flex items-center gap-3 px-4 py-2 bg-brand-dark text-white rounded-lg text-xs font-bold uppercase tracking-widest">
+                        <motion.div variants={fadeInUp} className="inline-flex items-center gap-3 px-4 py-2 bg-brand-dark text-white rounded-lg text-xs font-bold uppercase tracking-widest">
                             <Zap className="w-4 h-4 text-brand-primary" />
                             <span>Nova Era Editorial</span>
-                        </m.div>
+                        </motion.div>
 
-                        <m.h1 variants={fadeInUp} className="text-5xl sm:text-7xl md:text-8xl font-black uppercase leading-[0.9] tracking-tighter">
+                        <motion.h1 variants={fadeInUp} className="text-5xl sm:text-7xl md:text-8xl font-black uppercase leading-[0.9] tracking-tighter">
                             {siteContent['home.hero.title'] || "Onde a Arte"} <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-amber-600">
                                 {siteContent['home.hero.subtitle'] || "Encontra o Legado"}
                             </span>
-                        </m.h1>
+                        </motion.h1>
 
-                        <m.p variants={fadeInUp} className="text-xl md:text-2xl text-gray-500 font-medium max-w-lg leading-relaxed">
+                        <motion.p variants={fadeInUp} className="text-xl md:text-2xl text-gray-500 font-medium max-w-lg leading-relaxed">
                             {siteContent['hero.description'] || "Curadoria de excelência para leitores que exigem o extraordinário."}
-                        </m.p>
+                        </motion.p>
 
-                        <m.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 pt-4">
+                        <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 pt-4">
                             <button
                                 onClick={() => navigate('/livros')}
                                 className="px-10 py-5 bg-brand-dark text-white font-bold uppercase tracking-widest rounded-xl hover:bg-brand-primary transition-all shadow-xl shadow-brand-dark/20 flex items-center justify-center gap-3 group"
                             >
-                                Explorar Acervo <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                Exploring Collection <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                             </button>
                             <button
                                 onClick={() => navigate('/sobre')}
                                 className="px-10 py-5 bg-white border border-gray-200 text-brand-dark font-bold uppercase tracking-widest rounded-xl hover:bg-gray-50 transition-all"
                             >
-                                Nossa Essência
+                                Our Essence
                             </button>
-                        </m.div>
+                        </motion.div>
 
                         {/* Stats - Horizontal */}
-                        <m.div variants={fadeInUp} className="flex items-center gap-12 pt-12 border-t border-gray-100">
+                        <motion.div variants={fadeInUp} className="flex items-center gap-12 pt-12 border-t border-gray-100">
                             <div>
                                 <p className="text-4xl font-black text-brand-dark">{stats.booksCount}+</p>
                                 <p className="text-xs uppercase tracking-widest text-gray-400 font-bold mt-1">Obras Publicadas</p>
@@ -166,11 +166,11 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                                 <p className="text-4xl font-black text-brand-dark">{stats.readersCount}+</p>
                                 <p className="text-xs uppercase tracking-widest text-gray-400 font-bold mt-1">Leitores</p>
                             </div>
-                        </m.div>
-                    </m.div>
+                        </motion.div>
+                    </motion.div>
 
                     {/* Hero Image - Architecture */}
-                    <m.div
+                    <motion.div
                         initial={{ opacity: 0, x: 50 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.8 }}
@@ -190,7 +190,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                                 </div>
                             )}
                         </div>
-                    </m.div>
+                    </motion.div>
                 </div>
             </section>
 
@@ -199,7 +199,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                 <section className="py-32 bg-white relative overflow-hidden">
                     <div className="container mx-auto px-6 md:px-12">
                         <div className="grid lg:grid-cols-2 gap-24 items-center">
-                            <m.div
+                            <motion.div
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 whileInView={{ opacity: 1, scale: 1 }}
                                 viewport={{ once: true }}
@@ -216,9 +216,9 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                                 <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-brand-primary rounded-full flex items-center justify-center text-white text-center p-6 shadow-2xl z-20 rotate-12">
                                     <span className="text-xs font-black uppercase tracking-[0.2em]">Leitura do <br /> Mês</span>
                                 </div>
-                            </m.div>
+                            </motion.div>
 
-                            <m.div
+                            <motion.div
                                 initial={{ opacity: 0, x: 30 }}
                                 whileInView={{ opacity: 1, x: 0 }}
                                 viewport={{ once: true }}
@@ -240,7 +240,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                                         Mergulhar na Obra <BookOpen className="w-5 h-5" />
                                     </button>
                                 </div>
-                            </m.div>
+                            </motion.div>
                         </div>
                     </div>
                 </section>
@@ -371,7 +371,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                     <div className="max-w-4xl mx-auto">
                         {/* Most Downloaded Book */}
                         {mostDownloaded && (
-                            <m.div
+                            <motion.div
                                 initial={{ opacity: 0, scale: 0.98 }}
                                 whileInView={{ opacity: 1, scale: 1 }}
                                 viewport={{ once: true }}
@@ -419,7 +419,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                                 >
                                     Adquirir Obra Agora
                                 </button>
-                            </m.div>
+                            </motion.div>
                         )}
                     </div>
                 </div>

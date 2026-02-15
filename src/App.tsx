@@ -7,7 +7,6 @@ import { Book } from './types';
 import { Loader2 } from 'lucide-react';
 import WhatsAppBubble from './components/WhatsAppBubble';
 import { useAuth } from './contexts/AuthContext';
-import { LazyMotion, domAnimation } from 'framer-motion';
 
 // Lazy loading pages
 const AuthPage = React.lazy(() => import('./pages/AuthPage'));
@@ -132,92 +131,92 @@ const AppContent: React.FC = () => {
     };
 
     return (
-        <LazyMotion features={domAnimation}>
-            <div className="flex flex-col min-h-screen">
-                <ScrollToTop />
-                <Navbar
-                    cartCount={cart.reduce((acc, item) => acc + item.quantity, 0)}
-                    onNavigate={(path) => navigate(path)}
-                    user={user}
-                    currentView={location.pathname}
-                    onLogout={async () => {
-                        const { logout } = await import('./services/authService');
-                        await logout();
-                        navigate('/');
-                    }}
-                />
 
-                <main className="flex-grow">
-                    <React.Suspense fallback={
-                        <div className="h-screen flex items-center justify-center">
-                            <Loader2 className="w-8 h-8 text-brand-primary animate-spin" />
-                        </div>
-                    }>
-                        <Routes>
-                            <Route path="/" element={
-                                <HomePage
-                                    books={books}
-                                    loading={dataLoading}
-                                    onViewDetails={(b) => handleAction('VIEW_BOOK', b)}
-                                    onAddToCart={(b) => handleAction('ADD_TO_CART', b)}
-                                    onToggleWishlist={(b) => { }}
-                                    onNavigate={(v) => handleAction('NAVIGATE', v)}
-                                />
-                            } />
-                            <Route path="/livros" element={
-                                <CatalogPage
-                                    books={books}
-                                    loading={dataLoading}
-                                    onViewDetails={(b) => handleAction('VIEW_BOOK', b)}
-                                    onAddToCart={(b) => handleAction('ADD_TO_CART', b)}
-                                    onToggleWishlist={(b) => { }}
-                                />
-                            } />
-                            <Route path="/livro/:id" element={
-                                <BookPage
-                                    cart={cart}
-                                    onAddToCart={(b) => handleAction('ADD_TO_CART', b)}
-                                />
-                            } />
-                            <Route path="/sobre" element={<AboutPage />} />
-                            <Route path="/contacto" element={<ContactPage />} />
-                            <Route path="/projetos" element={<ProjectsPage />} />
-                            <Route path="/servicos" element={<ServicesPage />} />
-                            <Route path="/blog" element={<BlogPage user={user} />} />
-                            <Route path="/equipa/:id" element={<MemberDetailPage />} />
-                            <Route path="/login" element={<AuthPage onLogin={() => { }} />} />
+        <div className="flex flex-col min-h-screen">
+            <ScrollToTop />
+            <Navbar
+                cartCount={cart.reduce((acc, item) => acc + item.quantity, 0)}
+                onNavigate={(path) => navigate(path)}
+                user={user}
+                currentView={location.pathname}
+                onLogout={async () => {
+                    const { logout } = await import('./services/authService');
+                    await logout();
+                    navigate('/');
+                }}
+            />
 
-                            <Route path="/carrinho" element={
-                                <CheckoutPage
-                                    cart={cart}
-                                    onUpdateQuantity={handleUpdateQuantity}
-                                    onRemoveItem={(id) => handleUpdateQuantity(id, 0)}
-                                />
-                            } />
+            <main className="flex-grow">
+                <React.Suspense fallback={
+                    <div className="h-screen flex items-center justify-center">
+                        <Loader2 className="w-8 h-8 text-brand-primary animate-spin" />
+                    </div>
+                }>
+                    <Routes>
+                        <Route path="/" element={
+                            <HomePage
+                                books={books}
+                                loading={dataLoading}
+                                onViewDetails={(b) => handleAction('VIEW_BOOK', b)}
+                                onAddToCart={(b) => handleAction('ADD_TO_CART', b)}
+                                onToggleWishlist={(b) => { }}
+                                onNavigate={(v) => handleAction('NAVIGATE', v)}
+                            />
+                        } />
+                        <Route path="/livros" element={
+                            <CatalogPage
+                                books={books}
+                                loading={dataLoading}
+                                onViewDetails={(b) => handleAction('VIEW_BOOK', b)}
+                                onAddToCart={(b) => handleAction('ADD_TO_CART', b)}
+                                onToggleWishlist={(b) => { }}
+                            />
+                        } />
+                        <Route path="/livro/:id" element={
+                            <BookPage
+                                cart={cart}
+                                onAddToCart={(b) => handleAction('ADD_TO_CART', b)}
+                            />
+                        } />
+                        <Route path="/sobre" element={<AboutPage />} />
+                        <Route path="/contacto" element={<ContactPage />} />
+                        <Route path="/projetos" element={<ProjectsPage />} />
+                        <Route path="/servicos" element={<ServicesPage />} />
+                        <Route path="/blog" element={<BlogPage user={user} />} />
+                        <Route path="/equipa/:id" element={<MemberDetailPage />} />
+                        <Route path="/login" element={<AuthPage onLogin={() => { }} />} />
 
-                            {/* Protected Routes */}
-                            {/* Protected Routes */}
-                            <Route path="/perfil" element={
-                                <ProtectedRoute allowedRoles={['leitor', 'autor', 'adm']}>
-                                    <ProfilePage />
-                                </ProtectedRoute>
-                            } />
+                        <Route path="/carrinho" element={
+                            <CheckoutPage
+                                cart={cart}
+                                onUpdateQuantity={handleUpdateQuantity}
+                                onRemoveItem={(id) => handleUpdateQuantity(id, 0)}
+                            />
+                        } />
 
-                            <Route path="/admin" element={
-                                <ProtectedRoute allowedRoles={['adm']}>
-                                    <AdminDashboard />
-                                </ProtectedRoute>
-                            } />
+                        {/* Protected Routes */}
+                        {/* Protected Routes */}
+                        <Route path="/perfil" element={
+                            <ProtectedRoute allowedRoles={['leitor', 'autor', 'adm']}>
+                                <ProfilePage />
+                            </ProtectedRoute>
+                        } />
 
-                            <Route path="*" element={<Navigate to="/" replace />} />
-                        </Routes>
-                    </React.Suspense>
-                </main>
+                        <Route path="/admin" element={
+                            <ProtectedRoute allowedRoles={['adm']}>
+                                <AdminDashboard />
+                            </ProtectedRoute>
+                        } />
 
-                <Footer />
-                <WhatsAppBubble />
-            </div>
-        </LazyMotion>
+                        <Route path="*" element={<Navigate to="/" replace />} />
+                    </Routes>
+                </React.Suspense>
+            </main>
+
+            <Footer />
+            <WhatsAppBubble />
+        </div>
+
     );
 };
 
