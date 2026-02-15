@@ -58,9 +58,10 @@ const Footer: React.FC = () => {
                 <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-bold uppercase tracking-widest text-gray-500">
                     <p>&copy; {new Date().getFullYear()} Editora Graça. Todos os direitos reservados.</p>
                     <div className="flex items-center gap-2">
-                        <span>Feito com</span>
-                        <Heart className="w-3 h-3 text-brand-primary fill-current" />
-                        <span>em Angola</span>
+                        <span>desenvolvida por</span>
+                        <a href="https://ibuka47.com" target="_blank" rel="noopener noreferrer" className="font-bold text-brand-primary hover:text-white transition-colors">
+                            ibuka47
+                        </a>
                     </div>
                 </div>
             </div>

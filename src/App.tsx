@@ -122,8 +122,8 @@ const AppContent: React.FC = () => {
                 'CONTACT': '/contacto',
                 'CHECKOUT': '/carrinho',
                 'AUTH': '/login',
-                'READER_DASHBOARD': '/minha-biblioteca',
-                'AUTHOR_DASHBOARD': '/painel-autor',
+                'READER_DASHBOARD': '/perfil',
+                'AUTHOR_DASHBOARD': '/perfil',
                 'ADMIN_DASHBOARD': '/admin'
             };
             if (routes[payload]) navigate(routes[payload]);
