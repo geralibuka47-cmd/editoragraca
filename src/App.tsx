@@ -3,13 +3,11 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavig
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { ToastProvider, useToast } from './components/Toast';
-import { subscribeToAuthChanges } from './services/authService';
-import { getBooks } from './services/dataService';
-import { Book, User } from './types';
+import { Book } from './types';
 import { Loader2 } from 'lucide-react';
 import WhatsAppBubble from './components/WhatsAppBubble';
+import { useAuth } from './contexts/AuthContext';
 
-// Lazy loading pages
 // Lazy loading pages
 const AuthPage = React.lazy(() => import('./pages/AuthPage'));
 const CatalogPage = React.lazy(() => import('./pages/CatalogPage'));
@@ -19,8 +17,7 @@ const ContactPage = React.lazy(() => import('./pages/ContactPage'));
 const CheckoutPage = React.lazy(() => import('./pages/CheckoutPage'));
 const ServicesPage = React.lazy(() => import('./pages/ServicesPage'));
 const BlogPage = React.lazy(() => import('./pages/BlogPage'));
-const ReaderDashboard = React.lazy(() => import('./pages/ReaderDashboard'));
-const AuthorDashboard = React.lazy(() => import('./pages/AuthorDashboard'));
+const ProfilePage = React.lazy(() => import('./pages/ProfilePage'));
 const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard'));
 const BookPage = React.lazy(() => import('./pages/BookPage'));
 const MemberDetailPage = React.lazy(() => import('./pages/MemberDetailPage'));
@@ -36,7 +33,9 @@ const ScrollToTop = () => {
 };
 
 // Protected Route Component
-const ProtectedRoute = ({ children, allowedRoles, user, loading }: { children: React.ReactNode, allowedRoles?: string[], user: User | null, loading: boolean }) => {
+const ProtectedRoute = ({ children, allowedRoles }: { children: React.ReactNode, allowedRoles?: string[] }) => {
+    const { user, loading } = useAuth();
+
     if (loading) return (
         <div className="h-screen flex items-center justify-center bg-brand-light">
             <Loader2 className="w-12 h-12 text-brand-primary animate-spin" />
@@ -55,50 +54,26 @@ const ProtectedRoute = ({ children, allowedRoles, user, loading }: { children: R
 };
 
 const AppContent: React.FC = () => {
-    const [user, setUser] = useState<User | null>(null);
     const [books, setBooks] = useState<Book[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [authLoading, setAuthLoading] = useState(true); // Start true to block until auth check
+    const [dataLoading, setDataLoading] = useState(true);
     const [cart, setCart] = useState<any[]>(() => {
         const saved = localStorage.getItem('cart');
         return saved ? JSON.parse(saved) : [];
     });
     const { showToast } = useToast();
     const navigate = useNavigate();
+    const location = useLocation();
+    const { user } = useAuth();
 
     // Sync cart to local storage
     useEffect(() => {
         localStorage.setItem('cart', JSON.stringify(cart));
     }, [cart]);
 
-    // Auth Subscription
-    useEffect(() => {
-        const unsubscribe = subscribeToAuthChanges((u) => {
-            setUser(u);
-            setAuthLoading(false);
-        });
-
-        // Safety timeout: If auth takes too long (e.g. 8s), force unblock
-        const safetyTimer = setTimeout(() => {
-            setAuthLoading((prev) => {
-                if (prev) {
-                    console.warn("Auth timed out, forcing UI unlock");
-                    return false;
-                }
-                return prev;
-            });
-        }, 8000);
-
-        return () => {
-            unsubscribe();
-            clearTimeout(safetyTimer);
-        };
-    }, []);
-
     // Fetch Data
     useEffect(() => {
         const loadData = async () => {
-            setLoading(true);
+            setDataLoading(true);
             try {
                 const { getBooksMinimal } = await import('./services/dataService');
                 const fetchedBooks = await getBooksMinimal();
@@ -106,7 +81,7 @@ const AppContent: React.FC = () => {
             } catch (error) {
                 console.error("Failed to fetch books:", error);
             } finally {
-                setLoading(false);
+                setDataLoading(false);
             }
         };
         loadData();
@@ -148,62 +123,39 @@ const AppContent: React.FC = () => {
                 'CHECKOUT': '/carrinho',
                 'AUTH': '/login',
                 'READER_DASHBOARD': '/minha-biblioteca',
-                'AUTHOR_DASHBOARD': '/autor',
-                'ADMIN': '/admin',
-                'MEMBER': '/membro'
+                'AUTHOR_DASHBOARD': '/painel-autor',
+                'ADMIN_DASHBOARD': '/admin'
             };
-            if (routes[payload]) {
-                navigate(routes[payload]);
-            } else if (typeof payload === 'string' && payload.startsWith('/')) {
-                // If payload is a direct path
-                navigate(payload);
-            } else {
-                // Unknown view key
-                console.warn('Unknown view/route:', payload);
-            }
+            if (routes[payload]) navigate(routes[payload]);
         }
     };
 
-    const location = useLocation();
-    const isDashboard = location.pathname.startsWith('/admin') ||
-        location.pathname.startsWith('/autor') ||
-        location.pathname.startsWith('/minha-biblioteca');
-
-    if (authLoading) {
-        return (
-            <div className="h-screen flex items-center justify-center bg-brand-light">
-                <Loader2 className="w-12 h-12 text-brand-primary animate-spin" />
-            </div>
-        );
-    }
-
     return (
-        <div className="min-h-screen flex flex-col font-sans text-brand-dark bg-brand-light">
-            {!isDashboard && (
-                <Navbar
-                    cartCount={cart.reduce((acc, item) => acc + item.quantity, 0)}
-                    user={user}
-                    onLogout={async () => {
-                        const { logout } = await import('./services/authService');
-                        await logout();
-                        navigate('/');
-                    }}
-                    currentView={location.pathname}
-                    onNavigate={(v: string) => handleAction('NAVIGATE', v)}
-                />
-            )}
+        <div className="flex flex-col min-h-screen">
+            <ScrollToTop />
+            <Navbar
+                cartCount={cart.reduce((acc, item) => acc + item.quantity, 0)}
+                onNavigate={(path) => navigate(path)}
+                user={user}
+                currentView={location.pathname}
+                onLogout={async () => {
+                    const { logout } = await import('./services/authService');
+                    await logout();
+                    navigate('/');
+                }}
+            />
 
             <main className="flex-grow">
                 <React.Suspense fallback={
-                    <div className="h-96 flex items-center justify-center">
-                        <Loader2 className="w-12 h-12 text-brand-primary animate-spin" />
+                    <div className="h-screen flex items-center justify-center">
+                        <Loader2 className="w-8 h-8 text-brand-primary animate-spin" />
                     </div>
                 }>
                     <Routes>
                         <Route path="/" element={
                             <HomePage
                                 books={books}
-                                loading={loading}
+                                loading={dataLoading}
                                 onViewDetails={(b) => handleAction('VIEW_BOOK', b)}
                                 onAddToCart={(b) => handleAction('ADD_TO_CART', b)}
                                 onToggleWishlist={(b) => { }}
@@ -213,17 +165,25 @@ const AppContent: React.FC = () => {
                         <Route path="/livros" element={
                             <CatalogPage
                                 books={books}
-                                loading={loading}
+                                loading={dataLoading}
                                 onViewDetails={(b) => handleAction('VIEW_BOOK', b)}
                                 onAddToCart={(b) => handleAction('ADD_TO_CART', b)}
                                 onToggleWishlist={(b) => { }}
                             />
                         } />
-                        <Route path="/blog" element={<BlogPage user={user} />} />
-                        <Route path="/servicos" element={<ServicesPage />} />
+                        <Route path="/livro/:id" element={
+                            <BookPage
+                                cart={cart}
+                                onAddToCart={(b) => handleAction('ADD_TO_CART', b)}
+                            />
+                        } />
                         <Route path="/sobre" element={<AboutPage />} />
-                        <Route path="/projetos" element={<ProjectsPage />} />
                         <Route path="/contacto" element={<ContactPage />} />
+                        <Route path="/projetos" element={<ProjectsPage />} />
+                        <Route path="/servicos" element={<ServicesPage />} />
+                        <Route path="/blog" element={<BlogPage user={user} />} />
+                        <Route path="/equipa/:id" element={<MemberDetailPage />} />
+                        <Route path="/login" element={<AuthPage onLogin={() => { }} />} />
 
                         <Route path="/carrinho" element={
                             <CheckoutPage
@@ -233,96 +193,36 @@ const AppContent: React.FC = () => {
                             />
                         } />
 
-                        <Route path="/login" element={
-                            user ? <Navigate to="/" replace /> : <AuthPage onLogin={(u) => { setUser(u); }} />
-                        } />
-
                         {/* Protected Routes */}
-                        <Route path="/minha-biblioteca" element={
-                            <ProtectedRoute user={user} loading={authLoading}>
-                                <ReaderDashboard user={user} />
-                            </ProtectedRoute>
-                        } />
-
-                        <Route path="/autor" element={
-                            <ProtectedRoute user={user} loading={authLoading} allowedRoles={['autor', 'adm']}>
-                                <AuthorDashboard user={user} />
+                        {/* Protected Routes */}
+                        <Route path="/perfil" element={
+                            <ProtectedRoute allowedRoles={['leitor', 'autor', 'adm']}>
+                                <ProfilePage />
                             </ProtectedRoute>
                         } />
 
                         <Route path="/admin" element={
-                            <ProtectedRoute user={user} loading={authLoading} allowedRoles={['adm']}>
-                                <AdminDashboard user={user} />
+                            <ProtectedRoute allowedRoles={['adm']}>
+                                <AdminDashboard />
                             </ProtectedRoute>
                         } />
-
-                        <Route path="/livro/:id" element={
-                            <BookPage user={user} cart={cart} onAddToCart={(b) => handleAction('ADD_TO_CART', b)} />
-                        } />
-                        <Route path="/membro/:id" element={<MemberDetailPage />} />
 
                         <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
                 </React.Suspense>
             </main>
 
-            {!isDashboard && <Footer />}
+            <Footer />
             <WhatsAppBubble />
         </div>
     );
 };
 
-import ErrorBoundary from './components/ErrorBoundary';
-
-// APP_VERSION: Change this string to force a cache clear on all users' devices
-const APP_VERSION = '2.1.0';
-
-const checkAppVersion = () => {
-    const storedVersion = localStorage.getItem('app_version');
-    if (storedVersion !== APP_VERSION) {
-        console.log(`New version detected (${APP_VERSION}). Clearing cache...`);
-
-        // Keep essential data if needed, or clear everything
-        // For this case, we clear everything to ensure a clean slate
-        localStorage.clear();
-
-        // Set new version
-        localStorage.setItem('app_version', APP_VERSION);
-
-        // Force a reload to ensure the new version is loaded
-        window.location.reload();
-    }
-};
-
-// Helper to determine the correct basename
-const getBasename = () => {
-    // If we are on localhost and in the subdir
-    if (window.location.hostname === 'localhost' && window.location.pathname.startsWith('/editoragraca-novo')) {
-        return '/editoragraca-novo';
-    }
-    // Vercel or other root deployments
-    return '/';
-};
-
-import { LazyMotion, domAnimation } from 'framer-motion';
-
 const App: React.FC = () => {
-    // Check version before render
-    useEffect(() => {
-        checkAppVersion();
-    }, []);
-
     return (
-        <ErrorBoundary>
-            <LazyMotion features={domAnimation} strict>
-                <Router basename={getBasename()}>
-                    <ToastProvider>
-                        <ScrollToTop />
-                        <AppContent />
-                    </ToastProvider>
-                </Router>
-            </LazyMotion>
-        </ErrorBoundary>
+        <Router>
+            <AppContent />
+        </Router>
     );
 };
 

@@ -19,7 +19,7 @@ import {
     runTransaction
 } from 'firebase/firestore';
 import { db } from './firebase';
-import { Book, Order, User, UserRole } from '../types';
+import { Book, Order, User, UserRole, Manuscript, Royalties } from '../types';
 
 // Firestore Collections
 const COLLECTIONS = {
@@ -1164,7 +1164,7 @@ export const toggleFavorite = async (bookId: string, userId: string): Promise<bo
 
 // ==================== ADMIN & AUTHOR STATS ====================
 
-export const getAdminStats = async () => {
+export const getStats = async () => {
     try {
         const booksSnapshot = await getDocs(collection(db, COLLECTIONS.BOOKS));
         const usersSnapshot = await getDocs(collection(db, COLLECTIONS.USERS));
@@ -1439,3 +1439,4 @@ export const getAuthorRoyalties = async (authorId: string): Promise<Royalties | 
         return null;
     }
 };
+

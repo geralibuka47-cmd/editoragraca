@@ -8,12 +8,15 @@ import { initSentry } from './services/sentry';
 initSentry();
 
 import { HelmetProvider } from 'react-helmet-async';
+import { AuthProvider } from './contexts/AuthContext';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
         <HelmetProvider>
             <ToastProvider>
-                <App />
+                <AuthProvider>
+                    <App />
+                </AuthProvider>
             </ToastProvider>
         </HelmetProvider>
     </React.StrictMode>

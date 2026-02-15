@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion as m, AnimatePresence } from 'framer-motion';
-import { X, Upload, Image as ImageIcon, FileText, CheckCircle, AlertCircle, Calendar, Loader2, Info, DollarSign, Package, Tag, Layers, Globe, BookOpen, Sparkles, RefreshCw } from 'lucide-react';
+import { X, Upload, Image as ImageIcon, FileText, CheckCircle, AlertCircle, Calendar, Loader2, Info, DollarSign, Package, Tag, Layers, Globe, BookOpen, Sparkles, RefreshCw, Zap } from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -26,6 +26,7 @@ const bookSchema = z.object({
     digitalFileUrl: z.string().optional(),
     paymentInfo: z.string().optional(),
     paymentInfoNotes: z.string().optional(),
+    pages: z.coerce.number().min(1, 'Nº de páginas inválido').optional(),
 });
 
 type BookFormData = z.infer<typeof bookSchema>;
@@ -69,6 +70,7 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
             paymentInfo: '',
             paymentInfoNotes: '',
             launchDate: '',
+            pages: 0,
         }
     });
 
@@ -92,7 +94,8 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                     digitalFileUrl: book.digitalFileUrl || '',
                     paymentInfo: book.paymentInfo || '',
                     paymentInfoNotes: book.paymentInfoNotes || '',
-                    launchDate: book.launchDate || ''
+                    launchDate: book.launchDate || '',
+                    pages: book.pages || 0
                 });
 
                 const isCoverLink = book.coverUrl.startsWith('http');
@@ -115,7 +118,8 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                     digitalFileUrl: '',
                     paymentInfo: '',
                     paymentInfoNotes: '',
-                    launchDate: ''
+                    launchDate: '',
+                    pages: 0
                 });
                 setCoverType('file');
                 setDigitalFileType('file');
@@ -167,6 +171,7 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                     setValue('coverUrl', secureUrl);
                     setCoverPreview(secureUrl);
                 }
+                if (data.pageCount) setValue('pages', data.pageCount);
             }
         } catch (error) {
             console.error('Error fetching metadata:', error);
@@ -182,6 +187,7 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                 id: book?.id,
                 price: Number(data.price),
                 stock: data.format === 'digital' ? null : Number(data.stock),
+                pages: Number(data.pages) || null,
             };
             await onSave(sanitizedData, coverFile, digitalFile);
             onClose();
@@ -300,10 +306,19 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                                 options={[
                                                     { value: 'Ficção', label: 'Ficção' },
                                                     { value: 'Não-Ficção', label: 'Não-Ficção' },
-                                                    { value: 'Técnico', label: 'Técnico' },
-                                                    { value: 'Espiritualidade', label: 'Espiritualidade' },
-                                                    { value: 'Biografia', label: 'Biografia' },
+                                                    { value: 'Romance', label: 'Romance' },
+                                                    { value: 'Poesia', label: 'Poesia' },
+                                                    { value: 'Contos & Crónicas', label: 'Contos & Crónicas' },
                                                     { value: 'Literatura Angolana', label: 'Literatura Angolana' },
+                                                    { value: 'Infantil & Juvenil', label: 'Infantil & Juvenil' },
+                                                    { value: 'Biografia & Memórias', label: 'Biografia & Memórias' },
+                                                    { value: 'História & Política', label: 'História & Política' },
+                                                    { value: 'Desenvolvimento Pessoal', label: 'Desenvolvimento Pessoal' },
+                                                    { value: 'Espiritualidade & Religião', label: 'Espiritualidade & Religião' },
+                                                    { value: 'Técnico & Académico', label: 'Técnico & Académico' },
+                                                    { value: 'Gestão & Negócios', label: 'Gestão & Negócios' },
+                                                    { value: 'Direito', label: 'Direito' },
+                                                    { value: 'Saúde & Bem-estar', label: 'Saúde & Bem-estar' },
                                                 ]}
                                                 {...register('genre')}
                                                 error={errors.genre?.message as string}
@@ -315,8 +330,18 @@ const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, book, on
                                                     variant="glass"
                                                     placeholder="978-..."
                                                     {...register('isbn')}
-                                                    error={errors.isbn?.message as string}
                                                 />
+
+                                                <div className="absolute right-0 top-0 -mt-10 w-32">
+                                                    <Input
+                                                        type="number"
+                                                        label="Nº Páginas"
+                                                        variant="glass"
+                                                        placeholder="0"
+                                                        {...register('pages')}
+                                                        error={errors.pages?.message as string}
+                                                    />
+                                                </div>
                                                 <button
                                                     type="button"
                                                     onClick={handleFetchMetadata}

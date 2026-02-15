@@ -127,7 +127,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                     {user ? (
                         <div className="flex items-center gap-2">
                             <button
-                                onClick={() => onNavigate(user.role === 'adm' ? 'ADMIN' : (user.role === 'autor' ? 'AUTHOR_DASHBOARD' : 'READER_DASHBOARD'))}
+                                onClick={() => onNavigate(user.role === 'adm' ? '/admin' : '/perfil')}
                                 className="p-2 text-brand-dark/80 hover:text-brand-primary transition-colors rounded-full hover:bg-gray-50 flex items-center gap-2"
                                 title="Minha Conta"
                             >
