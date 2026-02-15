@@ -16,11 +16,11 @@ interface AdminStatsProps {
 
 const AdminStats: React.FC<AdminStatsProps> = ({ stats, isLoading }) => {
     const statCards = [
-        { label: 'Obras Ativas', value: stats.totalBooks, icon: BookOpen, color: 'text-brand-primary', glow: 'shadow-brand-primary/20' },
-        { label: 'Utilizadores', value: stats.totalUsers, icon: Users, color: 'text-blue-500', glow: 'shadow-blue-500/20' },
-        { label: 'Pendentes', value: stats.pendingOrders, icon: ShoppingCart, color: 'text-emerald-500', glow: 'shadow-emerald-500/20' },
-        { label: 'Receita', value: `${stats.revenue.toLocaleString('pt-AO')} Kz`, icon: TrendingUp, color: 'text-purple-500', glow: 'shadow-purple-500/20' },
-        { label: 'Baixo Stock', value: stats.lowStockCount, icon: AlertCircle, color: 'text-amber-400', glow: 'shadow-amber-500/20' },
+        { label: 'Obras Ativas', value: stats.totalBooks, icon: BookOpen, color: 'text-brand-primary', bg: 'bg-brand-primary/10', glow: 'shadow-brand-primary/10' },
+        { label: 'Utilizadores', value: stats.totalUsers, icon: Users, color: 'text-blue-500', bg: 'bg-blue-50', glow: 'shadow-blue-500/10' },
+        { label: 'Pendentes', value: stats.pendingOrders, icon: ShoppingCart, color: 'text-emerald-500', bg: 'bg-emerald-50', glow: 'shadow-emerald-500/10' },
+        { label: 'Receita', value: `${stats.revenue.toLocaleString('pt-AO')} Kz`, icon: TrendingUp, color: 'text-purple-500', bg: 'bg-purple-50', glow: 'shadow-purple-500/10' },
+        { label: 'Baixo Stock', value: stats.lowStockCount, icon: AlertCircle, color: 'text-amber-500', bg: 'bg-amber-50', glow: 'shadow-amber-500/10' },
     ];
 
     return (
@@ -31,19 +31,19 @@ const AdminStats: React.FC<AdminStatsProps> = ({ stats, isLoading }) => {
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: index * 0.1 }}
-                    className={`flex-1 min-w-[120px] sm:min-w-[140px] bg-white/5 backdrop-blur-3xl border border-white/5 p-4 sm:p-5 rounded-2xl sm:rounded-[2rem] hover:bg-white/[0.08] transition-all group relative overflow-hidden ${stat.glow} shadow-2xl`}
+                    className={`flex-1 min-w-[120px] sm:min-w-[140px] bg-white border border-gray-100 p-4 sm:p-5 rounded-2xl sm:rounded-[2rem] hover:shadow-lg transition-all group relative overflow-hidden ${stat.glow} shadow-sm`}
                 >
                     <div className="flex justify-between items-start mb-3">
-                        <div className={`p-2.5 rounded-xl bg-white/5 ${stat.color} group-hover:scale-110 transition-transform`}>
+                        <div className={`p-2.5 rounded-xl ${stat.bg} ${stat.color} group-hover:scale-110 transition-transform`}>
                             <stat.icon className="w-4 h-4" />
                         </div>
-                        <Activity className="w-3 h-3 text-white/10 animate-pulse" />
+                        <Activity className="w-3 h-3 text-gray-300 animate-pulse" />
                     </div>
 
                     <div className="space-y-0.5">
-                        <p className="text-xl sm:text-2xl font-black text-white tracking-tighter">
+                        <p className="text-xl sm:text-2xl font-black text-slate-900 tracking-tighter">
                             {isLoading ? (
-                                <Skeleton className="h-8 w-16 bg-white/10" />
+                                <Skeleton className="h-8 w-16 bg-gray-100" />
                             ) : (
                                 stat.label.includes('Receita')
                                     ? (stats.revenue >= 1000000
@@ -53,7 +53,7 @@ const AdminStats: React.FC<AdminStatsProps> = ({ stats, isLoading }) => {
                             )}
                             {stat.label.includes('Receita') && !isLoading && <span className="text-[10px] ml-1 opacity-40">Kz</span>}
                         </p>
-                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-500 group-hover:text-brand-primary transition-colors truncate">
+                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 group-hover:text-brand-primary transition-colors truncate">
                             {stat.label}
                         </p>
                     </div>
