@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion as m, AnimatePresence } from 'framer-motion';
-import { Image as ImageIcon, Calendar, MapPin, Users, X, Plus, Smile, Loader2, Send, Search, Trash2, Edit3, MoreHorizontal, Type, Zap } from 'lucide-react';
+import { Image as ImageIcon, Calendar, MapPin, Users, X, Plus, Loader2, Send, Search, Trash2, Type, Zap } from 'lucide-react';
 import { BlogPost } from '../../types';
 import { saveBlogPost, deleteBlogPost } from '../../services/dataService';
 import { useToast } from '../Toast';
