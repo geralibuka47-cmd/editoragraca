@@ -234,11 +234,11 @@ const AppContent: React.FC = () => {
                             </ProtectedRoute>
                         } />
 
-                        <Route path="/admin" element={
+                        <Route path="/admin/*" element={
                             <ProtectedRoute allowedRoles={['adm']}>
                                 <AdminLayout>
                                     <Routes>
-                                        <Route index element={<AdminOverview />} />
+                                        <Route path="/" element={<AdminOverview />} />
                                         <Route path="livros" element={<AdminBooksPage onStatsRefresh={() => { }} />} />
                                         <Route path="utilizadores" element={<AdminUsersPage />} />
                                         <Route path="encomendas" element={<AdminOrdersPage user={user!} />} />
@@ -251,7 +251,6 @@ const AppContent: React.FC = () => {
                                 </AdminLayout>
                             </ProtectedRoute>
                         } />
-                        <Route path="/admin/*" element={<Navigate to="/admin" replace />} />
 
                         <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
