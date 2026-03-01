@@ -146,7 +146,7 @@ const AppContent: React.FC = () => {
         }
     };
 
-    const isDashboardRoute = location.pathname === '/admin' || location.pathname === '/perfil';
+    const isDashboardRoute = location.pathname.startsWith('/admin') || location.pathname.startsWith('/perfil');
     const showShell = !isDashboardRoute;
 
     return (

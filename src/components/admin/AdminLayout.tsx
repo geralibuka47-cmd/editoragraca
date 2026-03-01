@@ -3,7 +3,7 @@ import { motion as m, AnimatePresence } from 'framer-motion';
 import {
     LayoutDashboard, BookCopy, Users, CreditCard,
     FileEdit, Settings, LogOut, ChevronLeft,
-    Bell, Search, User as UserIcon, Menu, X
+    Bell, Search, User as UserIcon, Menu, X, FileText, Briefcase, UserCog
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -26,6 +26,9 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         { icon: Users, label: 'Membros', path: '/admin/utilizadores' },
         { icon: CreditCard, label: 'Vendas', path: '/admin/encomendas' },
         { icon: FileEdit, label: 'Editorial', path: '/admin/blog' },
+        { icon: FileText, label: 'Manuscritos', path: '/admin/manuscritos' },
+        { icon: Briefcase, label: 'Serviços', path: '/admin/servicos' },
+        { icon: UserCog, label: 'Equipa', path: '/admin/team' },
         { icon: Settings, label: 'Definições', path: '/admin/definicoes' },
     ];
 
