@@ -39,85 +39,78 @@ const AdminOverview: React.FC = () => {
     ];
 
     return (
-        <div className="space-y-12 pb-24">
+        <div className="space-y-8 pb-12">
 
             {/* Action Bar */}
-            <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 pb-10 border-b border-gray-100">
-                <div className="space-y-4 text-center md:text-left">
-                    <span className="px-5 py-2 bg-brand-primary/10 text-brand-primary text-[10px] font-black uppercase tracking-[0.4em] rounded-full shadow-sm border border-brand-primary/5">
-                        Relatório Executivo
-                    </span>
-                    <h1 className="text-5xl md:text-7xl font-black text-brand-dark uppercase tracking-tighter leading-none">
-                        Gestão <span className="text-brand-primary italic font-serif lowercase font-normal">Sistémica</span>
+            <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-gray-200">
+                <div className="space-y-1 text-center md:text-left">
+                    <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+                        Visão Geral
                     </h1>
+                    <p className="text-sm text-gray-500">Métricas e performance do sistema.</p>
                 </div>
 
-                <div className="flex items-center gap-4 justify-center md:justify-end">
-                    <button className="flex items-center gap-3 px-8 py-5 bg-white border border-gray-100 rounded-3xl font-black text-[10px] uppercase tracking-widest text-gray-500 hover:bg-gray-50 transition-all">
-                        <Download className="w-4 h-4" /> Exportar Dados
+                <div className="flex items-center gap-3 justify-center md:justify-end">
+                    <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                        <Download className="w-4 h-4" /> Exportar
                     </button>
-                    <button className="flex items-center gap-3 px-10 py-5 bg-brand-dark text-white rounded-3xl font-black text-[10px] uppercase tracking-widest hover:bg-brand-primary transition-all shadow-xl shadow-brand-dark/20">
-                        Nova Obra <ArrowUpRight className="w-4 h-4" />
+                    <button className="flex items-center gap-2 px-4 py-2 bg-brand-primary text-white rounded-lg text-sm font-medium hover:bg-brand-dark transition-colors">
+                        <ArrowUpRight className="w-4 h-4" /> Relatório Detalhado
                     </button>
                 </div>
             </header>
 
             {/* KPI Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {kpis.map((kpi, i) => (
                     <m.div
                         key={kpi.label}
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.1 }}
-                        className="group relative bg-white p-10 rounded-[3rem] border border-gray-100/60 shadow-xl shadow-brand-dark/[0.02] hover:shadow-[0_40px_100px_-20px_rgba(0,0,0,0.08)] transition-all duration-700 overflow-hidden"
+                        className="bg-white p-5 rounded-xl border border-gray-200 hover:border-gray-300 transition-colors"
                     >
-                        <div className={`absolute top-0 right-0 w-24 h-24 bg-${kpi.color}/5 rounded-bl-[4rem] group-hover:scale-150 transition-transform duration-700`} />
-
-                        <div className="relative z-10 space-y-8">
-                            <div className="flex items-center justify-between">
-                                <div className={`w-14 h-14 bg-brand-dark rounded-2xl flex items-center justify-center group-hover:bg-brand-primary transition-all duration-500 shadow-lg`}>
-                                    <kpi.icon className="w-6 h-6 text-brand-primary group-hover:text-white transition-colors" />
-                                </div>
-                                <span className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 bg-${kpi.color}/10 text-${kpi.color} rounded-full`}>
-                                    {kpi.trend}
-                                </span>
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-gray-50 border border-gray-100">
+                                <kpi.icon className="w-5 h-5 text-gray-600" />
                             </div>
-
-                            <div className="space-y-2">
-                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{kpi.label}</p>
-                                <h3 className="text-3xl font-black text-brand-dark uppercase tracking-tight">{loading ? '...' : kpi.val}</h3>
-                            </div>
+                            <span className={`text-xs font-semibold px-2 py-1 rounded bg-${kpi.color}/10 text-${kpi.color}`}>
+                                {kpi.trend}
+                            </span>
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-gray-500 mb-1">{kpi.label}</p>
+                            <h3 className="text-2xl font-bold text-gray-900 leading-none">{loading ? '...' : kpi.val}</h3>
                         </div>
                     </m.div>
                 ))}
             </div>
 
             {/* Main Insights Grid */}
-            <div className="grid lg:grid-cols-3 gap-10">
+            <div className="grid lg:grid-cols-3 gap-6">
 
                 {/* Status Highlights */}
                 <m.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="lg:col-span-2 bg-brand-dark p-12 rounded-[4rem] text-white relative overflow-hidden"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="lg:col-span-2 bg-white border border-gray-200 rounded-xl p-6"
                 >
-                    <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_top_right,_rgba(196,160,82,0.1)_0%,_transparent_50%)]"></div>
-                    <div className="relative z-10 flex flex-col h-full justify-between gap-12">
-                        <div className="space-y-4">
-                            <h3 className="text-3xl font-black uppercase tracking-tighter">Insights de Performance</h3>
-                            <p className="text-gray-400 font-medium max-w-sm">O acervo registou um crescimento orgânico de 12% este mês, com destaque para a literatura digital.</p>
+                    <div className="flex flex-col h-full justify-between gap-8">
+                        <div>
+                            <h3 className="text-lg font-bold text-gray-900 mb-2">Insights de Performance</h3>
+                            <p className="text-sm text-gray-500">O acervo registou um crescimento orgânico de 12% este mês, com destaque para a literatura digital.</p>
                         </div>
 
-                        <div className="grid grid-cols-3 gap-8 pt-12 border-t border-white/5">
+                        <div className="grid grid-cols-3 gap-4 pt-6 border-t border-gray-100">
                             {[
                                 { l: 'Taxa Conversão', v: '84%' },
                                 { l: 'Rating Médio', v: '4.9' },
                                 { l: 'Retenção', v: '92%' }
                             ].map((s, i) => (
-                                <div key={i} className="space-y-1">
-                                    <p className="text-[9px] font-black text-brand-primary uppercase tracking-widest">{s.l}</p>
-                                    <p className="text-2xl font-black text-white">{s.v}</p>
+                                <div key={i}>
+                                    <p className="text-xs font-medium text-gray-500 mb-1">{s.l}</p>
+                                    <p className="text-xl font-bold text-gray-900">{s.v}</p>
                                 </div>
                             ))}
                         </div>
@@ -126,40 +119,41 @@ const AdminOverview: React.FC = () => {
 
                 {/* Alerts/Quick Actions */}
                 <m.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="bg-white p-12 rounded-[4rem] border border-gray-100 shadow-2xl shadow-brand-dark/5 space-y-10"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="bg-white p-6 rounded-xl border border-gray-200"
                 >
-                    <div className="flex items-center justify-between">
-                        <h4 className="font-black text-sm uppercase tracking-widest text-brand-dark">Alertas de Gestão</h4>
-                        <AlertCircle className="w-5 h-5 text-red-500" />
+                    <div className="flex items-center justify-between mb-6">
+                        <h4 className="font-bold text-sm text-gray-900">Alertas de Gestão</h4>
+                        <AlertCircle className="w-4 h-4 text-gray-400" />
                     </div>
 
-                    <div className="space-y-6">
+                    <div className="space-y-4">
                         {stats.lowStockCount > 0 ? (
-                            <div className="p-6 bg-red-50 rounded-3xl border border-red-100 flex gap-4 items-start">
-                                <div className="p-3 bg-red-100 rounded-xl text-red-600"><ShoppingBag className="w-4 h-4" /></div>
+                            <div className="p-4 bg-red-50 rounded-lg border border-red-100 flex gap-3 items-start">
+                                <ShoppingBag className="w-5 h-5 text-red-500 flex-shrink-0" />
                                 <div>
-                                    <p className="text-xs font-black text-red-800 uppercase tracking-tight">{stats.lowStockCount} Obras com Stock Baixo</p>
-                                    <p className="text-[10px] font-bold text-red-600 uppercase mt-1">Acção imediata necessária</p>
+                                    <p className="text-sm font-semibold text-red-800">{stats.lowStockCount} Obras com Stock Baixo</p>
+                                    <p className="text-xs text-red-600 mt-1">Revisão de inventário necessária.</p>
                                 </div>
                             </div>
                         ) : (
-                            <div className="p-6 bg-green-50 rounded-3xl border border-green-100 flex gap-4 items-start">
-                                <div className="p-3 bg-green-100 rounded-xl text-green-600"><CheckCircle className="w-4 h-4" /></div>
+                            <div className="p-4 bg-green-50 rounded-lg border border-green-100 flex gap-3 items-start">
+                                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
                                 <div>
-                                    <p className="text-xs font-black text-green-800 uppercase tracking-tight">Logística Nominal</p>
-                                    <p className="text-[10px] font-bold text-green-600 uppercase mt-1">Stock totalmente otimizado</p>
+                                    <p className="text-sm font-semibold text-green-800">Logística Nominal</p>
+                                    <p className="text-xs text-green-600 mt-1">Stock perfeitamente otimizado.</p>
                                 </div>
                             </div>
                         )}
 
-                        <div className="pt-6 space-y-4">
-                            <button className="w-full py-5 rounded-2xl bg-gray-50 border border-gray-100 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:bg-brand-primary/10 hover:text-brand-primary hover:border-brand-primary transition-all flex items-center justify-center gap-3">
-                                Calendário de Lançamentos <Calendar className="w-4 h-4" />
+                        <div className="pt-2 space-y-2">
+                            <button className="w-full py-2.5 px-4 rounded-lg bg-gray-50 border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors flex items-center justify-center gap-2">
+                                <Calendar className="w-4 h-4" /> Calendário Lançamentos
                             </button>
-                            <button className="w-full py-5 rounded-2xl bg-gray-50 border border-gray-100 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:bg-brand-primary/10 hover:text-brand-primary hover:border-brand-primary transition-all flex items-center justify-center gap-3">
-                                Auditoria de Sistema <ShieldCheck className="w-4 h-4" />
+                            <button className="w-full py-2.5 px-4 rounded-lg bg-gray-50 border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors flex items-center justify-center gap-2">
+                                <ShieldCheck className="w-4 h-4" /> Auditoria Geral
                             </button>
                         </div>
                     </div>

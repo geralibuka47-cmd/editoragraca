@@ -145,95 +145,88 @@ const AdminBlogPage: React.FC<AdminBlogTabProps> = ({ posts: initialPosts, onRef
             {/* Creation Console */}
             <m.div
                 layout
-                className="bg-white/5 rounded-[2.5rem] border border-white/5 p-10 overflow-hidden shadow-2xl relative group/console"
+                className="bg-white rounded-xl border border-gray-200 p-6 overflow-hidden shadow-sm relative group/console"
             >
-                <div className="absolute top-0 right-0 w-64 h-64 bg-brand-primary/5 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2" />
-
                 {!isCreating ? (
-                    <div className="flex items-center gap-8 relative z-10">
-                        <div className="w-16 h-16 bg-white/5 border border-white/10 rounded-[1.5rem] flex items-center justify-center flex-shrink-0 group-hover/console:border-brand-primary/30 transition-colors">
-                            <Plus className="w-8 h-8 text-brand-primary" />
+                    <div className="flex items-center gap-4 relative z-10">
+                        <div className="w-12 h-12 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-center flex-shrink-0 group-hover/console:border-brand-primary/30 transition-colors">
+                            <Plus className="w-6 h-6 text-brand-primary" />
                         </div>
                         <button
                             onClick={() => setIsCreating(true)}
-                            className="flex-1 text-left px-10 py-6 bg-white/[0.03] hover:bg-white/[0.05] rounded-[2rem] text-gray-500 hover:text-gray-300 font-black text-[11px] uppercase tracking-[0.2em] transition-all border border-transparent hover:border-white/5"
+                            className="flex-1 text-left px-6 py-4 bg-gray-50 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-600 font-medium text-sm transition-all border border-transparent"
                         >
-                            INICIAR NOVA TRANSMISSÃO PARA O FEED...
+                            Escreva algo para o feed ou agende um evento...
                         </button>
                     </div>
                 ) : (
                     <m.div
                         initial={{ opacity: 0, scale: 0.98 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="space-y-10 relative z-10"
+                        className="space-y-6 relative z-10"
                     >
-                        <div className="flex items-center justify-between gap-6">
-                            <div className="flex bg-white/5 p-1.5 rounded-2xl w-fit border border-white/5">
+                        <div className="flex items-center justify-between gap-4">
+                            <div className="flex bg-gray-100 p-1 rounded-lg w-fit">
                                 <button
                                     onClick={() => setContentType('post')}
-                                    className={`px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${contentType === 'post'
-                                        ? 'bg-brand-primary text-white shadow-xl shadow-brand-primary/20'
-                                        : 'text-gray-500 hover:text-white'
+                                    className={`px-6 py-2 rounded-md text-xs font-semibold transition-all ${contentType === 'post'
+                                        ? 'bg-white text-brand-primary shadow-sm border border-gray-200'
+                                        : 'text-gray-500 hover:text-gray-700'
                                         }`}
                                 >
-                                    Log de Notícias
+                                    Notícia
                                 </button>
                                 <button
                                     onClick={() => setContentType('event')}
-                                    className={`px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${contentType === 'event'
-                                        ? 'bg-brand-primary text-white shadow-xl shadow-brand-primary/20'
-                                        : 'text-gray-500 hover:text-white'
+                                    className={`px-6 py-2 rounded-md text-xs font-semibold transition-all ${contentType === 'event'
+                                        ? 'bg-white text-brand-primary shadow-sm border border-gray-200'
+                                        : 'text-gray-500 hover:text-gray-700'
                                         }`}
                                 >
-                                    Agendamento
+                                    Evento
                                 </button>
                             </div>
                             <button
                                 onClick={() => setIsCreating(false)}
-                                title="Fechar Terminal"
-                                aria-label="Fechar Terminal"
-                                className="w-12 h-12 flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/5 rounded-2xl text-gray-500 hover:text-white transition-all group/close"
+                                title="Cancelar"
+                                className="p-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-gray-400 hover:text-gray-600 transition-colors"
                             >
-                                <X className="w-5 h-5 transition-transform group-hover/close:rotate-90" />
+                                <X className="w-4 h-4" />
                             </button>
                         </div>
 
                         {contentType === 'post' && (
-                            <div className="space-y-10">
+                            <div className="space-y-6">
                                 <Textarea
-                                    variant="glass"
                                     value={postContent}
                                     onChange={(e) => setPostContent(e.target.value)}
-                                    placeholder="QUAL A NOVIDADE DO DIA?"
-                                    className="h-64 text-2xl font-black placeholder:text-gray-800 border-none bg-transparent pt-0"
+                                    placeholder="Qual é a novidade?"
+                                    className="h-48 text-lg font-medium placeholder:text-gray-400 border border-gray-200 bg-gray-50/50 rounded-xl"
                                 />
 
                                 <Input
-                                    label="MEDIA ASSET (URL)"
-                                    variant="glass"
+                                    label="Imagem (URL)"
                                     icon={<ImageIcon className="w-4 h-4" />}
                                     value={postImage}
                                     onChange={(e) => setPostImage(e.target.value)}
-                                    placeholder="HTTPS://IMAGES.UNSPLASH.COM/..."
+                                    placeholder="https://images.unsplash.com/..."
+                                    className="rounded-lg"
                                 />
 
                                 {postImage && (
                                     <m.div
                                         initial={{ opacity: 0, scale: 0.95 }}
                                         animate={{ opacity: 1, scale: 1 }}
-                                        className="relative rounded-[2.5rem] overflow-hidden aspect-video border border-white/10 group/preview shadow-2xl"
+                                        className="relative rounded-xl overflow-hidden aspect-video border border-gray-200 shadow-sm"
                                     >
-                                        <img src={postImage} alt="Preview Asset" className="w-full h-full object-cover transition-transform duration-1000 group-hover/preview:scale-105" />
-                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/preview:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
-                                            <button
-                                                onClick={() => setPostImage('')}
-                                                className="bg-red-500 text-white p-5 rounded-full shadow-2xl hover:scale-110 transition-all border border-red-400/50"
-                                                title="Remover Asset"
-                                                aria-label="Remover Asset"
-                                            >
-                                                <Trash2 className="w-6 h-6" />
-                                            </button>
-                                        </div>
+                                        <img src={postImage} alt="Preview" className="w-full h-full object-cover" />
+                                        <button
+                                            onClick={() => setPostImage('')}
+                                            title="Remover Imagem"
+                                            className="absolute top-4 right-4 bg-red-500 text-white p-2 rounded-lg shadow-lg hover:bg-red-600 transition-colors"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
                                     </m.div>
                                 )}
 
@@ -241,75 +234,72 @@ const AdminBlogPage: React.FC<AdminBlogTabProps> = ({ posts: initialPosts, onRef
                                     onClick={handleCreatePost}
                                     disabled={isSubmitting}
                                     isLoading={isSubmitting}
-                                    className="w-full py-6 rounded-[1.5rem]"
-                                    leftIcon={!isSubmitting && <Send className="w-4 h-4" />}
+                                    className="w-full py-4 rounded-lg font-semibold"
                                 >
-                                    Transmitir Publicação
+                                    Publicar Notícia
                                 </Button>
                             </div>
                         )}
 
                         {contentType === 'event' && (
-                            <div className="space-y-10">
-                                <div className="grid md:grid-cols-2 gap-10">
+                            <div className="space-y-6">
+                                <div className="grid md:grid-cols-2 gap-4">
                                     <Input
-                                        label="DESIGNAÇÃO DO EVENTO"
-                                        variant="glass"
+                                        label="Título do Evento"
                                         value={eventData.title}
                                         onChange={(e) => setEventData({ ...eventData, title: e.target.value })}
-                                        placeholder="EX: NOITE DE AUTÓGRAFOS"
+                                        placeholder="Ex: Noite de Autógrafos"
+                                        className="rounded-lg"
                                     />
                                     <Input
-                                        label="LOCALIZAÇÃO / COORDENADAS"
-                                        variant="glass"
+                                        label="Localização"
                                         icon={<MapPin className="w-4 h-4" />}
                                         value={eventData.location}
                                         onChange={(e) => setEventData({ ...eventData, location: e.target.value })}
-                                        placeholder="LOCAL DO EVENTO..."
+                                        placeholder="Local do evento..."
+                                        className="rounded-lg"
                                     />
                                 </div>
 
-                                <div className="grid md:grid-cols-2 gap-10">
+                                <div className="grid md:grid-cols-2 gap-4">
                                     <Input
                                         type="date"
-                                        label="DATA DO SISTEMA"
-                                        variant="glass"
+                                        label="Data"
                                         value={eventData.date}
                                         onChange={(e) => setEventData({ ...eventData, date: e.target.value })}
+                                        className="rounded-lg"
                                     />
                                     <Input
                                         type="time"
-                                        label="THRONOS (TIME)"
-                                        variant="glass"
+                                        label="Horário"
                                         value={eventData.time}
                                         onChange={(e) => setEventData({ ...eventData, time: e.target.value })}
+                                        className="rounded-lg"
                                     />
                                 </div>
 
                                 <Textarea
-                                    label="SÍNTESE DA MISSÃO"
-                                    variant="glass"
+                                    label="Descrição"
                                     value={eventData.description}
                                     onChange={(e) => setEventData({ ...eventData, description: e.target.value })}
-                                    className="h-32"
+                                    className="h-32 rounded-lg"
                                 />
 
                                 <Input
-                                    label="ASSET VISUAL DO EVENTO"
-                                    variant="glass"
+                                    label="Thumbnail do Evento (URL)"
                                     value={eventData.imageUrl}
                                     onChange={(e) => setEventData({ ...eventData, imageUrl: e.target.value })}
-                                    placeholder="URL DA IMAGEM OPTIMIZADA..."
+                                    placeholder="https://images.unsplash.com/..."
+                                    className="rounded-lg"
                                 />
 
                                 <Button
                                     onClick={handleCreateEvent}
                                     disabled={isSubmitting}
                                     isLoading={isSubmitting}
-                                    className="w-full py-6 rounded-[1.5rem]"
-                                    leftIcon={!isSubmitting && <Zap className="w-4 h-4" />}
+                                    className="w-full py-4 rounded-lg font-semibold"
                                 >
-                                    Marcar no Calendário Global
+                                    Criar Evento
                                 </Button>
                             </div>
                         )}
@@ -318,72 +308,66 @@ const AdminBlogPage: React.FC<AdminBlogTabProps> = ({ posts: initialPosts, onRef
             </m.div>
 
             {/* Timeline Section */}
-            <div className="space-y-10">
-                <div className="flex items-center justify-between px-6">
-                    <div className="flex items-center gap-4">
+            <div className="space-y-6">
+                <div className="flex items-center justify-between px-2">
+                    <div className="flex items-center gap-2">
                         <Type className="w-5 h-5 text-brand-primary" />
-                        <h3 className="text-xl font-black text-white tracking-widest uppercase">Timeline de Missões</h3>
+                        <h3 className="text-lg font-bold text-gray-900">Feed de Actividade</h3>
                     </div>
-                    <div className="px-5 py-2 bg-white/5 border border-white/5 rounded-full text-[9px] font-black text-gray-600 uppercase tracking-[0.4em]">
-                        {filteredPosts.length} Entradas Activas
+                    <div className="px-3 py-1 bg-gray-100 border border-gray-200 rounded-full text-[10px] font-semibold text-gray-500 uppercase tracking-wider">
+                        {filteredPosts.length} Publicações
                     </div>
                 </div>
 
-                <div className="grid gap-10">
+                <div className="grid gap-6">
                     <AnimatePresence mode="popLayout">
                         {filteredPosts.map((post, idx) => (
                             <m.div
                                 key={post.id}
                                 layout
-                                initial={{ opacity: 0, y: 40 }}
+                                initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
                                 transition={{ delay: idx * 0.05 }}
-                                className="bg-white/5 rounded-[3rem] border border-white/5 overflow-hidden group/item relative shadow-2xl"
+                                className="bg-white rounded-xl border border-gray-200 overflow-hidden group/item relative shadow-sm"
                             >
-                                <div className="p-12">
-                                    <div className="flex items-center justify-between mb-10 relative z-10">
-                                        <div className="flex items-center gap-6">
-                                            <div className="w-14 h-14 bg-gradient-to-br from-brand-primary to-brand-primary/40 rounded-2xl flex items-center justify-center font-black text-white text-xl shadow-lg">
+                                <div className="p-6">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-10 h-10 bg-brand-primary/10 rounded-lg flex items-center justify-center font-bold text-brand-primary text-sm">
                                                 EG
                                             </div>
                                             <div>
-                                                <p className="font-black text-white text-[11px] uppercase tracking-[0.2em] mb-1">{post.author}</p>
-                                                <div className="flex items-center gap-2 text-[10px] text-gray-500 font-black uppercase tracking-widest bg-white/5 px-3 py-1 rounded-full">
-                                                    <Calendar className="w-3 h-3 text-brand-primary" />
+                                                <p className="font-semibold text-gray-900 text-sm tracking-tight">{post.author}</p>
+                                                <div className="flex items-center gap-1.5 text-[10px] text-gray-500 font-medium">
+                                                    <Calendar className="w-3 h-3" />
                                                     {new Date(post.date).toLocaleDateString()}
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-2">
                                             <button
                                                 onClick={() => handleDelete(post.id)}
-                                                className="w-12 h-12 flex items-center justify-center bg-red-500/10 text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all border border-red-500/10 shadow-lg group/trash"
-                                                title="Eliminar Publicação"
-                                                aria-label="Eliminar Publicação"
+                                                className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                                                title="Eliminar"
                                             >
-                                                <Trash2 className="w-5 h-5 transition-transform group-hover/trash:scale-110" />
+                                                <Trash2 className="w-4 h-4" />
                                             </button>
                                         </div>
                                     </div>
 
-                                    <div className="relative z-10">
-                                        <h4 className="text-3xl font-black text-white tracking-tighter mb-6 leading-none group-hover/item:text-brand-primary transition-colors">{post.title}</h4>
-                                        <p className="text-gray-400 font-medium text-[15px] leading-relaxed mb-10 whitespace-pre-wrap max-w-3xl italic">{post.content}</p>
+                                    <div>
+                                        <h4 className="text-xl font-bold text-gray-900 mb-2 leading-tight">{post.title}</h4>
+                                        <p className="text-gray-600 font-medium text-sm leading-relaxed mb-6 whitespace-pre-wrap max-w-4xl">{post.content}</p>
 
                                         {post.imageUrl && (
-                                            <div className="relative rounded-[3rem] overflow-hidden aspect-[21/9] bg-white/5 border border-white/5 shadow-inner group/asset">
+                                            <div className="relative rounded-lg overflow-hidden aspect-[21/9] bg-gray-100 border border-gray-200">
                                                 <img
                                                     src={post.imageUrl}
                                                     alt={post.title}
-                                                    className="w-full h-full object-cover transition-transform duration-[2000ms] group-hover/asset:scale-110 grayscale-[0.5] group-hover/asset:grayscale-0"
+                                                    className="w-full h-full object-cover"
                                                 />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-bottom p-10 opacity-0 group-hover/asset:opacity-100 transition-opacity">
-                                                    <div className="mt-auto">
-                                                        <span className="bg-brand-primary text-white text-[9px] font-black px-4 py-2 rounded-lg uppercase tracking-widest shadow-2xl">Visual Asset Verified</span>
-                                                    </div>
-                                                </div>
                                             </div>
                                         )}
                                     </div>
@@ -393,9 +377,9 @@ const AdminBlogPage: React.FC<AdminBlogTabProps> = ({ posts: initialPosts, onRef
                     </AnimatePresence>
 
                     {filteredPosts.length === 0 && (
-                        <div className="py-40 text-center space-y-8 opacity-10">
-                            <Plus className="w-24 h-24 mx-auto text-brand-primary" />
-                            <p className="font-black uppercase tracking-[0.5em] text-[11px]">Sistema de Feed em Standby</p>
+                        <div className="py-24 text-center space-y-4">
+                            <Plus className="w-12 h-12 mx-auto text-gray-200" />
+                            <p className="font-semibold text-gray-400 text-sm">O feed está em standby</p>
                         </div>
                     )}
                 </div>

@@ -259,7 +259,7 @@ const AppContent: React.FC = () => {
 
             {showShell && <Footer />}
             {showShell && <WhatsAppBubble />}
-        </div>
+        </div >
 
     );
 };

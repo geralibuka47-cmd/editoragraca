@@ -128,12 +128,12 @@ const AdminUsersPage: React.FC = () => {
                                         >
                                             <td className="px-4 sm:px-6 py-4">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-12 h-12 bg-brand-primary/10 border border-brand-primary/20 rounded-2xl flex items-center justify-center text-brand-primary font-black text-sm group-hover:scale-110 transition-transform">
+                                                    <div className="w-10 h-10 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-center text-gray-700 font-bold text-sm">
                                                         {u.name?.charAt(0).toUpperCase()}
                                                     </div>
                                                     <div>
-                                                        <div className="font-black text-slate-900 text-[14px] tracking-tight">{u.name}</div>
-                                                        <div className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">{u.id.substring(0, 12)}</div>
+                                                        <div className="font-semibold text-gray-900 text-sm">{u.name}</div>
+                                                        <div className="text-xs text-gray-400">{u.id.substring(0, 12)}</div>
                                                     </div>
                                                 </div>
                                             </td>
@@ -145,8 +145,8 @@ const AdminUsersPage: React.FC = () => {
                                                     {u.email}
                                                 </div>
                                             </td>
-                                            <td className="px-4 sm:px-6 py-4">
-                                                <span className={`inline-flex items-center gap-2 w-fit px-3 py-1.5 rounded-lg border text-xs font-bold ${getRoleStyles(u.role)}`}>
+                                            <td className="px-4 sm:px-6 py-4 text-xs text-gray-500">
+                                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium border ${getRoleStyles(u.role)}`}>
                                                     {getRoleIcon(u.role)}
                                                     {u.role === 'admin' || u.role === 'adm' ? 'Administrador' : u.role === 'author' || u.role === 'autor' ? 'Escritor' : 'Leitor'}
                                                 </span>
@@ -158,33 +158,30 @@ const AdminUsersPage: React.FC = () => {
                                                 </div>
                                             </td>
                                             <td className="px-4 sm:px-6 py-4">
-                                                <div className="flex items-center justify-center gap-2 flex-wrap">
+                                                <div className="flex items-center justify-center gap-2">
                                                     {(u.role === 'leitor' || u.role === 'autor') && (
                                                         <button
                                                             onClick={() => handleUpdateRole(u.id, u.role, 'promote')}
-                                                            title="Promover Utilizador"
-                                                            aria-label="Promover Utilizador"
-                                                            className="w-10 h-10 bg-green-500/10 hover:bg-green-500/20 text-green-500 rounded-xl transition-all flex items-center justify-center border border-green-500/10 group/promote"
+                                                            title="Promover"
+                                                            className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-md transition-colors"
                                                         >
-                                                            <ArrowUpCircle className="w-4 h-4 transition-transform group-hover/promote:-translate-y-1" />
+                                                            <ArrowUpCircle className="w-4 h-4" />
                                                         </button>
                                                     )}
                                                     {(u.role === 'adm' || u.role === 'admin' || u.role === 'autor') && (
                                                         <button
                                                             onClick={() => handleUpdateRole(u.id, u.role, 'demote')}
-                                                            title="Despromover Utilizador"
-                                                            aria-label="Despromover Utilizador"
-                                                            className="w-10 h-10 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl transition-all flex items-center justify-center border border-red-500/10 group/demote"
+                                                            title="Despromover"
+                                                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
                                                         >
-                                                            <ArrowDownCircle className="w-4 h-4 transition-transform group-hover/demote:translate-y-1" />
+                                                            <ArrowDownCircle className="w-4 h-4" />
                                                         </button>
                                                     )}
                                                     <button
-                                                        title="Editar Perfil"
-                                                        aria-label="Editar Perfil"
-                                                        className="w-10 h-10 bg-gray-50 hover:bg-brand-primary/10 text-gray-400 hover:text-brand-primary rounded-xl transition-all flex items-center justify-center border border-gray-200 group/btn"
+                                                        title="Editar"
+                                                        className="p-2 text-gray-400 hover:text-brand-primary hover:bg-brand-primary/10 rounded-md transition-colors"
                                                     >
-                                                        <Edit className="w-4 h-4 transition-transform group-hover/btn:scale-110" />
+                                                        <Edit className="w-4 h-4" />
                                                     </button>
                                                 </div>
                                             </td>

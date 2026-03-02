@@ -138,12 +138,12 @@ const AdminServicesPage: React.FC = () => {
         <div className="space-y-6">
             <AdminPageHeader title="Serviços" subtitle="Catálogo de serviços editoriais" highlight="Soluções">
                 <Input placeholder="Pesquisar..." variant="light" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full sm:w-64" />
-                <m.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={handleCreate} className="bg-brand-primary text-white font-bold text-sm px-5 py-2.5 rounded-xl flex items-center gap-2 shadow-md min-h-[44px]">
+                <button onClick={handleCreate} className="bg-brand-primary text-white font-semibold text-sm px-5 py-2 rounded-lg flex items-center gap-2 hover:bg-brand-dark transition-colors min-h-[40px]">
                     <Plus className="w-4 h-4" /> Novo Serviço
-                </m.button>
+                </button>
             </AdminPageHeader>
 
-            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
                 <div className="overflow-x-auto">
                     <table className="w-full min-w-[720px] border-collapse">
                         <thead>
@@ -172,72 +172,68 @@ const AdminServicesPage: React.FC = () => {
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, scale: 0.95 }}
-                                            className="hover:bg-white/[0.03] transition-all duration-300 group/row"
+                                            className="hover:bg-gray-50 transition-colors group/row"
                                         >
                                             <td className="px-4 sm:px-6 py-4">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="w-10 h-10 rounded-xl bg-brand-primary/10 flex items-center justify-center text-brand-primary group-hover/row:scale-110 transition-transform">
-                                                        <Zap className="w-5 h-5 shadow-[0_0_15px_rgba(189,147,56,0.3)]" />
+                                                    <div className="w-10 h-10 rounded-lg bg-brand-primary/10 flex items-center justify-center text-brand-primary">
+                                                        <Zap className="w-5 h-5" />
                                                     </div>
-                                                    <span className="font-black text-white text-base tracking-tighter uppercase group-hover/row:text-brand-primary transition-colors">{service.title}</span>
+                                                    <span className="font-semibold text-gray-900 text-sm tracking-tight">{service.title}</span>
                                                 </div>
                                             </td>
                                             <td className="px-4 sm:px-6 py-4">
-                                                <div className="flex flex-wrap gap-2">
+                                                <div className="flex flex-wrap gap-1.5">
                                                     {service.details.slice(0, 3).map((d: string, i: number) => (
-                                                        <span key={i} className="px-4 py-1.5 bg-white/5 border border-white/5 text-[8px] font-black text-gray-400 rounded-full uppercase tracking-widest">
+                                                        <span key={i} className="px-2 py-0.5 bg-gray-50 border border-gray-200 text-[10px] font-medium text-gray-500 rounded">
                                                             {d}
                                                         </span>
                                                     ))}
                                                     {service.details.length > 3 && (
-                                                        <span className="px-3 py-1.5 bg-brand-primary/20 text-brand-primary text-[8px] font-black rounded-full border border-brand-primary/30 uppercase tracking-widest">
-                                                            +{service.details.length - 3} SPEC
+                                                        <span className="px-2 py-0.5 bg-brand-primary/10 text-brand-primary text-[10px] font-bold rounded border border-brand-primary/20">
+                                                            +{service.details.length - 3} itens
                                                         </span>
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="px-4 sm:px-6 py-4 text-right font-black text-lg text-brand-primary tracking-tighter">
+                                            <td className="px-4 sm:px-6 py-4 text-right font-bold text-gray-900 text-sm">
                                                 {typeof service.price === 'number' ?
                                                     `${service.price.toLocaleString()} Kz` :
-                                                    <span className="text-[10px] uppercase tracking-widest text-gray-500">{service.price}</span>
+                                                    <span className="text-[10px] uppercase font-bold text-gray-500">{service.price}</span>
                                                 }
                                             </td>
-                                            <td className="px-4 sm:px-6 py-4 text-right font-black text-gray-700">
-                                                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 rounded-lg border border-white/5">
+                                            <td className="px-4 sm:px-6 py-4 text-right">
+                                                <div className="inline-flex items-center gap-1.5 text-xs text-gray-500">
                                                     <Hash className="w-3 h-3" />
-                                                    <span className="text-xs">{service.order}</span>
+                                                    <span>{service.order}</span>
                                                 </div>
                                             </td>
                                             <td className="px-4 sm:px-6 py-4">
-                                                <div className="flex items-center justify-center gap-4">
-                                                    <m.button
-                                                        whileHover={{ scale: 1.1, rotate: -5 }}
-                                                        whileTap={{ scale: 0.9 }}
+                                                <div className="flex items-center justify-center gap-2">
+                                                    <button
                                                         onClick={() => handleEdit(service)}
-                                                        className="w-12 h-12 bg-white/5 border border-white/5 text-gray-400 rounded-2xl hover:bg-white/10 hover:text-white flex items-center justify-center transition-all shadow-xl group/edit"
-                                                        title="Refinar Parâmetros"
+                                                        className="p-2 text-gray-400 hover:text-brand-primary hover:bg-brand-primary/10 rounded-md transition-colors"
+                                                        title="Editar"
                                                     >
-                                                        <Edit className="w-5 h-5 transition-transform group-hover/edit:scale-110" />
-                                                    </m.button>
-                                                    <m.button
-                                                        whileHover={{ scale: 1.1, rotate: 5 }}
-                                                        whileTap={{ scale: 0.9 }}
+                                                        <Edit className="w-4 h-4" />
+                                                    </button>
+                                                    <button
                                                         onClick={() => handleDeleteService(service.id)}
-                                                        className="w-12 h-12 bg-red-500/5 border border-red-500/10 text-red-500/50 rounded-2xl hover:bg-red-500 hover:text-white flex items-center justify-center transition-all shadow-xl group/delete"
-                                                        title="Abortar Serviço"
+                                                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                                                        title="Eliminar"
                                                     >
-                                                        <Trash2 className="w-5 h-5 transition-transform group-hover/delete:scale-110" />
-                                                    </m.button>
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
                                                 </div>
                                             </td>
                                         </m.tr>
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan={5} className="px-10 py-48 text-center">
-                                            <div className="flex flex-col items-center gap-8 opacity-20 grayscale">
-                                                <Cpu className="w-24 h-24 text-brand-primary" />
-                                                <p className="font-black uppercase tracking-[0.6em] text-[11px] text-gray-400">Sem Protocolos de Serviço Registados.</p>
+                                        <td colSpan={5} className="py-24 text-center">
+                                            <div className="flex flex-col items-center gap-4 text-gray-300">
+                                                <Cpu className="w-12 h-12" />
+                                                <p className="font-semibold text-sm">Nenhum serviço registado</p>
                                             </div>
                                         </td>
                                     </tr>
@@ -260,97 +256,88 @@ const AdminServicesPage: React.FC = () => {
                             className="absolute inset-0 bg-black/80 backdrop-blur-2xl"
                         />
                         <m.div
-                            initial={{ opacity: 0, scale: 0.95, y: 40 }}
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: 40 }}
-                            className="bg-[#0D0D0D] rounded-[4rem] w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8)] relative z-20 border border-white/10 flex flex-col"
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-xl relative z-20 border border-gray-200 flex flex-col"
                         >
-                            <div className="p-12 border-b border-white/5 relative bg-gradient-to-b from-white/[0.02] to-transparent">
-                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-primary to-transparent" />
+                            <div className="p-8 border-b border-gray-100 relative">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <h3 className="text-4xl font-black text-white tracking-tighter uppercase mb-2">
-                                            {selectedServiceId ? 'Refinar Protocolo' : 'Novo Protocolo'}
+                                        <h3 className="text-xl font-bold text-gray-900 tracking-tight">
+                                            {selectedServiceId ? 'Editar Serviço' : 'Novo Serviço'}
                                         </h3>
-                                        <div className="flex items-center gap-3">
-                                            <Zap className="w-4 h-4 text-brand-primary animate-pulse" />
-                                            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500">Configuração de Solução Editorial</p>
-                                        </div>
+                                        <p className="text-xs text-gray-500">Configuração de catálogo editorial</p>
                                     </div>
-                                    <m.button
-                                        whileHover={{ rotate: 90, scale: 1.1 }}
-                                        whileTap={{ scale: 0.9 }}
+                                    <button
                                         onClick={() => setShowServiceModal(false)}
-                                        className="w-14 h-14 flex items-center justify-center bg-white/5 border border-white/5 text-gray-500 hover:text-white rounded-2xl transition-all"
-                                        title="Sair do Terminal"
-                                        aria-label="Sair do Terminal"
+                                        className="p-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-gray-400 hover:text-gray-600 transition-colors"
+                                        title="Fechar"
                                     >
-                                        <X className="w-6 h-6" />
-                                    </m.button>
+                                        <X className="w-4 h-4" />
+                                    </button>
                                 </div>
                             </div>
 
-                            <form onSubmit={handleSubmit(onSubmit)} className="flex-1 overflow-y-auto p-12 space-y-12 custom-scrollbar">
+                            <form onSubmit={handleSubmit(onSubmit)} className="flex-1 overflow-y-auto p-8 space-y-6">
 
-                                <div className="space-y-4">
+                                <div className="space-y-1">
                                     <Input
-                                        label="TITULAÇÃO DO SERVIÇO"
-                                        placeholder="EX: DESIGN EDITORIAL AVANÇADO"
+                                        label="Título do Serviço"
+                                        placeholder="Ex: Design Editorial"
                                         icon={<Tag className="w-4 h-4" />}
-                                        variant="glass"
                                         {...register('title')}
                                         error={errors.title?.message as string}
+                                        className="rounded-lg"
                                     />
                                 </div>
 
-                                <div className="grid md:grid-cols-2 gap-10">
+                                <div className="grid md:grid-cols-2 gap-6">
                                     <Input
-                                        label="INVESTIMENTO BASE"
-                                        placeholder="EX: 45.000 KZ"
+                                        label="Investimento Base"
+                                        placeholder="Ex: 45.000 Kz"
                                         icon={<DollarSign className="w-4 h-4" />}
-                                        variant="glass"
                                         {...register('price')}
                                         error={errors.price?.message as string}
+                                        className="rounded-lg"
                                     />
                                     <Input
                                         type="number"
-                                        label="SEQUÊNCIA DE EXIBIÇÃO"
+                                        label="Ordem de Exibição"
                                         icon={<Hash className="w-4 h-4" />}
-                                        variant="glass"
                                         {...register('order')}
                                         error={errors.order?.message as string}
+                                        className="rounded-lg"
                                     />
                                 </div>
 
                                 <div className="space-y-4">
                                     <Textarea
-                                        label="ESPECIFICAÇÕES TÉCNICAS (LINHA A LINHA)"
-                                        placeholder="EX:&#10;REVISÃO ORTOGRÁFICA&#10;DIAGRAMAÇÃO DE CAPA&#10;REGISTO DE ISBN"
-                                        rows={8}
-                                        variant="glass"
+                                        label="Especificações (uma por linha)"
+                                        placeholder="Revisão ortográfica&#10;Design de capa&#10;Registo de ISBN"
+                                        rows={6}
                                         {...register('details')}
                                         error={errors.details?.message as string}
-                                        className="custom-scrollbar"
+                                        className="rounded-lg"
                                     />
                                 </div>
                             </form>
 
-                            <div className="p-12 border-t border-white/5 bg-white/[0.01] flex flex-col sm:flex-row gap-6">
+                            <div className="p-8 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
                                 <button
                                     type="button"
                                     onClick={() => setShowServiceModal(false)}
-                                    className="flex-1 px-10 py-6 border border-white/10 text-gray-500 rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] hover:bg-white/5 hover:text-white transition-all flex items-center justify-center gap-2"
+                                    className="px-6 py-2 border border-gray-200 text-gray-500 rounded-lg font-semibold text-sm hover:bg-white hover:text-gray-700 transition-all"
                                 >
-                                    ABORTAR
+                                    Cancelar
                                 </button>
                                 <Button
                                     onClick={handleSubmit(onSubmit)}
                                     isLoading={isSubmitting}
                                     disabled={isSubmitting}
-                                    className="flex-[1.5] py-6 px-12"
-                                    leftIcon={!isSubmitting && <Save className="w-5 h-5" />}
+                                    className="px-8 rounded-lg"
                                 >
-                                    REGISTAR PROTOCOLO
+                                    Gravar Serviço
                                 </Button>
                             </div>
                         </m.div>

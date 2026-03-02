@@ -38,25 +38,25 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     };
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] flex selection:bg-brand-primary selection:text-white">
+        <div className="min-h-screen bg-gray-50 flex selection:bg-brand-primary selection:text-white">
 
             {/* Desktop Sidebar */}
             <m.aside
-                animate={{ width: isSidebarCollapsed ? 120 : 320 }}
-                className="hidden lg:flex flex-col bg-brand-dark border-r border-white/5 relative z-50 pt-12 pb-8 px-6 transition-all duration-500"
+                animate={{ width: isSidebarCollapsed ? 80 : 260 }}
+                className="hidden lg:flex flex-col bg-white border-r border-gray-200 relative z-50 pt-8 pb-6 px-4 transition-all duration-300"
             >
-                <div className="flex items-center justify-between mb-20 px-4">
-                    <Link to="/" className="flex items-center gap-4 group">
-                        <div className="w-12 h-12 bg-brand-primary/20 backdrop-blur-xl rounded-xl flex items-center justify-center border border-white/10 group-hover:scale-110 transition-transform">
-                            <span className="font-black text-brand-primary text-xl">G</span>
+                <div className="flex items-center justify-between mb-12 px-2">
+                    <Link to="/" className="flex items-center gap-3 group">
+                        <div className="w-10 h-10 bg-brand-light rounded-lg flex items-center justify-center border border-brand-primary/20">
+                            <span className="font-bold text-brand-primary text-lg">G</span>
                         </div>
                         {!isSidebarCollapsed && (
                             <m.span
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
-                                className="font-black text-white uppercase tracking-tighter text-lg"
+                                className="font-semibold text-brand-dark text-lg"
                             >
-                                Admin Hub
+                                Admin Core
                             </m.span>
                         )}
                     </Link>
@@ -70,102 +70,96 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                     </button>
                 </div>
 
-                <nav className="flex-grow space-y-4">
+                <nav className="flex-grow space-y-1">
                     {navItems.map((item) => {
                         const isActive = location.pathname === item.path || (item.path !== '/admin' && location.pathname.startsWith(item.path));
                         return (
                             <Link
                                 key={item.path}
                                 to={item.path}
-                                className={`flex items-center gap-6 px-6 py-5 rounded-[1.5rem] transition-all group relative ${isActive
-                                    ? 'bg-brand-primary text-white shadow-xl shadow-brand-primary/20 scale-105'
-                                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                className={`flex items-center gap-4 px-3 py-3 rounded-lg transition-colors group relative ${isActive
+                                    ? 'bg-brand-primary/10 text-brand-primary'
+                                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
                                     }`}
                             >
-                                <item.icon className={`w-6 h-6 ${isActive ? 'text-white' : 'group-hover:text-brand-primary transition-colors'}`} />
+                                <item.icon className="w-5 h-5 flex-shrink-0" />
                                 {!isSidebarCollapsed && (
                                     <m.span
                                         initial={{ opacity: 0, x: -10 }}
                                         animate={{ opacity: 1, x: 0 }}
-                                        className="font-bold text-sm uppercase tracking-widest"
+                                        className="font-medium text-sm whitespace-nowrap"
                                     >
                                         {item.label}
                                     </m.span>
-                                )}
-                                {isActive && (
-                                    <m.div
-                                        layoutId="sidebarActive"
-                                        className="absolute inset-0 bg-brand-primary rounded-[1.5rem] -z-10 shadow-2xl"
-                                    />
                                 )}
                             </Link>
                         );
                     })}
                 </nav>
 
-                <div className="space-y-4 pt-8 border-t border-white/5">
+                <div className="pt-6 border-t border-gray-200">
                     <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-6 px-6 py-5 rounded-[1.5rem] text-red-400 hover:text-red-300 hover:bg-red-400/5 transition-all group"
-                        title="Sair da Sessão"
-                        aria-label="Sair da Sessão"
+                        className="w-full flex items-center gap-4 px-3 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors group"
+                        title="Terminar Sessão"
+                        aria-label="Terminar Sessão"
                     >
-                        <LogOut className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                        <LogOut className="w-5 h-5 flex-shrink-0" />
                         {!isSidebarCollapsed && (
-                            <span className="font-bold text-sm uppercase tracking-widest">Sair da Sessão</span>
+                            <span className="font-medium text-sm whitespace-nowrap">Terminar Sessão</span>
                         )}
                     </button>
                 </div>
             </m.aside>
 
             {/* Main Content Area */}
-            <main className="flex-grow flex flex-col min-h-screen relative overflow-hidden">
+            <main className="flex-grow flex flex-col min-h-screen relative overflow-hidden bg-gray-50">
 
                 {/* Header (Top Bar) */}
-                <header className="h-28 bg-white/80 backdrop-blur-xl border-b border-gray-100 flex items-center justify-between px-10 sticky top-0 z-40">
-                    <div className="flex items-center gap-8 flex-grow max-w-2xl">
+                <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 sticky top-0 z-40">
+                    <div className="flex items-center gap-4 flex-grow max-w-xl">
                         <button
                             onClick={() => setIsMobileMenuOpen(true)}
-                            className="p-3 bg-gray-50 rounded-2xl border border-gray-100"
+                            className="p-2 lg:hidden text-gray-500 hover:text-brand-dark transition-colors"
                             title="Abrir Menu"
                             aria-label="Abrir Menu"
                         >
-                            <Menu className="w-6 h-6 text-brand-dark" />
+                            <Menu className="w-5 h-5" />
                         </button>
                         <div className="relative flex-grow group hidden md:block">
-                            <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-brand-primary transition-colors" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                             <input
                                 type="text"
-                                placeholder="Pesquisar no sistema..."
-                                className="w-full pl-16 pr-6 py-4 bg-gray-50 rounded-2xl border border-transparent focus:border-brand-primary/20 focus:bg-white transition-all outline-none font-medium text-sm"
+                                placeholder="Pesquisar..."
+                                className="w-full pl-10 pr-4 py-2 bg-gray-50 rounded-md border border-gray-200 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all outline-none text-sm"
                             />
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-8">
+                    <div className="flex items-center gap-6">
                         <button
-                            className="relative p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:bg-white transition-all group"
+                            className="relative p-2 text-gray-400 hover:text-gray-900 transition-colors"
                             title="Notificações"
                             aria-label="Notificações"
                         >
-                            <Bell className="w-5 h-5 text-gray-400 group-hover:text-brand-primary transition-colors" />
-                            <span className="absolute top-4 right-4 w-2 h-2 bg-brand-primary rounded-full border-2 border-white"></span>
+                            <Bell className="w-5 h-5" />
+                            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-brand-primary rounded-full border border-white"></span>
                         </button>
 
-                        <div className="flex items-center gap-6 pl-8 border-l border-gray-100">
+                        <div className="flex items-center gap-3 pl-6 border-l border-gray-200">
                             <div className="text-right hidden sm:block">
-                                <p className="text-sm font-black text-brand-dark uppercase tracking-tight">{user?.name || 'Administrador'}</p>
-                                <p className="text-[10px] font-bold text-brand-primary uppercase tracking-[0.2em] opacity-70">Protocolo de Gestão</p>
+                                <p className="text-sm font-semibold text-gray-900">{user?.name || 'Administrador'}</p>
+                                <p className="text-xs text-brand-primary">{user?.role === 'adm' ? 'Admin' : 'Equipa'}</p>
                             </div>
-                            <div className="w-14 h-14 bg-brand-light rounded-2xl border border-brand-primary/10 flex items-center justify-center shadow-lg shadow-brand-dark/5">
-                                <UserIcon className="w-7 h-7 text-brand-primary" />
+                            <div className="w-8 h-8 bg-brand-primary/10 rounded-full flex items-center justify-center">
+                                <UserIcon className="w-4 h-4 text-brand-primary" />
                             </div>
                         </div>
                     </div>
                 </header>
 
                 {/* Page Content */}
-                <div className="flex-grow p-10 overflow-y-auto no-scrollbar">
+                <div className="flex-grow p-6 md:p-8 overflow-y-auto no-scrollbar">
                     <AnimatePresence mode="wait">
                         <m.div
                             key={location.pathname}
@@ -189,36 +183,40 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={() => setIsMobileMenuOpen(false)}
-                            className="fixed inset-0 bg-brand-dark/40 backdrop-blur-md z-[100]"
+                            className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-[100] lg:hidden"
                         />
                         <m.aside
                             initial={{ x: '-100%' }}
                             animate={{ x: 0 }}
                             exit={{ x: '-100%' }}
-                            className="fixed inset-y-0 left-0 w-[85%] max-w-sm bg-brand-dark z-[110] p-10 flex flex-col"
+                            className="fixed inset-y-0 left-0 w-64 bg-white z-[110] p-6 flex flex-col shadow-2xl lg:hidden"
                         >
-                            <div className="flex items-center justify-between mb-16 px-4">
-                                <span className="font-black text-white uppercase tracking-tighter text-2xl">Administração</span>
+                            <div className="flex items-center justify-between mb-8">
+                                <span className="font-semibold text-brand-dark text-lg">Admin Core</span>
                                 <button
                                     onClick={() => setIsMobileMenuOpen(false)}
+                                    className="p-2 text-gray-400 hover:text-gray-900"
                                     title="Fechar Menu"
                                     aria-label="Fechar Menu"
                                 >
-                                    <X className="w-8 h-8 text-white" />
+                                    <X className="w-5 h-5" />
                                 </button>
                             </div>
-                            <nav className="flex-grow space-y-6">
-                                {navItems.map((item) => (
-                                    <Link
-                                        key={item.path}
-                                        to={item.path}
-                                        onClick={() => setIsMobileMenuOpen(false)}
-                                        className="flex items-center gap-8 py-4 text-gray-400 font-bold uppercase tracking-[0.2em] text-xs hover:text-white transition-colors"
-                                    >
-                                        <item.icon className="w-6 h-6 text-brand-primary" />
-                                        {item.label}
-                                    </Link>
-                                ))}
+                            <nav className="flex-grow space-y-2">
+                                {navItems.map((item) => {
+                                    const isActive = location.pathname === item.path || (item.path !== '/admin' && location.pathname.startsWith(item.path));
+                                    return (
+                                        <Link
+                                            key={item.path}
+                                            to={item.path}
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            className={`flex items-center gap-3 px-3 py-3 text-sm rounded-lg transition-colors ${isActive ? 'bg-brand-primary/10 text-brand-primary font-medium' : 'text-gray-600 hover:bg-gray-50'}`}
+                                        >
+                                            <item.icon className="w-5 h-5 flex-shrink-0" />
+                                            {item.label}
+                                        </Link>
+                                    );
+                                })}
                             </nav>
                         </m.aside>
                     </>

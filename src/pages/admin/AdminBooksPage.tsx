@@ -133,25 +133,23 @@ const AdminBooksPage: React.FC<AdminBooksPageProps> = ({ onStatsRefresh }) => {
                     value={searchQuery}
                     onChange={(e: any) => setSearchQuery(e.target.value)}
                 />
-                <m.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                <button
                     onClick={openAddModal}
-                    className="bg-brand-primary hover:bg-brand-primary/90 text-white font-bold text-sm px-5 py-2.5 rounded-xl flex items-center gap-2 shadow-md transition-all min-h-[44px]"
+                    className="bg-brand-primary hover:bg-brand-dark text-white font-medium text-sm px-4 py-2 rounded-lg flex items-center gap-2 transition-colors min-h-[40px]"
                 >
                     <Plus className="w-4 h-4" />
                     Nova Obra
-                </m.button>
+                </button>
             </AdminPageHeader>
 
-            <div className="flex flex-wrap gap-2 p-2 bg-gray-100 rounded-xl w-full overflow-x-auto">
+            <div className="flex flex-wrap gap-2 pt-2 w-full overflow-x-auto">
                 {(['all', 'físico', 'digital'] as const).map((format) => (
                     <button
                         key={format}
                         onClick={() => setFilterFormat(format)}
-                        className={`px-6 sm:px-10 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${filterFormat === format
-                            ? 'bg-brand-primary text-white shadow-lg'
-                            : 'text-gray-500 hover:text-slate-900'
+                        className={`px-4 py-2 rounded-md text-xs font-semibold uppercase tracking-wider transition-colors whitespace-nowrap ${filterFormat === format
+                            ? 'bg-brand-primary/10 text-brand-primary'
+                            : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
                             }`}
                     >
                         {format === 'all' ? 'Ver Tudo' : format}
@@ -159,7 +157,7 @@ const AdminBooksPage: React.FC<AdminBooksPageProps> = ({ onStatsRefresh }) => {
                 ))}
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full min-w-[640px] border-collapse">
                         <thead>
@@ -209,11 +207,11 @@ const AdminBooksPage: React.FC<AdminBooksPageProps> = ({ onStatsRefresh }) => {
                                             </td>
                                             <td className="px-4 sm:px-6 py-4">
                                                 <div className="flex flex-col gap-1">
-                                                    <span className="text-xs font-semibold text-gray-500">{book.genre}</span>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className={`text-[8px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg border ${book.format === 'digital'
-                                                            ? 'bg-blue-500/10 border-blue-500/20 text-blue-400'
-                                                            : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                                                    <span className="text-xs font-medium text-gray-500">{book.genre}</span>
+                                                    <div className="flex items-center gap-1.5 mt-1">
+                                                        <span className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded border ${book.format === 'digital'
+                                                            ? 'bg-blue-50 border-blue-200 text-blue-600'
+                                                            : 'bg-emerald-50 border-emerald-200 text-emerald-600'
                                                             }`}>
                                                             {book.format === 'digital' ? 'E-Book' : 'Físico'}
                                                         </span>
@@ -228,18 +226,18 @@ const AdminBooksPage: React.FC<AdminBooksPageProps> = ({ onStatsRefresh }) => {
                                                 </div>
                                             </td>
                                             <td className="px-4 sm:px-6 py-4 text-right">
-                                                <div className="flex flex-col items-end gap-1.5 min-w-[80px]">
+                                                <div className="flex flex-col items-end gap-1.5">
                                                     {book.format === 'digital' ? (
-                                                        <div className="text-[10px] font-black uppercase tracking-widest text-blue-400 bg-blue-500/10 px-3 py-1 rounded-lg border border-blue-500/20">
+                                                        <div className="text-[10px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
                                                             Ilimitado
                                                         </div>
                                                     ) : (
                                                         <>
-                                                            <div className={`text-md font-black ${Number(book.stock ?? 0) < 10 ? 'text-red-500' : 'text-slate-900'}`}>
+                                                            <div className={`text-sm font-semibold ${Number(book.stock ?? 0) < 10 ? 'text-red-500' : 'text-gray-900'}`}>
                                                                 {book.stock ?? 0}
-                                                                {Number(book.stock ?? 0) < 5 && <AlertCircle className="w-3 h-3 inline ml-2 animate-bounce" />}
+                                                                {Number(book.stock ?? 0) < 5 && <AlertCircle className="w-3 h-3 inline ml-1" />}
                                                             </div>
-                                                            <div className="h-1 w-20 bg-gray-200 rounded-full overflow-hidden">
+                                                            <div className="h-1.5 w-16 bg-gray-100 rounded-full overflow-hidden">
                                                                 <m.div
                                                                     initial={{ width: 0 }}
                                                                     animate={{ width: `${Math.min(((book.stock ?? 0) / 50) * 100, 100)}%` }}
@@ -254,19 +252,17 @@ const AdminBooksPage: React.FC<AdminBooksPageProps> = ({ onStatsRefresh }) => {
                                                 <div className="flex items-center justify-center gap-2">
                                                     <button
                                                         onClick={() => openEditModal(book)}
-                                                        className="w-10 h-10 sm:w-11 sm:h-11 bg-gray-50 hover:bg-brand-primary/10 text-gray-500 hover:text-brand-primary rounded-lg transition-all flex items-center justify-center border border-gray-200 min-touch"
-                                                        title="Editar Obra"
-                                                        aria-label="Editar Obra"
+                                                        className="p-2 text-gray-400 hover:text-brand-primary hover:bg-brand-primary/10 rounded-md transition-colors"
+                                                        title="Editar"
                                                     >
-                                                        <Edit className="w-4 h-4 transition-transform group-hover/btn:scale-110" />
+                                                        <Edit className="w-4 h-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDeleteBook(book.id)}
-                                                        className="w-10 h-10 sm:w-11 sm:h-11 bg-gray-50 hover:bg-red-50 text-gray-500 hover:text-red-500 rounded-lg transition-all flex items-center justify-center border border-gray-200 min-touch"
-                                                        title="Eliminar Obra"
-                                                        aria-label="Eliminar Obra"
+                                                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                                                        title="Eliminar"
                                                     >
-                                                        <Trash2 className="w-4 h-4 transition-transform group-hover/btn:scale-110" />
+                                                        <Trash2 className="w-4 h-4" />
                                                     </button>
                                                 </div>
                                             </td>

@@ -77,7 +77,7 @@ const AdminManuscriptsPage: React.FC = () => {
                 />
             </AdminPageHeader>
 
-            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
                 <div className="overflow-x-auto">
                     <table className="w-full min-w-[640px] border-collapse">
                         <thead>
@@ -110,9 +110,9 @@ const AdminManuscriptsPage: React.FC = () => {
                                             className="hover:bg-gray-50 transition-colors group"
                                         >
                                             <td className="px-4 sm:px-6 py-4">
-                                                <div className="flex flex-col gap-1.5">
-                                                    <span className="font-black text-slate-900 text-[14px] tracking-tight">{m_item.title}</span>
-                                                    <span className="text-[9px] font-black uppercase tracking-[0.1em] text-brand-primary/60">{m_item.genre}</span>
+                                                <div className="flex flex-col gap-0.5">
+                                                    <span className="font-semibold text-gray-900 text-sm tracking-tight">{m_item.title}</span>
+                                                    <span className="text-[10px] font-medium text-brand-primary/70">{m_item.genre}</span>
                                                 </div>
                                             </td>
                                             <td className="px-4 sm:px-6 py-4">
@@ -122,27 +122,27 @@ const AdminManuscriptsPage: React.FC = () => {
                                                 </div>
                                             </td>
                                             <td className="px-4 sm:px-6 py-4">
-                                                <span className={`px-4 py-2 rounded-xl border text-[9px] font-black uppercase tracking-[0.2em] w-fit flex items-center gap-2.5 shadow-lg ${m_item.status === 'approved' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-                                                    m_item.status === 'rejected' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
-                                                        'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                                                <span className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider border flex items-center gap-2 w-fit ${m_item.status === 'approved' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+                                                    m_item.status === 'rejected' ? 'bg-red-50 text-red-600 border-red-100' :
+                                                        'bg-amber-50 text-amber-600 border-amber-100'
                                                     }`}>
-                                                    <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${m_item.status === 'approved' ? 'bg-emerald-400' :
-                                                        m_item.status === 'rejected' ? 'bg-red-400' :
-                                                            'bg-amber-400'
+                                                    <div className={`w-1.5 h-1.5 rounded-full ${m_item.status === 'approved' ? 'bg-emerald-500' :
+                                                        m_item.status === 'rejected' ? 'bg-red-500' :
+                                                            'bg-amber-500'
                                                         }`} />
                                                     {m_item.status === 'approved' ? 'Aprovado' : m_item.status === 'rejected' ? 'Rejeitado' : 'Em Análise'}
                                                 </span>
                                             </td>
                                             <td className="px-4 sm:px-6 py-4">
-                                                <div className="flex items-center gap-3 text-[10px] text-gray-500 font-black uppercase tracking-widest">
-                                                    <Calendar className="w-4 h-4 text-gray-700" />
+                                                <div className="flex items-center gap-2 text-[10px] text-gray-500 font-medium">
+                                                    <Calendar className="w-3.5 h-3.5" />
                                                     {new Date(m_item.submittedDate).toLocaleDateString()}
                                                 </div>
                                             </td>
                                             <td className="px-4 sm:px-6 py-4 text-center">
                                                 <button
                                                     onClick={() => setSelectedManuscript(m_item)}
-                                                    className="px-8 py-3 bg-gray-50 hover:bg-brand-primary/10 text-gray-500 hover:text-brand-primary rounded-xl transition-all border border-gray-200 font-black text-[9px] uppercase tracking-widest"
+                                                    className="px-4 py-2 bg-gray-50 hover:bg-brand-primary/10 text-gray-600 hover:text-brand-primary rounded-lg transition-colors border border-gray-200 text-xs font-semibold"
                                                 >
                                                     Analisar
                                                 </button>
@@ -180,81 +180,73 @@ const AdminManuscriptsPage: React.FC = () => {
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl relative z-20 border border-gray-200"
+                            className="bg-white rounded-xl w-full max-w-2xl overflow-hidden shadow-xl relative z-20 border border-gray-200"
                         >
-                            <div className="p-12 border-b border-gray-100 relative bg-gradient-to-b from-gray-50/50 to-transparent">
+                            <div className="p-8 border-b border-gray-100 relative">
                                 <button
                                     onClick={() => setSelectedManuscript(null)}
-                                    title="Fechar análise"
-                                    aria-label="Fechar análise"
-                                    className="absolute top-10 right-10 w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
+                                    title="Fechar"
+                                    className="absolute top-8 right-8 p-2 rounded-lg bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
                                 >
-                                    <X className="w-5 h-5 text-gray-500" />
+                                    <X className="w-4 h-4" />
                                 </button>
-                                <div className="space-y-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-brand-primary/10 flex items-center justify-center text-brand-primary">
-                                            <BookOpen className="w-5 h-5" />
-                                        </div>
-                                        <h3 className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">Análise Técnica</h3>
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-2">
+                                        <BookOpen className="w-5 h-5 text-brand-primary" />
+                                        <h3 className="text-xl font-bold text-gray-900 tracking-tight">Análise Editorial</h3>
                                     </div>
-                                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">Obra: <span className="text-brand-primary">{selectedManuscript.title}</span></p>
+                                    <p className="text-xs text-gray-500">Obra: <span className="font-semibold text-brand-primary">{selectedManuscript.title}</span></p>
                                 </div>
                             </div>
 
-                            <div className="p-12 space-y-10">
-                                <div className="grid grid-cols-2 gap-10">
-                                    <div className="space-y-2">
-                                        <span className="block text-[9px] font-black uppercase tracking-[0.3em] text-gray-600">Proponente</span>
-                                        <p className="font-bold text-slate-900 flex items-center gap-3"><UserIcon className="w-4 h-4 text-brand-primary/40" /> {selectedManuscript.authorName}</p>
+                            <div className="p-8 space-y-8">
+                                <div className="grid grid-cols-2 gap-8">
+                                    <div className="space-y-1">
+                                        <span className="block text-[10px] font-semibold uppercase tracking-wider text-gray-400">Proponente</span>
+                                        <p className="text-sm font-medium text-gray-900 flex items-center gap-2"><UserIcon className="w-3.5 h-3.5 text-gray-400" /> {selectedManuscript.authorName}</p>
                                     </div>
-                                    <div className="space-y-2">
-                                        <span className="block text-[9px] font-black uppercase tracking-[0.3em] text-gray-600">Género Literário</span>
-                                        <p className="font-black text-brand-primary text-xs uppercase tracking-widest">{selectedManuscript.genre}</p>
+                                    <div className="space-y-1">
+                                        <span className="block text-[10px] font-semibold uppercase tracking-wider text-gray-400">Género Lit.</span>
+                                        <p className="text-xs font-bold text-brand-primary uppercase">{selectedManuscript.genre}</p>
                                     </div>
                                 </div>
 
-                                <m.a
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
+                                <a
                                     href={selectedManuscript.fileUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="block w-full py-8 bg-gray-50 border border-gray-200 rounded-2xl text-center font-black text-slate-900 text-[11px] uppercase tracking-[0.3em] hover:bg-brand-primary/10 hover:border-brand-primary/20 transition-all group flex items-center justify-center gap-4 shadow-sm"
+                                    className="block w-full py-4 bg-gray-50 border border-gray-200 rounded-xl text-center font-bold text-gray-900 text-xs uppercase tracking-wider hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
                                 >
-                                    <FileText className="w-5 h-5 text-brand-primary group-hover:animate-bounce" />
-                                    Download Manuscrito (PDF)
-                                </m.a>
+                                    <FileText className="w-4 h-4 text-brand-primary" />
+                                    Download PDF
+                                </a>
 
                                 <Textarea
                                     label="Parecer do Conselho Editorial"
-                                    variant="glass"
                                     placeholder="Descreva as razões fundamentais para a decisão final..."
                                     value={feedback}
                                     onChange={(e) => setFeedback(e.target.value)}
-                                    className="h-40"
+                                    className="h-32 rounded-lg"
                                 />
                             </div>
 
-                            <div className="p-12 bg-gray-50/50 flex flex-wrap justify-end gap-6 border-t border-gray-100">
+                            <div className="p-8 bg-gray-50 flex justify-end gap-3 border-t border-gray-100">
                                 <Button
                                     onClick={() => handleReviewManuscript('rejected')}
                                     disabled={isSubmitting}
                                     isLoading={isSubmitting}
                                     variant="outline"
-                                    className="px-8 border-red-500/20 text-red-400 hover:bg-red-500/10"
-                                    leftIcon={!isSubmitting && <XCircle className="w-4 h-4" />}
+                                    className="border-red-200 text-red-600 hover:bg-red-50 rounded-lg"
                                 >
-                                    Rejeitar Obra
+                                    Rejeitar
                                 </Button>
                                 <Button
                                     onClick={() => handleReviewManuscript('approved')}
                                     disabled={isSubmitting}
                                     isLoading={isSubmitting}
-                                    className="px-12"
-                                    leftIcon={!isSubmitting && <CheckCircle className="w-4 h-4" />}
+                                    className="px-8 rounded-lg"
                                 >
-                                    Homologar Proposta
+                                    Aprovar Obra
                                 </Button>
                             </div>
                         </m.div>

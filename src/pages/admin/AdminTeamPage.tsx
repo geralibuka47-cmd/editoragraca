@@ -143,14 +143,14 @@ const AdminTeamPage: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <AdminPageHeader title="Equipa" subtitle="Directório de colaboradores" highlight="Elite">
+            <AdminPageHeader title="Equipa" subtitle="Directório de colaboradores" highlight="Gestão">
                 <Input placeholder="Pesquisar..." variant="light" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full sm:w-64" />
-                <m.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={handleCreate} className="bg-brand-primary text-white font-bold text-sm px-5 py-2.5 rounded-xl flex items-center gap-2 shadow-md min-h-[44px]">
+                <button onClick={handleCreate} className="bg-brand-primary text-white font-semibold text-sm px-5 py-2 rounded-lg flex items-center gap-2 hover:bg-brand-dark transition-colors min-h-[40px]">
                     <Plus className="w-4 h-4" /> Novo Membro
-                </m.button>
+                </button>
             </AdminPageHeader>
 
-            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
                 <div className="overflow-x-auto">
                     <table className="w-full min-w-[720px] border-collapse">
                         <thead>
@@ -182,72 +182,65 @@ const AdminTeamPage: React.FC = () => {
                                             className="hover:bg-gray-50 transition-colors group"
                                         >
                                             <td className="px-4 sm:px-6 py-4">
-                                                <div className="flex items-center gap-6">
-                                                    <div className="w-16 h-16 rounded-[1.5rem] overflow-hidden bg-gray-100 border border-gray-200 flex-shrink-0 group-hover:border-brand-primary/40 transition-all duration-500 relative">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 border border-gray-200 flex-shrink-0 relative">
                                                         {member.photoUrl ? (
-                                                            <>
-                                                                <img src={member.photoUrl} alt={member.name} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
-                                                                <div className="absolute inset-0 bg-brand-primary/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                                            </>
+                                                            <img src={member.photoUrl} alt={member.name} className="w-full h-full object-cover" />
                                                         ) : (
-                                                            <div className="w-full h-full flex items-center justify-center text-gray-700">
-                                                                <User className="w-8 h-8" />
+                                                            <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                                                <User className="w-6 h-6" />
                                                             </div>
                                                         )}
                                                     </div>
-                                                    <div className="space-y-1">
-                                                        <span className="block font-black text-slate-900 text-base tracking-tighter uppercase group-hover:text-brand-primary transition-colors">{member.name}</span>
-                                                        <span className="block text-[8px] font-bold text-gray-600 uppercase tracking-[0.3em]">Status: Active Operator</span>
+                                                    <div>
+                                                        <span className="block font-semibold text-gray-900 text-sm tracking-tight">{member.name}</span>
+                                                        <span className="block text-[10px] text-gray-500 font-medium tracking-wide italic">Colaborador Ativo</span>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="px-4 sm:px-6 py-4">
                                                 <div className="flex flex-col">
-                                                    <span className="text-gray-300 font-black text-[11px] uppercase tracking-widest">{member.role}</span>
-                                                    <span className="text-[9px] text-gray-600 font-bold uppercase">Technical Specialist</span>
+                                                    <span className="text-gray-900 font-semibold text-xs tracking-tight">{member.role}</span>
+                                                    <span className="text-[10px] text-gray-500 font-medium">Equipa Editorial</span>
                                                 </div>
                                             </td>
                                             <td className="px-4 sm:px-6 py-4">
-                                                <span className="px-4 py-2 bg-brand-primary/10 border border-brand-primary/20 text-brand-primary rounded-lg text-[9px] font-black uppercase tracking-[0.2em] shadow-lg shadow-brand-primary/5">
+                                                <span className="px-2.5 py-1 bg-brand-primary/10 border border-brand-primary/20 text-brand-primary rounded text-[10px] font-bold uppercase tracking-wider">
                                                     {member.department}
                                                 </span>
                                             </td>
                                             <td className="px-4 sm:px-6 py-4 text-right">
-                                                <div className="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-full border border-white/5">
-                                                    <div className="w-1 h-1 rounded-full bg-brand-primary" />
-                                                    <span className="text-[10px] font-black text-gray-400">LEV. {member.displayOrder || 0}</span>
+                                                <div className="inline-flex items-center gap-1.5 text-xs text-gray-500">
+                                                    <Hash className="w-3 h-3 text-brand-primary" />
+                                                    <span>{member.displayOrder || 0}</span>
                                                 </div>
                                             </td>
                                             <td className="px-4 sm:px-6 py-4">
-                                                <div className="flex items-center justify-center gap-4">
-                                                    <m.button
-                                                        whileHover={{ scale: 1.1, rotate: -5 }}
-                                                        whileTap={{ scale: 0.9 }}
+                                                <div className="flex items-center justify-center gap-2">
+                                                    <button
                                                         onClick={() => handleEdit(member)}
-                                                        className="w-12 h-12 bg-gray-100 border border-white/5 text-gray-400 rounded-2xl hover:bg-white/10 hover:text-slate-900 flex items-center justify-center transition-all shadow-xl group/edit"
-                                                        title="Editar Operador"
+                                                        className="p-2 text-gray-400 hover:text-brand-primary hover:bg-brand-primary/10 rounded-md transition-colors"
+                                                        title="Editar"
                                                     >
-                                                        <Edit className="w-5 h-5 transition-transform group-hover/edit:scale-110" />
-                                                    </m.button>
-                                                    <m.button
-                                                        whileHover={{ scale: 1.1, rotate: 5 }}
-                                                        whileTap={{ scale: 0.9 }}
+                                                        <Edit className="w-4 h-4" />
+                                                    </button>
+                                                    <button
                                                         onClick={() => handleDeleteTeam(member.id)}
-                                                        className="w-12 h-12 bg-red-500/5 border border-red-500/10 text-red-500/50 rounded-2xl hover:bg-red-500 hover:text-white flex items-center justify-center transition-all shadow-xl group/delete"
-                                                        title="Revogar Acesso"
+                                                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                                                        title="Eliminar"
                                                     >
-                                                        <Trash2 className="w-5 h-5 transition-transform group-hover/delete:scale-110" />
-                                                    </m.button>
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
                                                 </div>
                                             </td>
                                         </m.tr>
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan={5} className="px-10 py-40 text-center">
-                                            <div className="flex flex-col items-center gap-8 opacity-10 grayscale">
-                                                <Shield className="w-24 h-24 text-brand-primary" />
-                                                <p className="font-black uppercase tracking-[0.5em] text-[11px]">Nenhum Operador Detectado no Perímetro.</p>
+                                        <td colSpan={5} className="py-24 text-center">
+                                            <div className="flex flex-col items-center gap-4 text-gray-300">
+                                                <Shield className="w-12 h-12" />
+                                                <p className="font-semibold text-sm">Nenhum membro registado</p>
                                             </div>
                                         </td>
                                     </tr>
@@ -270,109 +263,105 @@ const AdminTeamPage: React.FC = () => {
                             className="absolute inset-0 bg-black/80 backdrop-blur-2xl"
                         />
                         <m.div
-                            initial={{ opacity: 0, scale: 0.95, y: 30 }}
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: 30 }}
-                            className="bg-[#0D0D0D] rounded-[4rem] w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8)] relative z-20 border border-gray-200 flex flex-col"
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-xl relative z-20 border border-gray-200 flex flex-col"
                         >
-                            <div className="p-12 border-b border-white/5 relative bg-gradient-to-b from-white/[0.02] to-transparent">
-                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-primary to-transparent" />
+                            <div className="p-8 border-b border-gray-100 relative">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <h3 className="text-4xl font-black text-slate-900 tracking-tighter uppercase mb-2">{selectedMemberId ? 'Refinar Perfil' : 'Integrar Operador'}</h3>
-                                        <div className="flex items-center gap-3">
-                                            <Crosshair className="w-4 h-4 text-brand-primary" />
-                                            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500">Configuração de Payload de Equipa</p>
-                                        </div>
+                                        <h3 className="text-xl font-bold text-gray-900 tracking-tight">
+                                            {selectedMemberId ? 'Editar Perfil' : 'Novo Membro'}
+                                        </h3>
+                                        <p className="text-xs text-gray-500">Configuração de colaborador editorial</p>
                                     </div>
-                                    <m.button
-                                        whileHover={{ rotate: 90, scale: 1.1 }}
-                                        whileTap={{ scale: 0.9 }}
+                                    <button
                                         onClick={() => setShowTeamModal(false)}
-                                        className="w-14 h-14 flex items-center justify-center bg-gray-100 border border-white/5 text-gray-500 hover:text-slate-900 rounded-2xl transition-all"
-                                        title="Fechar Terminal"
-                                        aria-label="Fechar Terminal"
+                                        className="p-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-gray-400 hover:text-gray-600 transition-colors"
+                                        title="Fechar"
                                     >
-                                        <X className="w-6 h-6" />
-                                    </m.button>
+                                        <X className="w-4 h-4" />
+                                    </button>
                                 </div>
                             </div>
 
-                            <form onSubmit={handleSubmit(onSubmit)} className="flex-1 overflow-y-auto p-12 space-y-10 custom-scrollbar">
+                            <form onSubmit={handleSubmit(onSubmit)} className="flex-1 overflow-y-auto p-8 space-y-6">
 
-                                <div className="grid md:grid-cols-2 gap-10">
+                                <div className="grid md:grid-cols-2 gap-6">
                                     <Input
-                                        label="NOME CODIFICADO"
-                                        placeholder="OPERADOR ALFA"
+                                        label="Nome do Colaborador"
+                                        placeholder="Ex: João Silva"
                                         icon={<User className="w-4 h-4" />}
-                                        variant="glass"
                                         {...register('name')}
                                         error={errors.name?.message as string}
+                                        className="rounded-lg"
                                     />
                                     <Input
-                                        label="ESPECIALIZAÇÃO"
-                                        placeholder="ESTRATEGISTA"
+                                        label="Função / Cargo"
+                                        placeholder="Ex: Editor Chefe"
                                         icon={<Tag className="w-4 h-4" />}
-                                        variant="glass"
                                         {...register('role')}
                                         error={errors.role?.message as string}
+                                        className="rounded-lg"
                                     />
                                 </div>
 
-                                <div className="grid md:grid-cols-2 gap-10">
+                                <div className="grid md:grid-cols-2 gap-6">
                                     <Input
-                                        label="SECTOR DE ATUAÇÃO"
-                                        placeholder="NÚCLEO CENTRAL"
+                                        label="Departamento"
+                                        placeholder="Ex: Editorial"
                                         icon={<Briefcase className="w-4 h-4" />}
-                                        variant="glass"
                                         {...register('department')}
                                         error={errors.department?.message as string}
+                                        className="rounded-lg"
                                     />
                                     <Input
                                         type="number"
-                                        label="NÍVEL DE ACESSO"
+                                        label="Ordem de Exibição"
                                         icon={<Hash className="w-4 h-4" />}
-                                        variant="glass"
                                         {...register('displayOrder')}
                                         error={errors.displayOrder?.message as string}
+                                        className="rounded-lg"
                                     />
                                 </div>
 
                                 <Input
-                                    label="BIOMETRIC ASSET (FOTO URL)"
-                                    placeholder="HTTPS://..."
+                                    label="Foto (URL)"
+                                    placeholder="https://..."
                                     icon={<ImageIcon className="w-4 h-4" />}
-                                    variant="glass"
                                     {...register('photoUrl')}
                                     error={errors.photoUrl?.message as string}
+                                    className="rounded-lg"
                                 />
 
-                                <Textarea
-                                    label="DOSSIER TÉCNICO (BIO)"
-                                    placeholder="REGISTO DE TRAJECTÓRIA E IMPACTO..."
-                                    rows={5}
-                                    variant="glass"
-                                    {...register('bio')}
-                                    error={errors.bio?.message as string}
-                                />
+                                <div className="space-y-4">
+                                    <Textarea
+                                        label="Biografia"
+                                        placeholder="Descreva a trajectória e impacto do colaborador..."
+                                        rows={4}
+                                        {...register('bio')}
+                                        error={errors.bio?.message as string}
+                                        className="rounded-lg"
+                                    />
+                                </div>
                             </form>
 
-                            <div className="p-12 border-t border-white/5 bg-white/[0.01] flex flex-col sm:flex-row gap-6">
+                            <div className="p-8 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
                                 <button
                                     type="button"
                                     onClick={() => setShowTeamModal(false)}
-                                    className="flex-1 px-10 py-6 border border-gray-200 text-gray-500 rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] hover:bg-gray-100 hover:text-slate-900 transition-all flex items-center justify-center gap-2"
+                                    className="px-6 py-2 border border-gray-200 text-gray-500 rounded-lg font-semibold text-sm hover:bg-white hover:text-gray-700 transition-all"
                                 >
-                                    ABORTAR
+                                    Cancelar
                                 </button>
                                 <Button
                                     onClick={handleSubmit(onSubmit)}
                                     isLoading={isSubmitting}
                                     disabled={isSubmitting}
-                                    className="flex-[1.5] py-6 px-12"
-                                    leftIcon={!isSubmitting && <Save className="w-5 h-5" />}
+                                    className="px-8 rounded-lg"
                                 >
-                                    EFECTUAR REGISTO
+                                    Gravar Perfil
                                 </Button>
                             </div>
                         </m.div>

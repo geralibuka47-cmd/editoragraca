@@ -80,23 +80,23 @@ const AdminOrdersPage: React.FC<AdminOrdersPageProps> = ({ user }) => {
     return (
         <div className="space-y-6">
             <AdminPageHeader title="Encomendas" subtitle="Monitorização de pedidos e transações" highlight="Vendas">
-                <div className="flex flex-wrap gap-2 p-1.5 bg-gray-100 rounded-xl">
+                <div className="flex flex-wrap gap-2 pt-2 w-full overflow-x-auto">
                     {(['all', 'Pendente', 'Validado', 'Cancelado'] as const).map((s) => (
                         <button
                             key={s}
                             onClick={() => setFilterStatus(s)}
-                            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all min-touch ${filterStatus === s
-                                ? 'bg-brand-primary text-white'
-                                : 'text-gray-500 hover:bg-white hover:text-slate-900'
+                            className={`px-4 py-2 rounded-md text-xs font-semibold uppercase tracking-wider transition-colors whitespace-nowrap ${filterStatus === s
+                                ? 'bg-brand-primary/10 text-brand-primary'
+                                : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
                                 }`}
                         >
-                            {s === 'all' ? 'Todos' : s}
+                            {s === 'all' ? 'Ver Tudo' : s}
                         </button>
                     ))}
                 </div>
             </AdminPageHeader>
 
-            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
                 <div className="overflow-x-auto">
                     <table className="w-full min-w-[720px] border-collapse">
                         <thead>
@@ -130,30 +130,30 @@ const AdminOrdersPage: React.FC<AdminOrdersPageProps> = ({ user }) => {
                                         >
                                             <td className="px-4 sm:px-6 py-4">
                                                 <div className="flex flex-col gap-1">
-                                                    <span className="font-mono font-black text-slate-900 text-[12px] tracking-tight">{o.orderNumber || `#${o.id.substring(0, 8).toUpperCase()}`}</span>
-                                                    <div className="flex items-center gap-2 text-[10px] text-gray-500 font-bold uppercase tracking-widest">
-                                                        <Calendar className="w-3.5 h-3.5 text-gray-700" />
+                                                    <span className="font-mono font-bold text-gray-900 text-[12px]">{o.orderNumber || `#${o.id.substring(0, 8).toUpperCase()}`}</span>
+                                                    <div className="flex items-center gap-1.5 text-[10px] text-gray-500 font-medium">
+                                                        <Calendar className="w-3.5 h-3.5" />
                                                         {o.date}
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="px-4 sm:px-6 py-4">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 bg-gray-100 border border-gray-200 rounded-full flex items-center justify-center text-gray-400">
+                                                    <div className="w-10 h-10 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-center text-gray-400">
                                                         <UserIcon className="w-4 h-4" />
                                                     </div>
                                                     <div>
-                                                        <div className="font-black text-slate-900 text-[14px] tracking-tight">{o.customerName}</div>
-                                                        <div className="text-[10px] text-gray-500 font-medium lowercase italic">{o.customerEmail}</div>
+                                                        <div className="font-semibold text-gray-900 text-sm tracking-tight">{o.customerName}</div>
+                                                        <div className="text-[11px] text-gray-500 lowercase italic">{o.customerEmail}</div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="px-4 sm:px-6 py-4">
                                                 <div className="space-y-1">
                                                     {o.items.map((item, i) => (
-                                                        <div key={i} className="flex items-center gap-3">
-                                                            <div className="w-2 h-2 rounded-full bg-brand-primary/40 shrink-0" />
-                                                            <span className="text-[11px] font-black text-gray-400 uppercase tracking-wide truncate max-w-[200px]">
+                                                        <div key={i} className="flex items-center gap-2">
+                                                            <div className="w-1.5 h-1.5 rounded-full bg-brand-primary/40 shrink-0" />
+                                                            <span className="text-[11px] font-medium text-gray-600 truncate max-w-[200px]">
                                                                 {item.quantity}x {item.title}
                                                             </span>
                                                         </div>
@@ -161,39 +161,35 @@ const AdminOrdersPage: React.FC<AdminOrdersPageProps> = ({ user }) => {
                                                 </div>
                                             </td>
                                             <td className="px-4 sm:px-6 py-4 text-right">
-                                                <div className="font-bold text-brand-primary text-base">
+                                                <div className="font-semibold text-gray-900 text-sm">
                                                     {o.total.toLocaleString()}
-                                                    <span className="text-[10px] ml-1.5 opacity-40">Kz</span>
+                                                    <span className="text-[10px] ml-1 text-gray-500">Kz</span>
                                                 </div>
                                             </td>
                                             <td className="px-4 sm:px-6 py-4">
-                                                <div className="flex items-center justify-center gap-2 flex-wrap">
+                                                <div className="flex items-center justify-center gap-2">
                                                     {o.status === 'Pendente' ? (
                                                         <>
-                                                            <m.button
-                                                                whileHover={{ scale: 1.05 }}
-                                                                whileTap={{ scale: 0.95 }}
+                                                            <button
                                                                 onClick={() => handleUpdateStatus(o, 'Validado')}
                                                                 disabled={actionId === o.id}
-                                                                className="px-6 py-3 bg-brand-primary text-white rounded-xl text-[9px] font-black uppercase tracking-[0.2em] hover:brightness-110 shadow-lg shadow-brand-primary/20 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                                                                className="px-4 py-2 bg-brand-primary text-white rounded-md text-xs font-semibold hover:bg-brand-dark transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                                                             >
                                                                 {actionId === o.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <><CheckCircle className="w-3.5 h-3.5" /> Validar</>}
-                                                            </m.button>
-                                                            <m.button
-                                                                whileHover={{ scale: 1.05 }}
-                                                                whileTap={{ scale: 0.95 }}
+                                                            </button>
+                                                            <button
                                                                 onClick={() => handleUpdateStatus(o, 'Cancelado')}
                                                                 disabled={actionId === o.id}
-                                                                className="w-12 h-12 bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-xl transition-all flex items-center justify-center border border-gray-200 group/btn"
+                                                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
                                                                 title="Cancelar Pedido"
                                                             >
                                                                 <XCircle className="w-4 h-4" />
-                                                            </m.button>
+                                                            </button>
                                                         </>
                                                     ) : (
-                                                        <div className={`flex items-center gap-3 px-6 py-3 rounded-xl border text-[9px] font-black uppercase tracking-[0.2em] shadow-lg ${getStatusStyle(o.status)}`}>
+                                                        <div className={`flex items-center gap-2 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider border ${getStatusStyle(o.status)}`}>
                                                             {o.status === 'Validado' ? <Zap className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
-                                                            {o.status === 'Validado' ? 'Venda Concluída' : 'Venda Cancelada'}
+                                                            {o.status === 'Validado' ? 'Validado' : 'Cancelado'}
                                                         </div>
                                                     )}
                                                 </div>
