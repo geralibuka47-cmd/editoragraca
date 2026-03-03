@@ -26,19 +26,16 @@ const AtelierPage = React.lazy(() => import('./pages/AtelierPage'));
 const ProfilePage = React.lazy(() => import('./pages/ProfilePage'));
 const AdminLayout = React.lazy(() => import('./components/admin/AdminLayout'));
 const AdminOverview = React.lazy(() => import('./pages/admin/AdminOverview'));
+const AdminBooksPage = React.lazy(() => import('./pages/admin/AdminBooks'));
+const AdminUsersPage = React.lazy(() => import('./pages/admin/AdminUsers'));
+const AdminOrdersPage = React.lazy(() => import('./pages/admin/AdminOrders'));
+const AdminManuscriptsPage = React.lazy(() => import('./pages/admin/AdminManuscripts'));
+const AdminBlogPage = React.lazy(() => import('./pages/admin/AdminBlog'));
+const AdminTeamPage = React.lazy(() => import('./pages/admin/AdminTeam'));
+const AdminSettingsPage = React.lazy(() => import('./pages/admin/AdminSettings'));
 const BookPage = React.lazy(() => import('./pages/BookPage'));
 const MemberDetailPage = React.lazy(() => import('./pages/MemberDetailPage'));
 const ExhibitionPage = React.lazy(() => import('./pages/ExhibitionPage'));
-
-// Lazy loading admin pages
-const AdminBooksPage = React.lazy(() => import('./pages/admin/AdminBooksPage'));
-const AdminUsersPage = React.lazy(() => import('./pages/admin/AdminUsersPage'));
-const AdminOrdersPage = React.lazy(() => import('./pages/admin/AdminOrdersPage'));
-const AdminBlogPage = React.lazy(() => import('./pages/admin/AdminBlogPage'));
-const AdminManuscriptsPage = React.lazy(() => import('./pages/admin/AdminManuscriptsPage'));
-const AdminServicesPage = React.lazy(() => import('./pages/admin/AdminServicesPage'));
-const AdminTeamPage = React.lazy(() => import('./pages/admin/AdminTeamPage'));
-const AdminContentPage = React.lazy(() => import('./pages/admin/AdminContentPage'));
 
 // Scroll to top on route change
 const ScrollToTop = () => {
@@ -234,19 +231,20 @@ const AppContent: React.FC = () => {
                             </ProtectedRoute>
                         } />
 
+
                         <Route path="/admin/*" element={
                             <ProtectedRoute allowedRoles={['adm']}>
                                 <AdminLayout>
                                     <Routes>
                                         <Route path="/" element={<AdminOverview />} />
-                                        <Route path="livros" element={<AdminBooksPage onStatsRefresh={() => { }} />} />
+                                        <Route path="livros" element={<AdminBooksPage />} />
                                         <Route path="utilizadores" element={<AdminUsersPage />} />
-                                        <Route path="encomendas" element={<AdminOrdersPage user={user!} />} />
-                                        <Route path="blog" element={<AdminBlogPage posts={[]} onRefresh={() => { }} />} />
+                                        <Route path="encomendas" element={<AdminOrdersPage />} />
                                         <Route path="manuscritos" element={<AdminManuscriptsPage />} />
-                                        <Route path="servicos" element={<AdminServicesPage />} />
-                                        <Route path="team" element={<AdminTeamPage />} />
-                                        <Route path="definicoes" element={<AdminContentPage />} />
+                                        <Route path="blog" element={<AdminBlogPage />} />
+                                        <Route path="equipa" element={<AdminTeamPage />} />
+                                        <Route path="settings" element={<AdminSettingsPage />} />
+                                        {/* Future admin pages will be added here */}
                                     </Routes>
                                 </AdminLayout>
                             </ProtectedRoute>

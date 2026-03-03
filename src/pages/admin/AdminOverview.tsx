@@ -1,179 +1,159 @@
-import React, { useState, useEffect } from 'react';
-import { m } from 'framer-motion';
+import React from 'react';
 import {
-    Users, BookOpen, ShoppingBag,
-    TrendingUp, ArrowUpRight, AlertCircle,
-    Calendar, Download, LayoutGrid, Filter
+    Users,
+    BookOpen,
+    ShoppingBag,
+    TrendingUp,
+    ArrowUpRight,
+    ArrowDownRight,
+    Clock,
+    ChevronRight,
+    Zap
 } from 'lucide-react';
-import { getStats } from '../../services/dataService';
+import { motion } from 'framer-motion';
 
 const AdminOverview: React.FC = () => {
-    const [stats, setStats] = useState({
-        totalBooks: 0,
-        totalUsers: 0,
-        pendingOrders: 0,
-        revenue: 0,
-        lowStockCount: 0,
-    });
-    const [loading, setLoading] = useState(true);
+    const stats = [
+        { name: 'Utilizadores Ativos', value: '1,284', trend: '+12.5%', isUp: true, icon: Users, color: 'brand-primary' },
+        { name: 'Vendas Totais', value: '€12,450', trend: '+8.2%', isUp: true, icon: ShoppingBag, color: 'brand-dark' },
+        { name: 'Livros no Acervo', value: '142', trend: '+2', isUp: true, icon: BookOpen, color: 'amber-600' },
+        { name: 'Taxa de Conversão', value: '3.2%', trend: '-1.1%', isUp: false, icon: TrendingUp, color: 'brand-accent' },
+    ];
 
-    useEffect(() => {
-        const load = async () => {
-            try {
-                const data = await getStats();
-                setStats(data);
-            } catch (e) {
-                console.error(e);
-            } finally {
-                setLoading(false);
-            }
-        };
-        load();
-    }, []);
-
-    const kpis = [
-        { label: 'Obras no Acervo', val: stats.totalBooks, icon: BookOpen, trend: '+12%', color: 'brand-primary' },
-        { label: 'Membros Ativos', val: stats.totalUsers, icon: Users, trend: 'Novos 24', color: 'blue-500' },
-        { label: 'Vendas Brutas', val: `${stats.revenue.toLocaleString()} Kz`, icon: TrendingUp, trend: '+8.4%', color: 'emerald-500' },
-        { label: 'Pedidos Pendentes', val: stats.pendingOrders, icon: ShoppingBag, trend: 'Urgente', color: 'red-500' },
+    const recentActivities = [
+        { id: 1, type: 'order', title: 'Nova encomenda #4829', user: 'Carlos Mendes', time: 'Há 5 minutos', amount: '€45.00' },
+        { id: 2, type: 'user', title: 'Novo registo de autor', user: 'Ana Paula Santos', time: 'Há 22 minutos', amount: null },
+        { id: 3, type: 'book', title: 'Atualização de Stock', user: 'Sistema', time: 'Há 1 hora', amount: '20 un.' },
+        { id: 4, type: 'order', title: 'Encomenda expedida #4825', user: 'João Silva', time: 'Há 2 horas', amount: '€120.00' },
     ];
 
     return (
-        <div className="space-y-8 pb-12">
-
-            {/* Action Bar */}
-            <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-gray-200">
-                <div className="space-y-1 text-center md:text-left">
-                    <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-                        Visão Geral
-                    </h1>
-                    <p className="text-sm text-gray-500">Métricas e performance do sistema.</p>
+        <div className="space-y-12">
+            {/* Page Header */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 overflow-hidden">
+                <div>
+                    <span className="text-brand-primary font-bold uppercase tracking-[0.4em] text-[10px]">Visão Geral</span>
+                    <h2 className="text-4xl sm:text-5xl font-black text-brand-dark uppercase tracking-tighter leading-none mt-2">
+                        Dashboard
+                    </h2>
                 </div>
-
-                <div className="flex items-center gap-3 justify-center md:justify-end">
-                    <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors">
-                        <Download className="w-4 h-4" /> Exportar
-                    </button>
-                    <button className="flex items-center gap-2 px-4 py-2 bg-brand-primary text-white rounded-lg text-sm font-medium hover:bg-brand-dark transition-colors">
-                        <ArrowUpRight className="w-4 h-4" /> Relatório Detalhado
-                    </button>
-                </div>
-            </header>
-
-            {/* KPI Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {kpis.map((kpi, i) => (
-                    <m.div
-                        key={kpi.label}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.1 }}
-                        className="bg-white p-5 rounded-xl border border-gray-200 hover:border-gray-300 transition-colors"
+                <div className="flex items-center gap-3">
+                    <div className="px-4 py-2 bg-brand-dark text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                        <Clock className="w-3 h-3" />
+                        Últimos 30 dias
+                    </div>
+                    <button
+                        className="p-2 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
+                        title="Ações rápidas"
                     >
-                        <div className="flex items-start justify-between mb-4">
-                            <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-gray-50 border border-gray-100">
-                                <kpi.icon className="w-5 h-5 text-gray-600" />
+                        <Zap className="w-4 h-4 text-brand-primary" />
+                    </button>
+                </div>
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8">
+                {stats.map((stat, index) => (
+                    <motion.div
+                        key={stat.name}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="group p-8 bg-white rounded-[2rem] shadow-sm border border-gray-50 hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-500 relative overflow-hidden"
+                    >
+                        <div className={`absolute top-0 right-0 w-32 h-32 bg-${stat.color}/5 rounded-full translate-x-12 -translate-y-12 group-hover:scale-150 transition-transform duration-700`}></div>
+
+                        <div className="flex items-center justify-between mb-6 relative">
+                            <div className={`p-4 rounded-2xl bg-${stat.color}/10 text-${stat.color === 'brand-primary' ? 'brand-primary' : 'brand-dark'}`}>
+                                <stat.icon className="w-6 h-6" />
                             </div>
-                            <span className={`text-xs font-semibold px-2 py-1 rounded bg-${kpi.color}/10 text-${kpi.color}`}>
-                                {kpi.trend}
-                            </span>
+                            <div className={`flex items-center gap-1 text-xs font-black ${stat.isUp ? 'text-green-500' : 'text-red-500'}`}>
+                                {stat.isUp ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+                                {stat.trend}
+                            </div>
                         </div>
-                        <div>
-                            <p className="text-sm font-medium text-gray-500 mb-1">{kpi.label}</p>
-                            <h3 className="text-2xl font-bold text-gray-900 leading-none">{loading ? '...' : kpi.val}</h3>
+
+                        <div className="relative">
+                            <p className="text-3xl font-black text-brand-dark mb-1">{stat.value}</p>
+                            <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">{stat.name}</p>
                         </div>
-                    </m.div>
+                    </motion.div>
                 ))}
             </div>
 
-            {/* Main Insights Grid */}
-            <div className="grid lg:grid-cols-3 gap-6">
-
-                {/* Status Highlights */}
-                <m.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="lg:col-span-2 bg-white border border-gray-200 rounded-xl p-6"
-                >
-                    <div className="flex flex-col h-full justify-between gap-8">
-                        <div>
-                            <h3 className="text-lg font-bold text-gray-900 mb-2">Insights de Performance</h3>
-                            <p className="text-sm text-gray-500">O acervo registou um crescimento orgânico de 12% este mês, com destaque para a literatura digital.</p>
-                        </div>
-
-                        <div className="grid grid-cols-3 gap-4 pt-6 border-t border-gray-100">
-                            {[
-                                { l: 'Taxa Conversão', v: '84%' },
-                                { l: 'Rating Médio', v: '4.9' },
-                                { l: 'Retenção', v: '92%' }
-                            ].map((s, i) => (
-                                <div key={i}>
-                                    <p className="text-xs font-medium text-gray-500 mb-1">{s.l}</p>
-                                    <p className="text-xl font-bold text-gray-900">{s.v}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </m.div>
-
-                {/* Alerts/Quick Actions */}
-                <m.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="bg-white p-6 rounded-xl border border-gray-200"
-                >
-                    <div className="flex items-center justify-between mb-6">
-                        <h4 className="font-bold text-sm text-gray-900">Alertas de Gestão</h4>
-                        <AlertCircle className="w-4 h-4 text-gray-400" />
+            {/* Bottom Grid: Recent Activity & Quick Charts */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Activity Feed */}
+                <div className="lg:col-span-2 bg-white rounded-[2.5rem] p-10 border border-gray-50 shadow-sm">
+                    <div className="flex items-center justify-between mb-10">
+                        <h3 className="text-xl font-black uppercase tracking-tight text-brand-dark">Atividade Recente</h3>
+                        <button className="text-[10px] font-black uppercase tracking-widest text-brand-primary hover:text-brand-dark transition-colors border-b-2 border-brand-primary/20 pb-1">
+                            Ver Todo o Histórico
+                        </button>
                     </div>
 
-                    <div className="space-y-4">
-                        {stats.lowStockCount > 0 ? (
-                            <div className="p-4 bg-red-50 rounded-lg border border-red-100 flex gap-3 items-start">
-                                <ShoppingBag className="w-5 h-5 text-red-500 flex-shrink-0" />
-                                <div>
-                                    <p className="text-sm font-semibold text-red-800">{stats.lowStockCount} Obras com Stock Baixo</p>
-                                    <p className="text-xs text-red-600 mt-1">Revisão de inventário necessária.</p>
+                    <div className="space-y-6">
+                        {recentActivities.map((activity, index) => (
+                            <div key={activity.id} className="flex items-center justify-between p-4 rounded-2xl hover:bg-gray-50 transition-colors group cursor-pointer border border-transparent hover:border-gray-100">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 group-hover:bg-brand-primary group-hover:text-white transition-all duration-500">
+                                        {activity.type === 'order' && <ShoppingBag className="w-5 h-5" />}
+                                        {activity.type === 'user' && <Users className="w-5 h-5" />}
+                                        {activity.type === 'book' && <BookOpen className="w-5 h-5" />}
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-black text-brand-dark leading-tight">{activity.title}</span>
+                                        <span className="text-xs text-gray-400 font-medium">Por {activity.user} • {activity.time}</span>
+                                    </div>
                                 </div>
+                                {activity.amount && (
+                                    <span className="text-sm font-black text-brand-dark">{activity.amount}</span>
+                                )}
+                                {!activity.amount && (
+                                    <ChevronRight className="w-4 h-4 text-gray-300" />
+                                )}
                             </div>
-                        ) : (
-                            <div className="p-4 bg-green-50 rounded-lg border border-green-100 flex gap-3 items-start">
-                                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                                <div>
-                                    <p className="text-sm font-semibold text-green-800">Logística Nominal</p>
-                                    <p className="text-xs text-green-600 mt-1">Stock perfeitamente otimizado.</p>
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="pt-2 space-y-2">
-                            <button className="w-full py-2.5 px-4 rounded-lg bg-gray-50 border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors flex items-center justify-center gap-2">
-                                <Calendar className="w-4 h-4" /> Calendário Lançamentos
-                            </button>
-                            <button className="w-full py-2.5 px-4 rounded-lg bg-gray-50 border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors flex items-center justify-center gap-2">
-                                <ShieldCheck className="w-4 h-4" /> Auditoria Geral
-                            </button>
-                        </div>
+                        ))}
                     </div>
-                </m.div>
+                </div>
 
+                {/* Quick Actions / Integration Status */}
+                <div className="bg-brand-dark rounded-[2.5rem] p-10 text-white relative overflow-hidden shadow-2xl">
+                    <div className="absolute top-0 right-0 w-full h-full opacity-10 pointer-events-none">
+                        <div className="absolute top-[-20%] right-[-20%] w-[80%] h-[80%] bg-brand-primary blur-[100px] rounded-full"></div>
+                    </div>
+
+                    <h3 className="text-xl font-black uppercase tracking-tight mb-10 relative z-10">Estado do Sistema</h3>
+
+                    <div className="space-y-8 relative z-10">
+                        <div className="bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-sm">
+                            <div className="flex items-center justify-between mb-4">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Banco de Dados</span>
+                                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
+                            </div>
+                            <p className="text-sm font-bold text-white/90">Sincronizado via Supabase</p>
+                            <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-widest">Última sync: há 2m</p>
+                        </div>
+
+                        <div className="bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-sm">
+                            <div className="flex items-center justify-between mb-4">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Armazenamento</span>
+                                <span className="text-[10px] font-black">82%</span>
+                            </div>
+                            <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+                                <div className="w-[82%] h-full bg-brand-primary"></div>
+                            </div>
+                            <p className="text-[10px] text-gray-500 mt-4 uppercase tracking-widest">Capacidade do Firebase</p>
+                        </div>
+
+                        <button className="w-full py-4 bg-brand-primary text-white font-black uppercase tracking-widest text-xs rounded-xl hover:brightness-110 transition-all shadow-xl shadow-brand-primary/20">
+                            Lançar Nova Obra
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     );
 };
-
-const CheckCircle = ({ className }: { className: string }) => (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-    </svg>
-);
-
-const ShieldCheck = ({ className }: { className: string }) => (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-    </svg>
-);
 
 export default AdminOverview;
