@@ -165,6 +165,7 @@ const AdminBooks: React.FC = () => {
                                 <button
                                     onClick={() => setIsModalOpen(false)}
                                     className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all"
+                                    title="Fechar"
                                 >
                                     <Plus className="w-5 h-5 rotate-45" />
                                 </button>
@@ -200,20 +201,25 @@ const AdminBooks: React.FC = () => {
                                             <div className="space-y-2">
                                                 <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Preço (€)</label>
                                                 <input
+                                                    id="bookPrice"
                                                     required
                                                     type="number"
                                                     step="0.01"
                                                     value={formData.price}
                                                     onChange={e => setFormData({ ...formData, price: parseFloat(e.target.value) })}
                                                     className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+                                                    placeholder="0.00"
+                                                    title="Preço"
                                                 />
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Formato</label>
                                                 <select
+                                                    id="bookFormat"
                                                     value={formData.format}
                                                     onChange={e => setFormData({ ...formData, format: e.target.value as any })}
                                                     className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all appearance-none cursor-pointer"
+                                                    title="Formato"
                                                 >
                                                     <option value="físico">📖 Físico</option>
                                                     <option value="digital">📱 Digital</option>
@@ -257,10 +263,13 @@ const AdminBooks: React.FC = () => {
                                                 <div className="space-y-2">
                                                     <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Stock Disponível</label>
                                                     <input
+                                                        id="bookStock"
                                                         type="number"
                                                         value={formData.stock}
                                                         onChange={e => setFormData({ ...formData, stock: parseInt(e.target.value) })}
                                                         className="w-full px-4 py-2 bg-gray-50 border-none rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+                                                        placeholder="0"
+                                                        title="Stock"
                                                     />
                                                 </div>
                                             </div>

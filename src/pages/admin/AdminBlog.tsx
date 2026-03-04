@@ -150,6 +150,7 @@ const AdminBlog: React.FC = () => {
                                 <button
                                     onClick={() => setIsModalOpen(false)}
                                     className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all"
+                                    title="Fechar"
                                 >
                                     <Plus className="w-5 h-5 rotate-45" />
                                 </button>

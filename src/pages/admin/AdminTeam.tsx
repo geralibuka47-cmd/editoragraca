@@ -163,6 +163,7 @@ const AdminTeam: React.FC = () => {
                                 <button
                                     onClick={() => setIsModalOpen(false)}
                                     className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all"
+                                    title="Fechar"
                                 >
                                     <Plus className="w-5 h-5 rotate-45" />
                                 </button>
@@ -197,10 +198,13 @@ const AdminTeam: React.FC = () => {
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Ordem de Exibição</label>
                                             <input
+                                                id="memberOrder"
                                                 type="number"
                                                 value={formData.displayOrder}
                                                 onChange={e => setFormData({ ...formData, displayOrder: parseInt(e.target.value) })}
                                                 className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+                                                placeholder="0"
+                                                title="Ordem de Exibição"
                                             />
                                         </div>
                                     </div>
@@ -222,19 +226,25 @@ const AdminTeam: React.FC = () => {
                                             <div className="space-y-2">
                                                 <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Instagram (URL)</label>
                                                 <input
+                                                    id="memberInstagram"
                                                     type="url"
                                                     value={formData.socials?.instagram}
                                                     onChange={e => setFormData({ ...formData, socials: { ...formData.socials!, instagram: e.target.value } })}
                                                     className="w-full px-6 py-3 bg-gray-50 border-none rounded-xl text-[10px] font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+                                                    placeholder="URL Instagram"
+                                                    title="Instagram"
                                                 />
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">LinkedIn (URL)</label>
                                                 <input
+                                                    id="memberLinkedin"
                                                     type="url"
                                                     value={formData.socials?.linkedin}
                                                     onChange={e => setFormData({ ...formData, socials: { ...formData.socials!, linkedin: e.target.value } })}
                                                     className="w-full px-6 py-3 bg-gray-50 border-none rounded-xl text-[10px] font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+                                                    placeholder="URL LinkedIn"
+                                                    title="LinkedIn"
                                                 />
                                             </div>
                                         </div>
