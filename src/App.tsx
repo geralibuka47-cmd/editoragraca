@@ -223,14 +223,13 @@ const AppContent: React.FC = () => {
                             />
                         } />
 
-                        {/* Protected Routes */}
+
                         {/* Protected Routes */}
                         <Route path="/perfil" element={
                             <ProtectedRoute allowedRoles={['leitor', 'autor', 'adm']}>
                                 <ProfilePage />
                             </ProtectedRoute>
                         } />
-
 
                         <Route path="/admin/*" element={
                             <ProtectedRoute allowedRoles={['adm']}>

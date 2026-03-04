@@ -105,7 +105,7 @@ const AdminSettings: React.FC = () => {
                                         <div className="space-y-2">
                                             <label htmlFor="contactEmail" className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Email de Contacto</label>
                                             <div className="relative">
-                                                <Mail className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-primary" title="Email" />
+                                                <Mail className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-primary" />
                                                 <input
                                                     id="contactEmail"
                                                     type="email"
@@ -117,7 +117,7 @@ const AdminSettings: React.FC = () => {
                                         <div className="space-y-2">
                                             <label htmlFor="contactPhone" className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Telefone / WhatsApp</label>
                                             <div className="relative">
-                                                <Phone className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-primary" title="Telefone" />
+                                                <Phone className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-primary" />
                                                 <input
                                                     id="contactPhone"
                                                     type="text"
@@ -174,7 +174,7 @@ const AdminSettings: React.FC = () => {
                                             <div key={item.label} className="space-y-2">
                                                 <label htmlFor={`social-${item.label}`} className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">{item.label}</label>
                                                 <div className="relative">
-                                                    <item.icon className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-primary" title={item.label} />
+                                                    <item.icon className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-primary" />
                                                     <input
                                                         id={`social-${item.label}`}
                                                         type="text"
