@@ -22,7 +22,19 @@ const AdminBlog: React.FC = () => {
     const [posts, setPosts] = useState<BlogPost[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
     const { showToast } = useToast();
+
+    // Form State
+    const [formData, setFormData] = useState<Partial<BlogPost>>({
+        title: '',
+        content: '',
+        author: '',
+        imageUrl: '',
+        date: new Date().toISOString()
+    });
+    const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
         loadPosts();
@@ -40,6 +52,44 @@ const AdminBlog: React.FC = () => {
         }
     };
 
+    const handleOpenModal = (post?: BlogPost) => {
+        if (post) {
+            setEditingPost(post);
+            setFormData(post);
+        } else {
+            setEditingPost(null);
+            setFormData({
+                title: '',
+                content: '',
+                author: '',
+                imageUrl: '',
+                date: new Date().toISOString()
+            });
+        }
+        setIsModalOpen(true);
+    };
+
+    const handleSave = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSaving(true);
+        try {
+            const postToSave = {
+                ...formData,
+                id: editingPost?.id || `temp_${Date.now()}`,
+                date: formData.date || new Date().toISOString()
+            } as BlogPost;
+
+            await saveBlogPost(postToSave);
+            showToast(editingPost ? 'Artigo atualizado!' : 'Artigo publicado!', 'success');
+            setIsModalOpen(false);
+            loadPosts();
+        } catch (error) {
+            showToast('Erro ao gravar artigo', 'error');
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     const handleDelete = async (id: string, title: string) => {
         if (window.confirm(`Tem a certeza que deseja eliminar o post "${title}"?`)) {
             try {
@@ -53,8 +103,8 @@ const AdminBlog: React.FC = () => {
     };
 
     const filteredPosts = posts.filter(post =>
-        post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.author.toLowerCase().includes(searchTerm.toLowerCase())
+        (post.title?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+        (post.author?.toLowerCase() || '').includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -67,11 +117,118 @@ const AdminBlog: React.FC = () => {
                         Blog
                     </h2>
                 </div>
-                <button className="flex items-center gap-2 px-6 py-4 bg-brand-dark text-white rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-brand-primary transition-all shadow-xl shadow-brand-dark/20 group">
+                <button
+                    onClick={() => handleOpenModal()}
+                    className="flex items-center gap-2 px-6 py-4 bg-brand-dark text-white rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-brand-primary transition-all shadow-xl shadow-brand-dark/20 group"
+                >
                     <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform" />
                     Novo Artigo
                 </button>
             </div>
+
+            {/* Modal */}
+            <AnimatePresence>
+                {isModalOpen && (
+                    <>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setIsModalOpen(false)}
+                            className="fixed inset-0 bg-brand-dark/40 backdrop-blur-sm z-[100]"
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            className="fixed inset-x-4 top-4 bottom-4 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-4xl bg-white rounded-[2.5rem] shadow-2xl z-[101] overflow-hidden flex flex-col"
+                        >
+                            <div className="p-8 border-b border-gray-50 flex items-center justify-between shrink-0">
+                                <h3 className="text-2xl font-black text-brand-dark uppercase tracking-tighter">
+                                    {editingPost ? 'Editar Artigo' : 'Novo Artigo'}
+                                </h3>
+                                <button
+                                    onClick={() => setIsModalOpen(false)}
+                                    className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all"
+                                >
+                                    <Plus className="w-5 h-5 rotate-45" />
+                                </button>
+                            </div>
+
+                            <form onSubmit={handleSave} className="flex-1 overflow-y-auto p-8 space-y-8">
+                                <div className="space-y-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Título do Artigo</label>
+                                        <input
+                                            required
+                                            type="text"
+                                            value={formData.title}
+                                            onChange={e => setFormData({ ...formData, title: e.target.value })}
+                                            className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-lg font-black outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all placeholder:text-gray-200"
+                                            placeholder="Título impactante..."
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Autor</label>
+                                            <input
+                                                required
+                                                type="text"
+                                                value={formData.author}
+                                                onChange={e => setFormData({ ...formData, author: e.target.value })}
+                                                className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+                                                placeholder="Nome do autor"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">URL da Imagem</label>
+                                            <input
+                                                required
+                                                type="url"
+                                                value={formData.imageUrl}
+                                                onChange={e => setFormData({ ...formData, imageUrl: e.target.value })}
+                                                className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+                                                placeholder="https://images.unsplash.com/..."
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Conteúdo do Artigo</label>
+                                        <textarea
+                                            required
+                                            rows={12}
+                                            value={formData.content}
+                                            onChange={e => setFormData({ ...formData, content: e.target.value })}
+                                            className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-medium outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all resize-none italic"
+                                            placeholder="Escreva aqui o seu texto..."
+                                        />
+                                    </div>
+                                </div>
+                            </form>
+
+                            <div className="p-8 border-t border-gray-50 bg-gray-50/30 flex items-center justify-end gap-4 shrink-0">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsModalOpen(false)}
+                                    className="px-8 py-4 bg-white text-gray-400 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:text-brand-dark transition-all border border-gray-100"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={handleSave}
+                                    disabled={isSaving}
+                                    className="px-10 py-4 bg-brand-dark text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-primary transition-all shadow-xl shadow-brand-dark/10 flex items-center gap-3 disabled:opacity-50"
+                                >
+                                    {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
+                                    {editingPost ? 'Atualizar Artigo' : 'Publicar Artigo'}
+                                </button>
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
 
             {/* Search */}
             <div className="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm">
@@ -148,7 +305,11 @@ const AdminBlog: React.FC = () => {
                                         </div>
 
                                         <div className="flex items-center gap-2">
-                                            <button className="p-3 bg-gray-50 hover:bg-brand-dark hover:text-white rounded-xl transition-all" title="Editar Artigo">
+                                            <button
+                                                onClick={() => handleOpenModal(post)}
+                                                className="p-3 bg-gray-50 hover:bg-brand-dark hover:text-white rounded-xl transition-all"
+                                                title="Editar Artigo"
+                                            >
                                                 <Edit2 className="w-4 h-4" />
                                             </button>
                                             <button

@@ -223,7 +223,6 @@ const AppContent: React.FC = () => {
                             />
                         } />
 
-
                         {/* Protected Routes */}
                         <Route path="/perfil" element={
                             <ProtectedRoute allowedRoles={['leitor', 'autor', 'adm']}>
