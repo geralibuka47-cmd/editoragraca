@@ -11,18 +11,20 @@ import {
     Download,
     Eye,
     Loader2,
-    ShoppingBag
+    ShoppingBag,
+    Image
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getBooks, saveBook, deleteBook } from '../../services/dataService';
-import { Book } from '../../types';
+import { getBooks, saveBook, deleteBook, getAuthors } from '../../services/dataService';
+import { Book, User } from '../../types';
 import { useToast } from '../../components/Toast';
 
 const AdminBooks: React.FC = () => {
     const [books, setBooks] = useState<Book[]>([]);
+    const [authors, setAuthors] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
-    const [filterFormat, setFilterFormat] = useState<'all' | 'físico' | 'digital'>('all');
+    const [formatFilter, setFormatFilter] = useState<string>('todos');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingBook, setEditingBook] = useState<Book | null>(null);
     const { showToast } = useToast();
@@ -31,27 +33,39 @@ const AdminBooks: React.FC = () => {
     const [formData, setFormData] = useState<Partial<Book>>({
         title: '',
         author: '',
+        authorId: '',
         price: 0,
         coverUrl: '',
-        genre: '',
         format: 'físico',
         description: '',
         stock: 0,
-        featured: false
+        featured: false,
+        digitalFileUrl: '',
+        iban: '',
+        accountHolder: '',
+        accountNumber: '',
+        express: ''
     });
+
+    const [isNewAuthor, setIsNewAuthor] = useState(false);
+    const [newAuthorData, setNewAuthorData] = useState({ name: '', email: '' });
     const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
-        loadBooks();
+        loadData();
     }, []);
 
-    const loadBooks = async () => {
+    const loadData = async () => {
         setLoading(true);
         try {
-            const data = await getBooks(true);
-            setBooks(data);
+            const [booksData, authorsData] = await Promise.all([
+                getBooks(true),
+                getAuthors()
+            ]);
+            setBooks(booksData);
+            setAuthors(authorsData);
         } catch (error) {
-            showToast('Erro ao carregar catálogo', 'error');
+            showToast('Erro ao carregar dados', 'error');
         } finally {
             setLoading(false);
         }
@@ -61,19 +75,26 @@ const AdminBooks: React.FC = () => {
         if (book) {
             setEditingBook(book);
             setFormData(book);
+            setIsNewAuthor(false);
         } else {
             setEditingBook(null);
             setFormData({
                 title: '',
                 author: '',
+                authorId: '',
                 price: 0,
                 coverUrl: '',
-                genre: '',
                 format: 'físico',
                 description: '',
                 stock: 0,
-                featured: false
+                featured: false,
+                digitalFileUrl: '',
+                iban: '',
+                accountHolder: '',
+                accountNumber: '',
+                express: ''
             });
+            setIsNewAuthor(false);
         }
         setIsModalOpen(true);
     };
@@ -82,19 +103,27 @@ const AdminBooks: React.FC = () => {
         e.preventDefault();
         setIsSaving(true);
         try {
-            const bookToSave = {
+            let bookToSave = {
                 ...formData,
-                id: editingBook?.id || `temp_${Date.now()}`,
+                id: editingBook?.id || `temp_${Date.now()}`, // Keep ID for existing books, generate temp for new
                 price: Number(formData.price),
                 stock: Number(formData.stock),
             } as Book;
 
+            // Handle New Author Registration if applicable
+            if (isNewAuthor && newAuthorData.name) {
+                // In a real scenario, we might create the user here via a service
+                // For now, we'll store the name and a flag
+                bookToSave.author = newAuthorData.name;
+                // Note: The actual user creation should ideally be handled by the backend or a dedicated service
+            }
+
             await saveBook(bookToSave);
-            showToast(editingBook ? 'Livro atualizado!' : 'Livro adicionado!', 'success');
+            showToast(editingBook ? 'Obra atualizada!' : 'Obra publicada!', 'success');
             setIsModalOpen(false);
-            loadBooks();
+            loadData();
         } catch (error) {
-            showToast('Erro ao gravar livro', 'error');
+            showToast('Erro ao gravar obra', 'error');
         } finally {
             setIsSaving(false);
         }
@@ -105,20 +134,17 @@ const AdminBooks: React.FC = () => {
             try {
                 await deleteBook(id);
                 setBooks(prev => prev.filter(b => b.id !== id));
-                showToast('Livro eliminado com sucesso', 'success');
+                showToast('Obra eliminada com sucesso', 'success');
             } catch (error) {
-                showToast('Erro ao eliminar livro', 'error');
+                showToast('Erro ao eliminar obra', 'error');
             }
         }
     };
 
     const filteredBooks = books.filter(book => {
-        const title = book.title?.toLowerCase() || '';
-        const author = book.author?.toLowerCase() || '';
-        const matchesSearch =
-            title.includes(searchTerm.toLowerCase()) ||
-            author.includes(searchTerm.toLowerCase());
-        const matchesFormat = filterFormat === 'all' || book.format === filterFormat;
+        const matchesSearch = (book.title?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+            (book.author?.toLowerCase() || '').includes(searchTerm.toLowerCase());
+        const matchesFormat = formatFilter === 'todos' || book.format === formatFilter;
         return matchesSearch && matchesFormat;
     });
 
@@ -156,7 +182,7 @@ const AdminBooks: React.FC = () => {
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            className="fixed inset-x-4 top-4 bottom-4 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-4xl bg-white rounded-[2.5rem] shadow-2xl z-[101] overflow-hidden flex flex-col"
+                            className="fixed inset-x-4 top-4 bottom-4 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-5xl bg-white rounded-[2.5rem] shadow-2xl z-[101] overflow-hidden flex flex-col"
                         >
                             <div className="p-8 border-b border-gray-50 flex items-center justify-between shrink-0">
                                 <h3 className="text-2xl font-black text-brand-dark uppercase tracking-tighter">
@@ -172,8 +198,8 @@ const AdminBooks: React.FC = () => {
                             </div>
 
                             <form onSubmit={handleSave} className="flex-1 overflow-y-auto p-8 space-y-8">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    {/* Esquerda: Informação Básica */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                                    {/* Esquerda: Informação Básica e Autor */}
                                     <div className="space-y-6">
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Título da Obra</label>
@@ -186,29 +212,76 @@ const AdminBooks: React.FC = () => {
                                                 placeholder="Ex: O Alquimista"
                                             />
                                         </div>
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Autor</label>
-                                            <input
-                                                required
-                                                type="text"
-                                                value={formData.author}
-                                                onChange={e => setFormData({ ...formData, author: e.target.value })}
-                                                className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
-                                                placeholder="Nome do autor"
-                                            />
+
+                                        {/* Autor Selection */}
+                                        <div className="p-6 bg-gray-50/50 rounded-[2rem] border border-gray-100 space-y-4">
+                                            <div className="flex items-center justify-between">
+                                                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Autor</label>
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setIsNewAuthor(false)}
+                                                        className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest transition-all ${!isNewAuthor ? 'bg-brand-dark text-white' : 'bg-gray-100 text-gray-400'}`}
+                                                    >
+                                                        Selecionar
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setIsNewAuthor(true)}
+                                                        className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest transition-all ${isNewAuthor ? 'bg-brand-dark text-white' : 'bg-gray-100 text-gray-400'}`}
+                                                    >
+                                                        Registrar Novo
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            {!isNewAuthor ? (
+                                                <select
+                                                    value={formData.authorId}
+                                                    onChange={e => {
+                                                        const author = authors.find(a => a.id === e.target.value);
+                                                        setFormData({ ...formData, authorId: e.target.value, author: author?.name || '' });
+                                                    }}
+                                                    className="w-full px-6 py-4 bg-white border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all appearance-none cursor-pointer"
+                                                    title="Selecionar Autor"
+                                                >
+                                                    <option value="">-- Selecione um autor --</option>
+                                                    {authors.map(author => (
+                                                        <option key={author.id} value={author.id}>{author.name}</option>
+                                                    ))}
+                                                </select>
+                                            ) : (
+                                                <div className="grid grid-cols-1 gap-3">
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Nome do Novo Autor"
+                                                        value={newAuthorData.name}
+                                                        onChange={e => setNewAuthorData({ ...newAuthorData, name: e.target.value })}
+                                                        className="w-full px-6 py-4 bg-white border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+                                                    />
+                                                    <input
+                                                        type="email"
+                                                        placeholder="Email do Novo Autor"
+                                                        value={newAuthorData.email}
+                                                        onChange={e => setNewAuthorData({ ...newAuthorData, email: e.target.value })}
+                                                        className="w-full px-6 py-4 bg-white border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+                                                    />
+                                                </div>
+                                            )}
                                         </div>
+
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-2">
-                                                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Preço (€)</label>
+                                                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Preço (Kz)</label>
                                                 <input
                                                     id="bookPrice"
                                                     required
                                                     type="number"
-                                                    step="0.01"
+                                                    step="1"
                                                     value={formData.price}
                                                     onChange={e => setFormData({ ...formData, price: parseFloat(e.target.value) })}
                                                     className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
-                                                    placeholder="0.00"
+                                                    placeholder="0"
                                                     title="Preço"
                                                 />
                                             </div>
@@ -228,7 +301,7 @@ const AdminBooks: React.FC = () => {
                                         </div>
                                     </div>
 
-                                    {/* Direita: Imagem e Extras */}
+                                    {/* Direita: Detalhes Específicos e Capa */}
                                     <div className="space-y-6">
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">URL da Capa</label>
@@ -241,12 +314,96 @@ const AdminBooks: React.FC = () => {
                                                 placeholder="https://..."
                                             />
                                         </div>
+
+                                        {/* Conditional Fields based on Format */}
+                                        <AnimatePresence mode="wait">
+                                            {formData.format === 'digital' ? (
+                                                <motion.div
+                                                    key="digital-fields"
+                                                    initial={{ opacity: 0, x: 20 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    exit={{ opacity: 0, x: -20 }}
+                                                    className="space-y-2"
+                                                >
+                                                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Link para Download</label>
+                                                    <input
+                                                        required
+                                                        type="url"
+                                                        value={formData.digitalFileUrl}
+                                                        onChange={e => setFormData({ ...formData, digitalFileUrl: e.target.value })}
+                                                        className="w-full px-6 py-4 bg-brand-primary/5 border-2 border-brand-primary/10 rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+                                                        placeholder="URL do PDF/ePub"
+                                                    />
+                                                </motion.div>
+                                            ) : (
+                                                <motion.div
+                                                    key="physical-fields"
+                                                    initial={{ opacity: 0, x: 20 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    exit={{ opacity: 0, x: -20 }}
+                                                    className="p-6 bg-brand-primary/5 rounded-[2.5rem] border border-brand-primary/10 space-y-4"
+                                                >
+                                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-brand-primary ml-2 mb-4">Dados para Pagamento</h4>
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        <div className="space-y-1">
+                                                            <label className="text-[9px] font-bold uppercase text-gray-400 ml-2">Titular da Conta</label>
+                                                            <input
+                                                                id="accountHolder"
+                                                                type="text"
+                                                                value={formData.accountHolder}
+                                                                onChange={e => setFormData({ ...formData, accountHolder: e.target.value })}
+                                                                className="w-full px-4 py-3 bg-white border-none rounded-xl text-[10px] font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+                                                                placeholder="Nome do Titular"
+                                                                title="Titular da Conta"
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-1">
+                                                            <label className="text-[9px] font-bold uppercase text-gray-400 ml-2">IBAN</label>
+                                                            <input
+                                                                id="accountIban"
+                                                                type="text"
+                                                                value={formData.iban}
+                                                                onChange={e => setFormData({ ...formData, iban: e.target.value })}
+                                                                className="w-full px-4 py-3 bg-white border-none rounded-xl text-[10px] font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+                                                                placeholder="AO06..."
+                                                                title="IBAN"
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-1">
+                                                            <label className="text-[9px] font-bold uppercase text-gray-400 ml-2">Nº da Conta (Opcional)</label>
+                                                            <input
+                                                                id="accountNumber"
+                                                                type="text"
+                                                                value={formData.accountNumber}
+                                                                onChange={e => setFormData({ ...formData, accountNumber: e.target.value })}
+                                                                className="w-full px-4 py-3 bg-white border-none rounded-xl text-[10px] font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+                                                                placeholder="Nº da Conta"
+                                                                title="Número da Conta"
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-1">
+                                                            <label className="text-[9px] font-bold uppercase text-gray-400 ml-2">Express (Opcional)</label>
+                                                            <input
+                                                                id="accountExpress"
+                                                                type="text"
+                                                                value={formData.express}
+                                                                onChange={e => setFormData({ ...formData, express: e.target.value })}
+                                                                className="w-full px-4 py-3 bg-white border-none rounded-xl text-[10px] font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+                                                                placeholder="Express"
+                                                                title="Express"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+
                                         <div className="flex gap-6 items-start">
                                             <div className="w-24 h-32 bg-gray-50 rounded-xl overflow-hidden border-2 border-dashed border-gray-200 flex items-center justify-center shrink-0">
                                                 {formData.coverUrl ? (
                                                     <img src={formData.coverUrl} alt="Preview" className="w-full h-full object-cover" />
                                                 ) : (
-                                                    <ImageIcon className="w-6 h-6 text-gray-300" />
+                                                    <Image className="w-6 h-6 text-gray-300" />
                                                 )}
                                             </div>
                                             <div className="flex-1 space-y-4 pt-2">
@@ -303,7 +460,7 @@ const AdminBooks: React.FC = () => {
                                     className="px-10 py-4 bg-brand-dark text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-primary transition-all shadow-xl shadow-brand-dark/10 flex items-center gap-3 disabled:opacity-50"
                                 >
                                     {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
-                                    {editingBook ? 'Guardar Alterações' : 'Publicar Obra'}
+                                    {editingBook ? 'Atualizar Obra' : 'Publicar Obra'}
                                 </button>
                             </div>
                         </motion.div>
@@ -311,40 +468,38 @@ const AdminBooks: React.FC = () => {
                 )}
             </AnimatePresence>
 
-            {/* Filters & Search */}
-            <div className="flex flex-col md:flex-row gap-4 items-center bg-white p-4 rounded-3xl border border-gray-100 shadow-sm">
-                <div className="relative flex-1 w-full">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <input
-                        type="text"
-                        placeholder="Pesquisar por título ou autor..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-brand-primary/20 transition-all outline-none"
-                    />
+            {/* Filters */}
+            <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1 bg-white p-4 rounded-3xl border border-gray-100 shadow-sm">
+                    <div className="relative w-full">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder="Pesquisar por título ou autor..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-brand-primary/20 transition-all outline-none"
+                        />
+                    </div>
                 </div>
-                <div className="flex items-center gap-2 w-full md:w-auto">
-                    <select
-                        value={filterFormat}
-                        onChange={(e) => setFilterFormat(e.target.value as any)}
-                        className="flex-1 md:flex-none px-4 py-3 bg-gray-50 border-none rounded-2xl text-xs font-bold uppercase tracking-widest outline-none cursor-pointer hover:bg-gray-100 transition-colors"
-                        title="Filtrar por formato"
-                    >
-                        <option value="all">Todos os Formatos</option>
-                        <option value="físico">📖 Físico</option>
-                        <option value="digital">📱 Digital</option>
-                    </select>
-                    <button className="p-3 bg-gray-50 hover:bg-gray-100 rounded-2xl transition-colors" title="Mais filtros">
-                        <Filter className="w-4 h-4 text-brand-dark" />
-                    </button>
+                <div className="flex bg-white p-2 rounded-3xl border border-gray-100 shadow-sm">
+                    {['todos', 'físico', 'digital'].map((type) => (
+                        <button
+                            key={type}
+                            onClick={() => setFormatFilter(type)}
+                            className={`px-6 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${formatFilter === type ? 'bg-brand-dark text-white' : 'text-gray-400 hover:bg-gray-50'}`}
+                        >
+                            {type === 'todos' ? 'Todos os Formatos' : type}
+                        </button>
+                    ))}
                 </div>
             </div>
 
-            {/* Content */}
+            {/* List */}
             {loading ? (
                 <div className="h-64 flex flex-col items-center justify-center gap-4 text-gray-400">
                     <Loader2 className="w-8 h-8 animate-spin text-brand-primary" />
-                    <span className="text-xs font-bold uppercase tracking-widest">A carregar catálogo...</span>
+                    <span className="text-xs font-bold uppercase tracking-widest">A carregar acervo...</span>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 gap-4">
@@ -356,66 +511,70 @@ const AdminBooks: React.FC = () => {
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
                                 transition={{ delay: index * 0.05 }}
-                                className="group bg-white p-4 sm:p-6 rounded-[2rem] border border-gray-50 shadow-sm hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-500 flex flex-col sm:flex-row items-center gap-6"
+                                className="group bg-white p-5 rounded-[2rem] border border-gray-50 shadow-sm hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-500 flex items-center gap-6"
                             >
-                                {/* Book Cover Preview */}
-                                <div className="w-20 h-28 bg-gray-100 rounded-xl overflow-hidden shadow-md shrink-0 group-hover:scale-105 transition-transform duration-500">
+                                {/* Cover Preview */}
+                                <div className="w-20 h-28 rounded-2xl bg-gray-100 overflow-hidden shadow-md shrink-0 group-hover:scale-105 transition-transform duration-500 border-2 border-white">
                                     <img src={book.coverUrl} alt="" className="w-full h-full object-cover" />
                                 </div>
 
                                 {/* Details */}
-                                <div className="flex-1 text-center sm:text-left min-w-0">
-                                    <div className="flex flex-wrap justify-center sm:justify-start gap-2 mb-2">
-                                        <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest ${book.format === 'digital' ? 'bg-cyan-50 text-cyan-600' : 'bg-amber-50 text-amber-600'
-                                            }`}>
-                                            {book.format === 'digital' ? '📱 Digital' : '📖 Físico'}
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-3 mb-1">
+                                        <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest ${book.format === 'digital' ? 'bg-brand-primary/10 text-brand-primary' : 'bg-brand-dark/10 text-brand-dark'}`}>
+                                            {book.format}
                                         </span>
                                         {book.featured && (
-                                            <span className="px-3 py-1 bg-yellow-50 text-yellow-600 rounded-full text-[8px] font-black uppercase tracking-widest">
-                                                ⭐ Destaque
-                                            </span>
+                                            <span className="px-2 py-0.5 bg-yellow-400/10 text-yellow-600 rounded text-[8px] font-black uppercase tracking-widest">Destaque</span>
                                         )}
                                     </div>
-                                    <h3 className="text-lg font-black text-brand-dark truncate group-hover:text-brand-primary transition-colors">
+                                    <h3 className="text-xl font-black text-brand-dark truncate group-hover:text-brand-primary transition-colors">
                                         {book.title}
                                     </h3>
-                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">
                                         {book.author}
                                     </p>
                                 </div>
 
-                                {/* Stats Icons */}
+                                {/* Stats & Meta */}
                                 <div className="hidden lg:flex items-center gap-8 px-8 border-x border-gray-50">
-                                    <div className="flex flex-col items-center gap-1">
-                                        <Eye className="w-4 h-4 text-gray-300" />
-                                        <span className="text-[10px] font-black">{book.stats?.views || 0}</span>
+                                    <div className="text-center">
+                                        <div className="flex items-center justify-center gap-1 text-gray-400 mb-1">
+                                            <Eye className="w-3 h-3" title="Visualizações" />
+                                            <span className="text-[10px] font-bold tabular-nums">0</span>
+                                        </div>
+                                        <p className="text-[8px] font-black uppercase tracking-widest text-gray-300">Views</p>
                                     </div>
-                                    <div className="flex flex-col items-center gap-1">
-                                        {book.format === 'digital' ? <Download className="w-4 h-4 text-gray-300" /> : <ShoppingBag className="w-4 h-4 text-gray-300" />}
-                                        <span className="text-[10px] font-black">
-                                            {book.format === 'digital' ? book.stats?.downloads || 0 : book.stats?.copiesSold || 0}
-                                        </span>
+                                    <div className="text-center">
+                                        <div className="flex items-center justify-center gap-1 text-gray-400 mb-1">
+                                            <Download className="w-3 h-3" title="Downloads/Vendas" />
+                                            <span className="text-[10px] font-bold tabular-nums">0</span>
+                                        </div>
+                                        <p className="text-[8px] font-black uppercase tracking-widest text-gray-300">Sales</p>
                                     </div>
                                 </div>
 
                                 {/* Price & Actions */}
-                                <div className="flex items-center gap-4 shrink-0">
-                                    <div className="text-right mr-4 hidden sm:block">
-                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Preço</p>
-                                        <p className="text-lg font-black text-brand-dark">€{book.price.toFixed(2)}</p>
+                                <div className="flex items-center gap-8 pl-4">
+                                    <div className="text-right">
+                                        <p className="text-[8px] font-black uppercase tracking-widest text-gray-400 mb-1">Preço</p>
+                                        <p className="text-xl font-black text-brand-dark tabular-nums flex items-baseline">
+                                            <span className="text-xs mr-1">Kz</span>
+                                            {book.price.toLocaleString()}
+                                        </p>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <button
                                             onClick={() => handleOpenModal(book)}
                                             className="p-3 bg-gray-50 hover:bg-brand-dark hover:text-white rounded-2xl transition-all"
-                                            title="Editar"
+                                            title="Editar Obra"
                                         >
                                             <Edit2 className="w-4 h-4" />
                                         </button>
                                         <button
                                             onClick={() => handleDelete(book.id, book.title)}
                                             className="p-3 bg-gray-50 hover:bg-red-500 hover:text-white rounded-2xl transition-all text-red-500"
-                                            title="Eliminar"
+                                            title="Eliminar Obra"
                                         >
                                             <Trash2 className="w-4 h-4" />
                                         </button>

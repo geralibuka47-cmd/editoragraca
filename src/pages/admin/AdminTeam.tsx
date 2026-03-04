@@ -14,7 +14,7 @@ import {
     Twitter
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getTeamMembers, deleteTeamMember } from '../../services/dataService';
+import { getTeamMembers, saveTeamMember, deleteTeamMember } from '../../services/dataService';
 import { TeamMember } from '../../types';
 import { useToast } from '../../components/Toast';
 

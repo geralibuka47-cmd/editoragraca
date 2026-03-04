@@ -438,6 +438,17 @@ export const getAllUsers = async (): Promise<User[]> => {
     }
 };
 
+export const getAuthors = async (): Promise<User[]> => {
+    try {
+        const q = query(collection(db, COLLECTIONS.USERS), where('role', '==', 'autor'));
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => parseFirestoreDoc(doc.data(), doc.id)) as User[];
+    } catch (error) {
+        console.error('Error fetching authors:', error);
+        return [];
+    }
+};
+
 // ==================== PUBLIC STATS ====================
 
 let lastStatsData: any = null;

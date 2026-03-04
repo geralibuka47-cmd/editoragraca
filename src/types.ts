@@ -42,9 +42,14 @@ export interface Book {
   digitalFileUrl?: string;
   format?: 'físico' | 'digital';
   pages?: number;
-  paymentInfo?: string; // ID of the bank account to use
-  paymentInfoNotes?: string; // Custom notes for payment
-  launchDate?: string; // ISO date string for upcoming book launch
+  // Bank details for physical books
+  iban?: string;
+  accountHolder?: string;
+  accountNumber?: string;
+  express?: string;
+  paymentInfo?: string;
+  paymentInfoNotes?: string;
+  launchDate?: string;
   stats?: BookStats;
   reviews?: Review[];
 }
