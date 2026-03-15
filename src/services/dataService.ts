@@ -184,8 +184,17 @@ export const getBookById = async (id: string): Promise<Book | null> => {
     }
 };
 
-export const saveBook = async (book: Book) => {
+export const saveBook = async (book: Book, newAuthor?: Partial<User>) => {
     try {
+        let authorId = book.authorId;
+
+        // 1. If we have new author data, register the author first
+        if (newAuthor && newAuthor.name) {
+            authorId = await registerAuthor(newAuthor);
+            book.authorId = authorId;
+            book.author = newAuthor.name;
+        }
+
         const bookData = prepareForFirestore(book);
         const { id, ...payload } = bookData;
 
@@ -446,6 +455,26 @@ export const getAuthors = async (): Promise<User[]> => {
     } catch (error) {
         console.error('Error fetching authors:', error);
         return [];
+    }
+};
+
+export const registerAuthor = async (author: Partial<User>) => {
+    try {
+        const authorData = prepareForFirestore({
+            ...author,
+            role: 'autor',
+            createdAt: Timestamp.now(),
+            updatedAt: Timestamp.now()
+        });
+
+        // Use setDoc with a descriptive ID or addDoc
+        // Since we are creating a "user" for authentication later, we'd ideally use the Auth UID.
+        // For now, we'll create a Firestore document and return the ID.
+        const docRef = await addDoc(collection(db, COLLECTIONS.USERS), authorData);
+        return docRef.id;
+    } catch (error) {
+        console.error('Error registering author:', error);
+        throw error;
     }
 };
 
