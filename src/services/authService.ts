@@ -6,7 +6,10 @@ import {
     User as FirebaseUser,
     sendPasswordResetEmail,
     GoogleAuthProvider,
-    signInWithPopup
+    signInWithPopup,
+    RecaptchaVerifier,
+    signInWithPhoneNumber,
+    ConfirmationResult
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from './firebase';
@@ -154,6 +157,52 @@ export const logout = async () => {
         console.error('Erro ao fazer logout:', error);
         throw error;
     }
+};
+
+/**
+ * Send OTP SMS using Firebase Phone Auth
+ * @param phoneNumber - full phone number with country code, e.g. +244912345678
+ * @param recaptchaContainerId - id of the div to render reCAPTCHA in
+ */
+export const sendPhoneOTP = async (
+    phoneNumber: string,
+    recaptchaContainerId: string
+): Promise<ConfirmationResult> => {
+    const recaptchaVerifier = new RecaptchaVerifier(auth, recaptchaContainerId, {
+        size: 'invisible',
+        callback: () => {},
+    });
+    const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
+    return confirmationResult;
+};
+
+/**
+ * Confirm OTP code and create/load user profile
+ */
+export const confirmPhoneOTP = async (
+    confirmationResult: ConfirmationResult,
+    otp: string,
+    name: string,
+    role: 'leitor' | 'autor' = 'leitor'
+): Promise<User> => {
+    const result = await confirmationResult.confirm(otp);
+    const firebaseUser = result.user;
+
+    // Check if user profile already exists
+    const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+
+    if (!userDoc.exists()) {
+        // First time: create Firestore profile
+        await setDoc(doc(db, 'users', firebaseUser.uid), {
+            name,
+            email: firebaseUser.email || '',
+            phone: firebaseUser.phoneNumber || '',
+            role,
+            createdAt: new Date().toISOString()
+        });
+    }
+
+    return await convertFirebaseUser(firebaseUser);
 };
 
 /**
