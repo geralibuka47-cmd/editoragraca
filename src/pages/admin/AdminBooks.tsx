@@ -619,14 +619,14 @@ const AdminBooks: React.FC = () => {
                                 <div className="hidden lg:flex items-center gap-8 px-8 border-x border-gray-50">
                                     <div className="text-center">
                                         <div className="flex items-center justify-center gap-1 text-gray-400 mb-1">
-                                            <Eye className="w-3 h-3" title="Visualizações" />
+                                            <Eye className="w-3 h-3" />
                                             <span className="text-[10px] font-bold tabular-nums">0</span>
                                         </div>
                                         <p className="text-[8px] font-black uppercase tracking-widest text-gray-300">Views</p>
                                     </div>
                                     <div className="text-center">
                                         <div className="flex items-center justify-center gap-1 text-gray-400 mb-1">
-                                            <Download className="w-3 h-3" title="Downloads/Vendas" />
+                                            <Download className="w-3 h-3" />
                                             <span className="text-[10px] font-bold tabular-nums">0</span>
                                         </div>
                                         <p className="text-[8px] font-black uppercase tracking-widest text-gray-300">Sales</p>
