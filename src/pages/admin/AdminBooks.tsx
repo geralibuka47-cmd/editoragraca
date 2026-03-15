@@ -166,14 +166,19 @@ const AdminBooks: React.FC = () => {
     };
 
     const handleDelete = async (id: string, title: string) => {
+        console.log('Iniciando processo de deleção de:', title, 'ID:', id);
         if (window.confirm(`Tem a certeza que deseja eliminar "${title}"?`)) {
             try {
                 await deleteBook(id);
                 setBooks(prev => prev.filter(b => b.id !== id));
                 showToast('Obra eliminada com sucesso', 'success');
-            } catch (error) {
-                showToast('Erro ao eliminar obra', 'error');
+                console.log('Exclusão concluída com sucesso no UI');
+            } catch (error: any) {
+                console.error('Erro capturado no UI handleDelete:', error);
+                showToast(`Erro ao eliminar: ${error.message || 'Erro desconhecido'}`, 'error');
             }
+        } else {
+            console.log('Deleção cancelada pelo utilizador');
         }
     };
 

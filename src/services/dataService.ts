@@ -225,12 +225,22 @@ export const saveBook = async (book: Book, newAuthor?: Partial<User>) => {
 
 export const deleteBook = async (id: string) => {
     try {
+        console.log('--- DIAGNÓSTICO DELETAR ---');
+        console.log('ID alvo:', id);
+        console.log('Coleção:', COLLECTIONS.BOOKS);
+        
+        if (!id) {
+            throw new Error('ID do livro é inválido ou nulo');
+        }
+
         await deleteDoc(doc(db, COLLECTIONS.BOOKS, id));
+        console.log('Sucesso na deleção do documento');
+        
         // Invalidate cache
         booksCache = null;
         lastBooksFetch = 0;
     } catch (error) {
-        console.error('Erro ao eliminar livro:', error);
+        console.error('Erro detalhado ao eliminar livro no dataService:', error);
         throw error;
     }
 };
