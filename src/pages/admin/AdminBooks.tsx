@@ -51,7 +51,7 @@ const AdminBooks: React.FC = () => {
 
     const [currentStep, setCurrentStep] = useState(1);
     const [isNewAuthor, setIsNewAuthor] = useState(false);
-    const [newAuthorData, setNewAuthorData] = useState({ name: '', email: '', bio: '' });
+    const [newAuthorData, setNewAuthorData] = useState({ name: '', email: '', bio: '', whatsappNumber: '+244 ' });
     const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
@@ -99,7 +99,7 @@ const AdminBooks: React.FC = () => {
                 launchDate: ''
             });
             setIsNewAuthor(false);
-            setNewAuthorData({ name: '', email: '', bio: '' });
+            setNewAuthorData({ name: '', email: '', bio: '', whatsappNumber: '+244 ' });
         }
         setCurrentStep(1);
         setIsModalOpen(true);
@@ -402,22 +402,32 @@ const AdminBooks: React.FC = () => {
                                                                 type="text"
                                                                 value={newAuthorData.name}
                                                                 onChange={e => setNewAuthorData({ ...newAuthorData, name: e.target.value })}
-                                                                className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold"
+                                                                className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
                                                                 placeholder="Nome completo"
                                                             />
                                                         </div>
                                                         <div className="space-y-2">
-                                                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Email de Acesso</label>
+                                                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Telemóvel (WhatsApp)</label>
+                                                            <input
+                                                                type="tel"
+                                                                value={newAuthorData.whatsappNumber}
+                                                                onChange={e => setNewAuthorData({ ...newAuthorData, whatsappNumber: e.target.value })}
+                                                                className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+                                                                placeholder="+244 9..."
+                                                            />
+                                                            <p className="text-[8px] font-bold text-brand-primary uppercase tracking-widest ml-4">
+                                                                * Usado para login e notificações.
+                                                            </p>
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Email (Opcional)</label>
                                                             <input
                                                                 type="email"
                                                                 value={newAuthorData.email}
                                                                 onChange={e => setNewAuthorData({ ...newAuthorData, email: e.target.value })}
-                                                                className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold"
+                                                                className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
                                                                 placeholder="email@exemplo.com"
                                                             />
-                                                            <p className="text-[8px] font-bold text-brand-primary uppercase tracking-widest ml-4">
-                                                                * O autor receberá um link de redefinição de senha neste email.
-                                                            </p>
                                                         </div>
                                                     </div>
                                                     <div className="space-y-2">
