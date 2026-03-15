@@ -1196,7 +1196,7 @@ export const toggleFavorite = async (bookId: string, userId: string): Promise<bo
 
 // ==================== ADMIN & AUTHOR STATS ====================
 
-export const getStats = async () => {
+export const getAdminStats = async () => {
     try {
         const booksSnapshot = await getDocs(collection(db, COLLECTIONS.BOOKS));
         const usersSnapshot = await getDocs(collection(db, COLLECTIONS.USERS));

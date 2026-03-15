@@ -200,9 +200,9 @@ const AdminSettings: React.FC = () => {
 
                                     <div className="space-y-4">
                                         {[
-                                            { id: 1, title: 'Edição de Texto', price: 'A partir de €450', active: true },
-                                            { id: 2, title: 'Design de Capa', price: 'A partir de €300', active: true },
-                                            { id: 3, title: 'Paginação e Ebook', price: 'A partir de €150', active: false },
+                                            { id: 1, title: 'Edição de Texto', price: 'A partir de 450.000 Kz', active: true },
+                                            { id: 2, title: 'Design de Capa', price: 'A partir de 300.000 Kz', active: true },
+                                            { id: 3, title: 'Paginação e Ebook', price: 'A partir de 150.000 Kz', active: false },
                                         ].map((service) => (
                                             <div key={service.id} className="flex items-center justify-between p-6 bg-gray-50 rounded-2xl group hover:bg-gray-100 transition-all">
                                                 <div className="flex items-center gap-4">

@@ -161,7 +161,7 @@ const AdminOrders: React.FC = () => {
                                     <div className="flex items-center justify-between lg:justify-end gap-8 shrink-0">
                                         <div className="text-right">
                                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total</p>
-                                            <p className="text-xl font-black text-brand-primary">€{order.total.toFixed(2)}</p>
+                                            <p className="text-xl font-black text-brand-primary">Kz {order.total.toLocaleString()}</p>
                                         </div>
 
                                         <div className="flex items-center gap-3">

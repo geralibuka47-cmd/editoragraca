@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Users,
     BookOpen,
@@ -8,24 +8,56 @@ import {
     ArrowDownRight,
     Clock,
     ChevronRight,
-    Zap
+    Zap,
+    Loader2
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { getAdminStats } from '../../services/dataService';
 
 const AdminOverview: React.FC = () => {
+    const [loading, setLoading] = useState(true);
+    const [statsData, setStatsData] = useState({
+        totalBooks: 0,
+        totalUsers: 0,
+        pendingOrders: 0,
+        revenue: 0,
+        lowStockCount: 0
+    });
+
+    useEffect(() => {
+        const loadStats = async () => {
+            setLoading(true);
+            try {
+                const data = await getAdminStats();
+                setStatsData(data);
+            } catch (error) {
+                console.error("Erro ao carregar estatísticas do admin", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadStats();
+    }, []);
+
     const stats = [
-        { name: 'Utilizadores Ativos', value: '1,284', trend: '+12.5%', isUp: true, icon: Users, color: 'brand-primary' },
-        { name: 'Vendas Totais', value: '€12,450', trend: '+8.2%', isUp: true, icon: ShoppingBag, color: 'brand-dark' },
-        { name: 'Livros no Acervo', value: '142', trend: '+2', isUp: true, icon: BookOpen, color: 'amber-600' },
-        { name: 'Taxa de Conversão', value: '3.2%', trend: '-1.1%', isUp: false, icon: TrendingUp, color: 'brand-accent' },
+        { name: 'Utilizadores Ativos', value: statsData.totalUsers.toLocaleString(), trend: '+12.5%', isUp: true, icon: Users, color: 'brand-primary' },
+        { name: 'Rentabilidade', value: `Kz ${statsData.revenue.toLocaleString()}`, trend: '+8.2%', isUp: true, icon: ShoppingBag, color: 'brand-dark' },
+        { name: 'Livros no Acervo', value: statsData.totalBooks.toLocaleString(), trend: '+2', isUp: true, icon: BookOpen, color: 'amber-600' },
+        { name: 'Encomendas Pendentes', value: statsData.pendingOrders.toLocaleString(), trend: '-1.1%', isUp: false, icon: TrendingUp, color: 'brand-accent' },
     ];
 
     const recentActivities = [
-        { id: 1, type: 'order', title: 'Nova encomenda #4829', user: 'Carlos Mendes', time: 'Há 5 minutos', amount: '€45.00' },
-        { id: 2, type: 'user', title: 'Novo registo de autor', user: 'Ana Paula Santos', time: 'Há 22 minutos', amount: null },
-        { id: 3, type: 'book', title: 'Atualização de Stock', user: 'Sistema', time: 'Há 1 hora', amount: '20 un.' },
-        { id: 4, type: 'order', title: 'Encomenda expedida #4825', user: 'João Silva', time: 'Há 2 horas', amount: '€120.00' },
+        { id: 1, type: 'order', title: 'O histórico detalhado será implementado', user: 'Sistema', time: 'Agora', amount: null },
     ];
+
+    if (loading) {
+        return (
+            <div className="flex flex-col items-center justify-center h-64 text-brand-primary">
+                <Loader2 className="w-8 h-8 animate-spin mb-4" />
+                <p className="text-xs font-bold uppercase tracking-widest">A carregar dados...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-12">
@@ -40,7 +72,7 @@ const AdminOverview: React.FC = () => {
                 <div className="flex items-center gap-3">
                     <div className="px-4 py-2 bg-brand-dark text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
                         <Clock className="w-3 h-3" />
-                        Últimos 30 dias
+                        Tempo Real
                     </div>
                     <button
                         className="p-2 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
@@ -67,10 +99,7 @@ const AdminOverview: React.FC = () => {
                             <div className={`p-4 rounded-2xl bg-${stat.color}/10 text-${stat.color === 'brand-primary' ? 'brand-primary' : 'brand-dark'}`}>
                                 <stat.icon className="w-6 h-6" />
                             </div>
-                            <div className={`flex items-center gap-1 text-xs font-black ${stat.isUp ? 'text-green-500' : 'text-red-500'}`}>
-                                {stat.isUp ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-                                {stat.trend}
-                            </div>
+                            {/* For now hide trends as they require historical tracking */}
                         </div>
 
                         <div className="relative">
@@ -103,15 +132,9 @@ const AdminOverview: React.FC = () => {
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="text-sm font-black text-brand-dark leading-tight">{activity.title}</span>
-                                        <span className="text-xs text-gray-400 font-medium">Por {activity.user} • {activity.time}</span>
+                                        <span className="text-xs text-gray-400 font-medium">{activity.user} • {activity.time}</span>
                                     </div>
                                 </div>
-                                {activity.amount && (
-                                    <span className="text-sm font-black text-brand-dark">{activity.amount}</span>
-                                )}
-                                {!activity.amount && (
-                                    <ChevronRight className="w-4 h-4 text-gray-300" />
-                                )}
                             </div>
                         ))}
                     </div>
@@ -131,24 +154,21 @@ const AdminOverview: React.FC = () => {
                                 <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Banco de Dados</span>
                                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
                             </div>
-                            <p className="text-sm font-bold text-white/90">Sincronizado via Supabase</p>
-                            <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-widest">Última sync: há 2m</p>
+                            <p className="text-sm font-bold text-white/90">Sincronizado via Firebase</p>
+                            <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-widest">Tempo real ativo</p>
                         </div>
 
                         <div className="bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-sm">
                             <div className="flex items-center justify-between mb-4">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Armazenamento</span>
-                                <span className="text-[10px] font-black">82%</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Estado do Stock</span>
+                                {statsData.lowStockCount > 0 ? (
+                                    <span className="text-[10px] font-black text-amber-400">{statsData.lowStockCount} Livro(s) em Baixa</span>
+                                ) : (
+                                    <span className="text-[10px] font-black text-green-400">Estável</span>
+                                )}
                             </div>
-                            <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
-                                <div className="w-[82%] h-full bg-brand-primary"></div>
-                            </div>
-                            <p className="text-[10px] text-gray-500 mt-4 uppercase tracking-widest">Capacidade do Firebase</p>
+                            <p className="text-[10px] text-gray-500 mt-4 uppercase tracking-widest">Controlo de Inventário</p>
                         </div>
-
-                        <button className="w-full py-4 bg-brand-primary text-white font-black uppercase tracking-widest text-xs rounded-xl hover:brightness-110 transition-all shadow-xl shadow-brand-primary/20">
-                            Lançar Nova Obra
-                        </button>
                     </div>
                 </div>
             </div>
