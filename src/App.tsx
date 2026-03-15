@@ -10,6 +10,7 @@ import { logout as authLogout } from './services/authService';
 import { Loader2 } from 'lucide-react';
 import WhatsAppBubble from './components/WhatsAppBubble';
 import { useAuth } from './contexts/AuthContext';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Admin pages will be lazy loaded
 
@@ -262,11 +263,15 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
     return (
-        <Router>
-            <LazyMotion features={domAnimation}>
-                <AppContent />
-            </LazyMotion>
-        </Router>
+        <ErrorBoundary>
+            <Router>
+                <LazyMotion features={domAnimation}>
+                    <ToastProvider>
+                        <AppContent />
+                    </ToastProvider>
+                </LazyMotion>
+            </Router>
+        </ErrorBoundary>
     );
 };
 

@@ -14,7 +14,7 @@ import SEO from '../components/SEO';
 // Validation Schema
 const checkoutSchema = z.object({
     name: z.string().min(2, 'Nome é obrigatório'),
-    email: z.string().email('Email inválido'),
+    email: z.string().email('Email inválido').optional().or(z.literal('')),
     phone: z.string().min(9, 'Telefone inválido'),
     address: z.string().min(5, 'Endereço é obrigatório'),
     city: z.string().min(2, 'Cidade é obrigatória'),
@@ -68,7 +68,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
 
             const result = await createOrder({
                 customerName: data.name.trim(),
-                customerEmail: data.email.trim(),
+                customerEmail: (data.email || '').trim(),
                 items: cart.map(item => ({
                     bookId: item.id,
                     title: item.title,
@@ -83,7 +83,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
 
             setConfirmedOrder({
                 name: data.name,
-                email: data.email,
+                email: data.email || '',
                 orderNumber: result.orderNumber,
                 total: total
             });

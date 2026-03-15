@@ -81,7 +81,12 @@ const BookCard: React.FC<BookCardProps> = ({ book, onAddToCart, onViewDetails, o
                     </div>
                     <div className="text-right">
                         <p className="font-black text-brand-dark text-xl tracking-tighter">
-                            {Number(book.price) === 0 ? 'Gratuito' : `${Number(book.price).toLocaleString()} Kz`}
+                            {(() => {
+                                const price = Number(book.price);
+                                if (isNaN(price)) return 'N/D';
+                                if (price === 0) return 'Gratuito';
+                                return `${price.toLocaleString()} Kz`;
+                            })()}
                         </p>
                         <p className="text-[10px] text-gray-300 font-bold uppercase tracking-widest">AOA</p>
                     </div>

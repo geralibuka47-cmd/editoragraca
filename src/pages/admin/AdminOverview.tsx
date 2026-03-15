@@ -4,18 +4,17 @@ import {
     BookOpen,
     ShoppingBag,
     TrendingUp,
-    ArrowUpRight,
-    ArrowDownRight,
     Clock,
-    ChevronRight,
     Zap,
-    Loader2
+    Loader2,
+    RefreshCw
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { getAdminStats } from '../../services/dataService';
 
 const AdminOverview: React.FC = () => {
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [statsData, setStatsData] = useState({
         totalBooks: 0,
         totalUsers: 0,
@@ -24,18 +23,21 @@ const AdminOverview: React.FC = () => {
         lowStockCount: 0
     });
 
+    const loadStats = async (isRefresh = false) => {
+        if (isRefresh) setRefreshing(true);
+        else setLoading(true);
+        try {
+            const data = await getAdminStats();
+            setStatsData(data);
+        } catch (error) {
+            console.error("Erro ao carregar estatísticas do admin", error);
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
+        }
+    };
+
     useEffect(() => {
-        const loadStats = async () => {
-            setLoading(true);
-            try {
-                const data = await getAdminStats();
-                setStatsData(data);
-            } catch (error) {
-                console.error("Erro ao carregar estatísticas do admin", error);
-            } finally {
-                setLoading(false);
-            }
-        };
         loadStats();
     }, []);
 
@@ -69,11 +71,19 @@ const AdminOverview: React.FC = () => {
                         Dashboard
                     </h2>
                 </div>
-                <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3">
                     <div className="px-4 py-2 bg-brand-dark text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
                         <Clock className="w-3 h-3" />
                         Tempo Real
                     </div>
+                    <button
+                        onClick={() => loadStats(true)}
+                        disabled={refreshing}
+                        className="p-2 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50"
+                        title="Atualizar Dados"
+                    >
+                        <RefreshCw className={`w-4 h-4 text-brand-primary ${refreshing ? 'animate-spin' : ''}`} />
+                    </button>
                     <button
                         className="p-2 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
                         title="Ações rápidas"
