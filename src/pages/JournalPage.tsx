@@ -14,6 +14,7 @@ import { OptimizedImage } from '../components/OptimizedImage';
 import { useNavigate } from 'react-router-dom';
 import SEO from '../components/SEO';
 import { PageHero } from '../components/PageHero';
+import { useToast } from '../components/Toast';
 
 interface JournalPageProps {
     user: UserType | null;
@@ -21,12 +22,15 @@ interface JournalPageProps {
 
 const JournalPage: React.FC<JournalPageProps> = ({ user }) => {
     const navigate = useNavigate();
+    const { showToast } = useToast();
     const [posts, setPosts] = useState<BlogPost[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
     const [postInteractions, setPostInteractions] = useState<Record<string, { likesCount: number, comments: BlogComment[], isLiked: boolean }>>({});
     const [commentText, setCommentText] = useState('');
     const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+    const [newsletterEmail, setNewsletterEmail] = useState('');
+    const [isSubscribing, setIsSubscribing] = useState(false);
 
     useEffect(() => {
         const loadPosts = async () => {
@@ -382,8 +386,30 @@ const JournalPage: React.FC<JournalPageProps> = ({ user }) => {
                     <h2 className="text-4xl md:text-6xl font-black text-brand-dark uppercase tracking-tighter leading-none">Subscreva o <br />nosso <span className="text-brand-primary italic">manifesto</span></h2>
                     <p className="text-gray-500 font-medium max-w-sm">Receba crónicas exclusivas e convites para lançamentos literários diretamente no seu email.</p>
                     <div className="w-full max-w-md relative">
-                        <input type="email" placeholder="O seu melhor email..." className="w-full h-16 pl-8 pr-40 bg-white rounded-2xl border-none shadow-sm font-bold text-sm focus:ring-4 focus:ring-brand-primary/10" />
-                        <button className="absolute right-2 top-2 h-12 px-8 bg-brand-dark text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-brand-primary transition-all">Subscrever</button>
+                        <input
+                            type="email"
+                            value={newsletterEmail}
+                            onChange={e => setNewsletterEmail(e.target.value)}
+                            placeholder="O seu melhor email..."
+                            className="w-full h-16 pl-8 pr-40 bg-white rounded-2xl border-none shadow-sm font-bold text-sm focus:ring-4 focus:ring-brand-primary/10"
+                        />
+                        <button
+                            onClick={async () => {
+                                if (!newsletterEmail.trim()) return;
+                                setIsSubscribing(true);
+                                try {
+                                    const { subscribeToNewsletter } = await import('../services/newsletterService');
+                                    const ok = await subscribeToNewsletter(newsletterEmail.trim());
+                                    if (ok) { showToast('Subscrição realizada com sucesso!', 'success'); setNewsletterEmail(''); }
+                                    else showToast('Erro ao subscrever. Tente novamente.', 'error');
+                                } catch { showToast('Erro ao subscrever. Tente novamente.', 'error'); }
+                                finally { setIsSubscribing(false); }
+                            }}
+                            disabled={isSubscribing || !newsletterEmail.trim()}
+                            className="absolute right-2 top-2 h-12 px-8 bg-brand-dark text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-brand-primary transition-all disabled:opacity-50"
+                        >
+                            {isSubscribing ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Subscrever'}
+                        </button>
                     </div>
                 </div>
                 {/* Decorative Elements */}

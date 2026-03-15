@@ -67,6 +67,17 @@ const ProfilePage: React.FC = () => {
         navigate('/');
     };
 
+    const handleChangePassword = async () => {
+        if (!user?.email) return;
+        try {
+            const { resetPassword } = await import('../services/authService');
+            await resetPassword(user.email);
+            showToast('Email de recuperação enviado para ' + user.email, 'success');
+        } catch (error) {
+            showToast('Erro ao enviar email de recuperação.', 'error');
+        }
+    };
+
     if (loading || !user) return null; // Or loader
 
     return (
@@ -272,7 +283,10 @@ const ProfilePage: React.FC = () => {
                                     </div>
 
                                     <div className="pt-6">
-                                        <button className="text-brand-primary font-bold hover:underline text-sm">
+                                        <button
+                                            onClick={handleChangePassword}
+                                            className="text-brand-primary font-bold hover:underline text-sm"
+                                        >
                                             Alterar Palavra-passe
                                         </button>
                                     </div>
