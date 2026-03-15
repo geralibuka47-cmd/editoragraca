@@ -43,6 +43,7 @@ const AdminBooks: React.FC = () => {
         featured: false,
         digitalFileUrl: '',
         iban: '',
+        genre: '',
         accountHolder: '',
         accountNumber: '',
         express: '',
@@ -92,6 +93,7 @@ const AdminBooks: React.FC = () => {
                 stock: 0,
                 featured: false,
                 digitalFileUrl: '',
+                genre: '',
                 iban: '',
                 accountHolder: '',
                 accountNumber: '',
@@ -254,6 +256,17 @@ const AdminBooks: React.FC = () => {
                                                             onChange={e => setFormData({ ...formData, title: e.target.value })}
                                                             className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
                                                             placeholder="Título da obra"
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Gênero</label>
+                                                        <input
+                                                            required
+                                                            type="text"
+                                                            value={formData.genre}
+                                                            onChange={e => setFormData({ ...formData, genre: e.target.value })}
+                                                            className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+                                                            placeholder="Ex: Romance, Poesia, Acadêmico..."
                                                         />
                                                     </div>
                                                     <div className="grid grid-cols-2 gap-4">
