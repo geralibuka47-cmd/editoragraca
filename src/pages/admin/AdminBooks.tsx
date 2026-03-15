@@ -106,11 +106,11 @@ const AdminBooks: React.FC = () => {
     };
 
     const handleSave = async (e: React.FormEvent) => {
-        e.preventDefault();
+        if (e) e.preventDefault();
 
-        // Final Step check
+        // If clicking next in step 1 or 2
         if (currentStep < 3) {
-            setCurrentStep(prev => prev + 1);
+            handleNext();
             return;
         }
 
@@ -532,38 +532,36 @@ const AdminBooks: React.FC = () => {
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
-                            </form>
+                                <div className="p-8 border-t border-gray-50 bg-gray-50/30 flex items-center justify-between shrink-0">
+                                    <button
+                                        type="button"
+                                        onClick={currentStep === 1 ? () => setIsModalOpen(false) : handleBack}
+                                        className="px-8 py-4 bg-white text-gray-400 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:text-brand-dark transition-all border border-gray-100"
+                                    >
+                                        {currentStep === 1 ? 'Cancelar' : 'Anterior'}
+                                    </button>
 
-                            <div className="p-8 border-t border-gray-50 bg-gray-50/30 flex items-center justify-between shrink-0">
-                                <button
-                                    type="button"
-                                    onClick={currentStep === 1 ? () => setIsModalOpen(false) : handleBack}
-                                    className="px-8 py-4 bg-white text-gray-400 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:text-brand-dark transition-all border border-gray-100"
-                                >
-                                    {currentStep === 1 ? 'Cancelar' : 'Anterior'}
-                                </button>
-
-                                <div className="flex gap-4">
-                                    {currentStep < 3 ? (
-                                        <button
-                                            type="button"
-                                            onClick={handleNext}
-                                            className="px-10 py-4 bg-brand-dark text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-primary transition-all shadow-xl shadow-brand-dark/10"
-                                        >
-                                            Próximo Passo
-                                        </button>
-                                    ) : (
-                                        <button
-                                            type="submit"
-                                            disabled={isSaving}
-                                            className="px-10 py-4 bg-brand-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-dark transition-all shadow-xl shadow-brand-primary/20 flex items-center gap-3 disabled:opacity-50"
-                                        >
-                                            {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
-                                            {editingBook ? 'Guardar Alterações' : 'Publicar Obra'}
-                                        </button>
-                                    )}
+                                    <div className="flex gap-4">
+                                        {currentStep < 3 ? (
+                                            <button
+                                                type="submit"
+                                                className="px-10 py-4 bg-brand-dark text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-primary transition-all shadow-xl shadow-brand-dark/10"
+                                            >
+                                                Próximo Passo
+                                            </button>
+                                        ) : (
+                                            <button
+                                                type="submit"
+                                                disabled={isSaving}
+                                                className="px-10 py-4 bg-brand-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-dark transition-all shadow-xl shadow-brand-primary/20 flex items-center gap-3 disabled:opacity-50"
+                                            >
+                                                {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
+                                                {editingBook ? 'Guardar Alterações' : 'Publicar Obra'}
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
+                            </form>
                         </motion.div>
                     </>
                 )}
