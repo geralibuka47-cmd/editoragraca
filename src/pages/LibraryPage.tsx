@@ -95,7 +95,11 @@ const LibraryPage: React.FC<LibraryPageProps> = ({
         } else if (sortBy === 'price-desc') {
             result.sort((a, b) => b.price - a.price);
         } else if (sortBy === 'newest') {
-            result.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
+            result.sort((a, b) => {
+                const dateA = a.launchDate ? new Date(a.launchDate).getTime() : 0;
+                const dateB = b.launchDate ? new Date(b.launchDate).getTime() : 0;
+                return dateB - dateA;
+            });
         }
 
         return result;

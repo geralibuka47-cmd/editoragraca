@@ -317,6 +317,48 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                 </section>
             )}
 
+            {/* PRÓXIMOS LANÇAMENTOS */}
+            {books.filter(b => b.launchDate && new Date(b.launchDate) > new Date()).length > 0 && (
+                <section className="py-12 sm:py-16 md:py-24 bg-white px-4 sm:px-6 md:px-12 [content-visibility:auto] [contain-intrinsic-size:1px_1000px]">
+                    <div className="container mx-auto">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-8 sm:mb-16">
+                            <div>
+                                <span className="text-brand-primary font-bold uppercase tracking-widest text-[10px] sm:text-xs">Exclusivo & Antecipado</span>
+                                <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-brand-dark mt-2 uppercase tracking-tight">Próximos Lançamentos</h2>
+                            </div>
+                            <div className="flex items-center gap-2 px-4 py-2 bg-brand-primary/10 text-brand-primary rounded-full text-[10px] font-black uppercase tracking-widest">
+                                <Clock className="w-3 h-3" />
+                                <span>Em Breve</span>
+                            </div>
+                        </div>
+                        <motion.div
+                            variants={stagger}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true }}
+                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-12"
+                        >
+                            {books
+                                .filter(b => b.launchDate && new Date(b.launchDate) > new Date())
+                                .sort((a, b) => new Date(a.launchDate!).getTime() - new Date(b.launchDate!).getTime())
+                                .map(book => (
+                                    <motion.div key={book.id} variants={fadeInUp} className="relative group">
+                                        <div className="absolute -top-3 -right-3 z-20 bg-brand-primary text-white text-[8px] font-black px-3 py-1.5 rounded-full shadow-lg uppercase tracking-tighter">
+                                            {new Date(book.launchDate!).toLocaleDateString('pt-PT', { day: '2-digit', month: 'short' })}
+                                        </div>
+                                        <BookCard
+                                            book={book}
+                                            onViewDetails={onViewDetails}
+                                            onAddToCart={onAddToCart}
+                                            onToggleWishlist={onToggleWishlist}
+                                        />
+                                    </motion.div>
+                                ))}
+                        </motion.div>
+                    </div>
+                </section>
+            )}
+
             {/* LIVROS PAGOS */}
             {paidBooks.length > 0 && (
                 <section className="py-12 sm:py-16 md:py-24 bg-gray-50 px-4 sm:px-6 md:px-12 [content-visibility:auto] [contain-intrinsic-size:1px_1000px]">

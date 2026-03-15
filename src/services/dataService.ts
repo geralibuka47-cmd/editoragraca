@@ -141,7 +141,7 @@ export const getBooks = async (forceRefresh = false, limitCount?: number): Promi
     }
 
     try {
-        let q = query(collection(db, COLLECTIONS.BOOKS), orderBy('createdAt', 'desc'));
+        let q = query(collection(db, COLLECTIONS.BOOKS), orderBy('launchDate', 'desc'));
         if (limitCount) {
             q = query(q, limit(limitCount));
         }
