@@ -15,7 +15,8 @@ import {
     incrementBookView,
     checkIsFavorite,
     toggleFavorite,
-    checkDownloadAccess
+    checkDownloadAccess,
+    getUserProfile
 } from '../services/dataService';
 import { optimizeImageUrl } from '../components/OptimizedImage';
 import { useToast } from '../components/Toast';
@@ -28,7 +29,8 @@ const BookPage: React.FC<{ user?: UserType | null; cart: any[]; onAddToCart: (bo
 
     const [book, setBook] = useState<Book | null>(null);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<'sinopse' | 'extra' | 'avaliacoes'>('sinopse');
+    const [activeTab, setActiveTab] = useState<'sinopse' | 'ficha' | 'avaliacoes'>('sinopse');
+    const [authorProfile, setAuthorProfile] = useState<UserType | null>(null);
     const [stats, setStats] = useState<any>({ views: 0, rating: 0, downloads: 0, sales: 0, reviewsCount: 0 });
     const [isFavorite, setIsFavorite] = useState(false);
     const [hasDownloadAccess, setHasDownloadAccess] = useState(false);
@@ -51,17 +53,19 @@ const BookPage: React.FC<{ user?: UserType | null; cart: any[]; onAddToCart: (bo
                 }
                 setBook(fetchedBook);
 
-                const [realStats, bookReviews, favStatus, downloadAccess] = await Promise.all([
+                const [realStats, bookReviews, favStatus, downloadAccess, profile] = await Promise.all([
                     getBookStats(id),
                     getBookReviews(id),
                     user ? checkIsFavorite(id, user.id) : Promise.resolve(false),
-                    checkDownloadAccess(id, user?.id, fetchedBook.price || 0)
+                    checkDownloadAccess(id, user?.id, fetchedBook.price || 0),
+                    fetchedBook.authorId ? getUserProfile(fetchedBook.authorId) : Promise.resolve(null)
                 ]);
 
                 setStats(realStats);
                 setReviews(bookReviews);
                 setIsFavorite(favStatus);
                 setHasDownloadAccess(downloadAccess);
+                setAuthorProfile(profile);
 
                 // Track view
                 await incrementBookView(id);
@@ -347,14 +351,18 @@ const BookPage: React.FC<{ user?: UserType | null; cart: any[]; onAddToCart: (bo
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-brand-primary/10 blur-[60px] rounded-full"></div>
                                 <div className="relative z-10 space-y-6">
                                     <div className="w-20 h-20 bg-gray-800 rounded-3xl overflow-hidden border-2 border-white/10">
-                                        <img src={`https://ui-avatars.com/api/?name=${book.author}&background=C4A052&color=fff`} alt={book.author} className="w-full h-full object-cover" />
+                                        <img 
+                                            src={authorProfile?.avatarUrl || `https://ui-avatars.com/api/?name=${book.author}&background=C4A052&color=fff`} 
+                                            alt={book.author} 
+                                            className="w-full h-full object-cover" 
+                                        />
                                     </div>
                                     <div>
                                         <h4 className="text-xl font-black uppercase tracking-tight">{book.author}</h4>
                                         <p className="text-brand-primary text-[10px] font-black uppercase tracking-widest mt-1">Autor de Prestígio</p>
                                     </div>
-                                    <p className="text-xs text-gray-400 font-medium leading-relaxed italic opacity-80">
-                                        Uma das vozes emergentes na curadoria literária da Editora Graça, focada em expandir os limites da narrativa contemporânea.
+                                    <p className="text-xs text-gray-400 font-medium leading-relaxed italic opacity-80 line-clamp-4">
+                                        {authorProfile?.bio || "Uma das vozes emergentes na curadoria literária da Editora Graça, focada em expandir os limites da narrativa contemporânea."}
                                     </p>
                                 </div>
                             </div>
@@ -364,13 +372,13 @@ const BookPage: React.FC<{ user?: UserType | null; cart: any[]; onAddToCart: (bo
                         <div className="lg:col-span-8">
                             {/* Tabs Header */}
                             <div className="flex gap-4 sm:gap-10 border-b border-gray-200 mb-8 sm:mb-12 overflow-x-auto">
-                                {['sinopse', 'avaliacoes'].map((tab) => (
+                                {['sinopse', 'ficha', 'avaliacoes'].map((tab) => (
                                     <button
                                         key={tab}
                                         onClick={() => setActiveTab(tab as any)}
                                         className={`pb-4 sm:pb-6 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] transition-all relative shrink-0 min-touch ${activeTab === tab ? 'text-brand-dark' : 'text-gray-400 hover:text-gray-600'}`}
                                     >
-                                        {tab}
+                                        {tab === 'ficha' ? 'Ficha Técnica' : tab}
                                         {activeTab === tab && (
                                             <m.div layoutId="tab-underline" className="absolute bottom-0 left-0 right-0 h-1 bg-brand-primary rounded-full"></m.div>
                                         )}
@@ -397,6 +405,48 @@ const BookPage: React.FC<{ user?: UserType | null; cart: any[]; onAddToCart: (bo
                                             ) : (
                                                 <p className="italic text-gray-400">Esta obra aguarda uma sinopse oficial. Entretanto, a sua essência promete desafiar convenções e enriquecer o espírito literário.</p>
                                             )}
+                                        </div>
+                                    </m.div>
+                                ) : activeTab === 'ficha' ? (
+                                    <m.div
+                                        key="ficha"
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -20 }}
+                                        className="space-y-12"
+                                    >
+                                        <div className="flex items-center gap-4 text-brand-primary">
+                                            <BookOpen className="w-6 h-6" />
+                                            <h3 className="text-2xl font-black uppercase">Ficha Técnica da Produção</h3>
+                                        </div>
+                                        
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                                            {[
+                                                { label: 'Editor Responsável', value: book.editor },
+                                                { label: 'Diagramação', value: book.diagramador },
+                                                { label: 'Paginação', value: book.paginador },
+                                                { label: 'Arte da Capa', value: book.capa },
+                                                { label: 'Revisão Linguística', value: book.revisor },
+                                                { label: 'Projeto Gráfico', value: book.projetoGrafico },
+                                                { label: 'Unidade de Impressão', value: book.impressao },
+                                                { label: 'ISBN', value: book.isbn },
+                                                { label: 'Depósito Legal', value: book.depositoLegal },
+                                            ].map((item, i) => item.value && (
+                                                <div key={i} className="flex flex-col gap-1 border-b border-gray-100 pb-4">
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{item.label}</span>
+                                                    <span className="text-brand-dark font-bold text-lg">{item.value}</span>
+                                                </div>
+                                            ))}
+                                            
+                                            {/* Static/Extra info if needed */}
+                                            <div className="flex flex-col gap-1 border-b border-gray-100 pb-4">
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Ano de Edição</span>
+                                                <span className="text-brand-dark font-bold text-lg">{book.launchDate ? new Date(book.launchDate).getFullYear() : '2024'}</span>
+                                            </div>
+                                            <div className="flex flex-col gap-1 border-b border-gray-100 pb-4">
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Selo Editorial</span>
+                                                <span className="text-brand-dark font-bold text-lg uppercase tracking-tight">Editora Graça</span>
+                                            </div>
                                         </div>
                                     </m.div>
                                 ) : (
