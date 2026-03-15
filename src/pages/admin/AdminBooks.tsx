@@ -498,75 +498,97 @@ const AdminBooks: React.FC = () => {
                                                         {formData.format === 'digital' ? <Download className="w-6 h-6" /> : <CreditCard className="w-6 h-6" />}
                                                     </div>
                                                     <div>
-                                                        <h4 className="text-xl font-black text-brand-dark uppercase tracking-tighter">Especificações do Formato</h4>
-                                                        <p className="text-[10px] font-black uppercase tracking-widest text-brand-primary">Configurações para livro {formData.format}</p>
+                                                        <h4 className="text-xl font-black text-brand-dark uppercase tracking-tighter">Especificações da Obra</h4>
+                                                        <p className="text-[10px] font-black uppercase tracking-widest text-brand-primary">
+                                                            {formData.format === 'digital' ? 'Configurações para livro digital' : 'Configurações para livro físico'}
+                                                            {formData.price === 0 && ' (Gratuito)'}
+                                                        </p>
                                                     </div>
                                                 </div>
 
-                                                {formData.format === 'digital' ? (
-                                                    <div className="space-y-4">
-                                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Link Permanente de Download</label>
-                                                        <input
-                                                            required
-                                                            type="url"
-                                                            value={formData.digitalFileUrl}
-                                                            onChange={e => setFormData({ ...formData, digitalFileUrl: e.target.value })}
-                                                            className="w-full px-8 py-6 bg-white border-2 border-brand-primary/5 rounded-[2rem] text-sm font-bold outline-none focus:ring-4 focus:ring-brand-primary/10 transition-all"
-                                                            placeholder="URL do PDF ou ePub (Google Drive, Dropbox, etc.)"
-                                                        />
-                                                    </div>
-                                                ) : (
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                                        <div className="space-y-2">
-                                                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Titular da Conta</label>
+                                                <div className="space-y-8">
+                                                    {/* Digital Link - Always visible for digital books */}
+                                                    {formData.format === 'digital' && (
+                                                        <div className="space-y-4">
+                                                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Link Permanente de Download</label>
                                                             <input
-                                                                id="accountHolder"
-                                                                type="text"
-                                                                value={formData.accountHolder}
-                                                                onChange={e => setFormData({ ...formData, accountHolder: e.target.value })}
-                                                                className="w-full px-6 py-4 bg-white border-none rounded-2xl text-sm font-bold"
-                                                                placeholder="Nome completo"
-                                                                title="Titular da Conta"
+                                                                required
+                                                                type="url"
+                                                                value={formData.digitalFileUrl}
+                                                                onChange={e => setFormData({ ...formData, digitalFileUrl: e.target.value })}
+                                                                className="w-full px-8 py-6 bg-white border-2 border-brand-primary/5 rounded-[2rem] text-sm font-bold outline-none focus:ring-4 focus:ring-brand-primary/10 transition-all"
+                                                                placeholder="URL do PDF ou ePub (Google Drive, Dropbox, etc.)"
+                                                                title="Link de Download"
                                                             />
                                                         </div>
-                                                        <div className="space-y-2">
-                                                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">IBAN</label>
-                                                            <input
-                                                                id="accountIban"
-                                                                type="text"
-                                                                value={formData.iban}
-                                                                onChange={e => setFormData({ ...formData, iban: e.target.value })}
-                                                                className="w-full px-6 py-4 bg-white border-none rounded-2xl text-sm font-bold"
-                                                                placeholder="AO06..."
-                                                                title="IBAN"
-                                                            />
+                                                    )}
+
+                                                    {/* Payment Details - Only if price > 0 */}
+                                                    {formData.price !== undefined && formData.price > 0 ? (
+                                                        <div className="space-y-6">
+                                                            <div className="flex items-center gap-2 mb-2">
+                                                                <CreditCard className="w-4 h-4 text-brand-primary" />
+                                                                <span className="text-[10px] font-black uppercase tracking-widest text-brand-dark">Dados Bancários para Recebimento</span>
+                                                            </div>
+                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                                <div className="space-y-2">
+                                                                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Titular da Conta</label>
+                                                                    <input
+                                                                        id="accountHolder"
+                                                                        type="text"
+                                                                        value={formData.accountHolder}
+                                                                        onChange={e => setFormData({ ...formData, accountHolder: e.target.value })}
+                                                                        className="w-full px-6 py-4 bg-white border-none rounded-2xl text-sm font-bold"
+                                                                        placeholder="Nome completo"
+                                                                        title="Titular da Conta"
+                                                                    />
+                                                                </div>
+                                                                <div className="space-y-2">
+                                                                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">IBAN</label>
+                                                                    <input
+                                                                        id="accountIban"
+                                                                        type="text"
+                                                                        value={formData.iban}
+                                                                        onChange={e => setFormData({ ...formData, iban: e.target.value })}
+                                                                        className="w-full px-6 py-4 bg-white border-none rounded-2xl text-sm font-bold"
+                                                                        placeholder="AO06..."
+                                                                        title="IBAN"
+                                                                    />
+                                                                </div>
+                                                                <div className="space-y-2">
+                                                                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Número de Conta</label>
+                                                                    <input
+                                                                        id="accountNumber"
+                                                                        type="text"
+                                                                        value={formData.accountNumber}
+                                                                        onChange={e => setFormData({ ...formData, accountNumber: e.target.value })}
+                                                                        className="w-full px-6 py-4 bg-white border-none rounded-2xl text-sm font-bold"
+                                                                        placeholder="Opcional"
+                                                                        title="Número da Conta"
+                                                                    />
+                                                                </div>
+                                                                <div className="space-y-2">
+                                                                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Express</label>
+                                                                    <input
+                                                                        id="accountExpress"
+                                                                        type="text"
+                                                                        value={formData.express}
+                                                                        onChange={e => setFormData({ ...formData, express: e.target.value })}
+                                                                        className="w-full px-6 py-4 bg-white border-none rounded-2xl text-sm font-bold"
+                                                                        placeholder="Opcional"
+                                                                        title="Express"
+                                                                    />
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        <div className="space-y-2">
-                                                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Número de Conta</label>
-                                                            <input
-                                                                id="accountNumber"
-                                                                type="text"
-                                                                value={formData.accountNumber}
-                                                                onChange={e => setFormData({ ...formData, accountNumber: e.target.value })}
-                                                                className="w-full px-6 py-4 bg-white border-none rounded-2xl text-sm font-bold"
-                                                                placeholder="Opcional"
-                                                                title="Número da Conta"
-                                                            />
+                                                    ) : formData.format === 'físico' && (
+                                                        <div className="p-6 bg-white/50 rounded-2xl border border-dashed border-gray-200 text-center">
+                                                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                                                                Obra gratuita. Não são necessários dados de pagamento para este formato.
+                                                            </p>
                                                         </div>
-                                                        <div className="space-y-2">
-                                                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Express</label>
-                                                            <input
-                                                                id="accountExpress"
-                                                                type="text"
-                                                                value={formData.express}
-                                                                onChange={e => setFormData({ ...formData, express: e.target.value })}
-                                                                className="w-full px-6 py-4 bg-white border-none rounded-2xl text-sm font-bold"
-                                                                placeholder="Opcional"
-                                                                title="Express"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                )}
+                                                    )}
+                                                </div>
                                             </div>
                                         </motion.div>
                                     )}
