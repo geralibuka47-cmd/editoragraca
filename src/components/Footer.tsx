@@ -17,14 +17,16 @@ const Footer: React.FC = () => {
                             <span className="font-serif font-black text-2xl tracking-tight uppercase">EDITORA <span className="text-brand-primary">GRAÇA</span></span>
                         </div>
                         <p className="text-gray-400 leading-relaxed max-w-sm font-medium">
-                            Elevando a literatura angolana ao mundo. Obras de excelência para leitores exigentes.
+                            EDITORA GRAÇA (SU), LDA | NIF 5002078139<br />
+                            Malanje, Bairro Voanvala, rua 5, casa n.º 77
                         </p>
                         <div className="flex gap-4">
-                            {[Instagram, Facebook, Twitter, Linkedin].map((Icon, i) => (
-                                <a key={i} href="#" aria-label={`Visitar nosso ${['Instagram', 'Facebook', 'Twitter', 'LinkedIn'][i]}`} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-primary transition-colors">
-                                    <Icon className="w-4 h-4" />
-                                </a>
-                            ))}
+                            <a href="https://www.instagram.com/editoragraca" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-primary transition-colors">
+                                <Instagram className="w-4 h-4" />
+                            </a>
+                            <a href="https://web.facebook.com/gracepu47" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-primary transition-colors">
+                                <Facebook className="w-4 h-4" />
+                            </a>
                         </div>
                     </div>
 

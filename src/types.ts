@@ -50,6 +50,15 @@ export interface Book {
   paymentInfo?: string;
   paymentInfoNotes?: string;
   launchDate?: string;
+  // Technical Data (Ficha Técnica)
+  editor?: string;
+  diagramador?: string;
+  paginador?: string;
+  capa?: string;
+  revisor?: string;
+  projetoGrafico?: string;
+  impressao?: string;
+  depositoLegal?: string;
   stats?: BookStats;
   reviews?: Review[];
 }

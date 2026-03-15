@@ -47,7 +47,17 @@ const AdminBooks: React.FC = () => {
         accountHolder: '',
         accountNumber: '',
         express: '',
-        launchDate: ''
+        launchDate: '',
+        isbn: '',
+        // Technical Data
+        editor: '',
+        diagramador: '',
+        paginador: '',
+        capa: '',
+        revisor: '',
+        projetoGrafico: '',
+        impressao: '',
+        depositoLegal: ''
     });
 
     const [currentStep, setCurrentStep] = useState(1);
@@ -98,7 +108,17 @@ const AdminBooks: React.FC = () => {
                 accountHolder: '',
                 accountNumber: '',
                 express: '',
-                launchDate: ''
+                launchDate: '',
+                isbn: '',
+                // Technical Data
+                editor: '',
+                diagramador: '',
+                paginador: '',
+                capa: '',
+                revisor: '',
+                projetoGrafico: '',
+                impressao: '',
+                depositoLegal: ''
             });
             setIsNewAuthor(false);
             setNewAuthorData({ name: '', email: '', bio: '', whatsappNumber: '+244 ' });
@@ -110,8 +130,8 @@ const AdminBooks: React.FC = () => {
     const handleSave = async (e: React.FormEvent) => {
         if (e) e.preventDefault();
 
-        // If clicking next in step 1 or 2
-        if (currentStep < 3) {
+        // Final Step check
+        if (currentStep < 4) {
             handleNext();
             return;
         }
@@ -138,7 +158,7 @@ const AdminBooks: React.FC = () => {
     };
 
     const handleNext = () => {
-        if (currentStep < 3) setCurrentStep(prev => prev + 1);
+        if (currentStep < 4) setCurrentStep(prev => prev + 1);
     };
 
     const handleBack = () => {
@@ -217,7 +237,7 @@ const AdminBooks: React.FC = () => {
 
                                 {/* Progress Indicator */}
                                 <div className="flex items-center gap-4">
-                                    {[1, 2, 3].map((step) => (
+                                    {[1, 2, 3, 4].map((step) => (
                                         <div key={step} className="flex-1 flex items-center gap-3">
                                             <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-[10px] font-black transition-all ${currentStep >= step ? 'bg-brand-dark text-white' : 'bg-gray-100 text-gray-400'
                                                 }`}>
@@ -228,10 +248,11 @@ const AdminBooks: React.FC = () => {
                                         </div>
                                     ))}
                                 </div>
-                                <div className="flex justify-between mt-2 px-2 text-[8px] font-black uppercase tracking-widest text-gray-400">
-                                    <span>Geral</span>
-                                    <span>Autor</span>
-                                    <span>Detalhes</span>
+                                <div className="flex justify-between mt-2 px-2 text-[8px] font-black uppercase tracking-widest text-gray-400 text-center w-full">
+                                    <span className="w-1/4">Geral</span>
+                                    <span className="w-1/4">Autor</span>
+                                    <span className="w-1/4">Formato</span>
+                                    <span className="w-1/4">Ficha Técnica</span>
                                 </div>
                             </div>
 
@@ -544,6 +565,109 @@ const AdminBooks: React.FC = () => {
                                             </div>
                                         </motion.div>
                                     )}
+
+                                    {currentStep === 4 && (
+                                        <motion.div
+                                            key="step4"
+                                            initial={{ opacity: 0, x: 20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            exit={{ opacity: 0, x: -20 }}
+                                            className="space-y-8"
+                                        >
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Editor</label>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.editor}
+                                                        onChange={e => setFormData({ ...formData, editor: e.target.value })}
+                                                        className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+                                                        placeholder="Nome do editor"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Diagramador</label>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.diagramador}
+                                                        onChange={e => setFormData({ ...formData, diagramador: e.target.value })}
+                                                        className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+                                                        placeholder="Nome do diagramador"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Paginador</label>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.paginador}
+                                                        onChange={e => setFormData({ ...formData, paginador: e.target.value })}
+                                                        className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+                                                        placeholder="Nome do paginador"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Capa</label>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.capa}
+                                                        onChange={e => setFormData({ ...formData, capa: e.target.value })}
+                                                        className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+                                                        placeholder="Responsável pela capa"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Revisor</label>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.revisor}
+                                                        onChange={e => setFormData({ ...formData, revisor: e.target.value })}
+                                                        className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+                                                        placeholder="Nome do revisor"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Projeto Gráfico</label>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.projetoGrafico}
+                                                        onChange={e => setFormData({ ...formData, projetoGrafico: e.target.value })}
+                                                        className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+                                                        placeholder="Responsável pelo projeto gráfico"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Impressão</label>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.impressao}
+                                                        onChange={e => setFormData({ ...formData, impressao: e.target.value })}
+                                                        className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+                                                        placeholder="Local de impressão"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">ISBN</label>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.isbn}
+                                                        onChange={e => setFormData({ ...formData, isbn: e.target.value })}
+                                                        className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+                                                        placeholder="978-..."
+                                                    />
+                                                </div>
+                                                <div className="space-y-2 md:col-span-2">
+                                                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Depósito Legal</label>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.depositoLegal}
+                                                        onChange={e => setFormData({ ...formData, depositoLegal: e.target.value })}
+                                                        className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+                                                        placeholder="Número de depósito legal"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    )}
                                 </AnimatePresence>
                                 <div className="p-8 border-t border-gray-50 bg-gray-50/30 flex items-center justify-between shrink-0">
                                     <button
@@ -555,7 +679,7 @@ const AdminBooks: React.FC = () => {
                                     </button>
 
                                     <div className="flex gap-4">
-                                        {currentStep < 3 ? (
+                                        {currentStep < 4 ? (
                                             <button
                                                 type="submit"
                                                 className="px-10 py-4 bg-brand-dark text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-primary transition-all shadow-xl shadow-brand-dark/10"

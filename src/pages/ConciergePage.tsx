@@ -61,7 +61,7 @@ const ConciergePage: React.FC = () => {
         {
             icon: Phone,
             label: 'Linha Directa',
-            val: '+244 973 038 386',
+            val: '+244 973 038 386 | +244 947 472 230',
             sub: 'Disponível para consultoria imediata'
         },
         {
@@ -74,7 +74,7 @@ const ConciergePage: React.FC = () => {
             icon: MapPin,
             label: 'Atelier Físico',
             val: 'Malanje, Bairro Voanvala',
-            sub: 'Rua 5, Casa n.º 77, Angola'
+            sub: 'Rua 5, Casa n.º 77, Malanje, Angola'
         }
     ];
 
