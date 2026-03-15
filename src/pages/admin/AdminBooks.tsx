@@ -12,7 +12,8 @@ import {
     Eye,
     Loader2,
     ShoppingBag,
-    Image
+    Image,
+    CreditCard
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getBooks, saveBook, deleteBook, getAuthors } from '../../services/dataService';
