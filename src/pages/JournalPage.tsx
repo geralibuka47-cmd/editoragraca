@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import SEO from '../components/SEO';
 import { PageHero } from '../components/PageHero';
 import { useToast } from '../components/Toast';
+import AdUnit from '../components/AdUnit';
 
 interface JournalPageProps {
     user: UserType | null;
@@ -192,7 +193,7 @@ const JournalPage: React.FC<JournalPageProps> = ({ user }) => {
                     </div>
 
                     {/* Article Body */}
-                    <main className="py-24 container mx-auto px-6 md:px-12">
+                    <main className="py-16 container mx-auto px-6 md:px-12">
                         <div className="max-w-3xl mx-auto">
                             <div className="space-y-10">
                                 {selectedPost.content.split('\n').filter(p => p.trim()).map((para, i) => (
@@ -200,6 +201,15 @@ const JournalPage: React.FC<JournalPageProps> = ({ user }) => {
                                         {para}
                                     </p>
                                 ))}
+                            </div>
+
+                            {/* AD — Dentro do Artigo */}
+                            <div className="my-12">
+                                <AdUnit
+                                    slot="SLOT_ARTICLE"
+                                    format="rectangle"
+                                    className="max-w-lg mx-auto"
+                                />
                             </div>
 
                             {/* Interaction Zone */}
@@ -379,6 +389,17 @@ const JournalPage: React.FC<JournalPageProps> = ({ user }) => {
                     </div>
                 </section>
             )}
+
+            {/* AD — Entre Feed e Newsletter */}
+            <div className="py-8 bg-white">
+                <div className="container mx-auto px-6 md:px-12">
+                    <AdUnit
+                        slot="SLOT_BLOG_HORIZONTAL"
+                        format="horizontal"
+                        className="max-w-4xl mx-auto"
+                    />
+                </div>
+            </div>
 
             {/* Newsletter Hook */}
             <section className="py-24 bg-brand-light relative overflow-hidden">

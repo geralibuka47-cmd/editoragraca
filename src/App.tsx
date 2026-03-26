@@ -9,6 +9,7 @@ import { getBooksMinimal } from './services/dataService';
 import { logout as authLogout } from './services/authService';
 import { Loader2 } from 'lucide-react';
 import WhatsAppBubble from './components/WhatsAppBubble';
+import AnnouncementBar from './components/AnnouncementBar';
 import { useAuth } from './contexts/AuthContext';
 import ErrorBoundary from './components/ErrorBoundary';
 
@@ -75,10 +76,14 @@ const AppContent: React.FC = () => {
         const saved = localStorage.getItem('cart');
         return saved ? JSON.parse(saved) : [];
     });
+    const [announcementVisible, setAnnouncementVisible] = useState(false);
     const { showToast } = useToast();
     const navigate = useNavigate();
     const location = useLocation();
     const { user } = useAuth();
+
+    // Altura do AnnouncementBar (py-2.5 = ~42px)
+    const ANNOUNCEMENT_HEIGHT = 42;
 
     // Sync cart to local storage
     useEffect(() => {
@@ -146,12 +151,14 @@ const AppContent: React.FC = () => {
 
     const isDashboardRoute = location.pathname.startsWith('/admin') || location.pathname.startsWith('/perfil');
     const showShell = !isDashboardRoute;
+    const topOffset = showShell && announcementVisible ? ANNOUNCEMENT_HEIGHT : 0;
 
     return (
         <div className="flex flex-col min-h-screen">
             <ScrollToTop />
             {showShell && (
                 <>
+                    <AnnouncementBar onVisibilityChange={setAnnouncementVisible} />
                     <a
                         href="#main-content"
                         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-3 focus:bg-brand-primary focus:text-white focus:font-bold focus:rounded-lg focus:shadow-lg focus:text-sm min-touch"
@@ -163,6 +170,7 @@ const AppContent: React.FC = () => {
                         onNavigate={(path) => navigate(path)}
                         user={user}
                         currentView={location.pathname}
+                        announcementOffset={topOffset}
                         onLogout={async () => {
                             await authLogout();
                             navigate('/');
@@ -173,7 +181,8 @@ const AppContent: React.FC = () => {
 
             <main
                 id="main-content"
-                className={`flex-grow flex flex-col min-h-0 ${showShell ? 'pt-16 sm:pt-20 md:pt-24' : ''}`}
+                className="flex-grow flex flex-col min-h-0"
+                style={showShell ? { paddingTop: `calc(${topOffset}px + clamp(64px, 6vw, 96px))` } : {}}
                 tabIndex={-1}
             >
                 <React.Suspense fallback={

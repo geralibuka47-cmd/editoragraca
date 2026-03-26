@@ -10,6 +10,7 @@ import BookCard from '../components/BookCard';
 import { getPublicStats, getBlogPosts, getSiteContent, getTestimonials, getTeamMembers } from '../services/dataService';
 import { OptimizedImage, optimizeImageUrl } from '../components/OptimizedImage';
 import SEO from '../components/SEO';
+import AdUnit from '../components/AdUnit';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -125,9 +126,9 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                         variants={stagger}
                         className="space-y-8"
                     >
-                        <motion.div variants={fadeInUp} className="inline-flex items-center gap-3 px-4 py-2 bg-brand-dark text-white rounded-lg text-xs font-bold uppercase tracking-widest">
-                            <Zap className="w-4 h-4 text-brand-primary" />
-                            <span>Nova Era Editorial</span>
+                        <motion.div variants={fadeInUp} className="inline-flex items-center gap-3 px-4 py-2 bg-brand-primary text-white rounded-lg text-xs font-bold uppercase tracking-widest shadow-lg shadow-brand-primary/30">
+                            <Zap className="w-4 h-4 text-white animate-pulse" />
+                            <span>🎉 Lançamento Oficial — Já Online</span>
                         </motion.div>
 
                         <motion.h1 variants={fadeInUp} className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black uppercase leading-[0.9] tracking-tighter">
@@ -282,6 +283,17 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                 </section>
             )}
 
+            {/* AD UNIT — Entre Físicos e E-Books */}
+            <div className="py-8 px-4 sm:px-6 md:px-12 bg-white">
+                <div className="container mx-auto">
+                    <AdUnit
+                        slot="SLOT_HORIZONTAL_1"
+                        format="horizontal"
+                        className="max-w-4xl mx-auto"
+                    />
+                </div>
+            </div>
+
             {/* E-BOOKS */}
             {ebooks.length > 0 && (
                 <section className="py-12 sm:py-16 md:py-24 bg-white px-4 sm:px-6 md:px-12 [content-visibility:auto] [contain-intrinsic-size:1px_1000px]">
@@ -429,7 +441,18 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                 </section>
             )}
 
-            {/* 3. EXPERIENCE SECTION - Black Blocks */}
+            {/* AD UNIT — Entre Gratuitos e Experiência */}
+            <div className="py-8 px-4 sm:px-6 md:px-12 bg-gray-50">
+                <div className="container mx-auto">
+                    <AdUnit
+                        slot="SLOT_HORIZONTAL_2"
+                        format="auto"
+                        className="max-w-4xl mx-auto"
+                    />
+                </div>
+            </div>
+
+            {/* 3. EXPERIENCE SECTION */}
             <section className="py-16 sm:py-24 md:py-32 bg-brand-dark text-white px-4 sm:px-6 md:px-12 relative overflow-hidden [content-visibility:auto] [contain-intrinsic-size:1px_800px]">
                 <div className="absolute top-0 right-0 w-full h-full opacity-10 pointer-events-none">
                     <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-brand-primary blur-[120px] rounded-full"></div>

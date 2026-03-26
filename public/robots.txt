@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin/
+Disallow: /perfil/
+Disallow: /carrinho/
+
+Sitemap: https://editoragraca.com/sitemap.xml

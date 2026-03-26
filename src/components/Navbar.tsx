@@ -13,9 +13,10 @@ interface NavbarProps {
     cartCount: number;
     user: UserType | null;
     onLogout: () => void;
+    announcementOffset?: number;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, user, onLogout }) => {
+const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, user, onLogout, announcementOffset = 0 }) => {
     const location = useLocation();
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
     const [isSearchOpen, setIsSearchOpen] = React.useState(false);
@@ -81,7 +82,10 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
     ];
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100 shadow-sm h-16 sm:h-20 md:h-24 flex items-center transition-all safe-area-top">
+        <header
+            className="fixed left-0 right-0 z-50 bg-white border-b border-gray-100 shadow-sm h-16 sm:h-20 md:h-24 flex items-center transition-all safe-area-top"
+            style={{ top: `${announcementOffset}px` }}
+        >
             <div className="container mx-auto px-4 sm:px-6 md:px-12 flex justify-between items-center h-full gap-2">
                 {/* 1. Brand Identity - Clean & Iconic */}
                 <Link
