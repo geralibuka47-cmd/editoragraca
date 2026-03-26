@@ -228,14 +228,14 @@ export const deleteBook = async (id: string) => {
         console.log('--- DIAGNÓSTICO DELETAR ---');
         console.log('ID alvo:', id);
         console.log('Coleção:', COLLECTIONS.BOOKS);
-        
+
         if (!id) {
             throw new Error('ID do livro é inválido ou nulo');
         }
 
         await deleteDoc(doc(db, COLLECTIONS.BOOKS, id));
         console.log('Sucesso na deleção do documento');
-        
+
         // Invalidate cache
         booksCache = null;
         lastBooksFetch = 0;
@@ -901,7 +901,8 @@ export const getSiteContent = async (section?: string) => {
 
         snapshot.docs.forEach(doc => {
             const data = doc.data();
-            contentMap[data.key] = data.content;
+            // Use composite key to avoid clashes between sections
+            contentMap[`${data.section}.${data.key}`] = data.content;
         });
 
         siteContentCache.set(cacheKey, contentMap);

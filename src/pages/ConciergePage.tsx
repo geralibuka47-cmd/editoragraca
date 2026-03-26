@@ -26,8 +26,13 @@ const contactSchema = z.object({
 
 type ContactFormData = z.infer<typeof contactSchema>;
 
-const ConciergePage: React.FC = () => {
+interface ConciergePageProps {
+    siteContent?: Record<string, any>;
+}
+
+const ConciergePage: React.FC<ConciergePageProps> = ({ siteContent = {} }) => {
     const [formStatus, setFormStatus] = useState<'idle' | 'success' | 'error'>('idle');
+    const general = siteContent['general.config'] || {};
 
     const {
         register,
@@ -61,20 +66,20 @@ const ConciergePage: React.FC = () => {
         {
             icon: Phone,
             label: 'Linha Directa',
-            val: '+244 973 038 386 | +244 947 472 230',
+            val: general.contactPhone || '+244 973 038 386 | +244 947 472 230',
             sub: 'Disponível para consultoria imediata'
         },
         {
             icon: Mail,
             label: 'Correio Digital',
-            val: 'geraleditoragraca@gmail.com',
+            val: general.contactEmail || 'geraleditoragraca@gmail.com',
             sub: 'Resposta garantida em 24h úteis'
         },
         {
             icon: MapPin,
             label: 'Atelier Físico',
-            val: 'Malanje, Bairro Voanvala',
-            sub: 'Rua 5, Casa n.º 77, Malanje, Angola'
+            val: general.address || 'Malanje, Bairro Voanvala',
+            sub: general.addressDetail || 'Rua 5, Casa n.º 77, Malanje, Angola'
         }
     ];
 

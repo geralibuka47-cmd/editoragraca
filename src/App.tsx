@@ -5,7 +5,10 @@ import Footer from './components/Footer';
 import { LazyMotion, domAnimation } from 'framer-motion';
 import { ToastProvider, useToast } from './components/Toast';
 import { Book } from './types';
-import { getBooksMinimal } from './services/dataService';
+import {
+    getBooksMinimal,
+    getSiteContent,
+} from './services/dataService';
 import { logout as authLogout } from './services/authService';
 import { Loader2 } from 'lucide-react';
 import WhatsAppBubble from './components/WhatsAppBubble';
@@ -71,6 +74,7 @@ const ProtectedRoute = ({ children, allowedRoles }: { children: React.ReactNode,
 
 const AppContent: React.FC = () => {
     const [books, setBooks] = useState<Book[]>([]);
+    const [siteContent, setSiteContent] = useState<Record<string, any>>({});
     const [dataLoading, setDataLoading] = useState(true);
     const [cart, setCart] = useState<any[]>(() => {
         const saved = localStorage.getItem('cart');
@@ -95,10 +99,14 @@ const AppContent: React.FC = () => {
         const loadData = async () => {
             setDataLoading(true);
             try {
-                const fetchedBooks = await getBooksMinimal();
+                const [fetchedBooks, fetchedContent] = await Promise.all([
+                    getBooksMinimal(),
+                    getSiteContent()
+                ]);
                 setBooks(fetchedBooks);
+                setSiteContent(fetchedContent);
             } catch (error) {
-                console.error("Failed to fetch books:", error);
+                console.error("Failed to fetch initial data:", error);
             } finally {
                 setDataLoading(false);
             }
@@ -216,10 +224,10 @@ const AppContent: React.FC = () => {
                                 onAddToCart={(b) => handleAction('ADD_TO_CART', b)}
                             />
                         } />
-                        <Route path="/sobre" element={<HeritagePage />} />
-                        <Route path="/contacto" element={<ConciergePage />} />
-                        <Route path="/projetos" element={<ExhibitionPage />} />
-                        <Route path="/servicos" element={<AtelierPage />} />
+                        <Route path="/sobre" element={<HeritagePage siteContent={siteContent} />} />
+                        <Route path="/contacto" element={<ConciergePage siteContent={siteContent} />} />
+                        <Route path="/projetos" element={<ExhibitionPage siteContent={siteContent} />} />
+                        <Route path="/servicos" element={<AtelierPage siteContent={siteContent} />} />
                         <Route path="/blog" element={<JournalPage user={user} />} />
                         <Route path="/equipa/:id" element={<MemberDetailPage />} />
                         <Route path="/login" element={<LoginPage />} />
@@ -263,7 +271,7 @@ const AppContent: React.FC = () => {
                 </React.Suspense>
             </main>
 
-            {showShell && <Footer />}
+            {showShell && <Footer content={siteContent} />}
             {showShell && <WhatsAppBubble />}
         </div >
 

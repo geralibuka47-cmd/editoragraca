@@ -13,10 +13,13 @@ import SEO from '../components/SEO';
 import { OptimizedImage } from '../components/OptimizedImage';
 import niltonGracaImg from '../assets/imagens/niltongraca.png';
 
-const HeritagePage: React.FC = () => {
+interface HeritagePageProps {
+    siteContent?: Record<string, any>;
+}
+
+const HeritagePage: React.FC<HeritagePageProps> = ({ siteContent = {} }) => {
     const navigate = useNavigate();
-    const [siteContent, setSiteContent] = useState<any>({});
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
 
     const iconMap: Record<string, any> = {
         'BookOpen': BookOpen,
@@ -31,20 +34,6 @@ const HeritagePage: React.FC = () => {
         'MapPin': MapPin
     };
 
-    useEffect(() => {
-        const loadContent = async () => {
-            setIsLoading(true);
-            try {
-                const content = await getSiteContent('about');
-                setSiteContent(content);
-            } catch (error) {
-                console.error("Erro ao carregar conteúdo institucional:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        loadContent();
-    }, []);
 
     const timeline = siteContent['about.timeline'] || [
         { year: '2020', title: 'A Génese', desc: 'Fundação por Nilton Graça, unindo design e literatura.' },
@@ -62,7 +51,7 @@ const HeritagePage: React.FC = () => {
 
             <PageHero
                 title={<>Sobre <br /><span className="text-brand-primary italic font-serif font-normal lowercase text-4xl sm:text-6xl md:text-8xl">Nós</span></>}
-                subtitle="Não somos apenas uma editora; somos os arquitetos de um novo renascimento intelectual angolano, onde a estética e o rigor convergem."
+                subtitle={siteContent['about.hero_subtitle'] || "Não somos apenas uma editora; somos os arquitetos de um novo renascimento intelectual angolano, onde a estética e o rigor convergem."}
                 breadcrumb={[{ label: 'Nossa História' }]}
                 decorativeText="SOBRE NÓS"
                 titleClassName="text-4xl sm:text-5xl md:text-7xl lg:text-[10rem] font-black uppercase leading-[0.8] tracking-tighter mb-4"

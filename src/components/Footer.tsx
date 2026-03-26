@@ -4,7 +4,15 @@ import { Facebook, Instagram, Twitter, Linkedin, Heart, ArrowRight, Loader2 } fr
 import { Link } from 'react-router-dom';
 import { getInstagramPosts, InstagramPost } from '../services/instagramService';
 
-const Footer: React.FC = () => {
+interface FooterProps {
+    content?: Record<string, any>;
+}
+
+const Footer: React.FC<FooterProps> = ({ content = {} }) => {
+    const general = content['general.config'] || {};
+    const social = content['social.links'] || {};
+    const footerDesc = content['footer.description'] || 'EDITORA GRAÇA (SU), LDA | NIF 5002078139';
+
     return (
         <footer className="bg-brand-dark text-white pt-12 sm:pt-16 md:pt-24 pb-8 sm:pb-12 border-t border-white/5 font-sans safe-area-bottom">
             <div className="container mx-auto px-4 sm:px-6 md:px-12">
@@ -17,16 +25,25 @@ const Footer: React.FC = () => {
                             <span className="font-serif font-black text-2xl tracking-tight uppercase">EDITORA <span className="text-brand-primary">GRAÇA</span></span>
                         </div>
                         <p className="text-gray-400 leading-relaxed max-w-sm font-medium">
-                            EDITORA GRAÇA (SU), LDA | NIF 5002078139<br />
-                            Malanje, Bairro Voanvala, rua 5, casa n.º 77
+                            {footerDesc}<br />
+                            {general.address || 'Malanje, Angola'}
                         </p>
                         <div className="flex gap-4">
-                            <a href="https://www.instagram.com/editoragraca" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-primary transition-colors">
-                                <Instagram className="w-4 h-4" />
-                            </a>
-                            <a href="https://web.facebook.com/gracepu47" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-primary transition-colors">
-                                <Facebook className="w-4 h-4" />
-                            </a>
+                            {social.instagram && (
+                                <a href={social.instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-primary transition-colors">
+                                    <Instagram className="w-4 h-4" />
+                                </a>
+                            )}
+                            {social.facebook && (
+                                <a href={social.facebook} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-primary transition-colors">
+                                    <Facebook className="w-4 h-4" />
+                                </a>
+                            )}
+                            {social.linkedin && (
+                                <a href={social.linkedin} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-primary transition-colors">
+                                    <Linkedin className="w-4 h-4" />
+                                </a>
+                            )}
                         </div>
                     </div>
 

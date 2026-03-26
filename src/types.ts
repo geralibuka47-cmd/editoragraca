@@ -98,8 +98,10 @@ export interface EditorialService {
   title: string;
   price: string;
   details: string[];
+  description?: string;
   icon?: string;
   displayOrder?: number;
+  isActive?: boolean;
 }
 
 export interface TeamMember {

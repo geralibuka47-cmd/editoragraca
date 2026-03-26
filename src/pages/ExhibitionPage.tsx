@@ -11,7 +11,11 @@ import { PageHero } from '../components/PageHero';
 import SEO from '../components/SEO';
 import { OptimizedImage } from '../components/OptimizedImage';
 
-const ExhibitionPage: React.FC = () => {
+interface ExhibitionPageProps {
+    siteContent?: Record<string, any>;
+}
+
+const ExhibitionPage: React.FC<ExhibitionPageProps> = ({ siteContent = {} }) => {
     const [activeTab, setActiveTab] = useState<'academia' | 'fundacao' | 'play'>('academia');
     const [episodes, setEpisodes] = useState<PodcastEpisode[]>([]);
     const [loadingEpisodes, setLoadingEpisodes] = useState(false);

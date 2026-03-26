@@ -13,10 +13,13 @@ import BudgetGenerator from '../components/BudgetGenerator';
 import { PageHero } from '../components/PageHero';
 import SEO from '../components/SEO';
 
-const AtelierPage: React.FC = () => {
+interface AtelierPageProps {
+    siteContent?: Record<string, any>;
+}
+
+const AtelierPage: React.FC<AtelierPageProps> = ({ siteContent = {} }) => {
     const navigate = useNavigate();
     const [services, setServices] = useState<EditorialService[]>([]);
-    const [siteContent, setSiteContent] = useState<any>({});
     const [isLoading, setIsLoading] = useState(true);
 
     const FALLBACK_SERVICES: any[] = [
@@ -104,12 +107,8 @@ const AtelierPage: React.FC = () => {
         const loadData = async () => {
             setIsLoading(true);
             try {
-                const [servicesData, content] = await Promise.all([
-                    getEditorialServices(),
-                    getSiteContent('services')
-                ]);
+                const servicesData = await getEditorialServices();
                 setServices(servicesData.length > 0 ? servicesData : FALLBACK_SERVICES as any);
-                setSiteContent(content);
             } catch (error) {
                 console.error("Erro ao carregar serviços do atelier:", error);
                 setServices(FALLBACK_SERVICES as any);

@@ -19,6 +19,7 @@ import { useToast } from '../components/Toast';
 interface HomePageProps {
     books: Book[];
     loading: boolean;
+    siteContent?: Record<string, any>;
     onViewDetails: (book: Book) => void;
     onAddToCart: (book: Book) => void;
     onToggleWishlist: (book: Book) => void;
@@ -31,10 +32,9 @@ const newsletterSchema = z.object({
 
 type NewsletterFormData = z.infer<typeof newsletterSchema>;
 
-const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAddToCart, onToggleWishlist, onNavigate }) => {
+const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, onViewDetails, onAddToCart, onToggleWishlist, onNavigate }) => {
     const [stats, setStats] = useState({ booksCount: 0, authorsCount: 0, readersCount: 0 });
     const [recentPosts, setRecentPosts] = useState<BlogPost[]>([]);
-    const [siteContent, setSiteContent] = useState<any>({});
     const [authors, setAuthors] = useState<any[]>([]);
     const navigate = useNavigate();
     const { showToast } = useToast();
@@ -46,15 +46,13 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
     useEffect(() => {
         const loadData = async () => {
             try {
-                const [s, b, content, team] = await Promise.all([
+                const [s, b, team] = await Promise.all([
                     getPublicStats(),
                     getBlogPosts(),
-                    getSiteContent('home'),
                     getTeamMembers()
                 ]);
                 setStats(s);
                 setRecentPosts(b ? b.slice(0, 3) : []);
-                setSiteContent(content || {});
                 setAuthors(team || []);
             } catch (error) {
                 console.error("Error loading home data:", error);
@@ -113,7 +111,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
         <div className="bg-white overflow-hidden font-sans text-brand-dark">
             <SEO
                 title="Página Inicial"
-                description={siteContent['hero.description']}
+                description={siteContent['home.hero_subtitle'] || "Curadoria de excelência literária."}
             />
             {/* 1. HERO SECTION - Bold & Geometric */}
             <section className="min-h-screen pt-20 sm:pt-24 md:pt-32 pb-12 sm:pb-20 px-4 sm:px-6 md:px-12 flex items-center relative">
@@ -132,14 +130,14 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
                         </motion.div>
 
                         <motion.h1 variants={fadeInUp} className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black uppercase leading-[0.9] tracking-tighter">
-                            {siteContent['home.hero.title'] || "Onde a Arte"} <br />
+                            {siteContent['home.hero_title'] || "Onde a Arte"} <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-amber-600">
-                                {siteContent['home.hero.subtitle'] || "Encontra o Legado"}
+                                {siteContent['home.hero_subtitle'] || "Encontra o Legado"}
                             </span>
                         </motion.h1>
 
                         <motion.p variants={fadeInUp} className="text-base sm:text-xl md:text-2xl text-gray-500 font-medium max-w-lg leading-relaxed">
-                            {siteContent['hero.description'] || "Curadoria de excelência para leitores que exigem o extraordinário."}
+                            {siteContent['home.hero_subtitle'] || "Curadoria de excelência para leitores que exigem o extraordinário."}
                         </motion.p>
 
                         <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 pt-4">
@@ -554,8 +552,12 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, onViewDetails, onAd
             <section className="py-12 sm:py-16 md:py-24 bg-brand-dark px-4 sm:px-6 md:px-12 border-t border-white/10">
                 <div className="container mx-auto text-center max-w-3xl">
                     <Mail className="w-10 h-10 sm:w-12 sm:h-12 text-brand-primary mx-auto mb-4 sm:mb-6" />
-                    <h2 className="text-2xl sm:text-3xl md:text-5xl font-black text-white mb-4 sm:mb-6 uppercase tracking-tight">Fique a par das novidades</h2>
-                    <p className="text-gray-400 mb-6 sm:mb-10 text-sm sm:text-lg">Junte-se à nossa lista exclusiva de leitores e receba atualizações sobre lançamentos.</p>
+                    <h2 className="text-2xl sm:text-3xl md:text-5xl font-black text-white mb-4 sm:mb-6 uppercase tracking-tight">
+                        {siteContent['newsletter.title'] || "Fique a par das novidades"}
+                    </h2>
+                    <p className="text-gray-400 mb-6 sm:mb-10 text-sm sm:text-lg">
+                        {siteContent['newsletter.subtitle'] || "Junte-se à nossa lista exclusiva de leitores e receba atualizações sobre lançamentos."}
+                    </p>
 
                     <form onSubmit={handleSubmit(onSubscribe)} className="flex flex-col sm:flex-row gap-3 sm:gap-4 relative z-10 w-full">
                         <div className="flex-1">
