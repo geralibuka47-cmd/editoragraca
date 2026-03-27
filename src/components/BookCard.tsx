@@ -25,6 +25,7 @@ const BookCard: React.FC<BookCardProps> = ({ book, onAddToCart, onViewDetails, o
                     alt={book.title}
                     className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110 group-hover:rotate-1"
                     width={400}
+                    aspectRatio="book"
                 />
 
                 {/* Status Badges */}

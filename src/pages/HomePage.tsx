@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, ShoppingCart, Star, ChevronLeft, ChevronRight, Play, Download, Loader2, ArrowRight, Clock, CheckCircle, Mail, Zap, TrendingUp } from 'lucide-react';
+import { BookOpen, ShoppingCart, Star, ChevronLeft, ChevronRight, Play, Download, Loader2, ArrowRight, Clock, CheckCircle, Mail, Zap, TrendingUp, Eye, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
@@ -62,26 +62,54 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
         loadData();
     }, []);
 
-    // 1. Reading of the Month (Leitura do Mês)
-    const readingOfMonth = books.find(b => b.featured) || books[0];
+    const now = new Date();
+    const releasedBooks = books.filter(b => !b.launchDate || new Date(b.launchDate) <= now);
+    const futureBooks = books.filter(b => b.launchDate && new Date(b.launchDate) > now);
+
+    // 1. Reading of the Month (Leitura do Mês) - Must be a released book
+    const readingOfMonth = (releasedBooks.find(b => b.featured) || releasedBooks[0]);
 
     // 2. Author of the Month (Autor do Mês)
     const authorOfMonth = authors.find(a => a.featured) || authors[0];
 
-    // 3. Most Downloaded (Livro mais baixado)
-    const mostDownloaded = [...books]
-        .filter(b => b.format === 'digital' && b.stats?.downloads)
-        .sort((a, b) => (b.stats?.downloads || 0) - (a.stats?.downloads || 0))[0] ||
-        books.find(b => b.format === 'digital');
+    // 3. Most Downloaded (Livro mais baixado) - Mandatory > 0 downloads
+    const mostDownloadedBooks = [...releasedBooks]
+        .filter(b => b.stats?.downloads && b.stats.downloads > 0)
+        .sort((a, b) => (b.stats?.downloads || 0) - (a.stats?.downloads || 0));
 
-    // 4. Categories
-    const ebooks = books.filter(b => b.format === 'digital').slice(0, 4);
-    const physicalBooks = books.filter(b => b.format === 'físico').slice(0, 4);
-    const freeBooks = books.filter(b => b.price === 0).slice(0, 4);
-    const paidBooks = books.filter(b => b.price > 0).slice(0, 4);
+    const mostDownloaded = mostDownloadedBooks[0] || null;
 
-    const upcomingLaunch = books
-        .filter(b => b.launchDate && new Date(b.launchDate) > new Date())
+    // 4. Most Viewed (Mais Visto)
+    const mostViewed = [...releasedBooks]
+        .filter(b => b.stats?.views && b.stats.views > 0)
+        .sort((a, b) => (b.stats?.views || 0) - (a.stats?.views || 0))
+        .slice(0, 4);
+
+    // 5. Success Authors (Autores com mais downloads/vendas)
+    const authorStatsMap = new Map<string, { author: string, count: number, id: string, photo?: string }>();
+    releasedBooks.forEach(b => {
+        const count = (b.stats?.copiesSold || 0) + (b.stats?.downloads || 0);
+        if (count > 0) {
+            const key = b.authorId || b.author;
+            const current = authorStatsMap.get(key) || { author: b.author, id: b.authorId || '', count: 0 };
+            authorStatsMap.set(key, { ...current, count: current.count + count });
+        }
+    });
+    const topAuthors = Array.from(authorStatsMap.values())
+        .sort((a, b) => b.count - a.count)
+        .map(ts => ({
+            ...ts,
+            details: authors.find(a => a.id === ts.id || a.name === ts.author)
+        }))
+        .slice(0, 3);
+
+    // Categories (Only released)
+    const ebooks = releasedBooks.filter(b => b.format === 'digital').slice(0, 4);
+    const physicalBooks = releasedBooks.filter(b => b.format === 'físico').slice(0, 4);
+    const freeBooks = releasedBooks.filter(b => b.price === 0).slice(0, 4);
+    const paidBooks = releasedBooks.filter(b => b.price > 0).slice(0, 4);
+
+    const upcomingLaunch = futureBooks
         .sort((a, b) => new Date(a.launchDate!).getTime() - new Date(b.launchDate!).getTime())[0];
 
     // Get Featured Book (Hero)
@@ -185,6 +213,8 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
                                         alt={featuredBook.title}
                                         width={450}
                                         className="relative w-full rounded-2xl shadow-2xl transition-transform duration-500 group-hover:-translate-y-4"
+                                        priority={true}
+                                        aspectRatio="book"
                                     />
                                 </div>
                             )}
@@ -328,18 +358,18 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
                 </section>
             )}
 
-            {/* PRÓXIMOS LANÇAMENTOS */}
-            {books.filter(b => b.launchDate && new Date(b.launchDate) > new Date()).length > 0 && (
-                <section className="py-12 sm:py-16 md:py-24 bg-white px-4 sm:px-6 md:px-12 [content-visibility:auto] [contain-intrinsic-size:1px_1000px]">
+            {/* MAIS VISTOS */}
+            {mostViewed.length > 0 && (
+                <section className="py-12 sm:py-16 md:py-24 bg-white px-4 sm:px-6 md:px-12">
                     <div className="container mx-auto">
                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-8 sm:mb-16">
                             <div>
-                                <span className="text-brand-primary font-bold uppercase tracking-widest text-[10px] sm:text-xs">Exclusivo & Antecipado</span>
-                                <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-brand-dark mt-2 uppercase tracking-tight">Próximos Lançamentos</h2>
+                                <span className="text-brand-primary font-bold uppercase tracking-widest text-[10px] sm:text-xs">Tendências do Acervo</span>
+                                <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-brand-dark mt-2 uppercase tracking-tight">Obras Mais Vistas</h2>
                             </div>
-                            <div className="flex items-center gap-2 px-4 py-2 bg-brand-primary/10 text-brand-primary rounded-full text-[10px] font-black uppercase tracking-widest">
-                                <Clock className="w-3 h-3" />
-                                <span>Em Breve</span>
+                            <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-500 rounded-full text-[10px] font-black uppercase tracking-widest">
+                                <Eye className="w-3 h-3" />
+                                <span>Curiosidade em Alta</span>
                             </div>
                         </div>
                         <motion.div
@@ -349,35 +379,71 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
                             viewport={{ once: true }}
                             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-12"
                         >
-                            {books
-                                .filter(b => b.launchDate && new Date(b.launchDate) > new Date())
-                                .sort((a, b) => new Date(a.launchDate!).getTime() - new Date(b.launchDate!).getTime())
-                                .map(book => (
-                                    <motion.div key={book.id} variants={fadeInUp} className="relative group">
-                                        <div className="absolute -top-3 -right-3 z-20 bg-brand-primary text-white text-[8px] font-black px-3 py-1.5 rounded-full shadow-lg uppercase tracking-tighter">
-                                            {new Date(book.launchDate!).toLocaleDateString('pt-PT', { day: '2-digit', month: 'short' })}
-                                        </div>
-                                        <BookCard
-                                            book={book}
-                                            onViewDetails={onViewDetails}
-                                            onAddToCart={onAddToCart}
-                                            onToggleWishlist={onToggleWishlist}
-                                        />
-                                    </motion.div>
-                                ))}
+                            {mostViewed.map(book => (
+                                <motion.div key={book.id} variants={fadeInUp}>
+                                    <BookCard
+                                        book={book}
+                                        onViewDetails={onViewDetails}
+                                        onAddToCart={onAddToCart}
+                                        onToggleWishlist={onToggleWishlist}
+                                    />
+                                </motion.div>
+                            ))}
                         </motion.div>
+                    </div>
+                </section>
+            )}
+
+            {/* AUTORES DE SUCESSO */}
+            {topAuthors.length > 0 && (
+                <section className="py-12 sm:py-16 md:py-24 bg-gray-50 px-4 sm:px-6 md:px-12">
+                    <div className="container mx-auto">
+                        <div className="text-center mb-12 sm:mb-20">
+                            <span className="text-brand-primary font-bold uppercase tracking-widest text-[10px] sm:text-xs">Elite Intelectual</span>
+                            <h2 className="text-3xl sm:text-5xl md:text-6xl font-black text-brand-dark mt-2 uppercase tracking-tighter">Autores de Sucesso</h2>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            {topAuthors.map((ta, i) => (
+                                <motion.div
+                                    key={ta.id || i}
+                                    initial={{ opacity: 0, y: 30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: i * 0.1 }}
+                                    viewport={{ once: true }}
+                                    className="bg-white p-8 rounded-[2.5rem] border border-gray-100 hover:shadow-2xl transition-all group relative overflow-hidden"
+                                >
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-brand-primary/5 blur-[60px] rounded-full group-hover:bg-brand-primary/10 transition-colors" />
+                                    <div className="flex flex-col items-center text-center space-y-6 relative z-10">
+                                        <div className="w-24 h-24 bg-gray-100 rounded-3xl overflow-hidden border-4 border-white shadow-lg">
+                                            <img
+                                                src={ta.details?.imageUrl || `https://ui-avatars.com/api/?name=${ta.author}&background=C4A052&color=fff`}
+                                                alt={ta.author}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-xl font-black text-brand-dark uppercase tracking-tight">{ta.author}</h3>
+                                            <p className="text-brand-primary text-[10px] font-black uppercase tracking-widest mt-1">Líder de Preferência</p>
+                                        </div>
+                                        <div className="px-6 py-3 bg-brand-dark text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em]">
+                                            {ta.count} Obras Circuladas
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
                     </div>
                 </section>
             )}
 
             {/* LIVROS PAGOS */}
             {paidBooks.length > 0 && (
-                <section className="py-12 sm:py-16 md:py-24 bg-gray-50 px-4 sm:px-6 md:px-12 [content-visibility:auto] [contain-intrinsic-size:1px_1000px]">
+                <section className="py-12 sm:py-16 md:py-24 bg-white px-4 sm:px-6 md:px-12 [content-visibility:auto] [contain-intrinsic-size:1px_1000px]">
                     <div className="container mx-auto">
                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-8 sm:mb-16">
                             <div>
                                 <span className="text-brand-primary font-bold uppercase tracking-widest text-[10px] sm:text-xs">Obras de Excelência</span>
-                                <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-brand-dark mt-2 uppercase tracking-tight">Livros Pagos</h2>
+                                <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-brand-dark mt-2 uppercase tracking-tight">Livros Recomendados</h2>
                             </div>
                             <button onClick={() => navigate('/livros?preco=pago')} className="text-brand-dark font-black uppercase tracking-widest text-[10px] border-b-2 border-brand-primary pb-1 hover:text-brand-primary transition-all w-fit min-touch">
                                 Ver Coleção Completa
@@ -441,7 +507,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
             )}
 
             {/* UPCOMING RELEASES */}
-            <UpcomingReleases books={books} authors={authors} />
+            {futureBooks.length > 0 && <UpcomingReleases books={futureBooks} authors={authors} />}
 
             {/* AD UNIT — Entre Gratuitos e Experiência */}
             <div className="py-8 px-4 sm:px-6 md:px-12 bg-gray-50">

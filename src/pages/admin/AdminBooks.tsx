@@ -321,11 +321,11 @@ const AdminBooks: React.FC = () => {
                                                         </div>
                                                     </div>
                                                     <div className="space-y-2">
-                                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Data de Lançamento</label>
+                                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Data e Hora de Lançamento</label>
                                                         <input
                                                             required
-                                                            type="date"
-                                                            value={formData.launchDate ? formData.launchDate.split('T')[0] : ''}
+                                                            type="datetime-local"
+                                                            value={formData.launchDate ? (formData.launchDate.includes('T') ? formData.launchDate.substring(0, 16) : `${formData.launchDate}T00:00`) : ''}
                                                             onChange={e => setFormData({ ...formData, launchDate: e.target.value })}
                                                             className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
                                                         />

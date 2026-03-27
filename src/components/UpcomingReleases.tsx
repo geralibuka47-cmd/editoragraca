@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Calendar, User, BookOpen, Quote } from 'lucide-react';
 import { Book, TeamMember } from '../types';
-import { optimizeImageUrl } from './OptimizedImage';
+import { OptimizedImage, optimizeImageUrl } from './OptimizedImage';
 import { Link } from 'react-router-dom';
 
 interface UpcomingReleasesProps {
@@ -82,10 +82,11 @@ const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({ books, authors }) =
                         <div className="lg:col-span-5 space-y-10">
                             <div className="flex items-center gap-6">
                                 <div className="w-24 h-24 rounded-3xl overflow-hidden border-2 border-brand-primary/20 p-1">
-                                    <img
+                                    <OptimizedImage
                                         src={currentGroup.author.imageUrl}
                                         alt={currentGroup.author.name}
                                         className="w-full h-full object-cover rounded-2xl"
+                                        aspectRatio="square"
                                     />
                                 </div>
                                 <div>
@@ -126,10 +127,12 @@ const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({ books, authors }) =
                                     >
                                         <Link to={`/livro/${book.id}`} className="block space-y-4">
                                             <div className="aspect-[2/3] rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 group-hover:scale-[1.05] group-hover:-translate-y-2 border border-white/5">
-                                                <img
-                                                    src={optimizeImageUrl(book.coverUrl)}
+                                                <OptimizedImage
+                                                    src={book.coverUrl}
                                                     alt={book.title}
                                                     className="w-full h-full object-cover"
+                                                    aspectRatio="book"
+                                                    width={400}
                                                 />
                                                 <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
                                                     <p className="text-[9px] font-black text-brand-primary uppercase tracking-widest">
