@@ -11,6 +11,7 @@ import { getPublicStats, getBlogPosts, getSiteContent, getTestimonials, getTeamM
 import { OptimizedImage, optimizeImageUrl } from '../components/OptimizedImage';
 import SEO from '../components/SEO';
 import AdUnit from '../components/AdUnit';
+import UpcomingReleases from '../components/UpcomingReleases';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -438,6 +439,9 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
                     </div>
                 </section>
             )}
+
+            {/* UPCOMING RELEASES */}
+            <UpcomingReleases books={books} authors={authors} />
 
             {/* AD UNIT — Entre Gratuitos e Experiência */}
             <div className="py-8 px-4 sm:px-6 md:px-12 bg-gray-50">

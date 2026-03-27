@@ -1,7 +1,7 @@
 import React from 'react';
 import logo from '../assets/imagens/logo.png';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { ShoppingBag, Search, User, LogOut, Menu, X, Bell, Loader2, ShoppingCart, ChevronRight } from 'lucide-react';
+import { ShoppingBag, Search, User, LogOut, Menu, X, Bell, Loader2, ShoppingCart, ChevronRight, ArrowRight } from 'lucide-react';
 import { Input } from './ui/Input';
 import { motion as m, AnimatePresence } from 'framer-motion';
 import { User as UserType, Notification } from '../types';
@@ -94,9 +94,9 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                     aria-label="Editora Graça - Página inicial"
                 >
                     <img src={logo} alt="" className="h-8 sm:h-10 w-auto md:h-12 object-contain" />
-                    <div className="flex flex-col min-w-0">
-                        <span className="font-serif font-black text-brand-dark text-base sm:text-xl leading-none tracking-tight truncate">EDITORA <span className="text-brand-primary">GRAÇA</span></span>
-                        <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.25em] text-gray-400 hidden lg:block">Património Literário</span>
+                    <div className="flex flex-col leading-[0.85] min-w-0">
+                        <span className="font-serif font-black text-brand-dark text-[10px] sm:text-[13px] uppercase tracking-tight">Editora</span>
+                        <span className="font-serif font-black text-brand-primary text-base sm:text-2xl uppercase tracking-tighter">Graça</span>
                     </div>
                 </Link>
 
@@ -208,9 +208,10 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                                     <Link
                                         to={link.path}
                                         onClick={() => setIsMenuOpen(false)}
-                                        className="text-[clamp(1.8rem,8vw,4rem)] font-black text-brand-dark text-left uppercase tracking-tighter leading-none py-2 hover:text-brand-primary transition-colors block"
+                                        className="text-[clamp(1.5rem,7vw,2.8rem)] font-black text-brand-dark text-left uppercase tracking-tight leading-none py-3 border-b border-gray-50 flex items-center justify-between group hover:text-brand-primary transition-all duration-300"
                                     >
                                         {link.name}
+                                        <ArrowRight className="w-6 h-6 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-brand-primary" />
                                     </Link>
                                 </m.div>
                             ))}
