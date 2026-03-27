@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Calendar, User, BookOpen, Quote } from 'luci
 import { Book, TeamMember } from '../types';
 import { OptimizedImage, optimizeImageUrl } from './OptimizedImage';
 import { Link } from 'react-router-dom';
+import { normalizeString, isReleased } from '../services/dataService';
 
 interface UpcomingReleasesProps {
     books: Book[];
@@ -16,11 +17,7 @@ const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({ books, authors }) =
     // Group future books by author
     const groups = useMemo(() => {
         const now = Date.now();
-        const futureBooks = books.filter(b => {
-            if (!b.launchDate) return false;
-            const d = new Date(b.launchDate).getTime();
-            return !isNaN(d) && d > now;
-        });
+        const futureBooks = books.filter(b => b.launchDate && !isReleased(b.launchDate, now));
         const authorGroups = new Map<string, Book[]>();
 
         futureBooks.forEach(book => {
@@ -34,7 +31,7 @@ const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({ books, authors }) =
         return Array.from(authorGroups.entries()).map(([key, books]) => {
             const authorData = authors.find(a =>
                 (a.id && a.id.trim() === key.trim()) ||
-                (a.name && a.name.trim().toLowerCase() === key.trim().toLowerCase())
+                (normalizeString(a.name) === normalizeString(key))
             );
             return {
                 author: authorData || { name: key, role: 'Autor', bio: 'Escritor de prestígio da Editora Graça.', imageUrl: `https://ui-avatars.com/api/?name=${key}&background=C4A052&color=fff` },

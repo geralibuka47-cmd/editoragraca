@@ -61,7 +61,8 @@ const LibraryPage: React.FC<LibraryPageProps> = ({
     }, [books]);
 
     const filteredBooks = useMemo(() => {
-        let result = books.filter((b: Book) => isReleased(b.launchDate));
+        const nowTime = Date.now();
+        let result = books.filter((b: Book) => isReleased(b.launchDate, nowTime));
 
         if (searchQuery.trim()) {
             const query = searchQuery.toLowerCase();

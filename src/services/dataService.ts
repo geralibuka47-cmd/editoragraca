@@ -68,16 +68,30 @@ const timestampToString = (timestamp: any): string | undefined => {
     return d ? d.toISOString() : undefined;
 };
 
+// Helper: Normalize string for comparison (remove accents, trim, lowercase)
+export const normalizeString = (str: string): string => {
+    if (!str) return '';
+    return str.trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+};
+
 /**
  * Robust check if a book is already released
- * @param launchDate ISO string or Date
+ * @param launchDate ISO string, Date or custom string
  * @returns boolean
  */
-export const isReleased = (launchDate: string | undefined): boolean => {
+export const isReleased = (launchDate: any, now?: number): boolean => {
     if (!launchDate) return true; // Books with no date are assumed released (back catalog)
-    const d = new Date(launchDate);
-    if (isNaN(d.getTime())) return false; // If invalid, treat as unreleased for safety (strict isolation)
-    return d.getTime() <= Date.now();
+
+    const d = parseToDate(launchDate);
+    if (!d || isNaN(d.getTime())) {
+        return false;
+    }
+
+    const referenceTime = now || Date.now();
+    return d.getTime() <= (referenceTime + 1000); // 1s buffer
 };
 
 // Helper: Parse Firestore document to frontend format

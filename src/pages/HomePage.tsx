@@ -7,7 +7,7 @@ import { Button } from '../components/ui/Button';
 
 import { Book, BlogPost } from '../types';
 import BookCard from '../components/BookCard';
-import { getPublicStats, getBlogPosts, getSiteContent, getTestimonials, getTeamMembers, isReleased } from '../services/dataService';
+import { getPublicStats, getBlogPosts, getSiteContent, getTestimonials, getTeamMembers, isReleased, normalizeString } from '../services/dataService';
 import { OptimizedImage, optimizeImageUrl } from '../components/OptimizedImage';
 import SEO from '../components/SEO';
 import AdUnit from '../components/AdUnit';
@@ -49,7 +49,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
             try {
                 const [s, b, team] = await Promise.all([
                     getPublicStats(),
-                    getBlogPosts(),
+                    getBlogPosts(true),
                     getTeamMembers()
                 ]);
                 setStats(s);
@@ -62,8 +62,10 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
         loadData();
     }, []);
 
-    const releasedBooks = useMemo(() => books.filter((b: Book) => isReleased(b.launchDate)), [books]);
-    const futureBooks = useMemo(() => books.filter((b: Book) => b.launchDate && !isReleased(b.launchDate)), [books]);
+    const [now] = useState(Date.now());
+
+    const releasedBooks = useMemo(() => books.filter((b: Book) => isReleased(b.launchDate, now)), [books, now]);
+    const futureBooks = useMemo(() => books.filter((b: Book) => b.launchDate && !isReleased(b.launchDate, now)), [books, now]);
 
     // 1. Reading of the Month (Leitura do Mês) - Must be a released book
     const readingOfMonth = (releasedBooks.find(b => b.featured) || releasedBooks[0]);
@@ -97,7 +99,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
             ...ts,
             details: authors.find(a =>
                 (a.id && a.id.trim() === ts.id.trim()) ||
-                (a.name && a.name.trim().toLowerCase() === ts.author.trim().toLowerCase())
+                (normalizeString(a.name) === normalizeString(ts.author))
             )
         }))
         .slice(0, 3);

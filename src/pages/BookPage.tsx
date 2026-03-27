@@ -135,7 +135,7 @@ const BookPage: React.FC<{ user?: UserType | null; cart: any[]; onAddToCart: (bo
 
     if (!book) return null;
 
-    const isUpcoming = useMemo(() => !isReleased(book.launchDate), [book.launchDate]);
+    const isUpcoming = useMemo(() => !isReleased(book.launchDate, Date.now()), [book.launchDate]);
 
     return (
         <div className="min-h-screen bg-white font-sans text-brand-dark overflow-x-hidden">
