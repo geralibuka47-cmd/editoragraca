@@ -14,40 +14,43 @@ interface UpcomingReleasesProps {
 const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({ books, authors }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
-    // Prepare future books with their authors (One slide per book)
-    const futureItems = useMemo(() => {
+    // Group future books by author
+    const groups = useMemo(() => {
         const now = Date.now();
-        const filtered = books.filter(b => b.launchDate && !isReleased(b.launchDate, now));
+        const futureBooks = books.filter(b => b.launchDate && !isReleased(b.launchDate, now));
+        const authorGroups = new Map<string, Book[]>();
 
-        // Sort by launch date (nearest first)
-        return filtered.sort((a, b) => {
-            const dateA = new Date(a.launchDate!).getTime();
-            const dateB = new Date(b.launchDate!).getTime();
-            return dateA - dateB;
-        }).map(book => {
-            const authorKey = book.authorId || book.author;
+        futureBooks.forEach(book => {
+            const key = book.authorId || book.author;
+            if (!authorGroups.has(key)) {
+                authorGroups.set(key, []);
+            }
+            authorGroups.get(key)!.push(book);
+        });
+
+        return Array.from(authorGroups.entries()).map(([key, groupBooks]) => {
             const authorData = authors.find(a =>
-                (a.id && a.id.trim() === authorKey.trim()) ||
-                (normalizeString(a.name) === normalizeString(authorKey))
+                (a.id && a.id.trim() === key.trim()) ||
+                (normalizeString(a.name) === normalizeString(key))
             );
             return {
-                book,
                 author: authorData || {
-                    name: book.author || 'Autor da Obra',
+                    name: key || 'Autor',
                     role: 'Autor',
                     bio: 'Escritor de prestígio da Editora Graça.',
-                    imageUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(book.author || 'A')}&background=C4A052&color=fff`
-                }
+                    imageUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(key || 'A')}&background=C4A052&color=fff`
+                },
+                books: groupBooks.sort((a, b) => new Date(a.launchDate!).getTime() - new Date(b.launchDate!).getTime())
             };
         });
     }, [books, authors]);
 
-    if (futureItems.length === 0) return null;
+    if (groups.length === 0) return null;
 
-    const currentItem = futureItems[currentIndex];
+    const currentGroup = groups[currentIndex];
 
-    const nextSlide = () => setCurrentIndex((prev) => (prev + 1) % futureItems.length);
-    const prevSlide = () => setCurrentIndex((prev) => (prev - 1 + futureItems.length) % futureItems.length);
+    const nextSlide = () => setCurrentIndex((prev) => (prev + 1) % groups.length);
+    const prevSlide = () => setCurrentIndex((prev) => (prev - 1 + groups.length) % groups.length);
 
     return (
         <section className="section-fluid bg-brand-dark text-white overflow-hidden relative">
@@ -78,7 +81,7 @@ const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({ books, authors }) =
 
                 <AnimatePresence mode="wait">
                     <motion.div
-                        key={currentItem.book.id}
+                        key={currentIndex}
                         initial={{ opacity: 0, x: 50 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -50 }}
@@ -86,22 +89,22 @@ const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({ books, authors }) =
                         className="grid lg:grid-cols-12 gap-16 items-center"
                     >
                         {/* Author Info Column */}
-                        <div className="lg:col-span-4 space-y-10">
+                        <div className="lg:col-span-5 space-y-10">
                             <div className="flex items-center gap-6">
                                 <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-[2rem] overflow-hidden border-2 border-brand-primary/20 p-1">
                                     <div className="w-full h-full rounded-[1.8rem] overflow-hidden">
                                         <OptimizedImage
-                                            src={currentItem.author.imageUrl}
-                                            alt={currentItem.author.name}
+                                            src={currentGroup.author.imageUrl}
+                                            alt={currentGroup.author.name}
                                             className="w-full h-full object-cover"
                                             aspectRatio="square"
                                         />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight">{currentItem.author.name}</h3>
+                                    <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight">{currentGroup.author.name}</h3>
                                     <span className="inline-block px-3 py-1 bg-brand-primary/10 text-brand-primary rounded-lg text-[10px] font-black uppercase tracking-widest border border-brand-primary/20">
-                                        {currentItem.author.role || 'Autor'}
+                                        {currentGroup.author.role || 'Autor de Referência'}
                                     </span>
                                 </div>
                             </div>
@@ -109,52 +112,51 @@ const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({ books, authors }) =
                             <div className="relative">
                                 <Quote className="absolute -top-6 -left-6 w-12 h-12 text-white/5" />
                                 <p className="text-xl text-gray-400 font-medium leading-relaxed italic border-l-2 border-brand-primary/30 pl-8">
-                                    {currentItem.author.bio || 'Escritor de prestígio da Editora Graça.'}
+                                    {currentGroup.author.bio || 'Escritor de prestígio da Editora Graça.'}
                                 </p>
                             </div>
 
                             <div className="pt-6 flex items-center gap-6 opacity-40">
                                 <div className="flex items-center gap-2">
-                                    <Calendar className="w-4 h-4" />
-                                    <span className="text-[10px] font-black uppercase tracking-widest">
-                                        Previsto: {new Date(currentItem.book.launchDate!).toLocaleDateString('pt-PT', { day: '2-digit', month: 'long', year: 'numeric' })}
-                                    </span>
+                                    <BookOpen className="w-4 h-4" />
+                                    <span className="text-[10px] font-black uppercase tracking-widest">{currentGroup.books.length} Obras em Produção</span>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Featured Book Column */}
-                        <div className="lg:col-span-8 flex justify-center lg:justify-end">
-                            <div className="relative group w-full max-w-2xl">
-                                <div className="absolute inset-0 bg-brand-primary/20 blur-[100px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-                                <Link to={`/livro/${currentItem.book.id}`} className="block relative z-10">
-                                    <div className="aspect-[16/9] sm:aspect-[21/9] rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/5 flex bg-brand-dark/50">
-                                        {/* Cover Image Side */}
-                                        <div className="w-1/3 sm:w-1/4 h-full relative">
-                                            <OptimizedImage
-                                                src={currentItem.book.coverUrl}
-                                                alt={currentItem.book.title}
-                                                className="w-full h-full object-cover"
-                                                aspectRatio="book"
-                                                priority={true}
-                                            />
-                                        </div>
-                                        {/* Content Side */}
-                                        <div className="flex-1 flex flex-col justify-center p-8 sm:p-12 space-y-4">
-                                            <div className="flex items-center gap-3">
-                                                <span className="h-[2px] w-8 bg-brand-primary" />
-                                                <span className="text-brand-primary font-black uppercase tracking-[0.2em] text-[10px]">Em Produção</span>
+                        {/* Books Grid Column */}
+                        <div className="lg:col-span-7">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 sm:gap-10">
+                                {currentGroup.books.slice(0, 6).map((book, idx) => (
+                                    <motion.div
+                                        key={book.id}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.2 + (idx * 0.1) }}
+                                        className="group"
+                                    >
+                                        <Link to={`/livro/${book.id}`} className="block space-y-4">
+                                            <div className="aspect-[2/3] rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 group-hover:scale-[1.05] group-hover:-translate-y-2 border border-white/5">
+                                                <OptimizedImage
+                                                    src={book.coverUrl}
+                                                    alt={book.title}
+                                                    className="w-full h-full object-cover"
+                                                    aspectRatio="book"
+                                                    width={400}
+                                                />
+                                                <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                                                    <p className="text-[9px] font-black text-brand-primary uppercase tracking-widest">
+                                                        {new Date(book.launchDate!).toLocaleDateString('pt-PT', { day: '2-digit', month: 'short' })}
+                                                    </p>
+                                                </div>
                                             </div>
-                                            <h4 className="text-3xl sm:text-5xl font-black uppercase tracking-tighter leading-none">{currentItem.book.title}</h4>
-                                            <p className="text-gray-400 text-sm sm:text-base line-clamp-3 font-medium">{currentItem.book.description}</p>
-                                            <div className="pt-4">
-                                                <button className="flex items-center gap-3 text-white/60 hover:text-brand-primary transition-colors font-black uppercase tracking-widest text-[10px] group/btn">
-                                                    Explorar Projeto <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                                                </button>
+                                            <div className="space-y-1">
+                                                <h4 className="font-black text-sm uppercase tracking-tight group-hover:text-brand-primary transition-colors line-clamp-2">{book.title}</h4>
+                                                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Brevemente</p>
                                             </div>
-                                        </div>
-                                    </div>
-                                </Link>
+                                        </Link>
+                                    </motion.div>
+                                ))}
                             </div>
                         </div>
                     </motion.div>
