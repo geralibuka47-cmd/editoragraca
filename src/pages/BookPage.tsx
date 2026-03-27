@@ -16,7 +16,8 @@ import {
     checkIsFavorite,
     toggleFavorite,
     checkDownloadAccess,
-    getUserProfile
+    getUserProfile,
+    isReleased
 } from '../services/dataService';
 import { optimizeImageUrl } from '../components/OptimizedImage';
 import { useToast } from '../components/Toast';
@@ -134,10 +135,7 @@ const BookPage: React.FC<{ user?: UserType | null; cart: any[]; onAddToCart: (bo
 
     if (!book) return null;
 
-    const isUpcoming = useMemo(() => {
-        if (!book.launchDate) return false;
-        return new Date(book.launchDate).getTime() > new Date().getTime();
-    }, [book.launchDate]);
+    const isUpcoming = useMemo(() => !isReleased(book.launchDate), [book.launchDate]);
 
     return (
         <div className="min-h-screen bg-white font-sans text-brand-dark overflow-x-hidden">

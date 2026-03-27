@@ -15,7 +15,12 @@ const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({ books, authors }) =
 
     // Group future books by author
     const groups = useMemo(() => {
-        const futureBooks = books.filter(b => b.launchDate && new Date(b.launchDate) > new Date());
+        const now = Date.now();
+        const futureBooks = books.filter(b => {
+            if (!b.launchDate) return false;
+            const d = new Date(b.launchDate).getTime();
+            return !isNaN(d) && d > now;
+        });
         const authorGroups = new Map<string, Book[]>();
 
         futureBooks.forEach(book => {
@@ -27,10 +32,13 @@ const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({ books, authors }) =
         });
 
         return Array.from(authorGroups.entries()).map(([key, books]) => {
-            const authorData = authors.find(a => a.id === key || a.name === key);
+            const authorData = authors.find(a =>
+                (a.id && a.id.trim() === key.trim()) ||
+                (a.name && a.name.trim().toLowerCase() === key.trim().toLowerCase())
+            );
             return {
                 author: authorData || { name: key, role: 'Autor', bio: 'Escritor de prestígio da Editora Graça.', imageUrl: `https://ui-avatars.com/api/?name=${key}&background=C4A052&color=fff` },
-                books
+                books: books.slice(0, 4) // Limit to 4 books max per author
             };
         });
     }, [books, authors]);

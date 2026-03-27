@@ -11,6 +11,7 @@ import { BookCardSkeleton } from '../components/Skeleton';
 import { PageHero } from '../components/PageHero';
 import { OptimizedImage } from '../components/OptimizedImage';
 import SEO from '../components/SEO';
+import { isReleased } from '../services/dataService';
 
 interface LibraryPageProps {
     books: Book[];
@@ -60,8 +61,7 @@ const LibraryPage: React.FC<LibraryPageProps> = ({
     }, [books]);
 
     const filteredBooks = useMemo(() => {
-        const now = new Date();
-        let result = books.filter(b => !b.launchDate || new Date(b.launchDate) <= now);
+        let result = books.filter((b: Book) => isReleased(b.launchDate));
 
         if (searchQuery.trim()) {
             const query = searchQuery.toLowerCase();

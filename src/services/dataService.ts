@@ -43,12 +43,41 @@ const COLLECTIONS = {
     NOTIFICATIONS: 'notifications'
 };
 
-// Helper: Convert Firestore Timestamp to ISO string
+// Helper: Convert Firestore Timestamp or String to Date
+const parseToDate = (value: any): Date | null => {
+    if (!value) return null;
+    if (value.toDate) return value.toDate();
+    if (value instanceof Date) return value;
+    if (typeof value === 'string') {
+        // Try ISO format
+        let d = new Date(value);
+        if (!isNaN(d.getTime())) return d;
+
+        // Try DD/MM/YYYY
+        const parts = value.split('/');
+        if (parts.length === 3) {
+            d = new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
+            if (!isNaN(d.getTime())) return d;
+        }
+    }
+    return null;
+};
+
 const timestampToString = (timestamp: any): string | undefined => {
-    if (!timestamp) return undefined;
-    if (timestamp.toDate) return timestamp.toDate().toISOString();
-    if (timestamp instanceof Date) return timestamp.toISOString();
-    return timestamp;
+    const d = parseToDate(timestamp);
+    return d ? d.toISOString() : undefined;
+};
+
+/**
+ * Robust check if a book is already released
+ * @param launchDate ISO string or Date
+ * @returns boolean
+ */
+export const isReleased = (launchDate: string | undefined): boolean => {
+    if (!launchDate) return true; // Books with no date are assumed released (back catalog)
+    const d = new Date(launchDate);
+    if (isNaN(d.getTime())) return false; // If invalid, treat as unreleased for safety (strict isolation)
+    return d.getTime() <= Date.now();
 };
 
 // Helper: Parse Firestore document to frontend format

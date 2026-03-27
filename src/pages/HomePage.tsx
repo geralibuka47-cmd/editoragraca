@@ -7,7 +7,7 @@ import { Button } from '../components/ui/Button';
 
 import { Book, BlogPost } from '../types';
 import BookCard from '../components/BookCard';
-import { getPublicStats, getBlogPosts, getSiteContent, getTestimonials, getTeamMembers } from '../services/dataService';
+import { getPublicStats, getBlogPosts, getSiteContent, getTestimonials, getTeamMembers, isReleased } from '../services/dataService';
 import { OptimizedImage, optimizeImageUrl } from '../components/OptimizedImage';
 import SEO from '../components/SEO';
 import AdUnit from '../components/AdUnit';
@@ -62,18 +62,8 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
         loadData();
     }, []);
 
-    const now = new Date().getTime();
-    const releasedBooks = useMemo(() => books.filter(b => {
-        if (!b.launchDate) return true;
-        const launchTime = new Date(b.launchDate).getTime();
-        return isNaN(launchTime) || launchTime <= now;
-    }), [books, now]);
-
-    const futureBooks = useMemo(() => books.filter(b => {
-        if (!b.launchDate) return false;
-        const launchTime = new Date(b.launchDate).getTime();
-        return !isNaN(launchTime) && launchTime > now;
-    }), [books, now]);
+    const releasedBooks = useMemo(() => books.filter((b: Book) => isReleased(b.launchDate)), [books]);
+    const futureBooks = useMemo(() => books.filter((b: Book) => b.launchDate && !isReleased(b.launchDate)), [books]);
 
     // 1. Reading of the Month (Leitura do Mês) - Must be a released book
     const readingOfMonth = (releasedBooks.find(b => b.featured) || releasedBooks[0]);
@@ -90,7 +80,6 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
 
     // 4. Most Viewed (Mais Visto)
     const mostViewed = useMemo(() => [...releasedBooks]
-        .filter((b: Book) => (b.stats?.views || 0) > 0)
         .sort((a: Book, b: Book) => (b.stats?.views || 0) - (a.stats?.views || 0))
         .slice(0, 4), [releasedBooks]);
 
@@ -98,17 +87,18 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
     const authorStatsMap = new Map<string, { author: string, count: number, id: string, photo?: string }>();
     releasedBooks.forEach((b: Book) => {
         const count = (b.stats?.copiesSold || 0) + (b.stats?.downloads || 0);
-        if (count > 0) {
-            const key = b.authorId || b.author;
-            const current = authorStatsMap.get(key) || { author: b.author, id: b.authorId || '', count: 0 };
-            authorStatsMap.set(key, { ...current, count: current.count + count });
-        }
+        const key = b.authorId || b.author;
+        const current = authorStatsMap.get(key) || { author: b.author, id: b.authorId || '', count: 0 };
+        authorStatsMap.set(key, { ...current, count: current.count + count });
     });
     const topAuthors = Array.from(authorStatsMap.values())
         .sort((a, b) => b.count - a.count)
         .map(ts => ({
             ...ts,
-            details: authors.find(a => a.id === ts.id || a.name === ts.author)
+            details: authors.find(a =>
+                (a.id && a.id.trim() === ts.id.trim()) ||
+                (a.name && a.name.trim().toLowerCase() === ts.author.trim().toLowerCase())
+            )
         }))
         .slice(0, 3);
 
