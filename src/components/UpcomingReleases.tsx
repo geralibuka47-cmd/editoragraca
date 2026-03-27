@@ -21,7 +21,8 @@ const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({ books, authors }) =
         const authorGroups = new Map<string, Book[]>();
 
         futureBooks.forEach(book => {
-            const key = book.authorId || book.author;
+            // Grouping key: Author ID or Normalized Author Name
+            const key = book.authorId || normalizeString(book.author);
             if (!authorGroups.has(key)) {
                 authorGroups.set(key, []);
             }
@@ -29,16 +30,25 @@ const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({ books, authors }) =
         });
 
         return Array.from(authorGroups.entries()).map(([key, groupBooks]) => {
-            const authorData = authors.find(a =>
-                (a.id && a.id.trim() === key.trim()) ||
-                (normalizeString(a.name) === normalizeString(key))
+            const firstBook = groupBooks[0] as any;
+
+            // Try to find author in the team members list
+            const teamAuthor = authors.find(a =>
+                (a.id && a.id.trim() === firstBook.authorId?.trim()) ||
+                (normalizeString(a.name) === normalizeString(firstBook.author))
             );
+
+            // Prioritize data from the book record (denormalized in DB)
+            const authorName = firstBook.author || teamAuthor?.name || 'Autor';
+            const authorBio = firstBook.authorBio || teamAuthor?.bio || 'Escritor de prestígio da Editora Graça.';
+            const authorImg = firstBook.authorImageUrl || firstBook.authorPhoto || teamAuthor?.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=C4A052&color=fff`;
+
             return {
-                author: authorData || {
-                    name: key || 'Autor',
-                    role: 'Autor',
-                    bio: 'Escritor de prestígio da Editora Graça.',
-                    imageUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(key || 'A')}&background=C4A052&color=fff`
+                author: {
+                    name: authorName,
+                    role: firstBook.authorRole || teamAuthor?.role || 'Autor de Referência',
+                    bio: authorBio,
+                    imageUrl: authorImg
                 },
                 books: groupBooks.sort((a, b) => new Date(a.launchDate!).getTime() - new Date(b.launchDate!).getTime())
             };
@@ -104,7 +114,7 @@ const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({ books, authors }) =
                                 <div className="space-y-2">
                                     <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight">{currentGroup.author.name}</h3>
                                     <span className="inline-block px-3 py-1 bg-brand-primary/10 text-brand-primary rounded-lg text-[10px] font-black uppercase tracking-widest border border-brand-primary/20">
-                                        {currentGroup.author.role || 'Autor de Referência'}
+                                        {currentGroup.author.role}
                                     </span>
                                 </div>
                             </div>
@@ -112,14 +122,14 @@ const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({ books, authors }) =
                             <div className="relative">
                                 <Quote className="absolute -top-6 -left-6 w-12 h-12 text-white/5" />
                                 <p className="text-xl text-gray-400 font-medium leading-relaxed italic border-l-2 border-brand-primary/30 pl-8">
-                                    {currentGroup.author.bio || 'Escritor de prestígio da Editora Graça.'}
+                                    {currentGroup.author.bio}
                                 </p>
                             </div>
 
                             <div className="pt-6 flex items-center gap-6 opacity-40">
                                 <div className="flex items-center gap-2">
                                     <BookOpen className="w-4 h-4" />
-                                    <span className="text-[10px] font-black uppercase tracking-widest">{currentGroup.books.length} Obras em Produção</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest">{currentGroup.books.length} Obras em Antevisão</span>
                                 </div>
                             </div>
                         </div>
