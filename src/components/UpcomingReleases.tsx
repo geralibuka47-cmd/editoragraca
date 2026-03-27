@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Calendar, User, BookOpen, Quote, ArrowRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, ArrowRight } from 'lucide-react';
 import { Book, TeamMember } from '../types';
-import { OptimizedImage, optimizeImageUrl } from './OptimizedImage';
+import { OptimizedImage } from './OptimizedImage';
 import { Link } from 'react-router-dom';
 import { normalizeString, isReleased } from '../services/dataService';
 
@@ -21,7 +21,6 @@ const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({ books, authors }) =
         const authorGroups = new Map<string, Book[]>();
 
         futureBooks.forEach(book => {
-            // Grouping key: Author ID or Normalized Author Name
             const key = book.authorId || normalizeString(book.author);
             if (!authorGroups.has(key)) {
                 authorGroups.set(key, []);
@@ -32,22 +31,18 @@ const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({ books, authors }) =
         return Array.from(authorGroups.entries()).map(([key, groupBooks]) => {
             const firstBook = groupBooks[0] as any;
 
-            // Try to find author in the team members list
             const teamAuthor = authors.find(a =>
                 (a.id && a.id.trim() === firstBook.authorId?.trim()) ||
                 (normalizeString(a.name) === normalizeString(firstBook.author))
             );
 
-            // Prioritize data from the book record (denormalized in DB)
             const authorName = firstBook.author || teamAuthor?.name || 'Autor';
-            const authorBio = firstBook.authorBio || teamAuthor?.bio || 'Escritor de prestígio da Editora Graça.';
             const authorImg = firstBook.authorImageUrl || firstBook.authorPhoto || teamAuthor?.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=C4A052&color=fff`;
 
             return {
                 author: {
                     name: authorName,
                     role: firstBook.authorRole || teamAuthor?.role || 'Autor de Referência',
-                    bio: authorBio,
                     imageUrl: authorImg
                 },
                 books: groupBooks.sort((a, b) => new Date(a.launchDate!).getTime() - new Date(b.launchDate!).getTime())
@@ -96,48 +91,32 @@ const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({ books, authors }) =
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -50 }}
                         transition={{ duration: 0.6, ease: "circOut" }}
-                        className="grid lg:grid-cols-12 gap-16 items-center"
+                        className="grid lg:grid-cols-12 gap-12 items-center"
                     >
-                        {/* Author Info Column */}
-                        <div className="lg:col-span-5 space-y-10">
-                            <div className="flex items-center gap-6">
-                                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-[2rem] overflow-hidden border-2 border-brand-primary/20 p-1">
-                                    <div className="w-full h-full rounded-[1.8rem] overflow-hidden">
-                                        <OptimizedImage
-                                            src={currentGroup.author.imageUrl}
-                                            alt={currentGroup.author.name}
-                                            className="w-full h-full object-cover"
-                                            aspectRatio="square"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight">{currentGroup.author.name}</h3>
-                                    <span className="inline-block px-3 py-1 bg-brand-primary/10 text-brand-primary rounded-lg text-[10px] font-black uppercase tracking-widest border border-brand-primary/20">
-                                        {currentGroup.author.role}
-                                    </span>
+                        {/* Compact Author Info Column */}
+                        <div className="lg:col-span-3 flex flex-col items-center lg:items-start text-center lg:text-left space-y-6">
+                            <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-[2.5rem] overflow-hidden border-2 border-brand-primary/20 p-1 bg-brand-dark/50">
+                                <div className="w-full h-full rounded-[2.2rem] overflow-hidden">
+                                    <OptimizedImage
+                                        src={currentGroup.author.imageUrl}
+                                        alt={currentGroup.author.name}
+                                        className="w-full h-full object-cover"
+                                        aspectRatio="square"
+                                    />
                                 </div>
                             </div>
-
-                            <div className="relative">
-                                <Quote className="absolute -top-6 -left-6 w-12 h-12 text-white/5" />
-                                <p className="text-xl text-gray-400 font-medium leading-relaxed italic border-l-2 border-brand-primary/30 pl-8">
-                                    {currentGroup.author.bio}
-                                </p>
-                            </div>
-
-                            <div className="pt-6 flex items-center gap-6 opacity-40">
-                                <div className="flex items-center gap-2">
-                                    <BookOpen className="w-4 h-4" />
-                                    <span className="text-[10px] font-black uppercase tracking-widest">{currentGroup.books.length} Obras em Antevisão</span>
-                                </div>
+                            <div className="space-y-2">
+                                <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight leading-tight">{currentGroup.author.name}</h3>
+                                <span className="inline-block px-3 py-1 bg-brand-primary/10 text-brand-primary rounded-lg text-[10px] font-black uppercase tracking-widest border border-brand-primary/20">
+                                    {currentGroup.author.role}
+                                </span>
                             </div>
                         </div>
 
-                        {/* Books Grid Column */}
-                        <div className="lg:col-span-7">
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 sm:gap-10">
-                                {currentGroup.books.slice(0, 6).map((book, idx) => (
+                        {/* Expanded Books Grid Column */}
+                        <div className="lg:col-span-9">
+                            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
+                                {currentGroup.books.slice(0, 8).map((book, idx) => (
                                     <motion.div
                                         key={book.id}
                                         initial={{ opacity: 0, y: 20 }}
@@ -146,7 +125,7 @@ const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({ books, authors }) =
                                         className="group"
                                     >
                                         <Link to={`/livro/${book.id}`} className="block space-y-4">
-                                            <div className="aspect-[2/3] rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 group-hover:scale-[1.05] group-hover:-translate-y-2 border border-white/5">
+                                            <div className="aspect-[2/3] rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 group-hover:scale-[1.05] group-hover:-translate-y-2 border border-white/5 relative">
                                                 <OptimizedImage
                                                     src={book.coverUrl}
                                                     alt={book.title}
@@ -154,15 +133,16 @@ const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({ books, authors }) =
                                                     aspectRatio="book"
                                                     width={400}
                                                 />
-                                                <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
-                                                    <p className="text-[9px] font-black text-brand-primary uppercase tracking-widest">
+                                                <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/90 to-transparent">
+                                                    <p className="text-[10px] font-black text-brand-primary uppercase tracking-[0.2em] mb-1">
                                                         {new Date(book.launchDate!).toLocaleDateString('pt-PT', { day: '2-digit', month: 'short' })}
                                                     </p>
+                                                    <h4 className="font-black text-xs sm:text-sm uppercase tracking-tight text-white line-clamp-2 leading-tight">{book.title}</h4>
                                                 </div>
                                             </div>
-                                            <div className="space-y-1">
-                                                <h4 className="font-black text-sm uppercase tracking-tight group-hover:text-brand-primary transition-colors line-clamp-2">{book.title}</h4>
-                                                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Brevemente</p>
+                                            <div className="flex items-center gap-2 text-brand-primary/60 group-hover:text-brand-primary transition-colors">
+                                                <span className="text-[9px] font-black uppercase tracking-widest">Ver Detalhes</span>
+                                                <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                                             </div>
                                         </Link>
                                     </motion.div>
