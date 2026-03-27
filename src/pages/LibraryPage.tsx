@@ -9,6 +9,7 @@ import { Book } from '../types';
 import BookCard from '../components/BookCard';
 import { BookCardSkeleton } from '../components/Skeleton';
 import { PageHero } from '../components/PageHero';
+import { OptimizedImage } from '../components/OptimizedImage';
 import SEO from '../components/SEO';
 
 interface LibraryPageProps {
@@ -59,7 +60,8 @@ const LibraryPage: React.FC<LibraryPageProps> = ({
     }, [books]);
 
     const filteredBooks = useMemo(() => {
-        let result = [...books];
+        const now = new Date();
+        let result = books.filter(b => !b.launchDate || new Date(b.launchDate) <= now);
 
         if (searchQuery.trim()) {
             const query = searchQuery.toLowerCase();
@@ -442,7 +444,15 @@ const LibraryPage: React.FC<LibraryPageProps> = ({
                         </div>
                         <div className="flex items-center gap-8">
                             <div className="w-32 h-44 bg-gray-100 rounded-xl overflow-hidden shadow-xl shrink-0">
-                                {books[0] && <img src={books[0].coverUrl} alt={books[0].title} className="w-full h-full object-cover" />}
+                                {books[0] && (
+                                    <OptimizedImage
+                                        src={books[0].coverUrl}
+                                        alt={books[0].title}
+                                        className="w-full h-full object-cover"
+                                        aspectRatio="book"
+                                        width={200}
+                                    />
+                                )}
                             </div>
                             <div className="space-y-4">
                                 <h4 className="text-xl font-black uppercase tracking-tight leading-none">{books[0]?.title}</h4>

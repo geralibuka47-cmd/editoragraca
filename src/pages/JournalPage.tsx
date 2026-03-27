@@ -299,7 +299,13 @@ const JournalPage: React.FC<JournalPageProps> = ({ user }) => {
                                             className="group cursor-pointer bg-white p-6 rounded-[2.5rem] shadow-sm hover:shadow-xl transition-all border border-gray-100 flex gap-6 items-center"
                                         >
                                             <div className="w-24 h-24 rounded-2xl overflow-hidden bg-gray-100 shrink-0">
-                                                <img src={p.imageUrl} alt={p.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                                <OptimizedImage
+                                                    src={p.imageUrl}
+                                                    alt={p.title}
+                                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                                    aspectRatio="square"
+                                                    width={100}
+                                                />
                                             </div>
                                             <div className="space-y-2">
                                                 <p className="text-[9px] font-black text-brand-primary uppercase tracking-widest">{new Date(p.date).toLocaleDateString()}</p>
@@ -345,7 +351,12 @@ const JournalPage: React.FC<JournalPageProps> = ({ user }) => {
                                 onClick={() => setSelectedPost(posts[0])}
                                 className="group relative aspect-[16/10] md:aspect-[16/8] lg:aspect-square rounded-[3rem] overflow-hidden cursor-pointer shadow-2xl shadow-brand-dark/20"
                             >
-                                <img src={posts[0].imageUrl} alt={posts[0].title} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+                                <OptimizedImage
+                                    src={posts[0].imageUrl}
+                                    alt={posts[0].title}
+                                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                                    priority={true}
+                                />
                                 <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/40 to-transparent"></div>
                                 <div className="absolute bottom-0 left-0 p-8 md:p-14 space-y-6">
                                     <div className="flex items-center gap-4">
