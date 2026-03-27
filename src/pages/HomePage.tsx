@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, ShoppingCart, Star, ChevronLeft, ChevronRight, Play, Download, Loader2, ArrowRight, Clock, CheckCircle, Mail, Zap, TrendingUp, Eye, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
@@ -62,9 +62,18 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
         loadData();
     }, []);
 
-    const now = new Date();
-    const releasedBooks = books.filter(b => !b.launchDate || new Date(b.launchDate) <= now);
-    const futureBooks = books.filter(b => b.launchDate && new Date(b.launchDate) > now);
+    const now = new Date().getTime();
+    const releasedBooks = useMemo(() => books.filter(b => {
+        if (!b.launchDate) return true;
+        const launchTime = new Date(b.launchDate).getTime();
+        return isNaN(launchTime) || launchTime <= now;
+    }), [books, now]);
+
+    const futureBooks = useMemo(() => books.filter(b => {
+        if (!b.launchDate) return false;
+        const launchTime = new Date(b.launchDate).getTime();
+        return !isNaN(launchTime) && launchTime > now;
+    }), [books, now]);
 
     // 1. Reading of the Month (Leitura do Mês) - Must be a released book
     const readingOfMonth = (releasedBooks.find(b => b.featured) || releasedBooks[0]);
@@ -73,21 +82,21 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
     const authorOfMonth = authors.find(a => a.featured) || authors[0];
 
     // 3. Most Downloaded (Livro mais baixado) - Mandatory > 0 downloads
-    const mostDownloadedBooks = [...releasedBooks]
-        .filter(b => b.stats?.downloads && b.stats.downloads > 0)
-        .sort((a, b) => (b.stats?.downloads || 0) - (a.stats?.downloads || 0));
+    const mostDownloadedBooks = useMemo(() => [...releasedBooks]
+        .filter((b: Book) => (b.stats?.downloads || 0) > 0)
+        .sort((a: Book, b: Book) => (b.stats?.downloads || 0) - (a.stats?.downloads || 0)), [releasedBooks]);
 
     const mostDownloaded = mostDownloadedBooks[0] || null;
 
     // 4. Most Viewed (Mais Visto)
-    const mostViewed = [...releasedBooks]
-        .filter(b => b.stats?.views && b.stats.views > 0)
-        .sort((a, b) => (b.stats?.views || 0) - (a.stats?.views || 0))
-        .slice(0, 4);
+    const mostViewed = useMemo(() => [...releasedBooks]
+        .filter((b: Book) => (b.stats?.views || 0) > 0)
+        .sort((a: Book, b: Book) => (b.stats?.views || 0) - (a.stats?.views || 0))
+        .slice(0, 4), [releasedBooks]);
 
     // 5. Success Authors (Autores com mais downloads/vendas)
     const authorStatsMap = new Map<string, { author: string, count: number, id: string, photo?: string }>();
-    releasedBooks.forEach(b => {
+    releasedBooks.forEach((b: Book) => {
         const count = (b.stats?.copiesSold || 0) + (b.stats?.downloads || 0);
         if (count > 0) {
             const key = b.authorId || b.author;
@@ -104,13 +113,13 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
         .slice(0, 3);
 
     // Categories (Only released)
-    const ebooks = releasedBooks.filter(b => b.format === 'digital').slice(0, 4);
-    const physicalBooks = releasedBooks.filter(b => b.format === 'físico').slice(0, 4);
-    const freeBooks = releasedBooks.filter(b => b.price === 0).slice(0, 4);
-    const paidBooks = releasedBooks.filter(b => b.price > 0).slice(0, 4);
+    const ebooks = useMemo(() => releasedBooks.filter((b: Book) => b.format === 'digital').slice(0, 4), [releasedBooks]);
+    const physicalBooks = useMemo(() => releasedBooks.filter((b: Book) => b.format === 'físico').slice(0, 4), [releasedBooks]);
+    const freeBooks = useMemo(() => releasedBooks.filter((b: Book) => (b.price || 0) === 0).slice(0, 4), [releasedBooks]);
+    const paidBooks = useMemo(() => releasedBooks.filter((b: Book) => (b.price || 0) > 0).slice(0, 4), [releasedBooks]);
 
-    const upcomingLaunch = futureBooks
-        .sort((a, b) => new Date(a.launchDate!).getTime() - new Date(b.launchDate!).getTime())[0];
+    const upcomingLaunch = useMemo(() => futureBooks
+        .sort((a: Book, b: Book) => new Date(a.launchDate!).getTime() - new Date(b.launchDate!).getTime())[0], [futureBooks]);
 
     // Get Featured Book (Hero)
     const featuredBook = readingOfMonth;
@@ -270,6 +279,24 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
                                     </button>
                                 </div>
                             </motion.div>
+                        </div>
+                    </div>
+                </section>
+            )}
+
+            {/* UPCOMING RELEASES (Futuros Lançamentos) - Logo após Leitura do Mês */}
+            {futureBooks.length > 0 && (
+                <section className="relative z-20">
+                    <UpcomingReleases books={futureBooks} authors={authors} />
+
+                    {/* AD UNIT — Posicionado estrategicamente após o slider */}
+                    <div className="py-8 sm:py-12 bg-gray-50 px-4 sm:px-6 md:px-12">
+                        <div className="container mx-auto">
+                            <AdUnit
+                                slot="SLOT_HORIZONTAL_2"
+                                format="auto"
+                                className="max-w-4xl mx-auto"
+                            />
                         </div>
                     </div>
                 </section>
@@ -505,20 +532,6 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
                     </div>
                 </section>
             )}
-
-            {/* UPCOMING RELEASES */}
-            {futureBooks.length > 0 && <UpcomingReleases books={futureBooks} authors={authors} />}
-
-            {/* AD UNIT — Entre Gratuitos e Experiência */}
-            <div className="py-8 px-4 sm:px-6 md:px-12 bg-gray-50">
-                <div className="container mx-auto">
-                    <AdUnit
-                        slot="SLOT_HORIZONTAL_2"
-                        format="auto"
-                        className="max-w-4xl mx-auto"
-                    />
-                </div>
-            </div>
 
             {/* 3. EXPERIENCE SECTION */}
             <section className="py-16 sm:py-24 md:py-32 bg-brand-dark text-white px-4 sm:px-6 md:px-12 relative overflow-hidden [content-visibility:auto] [contain-intrinsic-size:1px_800px]">

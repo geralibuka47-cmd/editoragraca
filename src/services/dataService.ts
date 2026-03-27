@@ -68,6 +68,22 @@ const parseFirestoreDoc = (docData: any, id: string): any => {
     if (parsed.confirmedAt) parsed.confirmedAt = timestampToString(parsed.confirmedAt);
     if (parsed.date) parsed.date = timestampToString(parsed.date);
 
+    // Initialize stats if missing
+    if (!parsed.stats) {
+        parsed.stats = {
+            views: 0,
+            downloads: 0,
+            copiesSold: 0,
+            rating: 5,
+            reviewsCount: 0
+        };
+    } else {
+        // Ensure sub-fields exist
+        parsed.stats.views = parsed.stats.views || 0;
+        parsed.stats.downloads = parsed.stats.downloads || 0;
+        parsed.stats.copiesSold = parsed.stats.copiesSold || 0;
+    }
+
     return parsed;
 };
 
@@ -141,7 +157,7 @@ export const getBooks = async (forceRefresh = false, limitCount?: number): Promi
     }
 
     try {
-        let q = query(collection(db, COLLECTIONS.BOOKS), orderBy('launchDate', 'desc'));
+        let q = query(collection(db, COLLECTIONS.BOOKS), orderBy('updatedAt', 'desc'));
         if (limitCount) {
             q = query(q, limit(limitCount));
         }
@@ -165,8 +181,8 @@ export const getBooks = async (forceRefresh = false, limitCount?: number): Promi
 };
 
 export const getBooksMinimal = async (forceRefresh = false): Promise<Book[]> => {
-    // Fetch a smaller subset initially for faster first paint
-    return getBooks(forceRefresh, 12);
+    // Fetch a moderate subset initially to ensure stats and future releases are included
+    return getBooks(forceRefresh, 40);
 };
 
 export const getBookById = async (id: string): Promise<Book | null> => {

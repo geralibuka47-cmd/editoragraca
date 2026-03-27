@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
     X, ShoppingCart, Heart, Share2, Check, Star, Eye,
@@ -134,7 +134,10 @@ const BookPage: React.FC<{ user?: UserType | null; cart: any[]; onAddToCart: (bo
 
     if (!book) return null;
 
-    const isUpcoming = book.launchDate ? new Date(book.launchDate) > new Date() : false;
+    const isUpcoming = useMemo(() => {
+        if (!book.launchDate) return false;
+        return new Date(book.launchDate).getTime() > new Date().getTime();
+    }, [book.launchDate]);
 
     return (
         <div className="min-h-screen bg-white font-sans text-brand-dark overflow-x-hidden">
