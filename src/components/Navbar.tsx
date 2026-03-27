@@ -83,10 +83,10 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
 
     return (
         <header
-            className="fixed left-0 right-0 z-50 bg-white border-b border-gray-100 shadow-sm h-16 sm:h-20 md:h-24 flex items-center transition-all safe-area-top"
+            className="fixed left-0 right-0 z-50 bg-white border-b border-gray-100 shadow-sm h-16 sm:h-20 lg:h-24 flex items-center transition-all safe-area-top"
             style={{ top: `${announcementOffset}px` }}
         >
-            <div className="container mx-auto px-4 sm:px-6 md:px-12 flex justify-between items-center h-full gap-2">
+            <div className="container flex justify-between items-center h-full gap-2">
                 {/* 1. Brand Identity - Clean & Iconic */}
                 <Link
                     to="/"

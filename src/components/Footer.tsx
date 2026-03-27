@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import logo from '../assets/imagens/logo.png';
-import { Facebook, Instagram, Twitter, Linkedin, Heart, ArrowRight, Loader2 } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Linkedin, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { getInstagramPosts, InstagramPost } from '../services/instagramService';
 
 interface FooterProps {
     content?: Record<string, any>;
@@ -15,11 +14,11 @@ const Footer: React.FC<FooterProps> = ({ content = {} }) => {
 
     return (
         <footer className="bg-brand-dark text-white pt-12 sm:pt-16 md:pt-24 pb-8 sm:pb-12 border-t border-white/5 font-sans safe-area-bottom">
-            <div className="container mx-auto px-4 sm:px-6 md:px-12">
+            <div className="container">
 
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-8 sm:gap-12 mb-12 sm:mb-20">
+                <div className="grid lg:grid-cols-12 gap-12 mb-20">
                     {/* Brand Column */}
-                    <div className="md:col-span-4 space-y-8">
+                    <div className="lg:col-span-4 space-y-8">
                         <div className="flex items-center gap-3">
                             <img src={logo} alt="Editora Graça" className="h-10 w-auto brightness-0 invert" />
                             <span className="font-serif font-black text-2xl tracking-tight uppercase">EDITORA <span className="text-brand-primary">GRAÇA</span></span>
@@ -48,7 +47,7 @@ const Footer: React.FC<FooterProps> = ({ content = {} }) => {
                     </div>
 
                     {/* Links Grid */}
-                    <div className="md:col-span-8 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
+                    <div className="lg:col-span-8 grid-universal">
                         {[
                             { title: "Empresa", links: [{ l: "Sobre Nós", p: "/sobre" }, { l: "Portefólio", p: "/projetos" }, { l: "Carreiras", p: "#" }, { l: "Imprensa", p: "#" }, { l: "Contactos", p: "/contacto" }] },
                             { title: "Catálogo", links: [{ l: "Lançamentos", p: "/livros" }, { l: "Mais Vendidos", p: "/livros" }, { l: "E-books", p: "/livros?tipo=digital" }, { l: "Autores", p: "/sobre" }] },

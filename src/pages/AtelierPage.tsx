@@ -164,21 +164,21 @@ const AtelierPage: React.FC<AtelierPageProps> = ({ siteContent = {} }) => {
             </section>
 
             {/* Services Showcase */}
-            <section className="py-32 bg-white relative">
-                <div className="container mx-auto px-6 md:px-12">
-                    <div className="flex flex-col md:flex-row items-end justify-between mb-24 gap-8">
+            <section className="section-fluid bg-white relative">
+                <div className="container">
+                    <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-24 gap-8">
                         <div className="max-w-2xl space-y-6">
                             <span className="text-brand-primary font-black text-xs uppercase tracking-[0.5em]">O Nosso Ecossistema</span>
-                            <h2 className="text-5xl md:text-7xl font-black text-brand-dark uppercase tracking-tighter leading-[0.9]">
+                            <h2 className="uppercase tracking-tighter leading-[0.9]">
                                 Soluções <span className="text-brand-primary italic font-serif lowercase font-normal">360°</span> para o seu Livro
                             </h2>
                         </div>
-                        <p className="text-gray-400 font-medium max-w-xs text-right">
+                        <p className="text-gray-400 font-medium max-w-xs lg:text-right">
                             Da primeira revisão à estratégia de lançamento, garantimos que cada detalhe reflita a grandeza da sua obra.
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+                    <div className="grid-universal">
                         {isLoading ? (
                             Array(6).fill(0).map((_, i) => <ServiceCardSkeleton key={i} />)
                         ) : (

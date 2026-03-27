@@ -114,7 +114,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
                 description={siteContent['home.hero_subtitle'] || "Curadoria de excelência literária."}
             />
             {/* 1. HERO SECTION - Bold & Geometric */}
-            <section className="min-h-screen pt-20 sm:pt-24 md:pt-32 pb-12 sm:pb-20 px-4 sm:px-6 md:px-12 flex items-center relative">
+            <section className="min-h-screen section-fluid flex items-center relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-1/2 h-full bg-gray-50 skew-x-12 translate-x-1/3 -z-10 hidden lg:block"></div>
 
                 <div className="container mx-auto grid lg:grid-cols-2 gap-10 sm:gap-16 items-center w-full">
@@ -129,14 +129,14 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
                             <span>🎉 Lançamento Oficial — Já Online</span>
                         </motion.div>
 
-                        <motion.h1 variants={fadeInUp} className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black uppercase leading-[0.9] tracking-tighter">
+                        <motion.h1 variants={fadeInUp} className="uppercase leading-[0.9] tracking-tighter">
                             {siteContent['home.hero_title'] || "Onde a Arte"} <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-amber-600">
                                 {siteContent['home.hero_subtitle'] || "Encontra o Legado"}
                             </span>
                         </motion.h1>
 
-                        <motion.p variants={fadeInUp} className="text-base sm:text-xl md:text-2xl text-gray-500 font-medium max-w-lg leading-relaxed">
+                        <motion.p variants={fadeInUp} className="text-gray-500 font-medium max-w-lg leading-relaxed">
                             {siteContent['home.hero_subtitle'] || "Curadoria de excelência para leitores que exigem o extraordinário."}
                         </motion.p>
 
@@ -514,10 +514,10 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
                     </div>
                 </div>
 
-                <div className="container mx-auto grid lg:grid-cols-2 gap-12 sm:gap-20 items-center relative z-10">
+                <div className="container grid lg:grid-cols-2 gap-12 sm:gap-20 items-center relative z-10">
                     <div>
                         <span className="text-brand-primary font-bold uppercase tracking-widest text-xs sm:text-sm">Experiência</span>
-                        <h2 className="text-2xl sm:text-4xl md:text-6xl font-black mt-4 mb-6 sm:mb-8 leading-tight uppercase">
+                        <h2 className="mt-4 mb-6 sm:mb-8 leading-tight uppercase">
                             Mais que uma editora, <br />um movimento.
                         </h2>
                         <ul className="space-y-4 sm:space-y-6">

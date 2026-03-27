@@ -58,12 +58,12 @@ const HeritagePage: React.FC<HeritagePageProps> = ({ siteContent = {} }) => {
             />
 
             {/* Cinematic Storytelling Section */}
-            <section className="py-32 bg-white relative overflow-hidden">
-                <div className="container mx-auto px-6 md:px-12">
+            <section className="section-fluid bg-white relative overflow-hidden">
+                <div className="container">
                     <div className="grid lg:grid-cols-2 gap-24 items-center">
                         <div className="space-y-12">
                             <span className="text-brand-primary font-black text-xs uppercase tracking-[0.5em]">A Nossa Razão de Ser</span>
-                            <h2 className="text-5xl md:text-7xl font-black text-brand-dark uppercase tracking-tighter leading-none">
+                            <h2 className="uppercase tracking-tighter leading-none">
                                 Curadoria de <span className="text-brand-primary italic font-serif lowercase font-normal">Obra-Prima</span>
                             </h2>
                             <p className="text-xl md:text-2xl text-gray-500 font-medium leading-relaxed">

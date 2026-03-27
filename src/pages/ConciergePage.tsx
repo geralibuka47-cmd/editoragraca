@@ -98,14 +98,14 @@ const ConciergePage: React.FC<ConciergePageProps> = ({ siteContent = {} }) => {
                 titleClassName="text-4xl sm:text-5xl md:text-7xl lg:text-[10rem] font-black uppercase leading-[0.8] tracking-tighter mb-4"
             />
 
-            <section className="py-24 md:py-40 relative overflow-hidden">
-                <div className="container mx-auto px-6 md:px-12">
+            <section className="section-fluid relative overflow-hidden">
+                <div className="container">
                     <div className="grid lg:grid-cols-2 gap-24 items-start">
                         {/* Status & Info */}
                         <div className="space-y-16">
                             <div className="space-y-6">
                                 <span className="text-brand-primary font-black text-xs uppercase tracking-[0.5em]">Excelência no Atendimento</span>
-                                <h2 className="text-5xl md:text-7xl font-black text-brand-dark uppercase tracking-tighter leading-none">
+                                <h2 className="uppercase tracking-tighter leading-none">
                                     Canais de <br /><span className="text-brand-primary italic font-serif lowercase font-normal">Exclusividade</span>
                                 </h2>
                                 <p className="text-xl text-gray-400 font-medium leading-relaxed max-w-xl">

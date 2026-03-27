@@ -89,7 +89,7 @@ const ExhibitionPage: React.FC<ExhibitionPageProps> = ({ siteContent = {} }) => 
 
             {/* Navigation / Tab Bar */}
             <div className="sticky top-20 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-100 py-6">
-                <div className="container mx-auto px-6 md:px-12 flex justify-center gap-4 md:gap-8 overflow-x-auto no-scrollbar pb-2 md:pb-0">
+                <div className="container flex justify-center gap-4 md:gap-8 overflow-x-auto no-scrollbar pb-2 md:pb-0">
                     {tabs.map(tab => {
                         const Icon = tab.icon;
                         const isActive = activeTab === tab.id;

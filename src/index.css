@@ -27,12 +27,30 @@
         -moz-osx-font-smoothing: grayscale;
         line-height: 1.6;
         overflow-x: hidden;
+        /* Tipografia fluida universal */
+        font-size: clamp(14px, 1.2vw, 18px);
     }
 
     img,
     video {
         max-width: 100%;
         height: auto;
+        display: block;
+    }
+
+    h1 {
+        font-size: clamp(2rem, 8vw, 5rem);
+        font-weight: 900;
+    }
+
+    h2 {
+        font-size: clamp(1.5rem, 6vw, 3.5rem);
+        font-weight: 800;
+    }
+
+    h3 {
+        font-size: clamp(1.25rem, 4vw, 2.5rem);
+        font-weight: 700;
     }
 
     h1,
@@ -199,12 +217,35 @@
     border: 0;
 }
 
-/* Responsividade global */
-@media (max-width: 640px) {
-    .container {
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
+/* Responsividade global universal */
+.container {
+    width: min(92%, 1400px);
+    margin-inline: auto;
+}
+
+/* Utilitários Fluidos */
+.grid-universal {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: clamp(1rem, 3vw, 3rem);
+}
+
+.section-fluid {
+    padding-block: clamp(3rem, 10vw, 10rem);
+    padding-inline: clamp(1rem, 5vw, 5rem);
+}
+
+/* Breakpoints consolidados (3 níveis) */
+@media (min-width: 768px) {
+    /* Tablet */
+}
+
+@media (min-width: 1024px) {
+    /* Laptop */
+}
+
+@media (min-width: 1280px) {
+    /* Desktop */
 }
 
 /* Área segura para dispositivos com notch */
