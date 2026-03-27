@@ -77,11 +77,6 @@ export const normalizeString = (str: string): string => {
         .replace(/[\u0300-\u036f]/g, "");
 };
 
-/**
- * Robust check if a book is already released
- * @param launchDate ISO string, Date or custom string
- * @returns boolean
- */
 export const isReleased = (launchDate: any, now?: number): boolean => {
     if (!launchDate) return true; // Books with no date are assumed released (back catalog)
 
@@ -91,7 +86,7 @@ export const isReleased = (launchDate: any, now?: number): boolean => {
     }
 
     const referenceTime = now || Date.now();
-    return d.getTime() <= (referenceTime + 1000); // 1s buffer
+    return d.getTime() <= referenceTime; // Strictly <= now, per user requirement
 };
 
 // Helper: Parse Firestore document to frontend format

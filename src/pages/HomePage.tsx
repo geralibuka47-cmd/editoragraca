@@ -67,15 +67,22 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
     const releasedBooks = useMemo(() => books.filter((b: Book) => isReleased(b.launchDate, now)), [books, now]);
     const futureBooks = useMemo(() => books.filter((b: Book) => b.launchDate && !isReleased(b.launchDate, now)), [books, now]);
 
-    // 1. Reading of the Month (Leitura do Mês) - Must be a released book
-    const readingOfMonth = (releasedBooks.find(b => b.featured) || releasedBooks[0]);
+    // 1. Reading of the Month (Leitura do Mês) - Must be the LATEST released book
+    const readingOfMonth = useMemo(() => {
+        const sorted = [...releasedBooks].sort((a, b) => {
+            const dateA = a.launchDate ? new Date(a.launchDate).getTime() : 0;
+            const dateB = b.launchDate ? new Date(b.launchDate).getTime() : 0;
+            return dateB - dateA;
+        });
+        // Prefer explicit featured if it's already released, otherwise latest released
+        return sorted.find(b => b.featured) || sorted[0];
+    }, [releasedBooks]);
 
     // 2. Author of the Month (Autor do Mês)
     const authorOfMonth = authors.find(a => a.featured) || authors[0];
 
-    // 3. Most Downloaded (Livro mais baixado) - Mandatory > 0 downloads
+    // 3. Most Downloaded (Livro mais baixado)
     const mostDownloadedBooks = useMemo(() => [...releasedBooks]
-        .filter((b: Book) => (b.stats?.downloads || 0) > 0)
         .sort((a: Book, b: Book) => (b.stats?.downloads || 0) - (a.stats?.downloads || 0)), [releasedBooks]);
 
     const mostDownloaded = mostDownloadedBooks[0] || null;
@@ -104,11 +111,17 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
         }))
         .slice(0, 3);
 
-    // Categories (Only released)
-    const ebooks = useMemo(() => releasedBooks.filter((b: Book) => b.format === 'digital').slice(0, 4), [releasedBooks]);
-    const physicalBooks = useMemo(() => releasedBooks.filter((b: Book) => b.format === 'físico').slice(0, 4), [releasedBooks]);
-    const freeBooks = useMemo(() => releasedBooks.filter((b: Book) => (b.price || 0) === 0).slice(0, 4), [releasedBooks]);
-    const paidBooks = useMemo(() => releasedBooks.filter((b: Book) => (b.price || 0) > 0).slice(0, 4), [releasedBooks]);
+    // Categories (Only released, sorted by launchDate desc)
+    const sortByLaunch = (a: Book, b: Book) => {
+        const dateA = a.launchDate ? new Date(a.launchDate).getTime() : 0;
+        const dateB = b.launchDate ? new Date(b.launchDate).getTime() : 0;
+        return dateB - dateA;
+    };
+
+    const ebooks = useMemo(() => [...releasedBooks].filter((b: Book) => b.format === 'digital').sort(sortByLaunch).slice(0, 4), [releasedBooks]);
+    const physicalBooks = useMemo(() => [...releasedBooks].filter((b: Book) => b.format === 'físico').sort(sortByLaunch).slice(0, 4), [releasedBooks]);
+    const freeBooks = useMemo(() => [...releasedBooks].filter((b: Book) => (b.price || 0) === 0).sort(sortByLaunch).slice(0, 4), [releasedBooks]);
+    const paidBooks = useMemo(() => [...releasedBooks].filter((b: Book) => (b.price || 0) > 0).sort(sortByLaunch).slice(0, 4), [releasedBooks]);
 
     const upcomingLaunch = useMemo(() => futureBooks
         .sort((a: Book, b: Book) => new Date(a.launchDate!).getTime() - new Date(b.launchDate!).getTime())[0], [futureBooks]);
