@@ -185,11 +185,11 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
             <AnimatePresence>
                 {isMenuOpen && (
                     <m.div
-                        initial={{ x: '100%' }}
-                        animate={{ x: 0 }}
-                        exit={{ x: '100%' }}
-                        transition={{ type: "tween", duration: 0.3 }}
-                        className="fixed inset-0 z-[60] bg-white flex flex-col pt-8 px-8 md:hidden shadow-2xl"
+                        initial={{ x: '100%', opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: '100%', opacity: 0 }}
+                        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                        className="fixed inset-0 z-[60] bg-white flex flex-col p-[clamp(1.5rem,6vw,4rem)] md:hidden shadow-2xl"
                     >
                         <div className="flex justify-between items-center mb-12">
                             <span className="font-serif font-black text-2xl text-brand-dark">MENU</span>
@@ -197,16 +197,22 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                                 <X className="w-6 h-6 text-brand-dark" />
                             </button>
                         </div>
-                        <div className="flex flex-col gap-6">
-                            {navLinks.map((link) => (
-                                <Link
+                        <div className="flex flex-col gap-4 sm:gap-6 mt-8">
+                            {navLinks.map((link, i) => (
+                                <m.div
                                     key={link.path}
-                                    to={link.path}
-                                    onClick={() => setIsMenuOpen(false)}
-                                    className="text-2xl font-black text-brand-dark text-left uppercase tracking-tight py-4 border-b border-gray-100 last:border-0"
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: i * 0.05 }}
                                 >
-                                    {link.name}
-                                </Link>
+                                    <Link
+                                        to={link.path}
+                                        onClick={() => setIsMenuOpen(false)}
+                                        className="text-[clamp(1.8rem,8vw,4rem)] font-black text-brand-dark text-left uppercase tracking-tighter leading-none py-2 hover:text-brand-primary transition-colors block"
+                                    >
+                                        {link.name}
+                                    </Link>
+                                </m.div>
                             ))}
                         </div>
                     </m.div>
@@ -220,74 +226,76 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
-                        className="absolute top-full left-0 right-0 bg-white border-b border-gray-100 shadow-xl py-4 sm:py-6 px-4 md:px-12 flex justify-center w-full"
+                        className="absolute top-full left-0 right-0 bg-white border-b border-gray-100 shadow-xl py-6 px-4 flex justify-center w-full"
                     >
-                        <form onSubmit={handleSearch} className="w-full max-w-3xl relative">
-                            <Input
-                                autoFocus
-                                type="text"
-                                variant="light"
-                                placeholder="O que procura..."
-                                value={searchQuery}
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-                                className="pr-14"
-                                icon={<Search className="w-5 h-5" />}
-                            />
-                            <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                                {isSearching && <Loader2 className="w-4 h-4 animate-spin text-brand-primary" />}
-                                <button
-                                    type="submit"
-                                    className="text-brand-primary font-bold uppercase text-xs tracking-widest px-2 hover:brightness-110 transition-all"
-                                    title="Efetuar Pesquisa"
-                                    aria-label="Efetuar Pesquisa"
-                                >
-                                    Buscar
-                                </button>
-                            </div>
-
-                            {/* Instant Results Dropdown */}
-                            <AnimatePresence>
-                                {searchResults.length > 0 && (
-                                    <m.div
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: 10 }}
-                                        className="absolute top-full mt-4 left-0 right-0 bg-white rounded-3xl overflow-hidden shadow-2xl border border-gray-100 z-50 p-4"
+                        <div className="container px-0 flex justify-center">
+                            <form onSubmit={handleSearch} className="w-full max-w-4xl relative">
+                                <Input
+                                    autoFocus
+                                    type="text"
+                                    variant="light"
+                                    placeholder="O que procura..."
+                                    value={searchQuery}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                                    className="pr-14"
+                                    icon={<Search className="w-5 h-5" />}
+                                />
+                                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                                    {isSearching && <Loader2 className="w-4 h-4 animate-spin text-brand-primary" />}
+                                    <button
+                                        type="submit"
+                                        className="text-brand-primary font-bold uppercase text-xs tracking-widest px-2 hover:brightness-110 transition-all"
+                                        title="Efetuar Pesquisa"
+                                        aria-label="Efetuar Pesquisa"
                                     >
-                                        <div className="px-6 pt-4 pb-2">
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Resultados Rápidos</span>
-                                        </div>
-                                        <div className="space-y-2">
-                                            {searchResults.map((result) => (
-                                                <button
-                                                    key={result.id}
-                                                    onClick={() => {
-                                                        onNavigate(result.url);
-                                                        setIsSearchOpen(false);
-                                                        setSearchQuery('');
-                                                    }}
-                                                    className="w-full flex items-center gap-4 p-4 hover:bg-gray-50 rounded-2xl transition-all text-left group"
-                                                >
-                                                    <div className="w-12 h-16 bg-gray-100 rounded-lg overflow-hidden shrink-0">
-                                                        {result.image && (
-                                                            <img src={result.image} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
-                                                        )}
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <h4 className="font-black text-brand-dark leading-tight group-hover:text-brand-primary transition-colors">{result.title}</h4>
-                                                        <p className="text-xs text-gray-500 font-medium">{result.subtitle}</p>
-                                                    </div>
-                                                    <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest ${result.type === 'book' ? 'bg-brand-primary/10 text-brand-primary' : 'bg-brand-dark/10 text-brand-dark'
-                                                        }`}>
-                                                        {result.type === 'book' ? 'Livro' : 'Post'}
-                                                    </span>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </m.div>
-                                )}
-                            </AnimatePresence>
-                        </form>
+                                        Buscar
+                                    </button>
+                                </div>
+
+                                {/* Instant Results Dropdown */}
+                                <AnimatePresence>
+                                    {searchResults.length > 0 && (
+                                        <m.div
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: 10 }}
+                                            className="absolute top-full mt-4 left-0 right-0 bg-white rounded-3xl overflow-hidden shadow-2xl border border-gray-100 z-50 p-4"
+                                        >
+                                            <div className="px-6 pt-4 pb-2">
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Resultados Rápidos</span>
+                                            </div>
+                                            <div className="space-y-2">
+                                                {searchResults.map((result) => (
+                                                    <button
+                                                        key={result.id}
+                                                        onClick={() => {
+                                                            onNavigate(result.url);
+                                                            setIsSearchOpen(false);
+                                                            setSearchQuery('');
+                                                        }}
+                                                        className="w-full flex items-center gap-4 p-4 hover:bg-gray-50 rounded-2xl transition-all text-left group"
+                                                    >
+                                                        <div className="w-12 h-16 bg-gray-100 rounded-lg overflow-hidden shrink-0">
+                                                            {result.image && (
+                                                                <img src={result.image} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                                                            )}
+                                                        </div>
+                                                        <div className="flex-1">
+                                                            <h4 className="font-black text-brand-dark leading-tight group-hover:text-brand-primary transition-colors">{result.title}</h4>
+                                                            <p className="text-xs text-gray-500 font-medium">{result.subtitle}</p>
+                                                        </div>
+                                                        <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest ${result.type === 'book' ? 'bg-brand-primary/10 text-brand-primary' : 'bg-brand-dark/10 text-brand-dark'
+                                                            }`}>
+                                                            {result.type === 'book' ? 'Livro' : 'Post'}
+                                                        </span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </m.div>
+                                    )}
+                                </AnimatePresence>
+                            </form>
+                        </div>
                     </m.div>
                 )}
             </AnimatePresence>
