@@ -17,15 +17,16 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     src,
     alt,
     className = '',
-    fallbackSrc = 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&h=500&fit=crop',
+    fallbackSrc = 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400&h=600&fit=crop',
     onError,
     width,
     height,
     priority = false,
     aspectRatio = 'auto'
 }) => {
-    const [imgSrc, setImgSrc] = useState(src);
-    const [isLoading, setIsLoading] = useState(!priority); // Skip loading state if priority
+    const optimized = optimizeImageUrl(src, width, height);
+    const [imgSrc, setImgSrc] = useState(optimized);
+    const [isLoading, setIsLoading] = useState(!priority);
     const [hasError, setHasError] = useState(false);
 
     const aspectClasses = {
@@ -42,7 +43,10 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     }, [src, width, height, priority]);
 
     const handleError = () => {
-        if (imgSrc !== fallbackSrc) {
+        // On error: try direct URL first, then fallback
+        if (imgSrc !== src && imgSrc !== fallbackSrc) {
+            setImgSrc(src); // try original
+        } else if (imgSrc !== fallbackSrc) {
             setImgSrc(fallbackSrc);
         } else {
             setHasError(true);
@@ -51,16 +55,11 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
         onError?.();
     };
 
-    const handleLoad = () => {
-        setIsLoading(false);
-    };
-
     if (hasError) {
         return (
             <div className={`flex items-center justify-center bg-gray-100 ${aspectClasses[aspectRatio]} ${className}`}>
-                <div className="text-center p-4">
-                    <ImageOff className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                    <p className="text-sm text-gray-500 uppercase font-black text-[10px] tracking-widest">Erro de Mídia</p>
+                <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Sem imagem</span>
                 </div>
             </div>
         );
@@ -68,10 +67,9 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
 
     return (
         <div className={`relative overflow-hidden ${aspectClasses[aspectRatio]} ${className}`}>
+            {/* Skeleton shown while loading */}
             {isLoading && !priority && (
-                <div className="absolute inset-0 bg-gray-100 animate-pulse flex items-center justify-center">
-                    <div className="w-8 h-8 border-2 border-brand-primary/20 border-t-brand-primary rounded-full animate-spin" />
-                </div>
+                <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 animate-pulse" />
             )}
             <img
                 src={imgSrc}
@@ -81,39 +79,43 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
                 loading={priority ? 'eager' : 'lazy'}
                 fetchPriority={priority ? 'high' : 'auto'}
                 decoding={priority ? 'sync' : 'async'}
-                className={`w-full h-full object-cover transition-all duration-700 ${isLoading && !priority ? 'opacity-0 scale-105' : 'opacity-100 scale-100'}`}
+                className={`w-full h-full object-cover transition-opacity duration-500 ${isLoading && !priority ? 'opacity-0' : 'opacity-100'}`}
                 onError={handleError}
-                onLoad={handleLoad}
+                onLoad={() => setIsLoading(false)}
             />
         </div>
     );
 };
 
-// Utility function to optimize image URL (add query params for resizing)
+// Proxy universal de redimensionamento via weserv.nl
+// Suporta: Firebase Storage, Unsplash, URLs genéricos
 export const optimizeImageUrl = (url: string, width?: number, height?: number): string => {
-    if (!url) return url;
+    if (!url || url.startsWith('data:')) return url;
 
     try {
-        // Check if it's an Unsplash URL
+        // Unsplash — parâmetros nativos
         if (url.includes('unsplash.com')) {
-            const separator = url.includes('?') ? '&' : '?';
-            let params = 'auto=format&q=80';
+            const sep = url.includes('?') ? '&' : '?';
+            let p = 'auto=format&q=75&fm=webp';
+            if (width) p += `&w=${width}`;
+            if (height) p += `&h=${height}`;
+            if (width && height) p += '&fit=crop';
+            return `${url}${sep}${p}`;
+        }
+
+        // Cloudinary — parâmetros nativos
+        if (url.includes('cloudinary.com') && width) {
+            return url.replace('/upload/', `/upload/w_${width},q_auto,f_webp/`);
+        }
+
+        // Firebase Storage & outros URLs — proxy weserv.nl para resize + WebP
+        if (width || height) {
+            const encoded = encodeURIComponent(url);
+            let params = `url=${encoded}&output=webp&q=80`;
             if (width) params += `&w=${width}`;
             if (height) params += `&h=${height}`;
-            if (width && height) params += '&fit=crop';
-            return `${url}${separator}${params}`;
-        }
-
-        // Google Drive Optimization (Basic)
-        if (url.includes('drive.google.com')) {
-            // Convert to direct link if possible or use proxy
-            return url.replace('file/d/', 'uc?id=').replace('/view?usp=sharing', '');
-        }
-
-        // Generic size hints for CDN-like URLs that support ?w= or ?width=
-        if (width && (url.includes('cloudinary') || url.includes('imgix') || url.includes('images.weserv.nl'))) {
-            const separator = url.includes('?') ? '&' : '?';
-            return `${url}${separator}w=${width}${height ? `&h=${height}` : ''}`;
+            if (width && height) params += '&fit=cover';
+            return `https://wsrv.nl/?${params}`;
         }
     } catch (e) {
         return url;

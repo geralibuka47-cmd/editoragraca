@@ -209,10 +209,22 @@ const globalStatsCache = new Map<string, { data: any, timestamp: number }>();
 export const getBooks = async (forceRefresh = false, limitCount?: number): Promise<Book[]> => {
     const now = Date.now();
 
-    // If not forcing refresh, and we have cache, and it's not expired, and we're not asking for a restricted subset that cache might not satisfy
+    // 1. Memory cache (fastest)
     if (!forceRefresh && booksCache && (now - lastBooksFetch < CACHE_DURATION)) {
         if (!limitCount || booksCache.length >= limitCount) {
             return limitCount ? booksCache.slice(0, limitCount) : booksCache;
+        }
+    }
+
+    // 2. localStorage cache (fast — avoid Firestore on revisit)
+    if (!forceRefresh && !limitCount) {
+        const localBooks = getLocal('books');
+        if (localBooks && Array.isArray(localBooks)) {
+            booksCache = localBooks;
+            lastBooksFetch = now;
+            // Refresh in background silently
+            setTimeout(() => getBooks(true), 0);
+            return localBooks;
         }
     }
 
@@ -231,6 +243,7 @@ export const getBooks = async (forceRefresh = false, limitCount?: number): Promi
         if (!limitCount) {
             booksCache = books;
             lastBooksFetch = now;
+            setLocal('books', books); // Persist to localStorage
         }
 
         return books;
