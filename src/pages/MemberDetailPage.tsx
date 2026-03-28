@@ -2,14 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { m, useScroll, useTransform, Variants } from 'framer-motion';
 import { ArrowLeft, Mail, Linkedin, Twitter, Sparkles, MapPin, Award, BookOpen, Quote, Loader2 } from 'lucide-react';
-import { getTeamMemberById } from '../services/dataService';
+import { getTeamMemberById, getBooksMinimal, isReleased } from '../services/dataService';
 import SEO from '../components/SEO';
 import { OptimizedImage } from '../components/OptimizedImage';
+import { Book } from '../types';
+import BookCard from '../components/BookCard';
 
 const MemberDetailPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [member, setMember] = useState<any>(null);
+    const [authorBooks, setAuthorBooks] = useState<Book[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     const { scrollY } = useScroll();
@@ -17,19 +20,31 @@ const MemberDetailPage: React.FC = () => {
     const headerOpacity = useTransform(scrollY, [0, 400], [1, 0.4]);
 
     useEffect(() => {
-        const fetchMember = async () => {
+        const fetchData = async () => {
             if (!id) return;
             setIsLoading(true);
             try {
-                const data = await getTeamMemberById(id);
-                setMember(data);
+                const [memberData, allBooks] = await Promise.all([
+                    getTeamMemberById(id),
+                    getBooksMinimal()
+                ]);
+
+                setMember(memberData);
+
+                if (memberData) {
+                    const filtered = allBooks.filter((b: Book) =>
+                        (b.authorId && b.authorId === memberData.id) ||
+                        (b.author && b.author.toLowerCase() === memberData.name.toLowerCase())
+                    );
+                    setAuthorBooks(filtered);
+                }
             } catch (error) {
-                console.error("Erro ao carregar membro:", error);
+                console.error("Erro ao carregar dados:", error);
             } finally {
                 setIsLoading(false);
             }
         };
-        fetchMember();
+        fetchData();
     }, [id]);
 
     if (isLoading) {
@@ -261,7 +276,38 @@ const MemberDetailPage: React.FC = () => {
                 </div>
             </section>
 
-            {/* 3. CTA SECTION */}
+            {/* 3. AUTHOR'S BOOKS */}
+            {authorBooks.length > 0 && (
+                <section className="py-24 bg-gray-50">
+                    <div className="container mx-auto px-6 md:px-12">
+                        <div className="mb-16">
+                            <span className="text-brand-primary font-black uppercase tracking-[0.4em] text-[10px]">Catálogo Autoral</span>
+                            <h2 className="text-4xl md:text-6xl font-black text-brand-dark tracking-tighter uppercase mt-2">Obras do Autor</h2>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
+                            {authorBooks.map((book) => (
+                                <m.div
+                                    key={book.id}
+                                    initial="hidden"
+                                    whileInView="visible"
+                                    viewport={{ once: true }}
+                                    variants={itemVariants}
+                                >
+                                    <BookCard
+                                        book={book}
+                                        onViewDetails={(b) => navigate(`/livro/${b.id}`)}
+                                        onAddToCart={() => { }} // Could be improved if needed
+                                        onToggleWishlist={() => { }}
+                                    />
+                                </m.div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            )}
+
+            {/* 4. CTA SECTION */}
             <section className="py-24 bg-brand-dark relative overflow-hidden">
                 <div className="container mx-auto px-6 md:px-12 relative z-10 text-center">
                     <m.div

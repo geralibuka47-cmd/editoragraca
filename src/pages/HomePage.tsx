@@ -92,13 +92,12 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
         .sort((a: Book, b: Book) => (b.stats?.views || 0) - (a.stats?.views || 0))
         .slice(0, 4), [releasedBooks]);
 
-    // 5. Success Authors (Autores com mais downloads/vendas)
+    // 5. Success Authors (Autores com mais obras no site)
     const authorStatsMap = new Map<string, { author: string, count: number, id: string, photo?: string }>();
-    releasedBooks.forEach((b: Book) => {
-        const count = (b.stats?.copiesSold || 0) + (b.stats?.downloads || 0);
+    books.forEach((b: Book) => {
         const key = b.authorId || b.author;
         const current = authorStatsMap.get(key) || { author: b.author, id: b.authorId || '', count: 0 };
-        authorStatsMap.set(key, { ...current, count: current.count + count });
+        authorStatsMap.set(key, { ...current, count: current.count + 1 });
     });
     const topAuthors = Array.from(authorStatsMap.values())
         .sort((a, b) => b.count - a.count)
@@ -436,7 +435,6 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
                 <section className="py-12 sm:py-16 md:py-24 bg-gray-50 px-4 sm:px-6 md:px-12">
                     <div className="container mx-auto">
                         <div className="text-center mb-12 sm:mb-20">
-                            <span className="text-brand-primary font-bold uppercase tracking-widest text-[10px] sm:text-xs">Elite Intelectual</span>
                             <h2 className="text-3xl sm:text-5xl md:text-6xl font-black text-brand-dark mt-2 uppercase tracking-tighter">Autores de Sucesso</h2>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -447,7 +445,8 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
                                     whileInView={{ opacity: 1, y: 0 }}
                                     transition={{ delay: i * 0.1 }}
                                     viewport={{ once: true }}
-                                    className="bg-white p-8 rounded-[2.5rem] border border-gray-100 hover:shadow-2xl transition-all group relative overflow-hidden"
+                                    onClick={() => ta.details?.id && navigate(`/equipa/${ta.details.id}`)}
+                                    className="bg-white p-8 rounded-[2.5rem] border border-gray-100 hover:shadow-2xl transition-all group relative overflow-hidden cursor-pointer"
                                 >
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-brand-primary/5 blur-[60px] rounded-full group-hover:bg-brand-primary/10 transition-colors" />
                                     <div className="flex flex-col items-center text-center space-y-6 relative z-10">
@@ -463,7 +462,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
                                             <p className="text-brand-primary text-[10px] font-black uppercase tracking-widest mt-1">Líder de Preferência</p>
                                         </div>
                                         <div className="px-6 py-3 bg-brand-dark text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em]">
-                                            {ta.count} Obras Circuladas
+                                            {ta.count} {ta.count === 1 ? 'Obra Registada' : 'Obras Registadas'}
                                         </div>
                                     </div>
                                 </motion.div>
