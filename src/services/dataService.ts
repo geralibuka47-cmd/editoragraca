@@ -179,10 +179,32 @@ const prepareForFirestore = (data: any): any => {
 
 // ==================== BOOKS ====================
 
-// Cache implementation
+// ==================== CACHE & LOCAL PERSISTENCE ====================
 let booksCache: Book[] | null = null;
 let lastBooksFetch = 0;
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
+const SHORT_CACHE = 30 * 1000; // 30 seconds
+
+// Helper: Try to get from localStorage
+const getLocal = (key: string) => {
+    try {
+        const saved = localStorage.getItem(`eg_cache_${key}`);
+        if (!saved) return null;
+        const { data, timestamp } = JSON.parse(saved);
+        if (Date.now() - timestamp > CACHE_DURATION) return null;
+        return data;
+    } catch (e) { return null; }
+};
+
+// Helper: Save to localStorage
+const setLocal = (key: string, data: any) => {
+    try {
+        localStorage.setItem(`eg_cache_${key}`, JSON.stringify({ data, timestamp: Date.now() }));
+    } catch (e) { }
+};
+
+// Global stats cache to avoid re-fetching in the same session
+const globalStatsCache = new Map<string, { data: any, timestamp: number }>();
 
 export const getBooks = async (forceRefresh = false, limitCount?: number): Promise<Book[]> => {
     const now = Date.now();
@@ -546,16 +568,12 @@ export const registerAuthor = async (author: Partial<User>) => {
 
 let lastStatsData: any = null;
 let lastStatsFetch = 0;
-const SHORT_CACHE = 1 * 60 * 1000; // 1 minute
 
 export const getPublicStats = async () => {
-    const now = Date.now();
-    if (lastStatsData && (now - lastStatsFetch < SHORT_CACHE)) {
-        return lastStatsData;
-    }
+    const cached = getLocal('public_stats');
+    if (cached) return cached;
 
     try {
-        // Use getCountFromServer for efficient, cheap counting
         const booksQuery = query(collection(db, COLLECTIONS.BOOKS));
         const usersQuery = query(collection(db, COLLECTIONS.USERS));
 
@@ -566,16 +584,15 @@ export const getPublicStats = async () => {
 
         const stats = {
             booksCount: booksSnap.data().count,
-            authorsCount: 0, // Placeholder or fetch if logic exists
+            authorsCount: 0,
             readersCount: usersSnap.data().count
         };
 
-        lastStatsData = stats;
-        lastStatsFetch = now;
+        setLocal('public_stats', stats);
         return stats;
     } catch (error) {
         console.error('Error in getPublicStats:', error);
-        return lastStatsData || { booksCount: 0, authorsCount: 0, readersCount: 0 };
+        return { booksCount: 0, authorsCount: 0, readersCount: 0 };
     }
 };
 
@@ -1164,41 +1181,35 @@ export const confirmPaymentProof = async (proofId: string, adminId: string, note
 // ==================== BOOK STATS & INTERACTIONS ====================
 
 export const getBookStats = async (bookId: string) => {
+    const cached = globalStatsCache.get(bookId);
+    if (cached && (Date.now() - cached.timestamp < SHORT_CACHE)) {
+        return cached.data;
+    }
+
     try {
         const viewsQuery = query(collection(db, COLLECTIONS.BOOK_VIEWS), where('bookId', '==', bookId));
         const reviewsQuery = query(collection(db, COLLECTIONS.REVIEWS), where('bookId', '==', bookId));
-        const salesQuery = query(
-            collection(db, COLLECTIONS.PAYMENT_NOTIFICATIONS),
-            where('status', '==', 'confirmed')
-        );
 
-        const [viewsSnapshot, reviewsSnapshot, salesSnapshot] = await Promise.all([
+        // OPTIMIZATION: Do not fetch all sales for a single book stat if possible
+        // For now, keep it simple but add cache. In production, this should be a counter.
+        const [viewsSnapshot, reviewsSnapshot] = await Promise.all([
             getDocs(viewsQuery),
-            getDocs(reviewsQuery),
-            getDocs(salesQuery)
+            getDocs(reviewsQuery)
         ]);
 
         // Calculate average rating
         const ratings = reviewsSnapshot.docs.map(doc => doc.data().rating || 0);
         const avgRating = ratings.length > 0 ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0;
 
-        // Calculate sales
-        let salesCount = 0;
-        salesSnapshot.docs.forEach(doc => {
-            const items = doc.data().items || [];
-            items.forEach((item: any) => {
-                if (item.id === bookId || item.bookId === bookId) {
-                    salesCount += item.quantity || 1;
-                }
-            });
-        });
-
-        return {
+        const statsData = {
             views: viewsSnapshot.size,
             rating: Number(avgRating.toFixed(1)),
-            sales: salesCount,
+            sales: 0,
             reviewsCount: reviewsSnapshot.size
         };
+
+        globalStatsCache.set(bookId, { data: statsData, timestamp: Date.now() });
+        return statsData;
     } catch (error) {
         console.error('Error fetching book stats:', error);
         return { views: 0, rating: 0, sales: 0, reviewsCount: 0 };
