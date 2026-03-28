@@ -123,6 +123,8 @@ const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({ books, authors }) =
                                             alt={currentGroup.author.name}
                                             className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-110"
                                             aspectRatio="square"
+                                            width={200}
+                                            height={200}
                                         />
                                     </div>
                                 </div>
