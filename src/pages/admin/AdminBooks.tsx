@@ -13,7 +13,8 @@ import {
     Loader2,
     ShoppingBag,
     Image,
-    CreditCard
+    CreditCard,
+    Sparkles
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getBooks, saveBook, deleteBook, getAuthors } from '../../services/dataService';
@@ -35,6 +36,9 @@ const AdminBooks: React.FC = () => {
         title: '',
         author: '',
         authorId: '',
+        authorIds: [],
+        authors: [],
+        category: 'livro',
         price: 0,
         coverUrl: '',
         format: 'físico',
@@ -96,6 +100,9 @@ const AdminBooks: React.FC = () => {
                 title: '',
                 author: '',
                 authorId: '',
+                authorIds: [],
+                authors: [],
+                category: 'livro',
                 price: 0,
                 coverUrl: '',
                 format: 'físico',
@@ -308,6 +315,21 @@ const AdminBooks: React.FC = () => {
                                                             />
                                                         </div>
                                                         <div className="space-y-2">
+                                                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Tipo de Obra</label>
+                                                            <select
+                                                                title="Categoria da Obra"
+                                                                value={formData.category}
+                                                                onChange={e => setFormData({ ...formData, category: e.target.value as any })}
+                                                                className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all appearance-none cursor-pointer capitalize"
+                                                            >
+                                                                <option value="livro">Livro Individual</option>
+                                                                <option value="coletânea">Coletânea</option>
+                                                                <option value="antologia">Antologia</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        <div className="space-y-2">
                                                             <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Formato</label>
                                                             <select
                                                                 title="Formato da Obra"
@@ -319,16 +341,16 @@ const AdminBooks: React.FC = () => {
                                                                 <option value="digital">📱 Digital</option>
                                                             </select>
                                                         </div>
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Data e Hora de Lançamento</label>
-                                                        <input
-                                                            required
-                                                            type="datetime-local"
-                                                            value={formData.launchDate ? (formData.launchDate.includes('T') ? formData.launchDate.substring(0, 16) : `${formData.launchDate}T00:00`) : ''}
-                                                            onChange={e => setFormData({ ...formData, launchDate: e.target.value })}
-                                                            className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
-                                                        />
+                                                        <div className="space-y-2">
+                                                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Data de Lançamento</label>
+                                                            <input
+                                                                required
+                                                                type="datetime-local"
+                                                                value={formData.launchDate ? (formData.launchDate.includes('T') ? formData.launchDate.substring(0, 16) : `${formData.launchDate}T00:00`) : ''}
+                                                                onChange={e => setFormData({ ...formData, launchDate: e.target.value })}
+                                                                className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+                                                            />
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div className="space-y-6">
@@ -415,22 +437,73 @@ const AdminBooks: React.FC = () => {
                                             </div>
 
                                             {!isNewAuthor ? (
-                                                <div className="space-y-4">
-                                                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Autor do Acervo</label>
-                                                    <select
-                                                        value={formData.authorId}
-                                                        onChange={e => {
-                                                            const author = authors.find(a => a.id === e.target.value);
-                                                            setFormData({ ...formData, authorId: e.target.value, author: author?.name || '' });
-                                                        }}
-                                                        className="w-full px-8 py-6 bg-gray-50 border-none rounded-[2rem] text-lg font-black outline-none focus:ring-4 focus:ring-brand-primary/10 transition-all appearance-none cursor-pointer"
-                                                        title="Selecionar Autor"
-                                                    >
-                                                        <option value="">-- Selecione um autor --</option>
-                                                        {authors.map(author => (
-                                                            <option key={author.id} value={author.id}>{author.name}</option>
-                                                        ))}
-                                                    </select>
+                                                <div className="space-y-6">
+                                                    <div className="space-y-4">
+                                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Adicionar Autor(es)</label>
+                                                        <select
+                                                            value=""
+                                                            onChange={e => {
+                                                                const authorId = e.target.value;
+                                                                if (!authorId) return;
+                                                                const author = authors.find(a => a.id === authorId);
+                                                                if (!author) return;
+
+                                                                const currentIds = formData.authorIds || [];
+                                                                const currentAuthors = formData.authors || [];
+
+                                                                if (!currentIds.includes(authorId)) {
+                                                                    setFormData({
+                                                                        ...formData,
+                                                                        authorId: formData.authorId || authorId, // Set primary if none exists
+                                                                        author: formData.author || author.name,
+                                                                        authorIds: [...currentIds, authorId],
+                                                                        authors: [...currentAuthors, { id: authorId, name: author.name }]
+                                                                    });
+                                                                }
+                                                            }}
+                                                            className="w-full px-8 py-6 bg-gray-50 border-none rounded-[2rem] text-lg font-black outline-none focus:ring-4 focus:ring-brand-primary/10 transition-all appearance-none cursor-pointer"
+                                                            title="Adicionar Autor"
+                                                        >
+                                                            <option value="">-- Selecione para adicionar --</option>
+                                                            {authors.filter(a => !(formData.authorIds || []).includes(a.id)).map(author => (
+                                                                <option key={author.id} value={author.id}>{author.name}</option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
+
+                                                    {/* Selected Authors List */}
+                                                    <div className="space-y-3">
+                                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Autores Selecionados</label>
+                                                        <div className="flex flex-wrap gap-3 min-h-[60px] p-6 bg-gray-50 rounded-[2rem] border-2 border-dashed border-gray-100">
+                                                            {(formData.authors || []).length > 0 ? (
+                                                                formData.authors?.map((auth: any) => (
+                                                                    <div key={auth.id} className="flex items-center gap-3 px-4 py-2 bg-white rounded-xl shadow-sm border border-gray-100 group">
+                                                                        <span className="text-sm font-bold text-brand-dark">{auth.name}</span>
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => {
+                                                                                const newIds = (formData.authorIds || []).filter(id => id !== auth.id);
+                                                                                const newAuthors = (formData.authors || []).filter((a: any) => a.id !== auth.id);
+                                                                                setFormData({
+                                                                                    ...formData,
+                                                                                    authorIds: newIds,
+                                                                                    authors: newAuthors,
+                                                                                    // Update primary author if it was deleted
+                                                                                    authorId: formData.authorId === auth.id ? (newIds[0] || '') : formData.authorId,
+                                                                                    author: formData.author === auth.name ? (newAuthors[0]?.name || '') : formData.author
+                                                                                });
+                                                                            }}
+                                                                            className="w-5 h-5 rounded-full bg-red-50 text-red-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                        >
+                                                                            <Plus className="w-3 h-3 rotate-45" />
+                                                                        </button>
+                                                                    </div>
+                                                                ))
+                                                            ) : (
+                                                                <span className="text-xs text-gray-300 font-medium italic">Nenhum autor selecionado...</span>
+                                                            )}
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             ) : (
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -787,6 +860,12 @@ const AdminBooks: React.FC = () => {
                                         <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest ${book.format === 'digital' ? 'bg-brand-primary/10 text-brand-primary' : 'bg-brand-dark/10 text-brand-dark'}`}>
                                             {book.format}
                                         </span>
+                                        {book.category && book.category !== 'livro' && (
+                                            <span className="px-2 py-0.5 bg-brand-primary text-white rounded text-[8px] font-black uppercase tracking-widest leading-none flex items-center gap-1">
+                                                <Sparkles className="w-2 h-2" />
+                                                {book.category}
+                                            </span>
+                                        )}
                                         {book.featured && (
                                             <span className="px-2 py-0.5 bg-yellow-400/10 text-yellow-600 rounded text-[8px] font-black uppercase tracking-widest">Destaque</span>
                                         )}
@@ -794,8 +873,10 @@ const AdminBooks: React.FC = () => {
                                     <h3 className="text-xl font-black text-brand-dark truncate group-hover:text-brand-primary transition-colors">
                                         {book.title}
                                     </h3>
-                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">
-                                        {book.author}
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 truncate">
+                                        {book.authors && book.authors.length > 0
+                                            ? book.authors.map(a => a.name).join(', ')
+                                            : book.author}
                                     </p>
                                 </div>
 

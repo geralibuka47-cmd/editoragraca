@@ -95,9 +95,16 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
     // 5. Success Authors (Autores com mais obras no site)
     const authorStatsMap = new Map<string, { author: string, count: number, id: string, photo?: string }>();
     books.forEach((b: Book) => {
-        const key = b.authorId || b.author;
-        const current = authorStatsMap.get(key) || { author: b.author, id: b.authorId || '', count: 0 };
-        authorStatsMap.set(key, { ...current, count: current.count + 1 });
+        const bookAuthors = b.authors && b.authors.length > 0
+            ? b.authors
+            : [{ id: b.authorId || '', name: b.author }];
+
+        bookAuthors.forEach(auth => {
+            if (!auth.name) return;
+            const key = auth.id || auth.name;
+            const current = authorStatsMap.get(key) || { author: auth.name, id: auth.id || '', count: 0 };
+            authorStatsMap.set(key, { ...current, count: current.count + 1 });
+        });
     });
     const topAuthors = Array.from(authorStatsMap.values())
         .sort((a, b) => b.count - a.count)

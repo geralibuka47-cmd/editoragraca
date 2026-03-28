@@ -24,6 +24,7 @@ export interface User {
   bio?: string;
   avatarUrl?: string;
 }
+export type BookCategory = 'livro' | 'coletânea' | 'antologia';
 
 export interface Book {
   id: string;
@@ -37,7 +38,10 @@ export interface Book {
   isBestseller?: boolean;
   featured?: boolean;
   description?: string;
-  authorId?: string;
+  authorId?: string; // Main author ID (legacy)
+  authorIds?: string[]; // Array of author IDs for multi-author support
+  authors?: { id?: string; name: string }[]; // Structured authors list
+  category?: BookCategory;
   stock?: number;
   digitalFileUrl?: string;
   format?: 'físico' | 'digital';

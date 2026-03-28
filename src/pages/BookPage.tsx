@@ -155,7 +155,22 @@ const BookPage: React.FC<BookPageProps> = ({ user, cart, onAddToCart }) => {
                     <div className="space-y-4">
                         <h1 className="text-4xl sm:text-6xl font-black uppercase tracking-tighter leading-none">{book.title}</h1>
                         <p className="text-xl text-gray-400 font-light italic">
-                            Por <span className="text-white font-black not-italic">{book.author}</span>
+                            Por {book.authors && book.authors.length > 0 ? (
+                                book.authors.map((auth, idx) => (
+                                    <React.Fragment key={auth.id || idx}>
+                                        {auth.id ? (
+                                            <Link to={`/equipa/${auth.id}`} className="text-white font-black not-italic hover:text-brand-primary transition-colors">
+                                                {auth.name}
+                                            </Link>
+                                        ) : (
+                                            <span className="text-white font-black not-italic">{auth.name}</span>
+                                        )}
+                                        {idx < (book.authors?.length || 0) - 1 ? (idx === (book.authors?.length || 0) - 2 ? ' e ' : ', ') : ''}
+                                    </React.Fragment>
+                                ))
+                            ) : (
+                                <span className="text-white font-black not-italic">{book.author}</span>
+                            )}
                         </p>
                     </div>
 
@@ -220,15 +235,20 @@ const BookPage: React.FC<BookPageProps> = ({ user, cart, onAddToCart }) => {
 
                         {/* Info */}
                         <div className="lg:col-span-8 space-y-8">
-                            {/* Genre + Bestseller */}
+                            {/* Genre + Bestseller + Category */}
                             <div className="flex flex-wrap items-center gap-3">
+                                {book.category && book.category !== 'livro' && (
+                                    <span className="px-4 py-1.5 bg-brand-primary/20 text-brand-primary font-black text-[10px] uppercase tracking-[0.4em] rounded-full border border-brand-primary/30 flex items-center gap-2">
+                                        <Sparkles className="w-3 h-3" /> {book.category}
+                                    </span>
+                                )}
                                 {book.genre && (
                                     <span className="px-4 py-1.5 bg-brand-primary/15 text-brand-primary font-black text-[10px] uppercase tracking-[0.2em] rounded-full border border-brand-primary/20">
                                         {book.genre}
                                     </span>
                                 )}
                                 {book.isBestseller && (
-                                    <span className="px-4 py-1.5 bg-amber-500/15 text-amber-400 font-black text-[10px] uppercase tracking-[0.2em] rounded-full border border-amber-500/20">
+                                    <span className="px-4 py-1.5 bg-amber-500/15 text-amber-400 font-black text-[10px] uppercase tracking-[1em] rounded-full border border-amber-500/20">
                                         Bestseller
                                     </span>
                                 )}
@@ -240,7 +260,22 @@ const BookPage: React.FC<BookPageProps> = ({ user, cart, onAddToCart }) => {
                                     {book.title}
                                 </h1>
                                 <p className="mt-4 text-xl sm:text-2xl text-gray-400 italic font-light">
-                                    Por <span className="text-white font-black not-italic">{book.author}</span>
+                                    Por {book.authors && book.authors.length > 0 ? (
+                                        book.authors.map((auth, idx) => (
+                                            <React.Fragment key={auth.id || idx}>
+                                                {auth.id ? (
+                                                    <Link to={`/equipa/${auth.id}`} className="text-white font-black not-italic hover:text-brand-primary transition-colors underline decoration-brand-primary/30 underline-offset-4">
+                                                        {auth.name}
+                                                    </Link>
+                                                ) : (
+                                                    <span className="text-white font-black not-italic">{auth.name}</span>
+                                                )}
+                                                {idx < (book.authors?.length || 0) - 1 ? (idx === (book.authors?.length || 0) - 2 ? ' e ' : ', ') : ''}
+                                            </React.Fragment>
+                                        ))
+                                    ) : (
+                                        <span className="text-white font-black not-italic">{book.author}</span>
+                                    )}
                                 </p>
                             </div>
 
@@ -346,21 +381,49 @@ const BookPage: React.FC<BookPageProps> = ({ user, cart, onAddToCart }) => {
                                 </ul>
                             </div>
 
-                            {/* Author card */}
-                            <div className="bg-brand-dark text-white rounded-3xl p-8 space-y-4">
-                                <div className="w-14 h-14 bg-gray-700 rounded-2xl overflow-hidden">
-                                    <img
-                                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(book.author)}&background=C4A052&color=fff`}
-                                        alt={book.author}
-                                        className="w-full h-full object-cover"
-                                    />
-                                </div>
-                                <div>
-                                    <h4 className="font-black uppercase tracking-tight">{book.author}</h4>
-                                    <p className="text-brand-primary text-[10px] font-black uppercase tracking-widest">Autor da Obra</p>
-                                </div>
-                                <p className="text-xs text-gray-400 leading-relaxed italic">
-                                    Obra de referência no acervo da Editora Graça.
+                            {/* Author(s) card */}
+                            <div className="bg-brand-dark text-white rounded-3xl p-8 space-y-6">
+                                {book.authors && book.authors.length > 0 ? (
+                                    book.authors.map((auth, idx) => (
+                                        <div key={auth.id || idx} className={`flex items-center gap-4 ${idx > 0 ? 'pt-6 border-t border-white/5' : ''}`}>
+                                            <div className="w-12 h-12 bg-gray-700 rounded-xl overflow-hidden shrink-0">
+                                                <img
+                                                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(auth.name)}&background=C4A052&color=fff`}
+                                                    alt={auth.name}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </div>
+                                            <div className="min-w-0">
+                                                {auth.id ? (
+                                                    <Link to={`/equipa/${auth.id}`} className="font-black uppercase tracking-tight hover:text-brand-primary transition-colors block truncate">
+                                                        {auth.name}
+                                                    </Link>
+                                                ) : (
+                                                    <h4 className="font-black uppercase tracking-tight truncate">{auth.name}</h4>
+                                                )}
+                                                <p className="text-brand-primary text-[9px] font-black uppercase tracking-widest mt-0.5">
+                                                    {book.category === 'antologia' ? 'Colaborador' : 'Autor da Obra'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 bg-gray-700 rounded-xl overflow-hidden shrink-0">
+                                            <img
+                                                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(book.author)}&background=C4A052&color=fff`}
+                                                alt={book.author}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-black uppercase tracking-tight">{book.author}</h4>
+                                            <p className="text-brand-primary text-[9px] font-black uppercase tracking-widest mt-0.5">Autor da Obra</p>
+                                        </div>
+                                    </div>
+                                )}
+                                <p className="text-xs text-gray-400 leading-relaxed italic pt-2">
+                                    {book.category === 'antologia' ? 'Esta obra reúne talentos diversos no acervo da Editora Graça.' : 'Obra de referência no acervo da Editora Graça.'}
                                 </p>
                             </div>
                         </aside>

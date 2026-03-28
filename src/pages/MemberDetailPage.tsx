@@ -34,7 +34,9 @@ const MemberDetailPage: React.FC = () => {
                 if (memberData) {
                     const filtered = allBooks.filter((b: Book) =>
                         (b.authorId && b.authorId === memberData.id) ||
-                        (b.author && b.author.toLowerCase() === memberData.name.toLowerCase())
+                        (b.authorIds && b.authorIds.includes(memberData.id)) ||
+                        (b.authors && b.authors.some(a => a.id === memberData.id)) ||
+                        (b.author && b.author.toLowerCase().includes(memberData.name.toLowerCase()))
                     );
                     setAuthorBooks(filtered);
                 }

@@ -55,7 +55,11 @@ const AdminOrders: React.FC = () => {
         const matchesSearch =
             order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
             order.orderNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            order.id.toLowerCase().includes(searchTerm.toLowerCase());
+            order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            order.items.some(item =>
+                item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (item.author || '').toLowerCase().includes(searchTerm.toLowerCase())
+            );
         const matchesStatus = filterStatus === 'all' || order.status === filterStatus;
         return matchesSearch && matchesStatus;
     });

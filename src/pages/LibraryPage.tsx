@@ -34,6 +34,7 @@ const LibraryPage: React.FC<LibraryPageProps> = ({
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedGenre, setSelectedGenre] = useState('Todos');
     const [selectedFormat, setSelectedFormat] = useState<'all' | 'físico' | 'digital'>('all');
+    const [selectedCategory, setSelectedCategory] = useState<'all' | 'livro' | 'coletânea' | 'antologia'>('all');
     const [sortBy, setSortBy] = useState('title-asc');
     const [showFilters, setShowFilters] = useState(false);
     const [priceRange, setPriceRange] = useState<'all' | 'low' | 'mid' | 'high'>('all');
@@ -70,6 +71,7 @@ const LibraryPage: React.FC<LibraryPageProps> = ({
             result = result.filter(book =>
                 book.title.toLowerCase().includes(query) ||
                 book.author.toLowerCase().includes(query) ||
+                (book.authors && book.authors.some(a => a.name.toLowerCase().includes(query))) ||
                 (book.description || '').toLowerCase().includes(query)
             );
         }
@@ -80,6 +82,10 @@ const LibraryPage: React.FC<LibraryPageProps> = ({
 
         if (selectedFormat !== 'all') {
             result = result.filter(book => book.format === selectedFormat);
+        }
+
+        if (selectedCategory !== 'all') {
+            result = result.filter(book => book.category === selectedCategory);
         }
 
         if (priceRange === 'low') {
@@ -113,6 +119,7 @@ const LibraryPage: React.FC<LibraryPageProps> = ({
         setSearchQuery('');
         setSelectedGenre('Todos');
         setSelectedFormat('all');
+        setSelectedCategory('all');
         setSortBy('title-asc');
         setPriceRange('all');
     };
@@ -121,6 +128,7 @@ const LibraryPage: React.FC<LibraryPageProps> = ({
         return [
             selectedGenre !== 'Todos',
             selectedFormat !== 'all',
+            selectedCategory !== 'all',
             priceRange !== 'all',
             searchQuery.trim() !== ''
         ].filter(Boolean).length;
@@ -221,6 +229,22 @@ const LibraryPage: React.FC<LibraryPageProps> = ({
                                 </div>
                             </div>
 
+                            {/* Category Filter */}
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-black uppercase tracking-[0.4em] text-brand-primary ml-2">Estilo de Publicação</label>
+                                <div className="grid grid-cols-1 gap-2">
+                                    {['all', 'livro', 'coletânea', 'antologia'].map(cat => (
+                                        <button
+                                            key={cat}
+                                            onClick={() => setSelectedCategory(cat as any)}
+                                            className={`px-6 py-3 rounded-xl text-xs font-bold border transition-all text-center capitalize ${selectedCategory === cat ? 'bg-brand-dark text-white border-brand-dark' : 'bg-white text-gray-400 border-gray-100 hover:bg-gray-50'}`}
+                                        >
+                                            {cat === 'all' ? 'Todas as Categorias' : cat}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
                             {/* Clear All */}
                             {activeFiltersCount > 0 && (
                                 <button
@@ -273,6 +297,19 @@ const LibraryPage: React.FC<LibraryPageProps> = ({
                                         className={`px-8 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg transition-all ${selectedGenre === g ? 'bg-brand-dark text-white' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
                                     >
                                         {g}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Mobile Category Quick Filter */}
+                            <div className="flex gap-4 overflow-x-auto pb-4 custom-scrollbar whitespace-nowrap">
+                                {['all', 'livro', 'coletânea', 'antologia'].map(cat => (
+                                    <button
+                                        key={cat}
+                                        onClick={() => setSelectedCategory(cat as any)}
+                                        className={`px-8 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg transition-all capitalize ${selectedCategory === cat ? 'bg-brand-primary text-white shadow-brand-primary/20' : 'bg-gray-100 text-gray-400'}`}
+                                    >
+                                        {cat === 'all' ? 'Ver Tudo' : cat}
                                     </button>
                                 ))}
                             </div>
@@ -463,7 +500,11 @@ const LibraryPage: React.FC<LibraryPageProps> = ({
                             </div>
                             <div className="space-y-4">
                                 <h4 className="text-xl font-black uppercase tracking-tight leading-none">{books[0]?.title}</h4>
-                                <p className="text-brand-primary font-serif italic text-lg">{books[0]?.author}</p>
+                                <p className="text-brand-primary font-serif italic text-lg">
+                                    {books[0]?.authors && books[0].authors.length > 0
+                                        ? books[0].authors.map(a => a.name).join(', ')
+                                        : books[0]?.author}
+                                </p>
                                 <button
                                     onClick={() => books[0] && onViewDetails(books[0])}
                                     className="px-8 py-3 bg-brand-dark text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-primary transition-all"

@@ -284,6 +284,19 @@ export const saveBook = async (book: Book, newAuthor?: Partial<User>) => {
             book.author = newAuthor.name;
         }
 
+        // Normalize authors array and authorIds for multi-author support
+        if (book.authorId && (!book.authorIds || !book.authorIds.includes(book.authorId))) {
+            book.authorIds = Array.from(new Set([...(book.authorIds || []), book.authorId]));
+        }
+
+        if (book.author && book.authorId && (!book.authors || book.authors.length === 0)) {
+            book.authors = [{ id: book.authorId, name: book.author }];
+        }
+
+        if (!book.category) {
+            book.category = 'livro';
+        }
+
         const bookData = prepareForFirestore(book);
         const { id, ...payload } = bookData;
 
@@ -1368,11 +1381,26 @@ export const getAdminStats = async () => {
 
 export const getAuthorStats = async (authorId: string) => {
     try {
-        const booksQuery = query(
+        const booksQuery1 = query(
             collection(db, COLLECTIONS.BOOKS),
             where('authorId', '==', authorId)
         );
-        const booksSnapshot = await getDocs(booksQuery);
+        const booksQuery2 = query(
+            collection(db, COLLECTIONS.BOOKS),
+            where('authorIds', 'array-contains', authorId)
+        );
+
+        const [snap1, snap2] = await Promise.all([
+            getDocs(booksQuery1),
+            getDocs(booksQuery2)
+        ]);
+
+        // Merge and deduplicate book IDs
+        const bookIdsSet = new Set<string>();
+        snap1.docs.forEach(doc => bookIdsSet.add(doc.id));
+        snap2.docs.forEach(doc => bookIdsSet.add(doc.id));
+
+        const publishedBooksCount = bookIdsSet.size;
 
         // Both new Orders and legacy Notifications for author stats
         const ordersSnapshot = await getDocs(collection(db, COLLECTIONS.ORDERS));
@@ -1387,7 +1415,8 @@ export const getAuthorStats = async (authorId: string) => {
             if (data.status !== 'Validado') return;
             const items = data.items || [];
             items.forEach((item: any) => {
-                if (item.authorId === authorId) {
+                const isItemAuthor = item.authorId === authorId || (item.authorIds && item.authorIds.includes(authorId));
+                if (isItemAuthor) {
                     totalSales += item.quantity || 1;
                     revenue += (item.price || 0) * (item.quantity || 1);
                 }
@@ -1398,7 +1427,8 @@ export const getAuthorStats = async (authorId: string) => {
         salesSnapshot.docs.forEach(doc => {
             const items = doc.data().items || [];
             items.forEach((item: any) => {
-                if (item.authorId === authorId) {
+                const isItemAuthor = item.authorId === authorId || (item.authorIds && item.authorIds.includes(authorId));
+                if (isItemAuthor) {
                     totalSales += item.quantity || 1;
                     revenue += (item.price || 0) * (item.quantity || 1);
                 }
@@ -1406,7 +1436,7 @@ export const getAuthorStats = async (authorId: string) => {
         });
 
         return {
-            publishedBooks: booksSnapshot.size,
+            publishedBooks: publishedBooksCount,
             totalSales,
             totalRoyalties: revenue * 0.7
         };
@@ -1429,7 +1459,8 @@ export const getAuthorConfirmedSales = async (authorId: string) => {
             const data = doc.data();
             const items = data.items || [];
             items.forEach((item: any) => {
-                if (item.authorId === authorId) {
+                const isItemAuthor = item.authorId === authorId || (item.authorIds && item.authorIds.includes(authorId));
+                if (isItemAuthor) {
                     sales.push({
                         ...parseFirestoreDoc(data, doc.id),
                         item

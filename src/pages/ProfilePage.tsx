@@ -112,7 +112,8 @@ const ProfilePage: React.FC = () => {
                     const filtered = allOrders.filter(order =>
                         order.items?.some((item: any) =>
                             item.authorId === user.id ||
-                            (item.author && item.author.toLowerCase() === user.name.toLowerCase())
+                            (item.authorIds && item.authorIds.includes(user.id)) ||
+                            (item.author && item.author.toLowerCase().includes(user.name?.toLowerCase() || ''))
                         )
                     );
                     setAuthorOrders(filtered);
@@ -399,7 +400,11 @@ const ProfilePage: React.FC = () => {
                                                             </td>
                                                             <td className="px-6 py-4">
                                                                 <div className="flex -space-x-2">
-                                                                    {order.items.filter((i: any) => i.authorId === user.id || i.author?.toLowerCase() === user.name.toLowerCase()).map((item: any, idx: number) => (
+                                                                    {order.items.filter((i: any) =>
+                                                                        i.authorId === user.id ||
+                                                                        (i.authorIds && i.authorIds.includes(user.id)) ||
+                                                                        (i.author && i.author.toLowerCase().includes(user.name?.toLowerCase() || ''))
+                                                                    ).map((item: any, idx: number) => (
                                                                         <div key={idx} className="w-8 h-12 rounded bg-gray-100 border-2 border-white overflow-hidden shadow-sm" title={item.title}>
                                                                             <img src={item.coverUrl} alt="" className="w-full h-full object-cover" />
                                                                         </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingBag, Eye, Star, ArrowUpRight } from 'lucide-react';
+import { ShoppingBag, Eye, Star, ArrowUpRight, Sparkles } from 'lucide-react';
 import { Book } from '../types';
 import { OptimizedImage } from '../components/OptimizedImage';
 
@@ -30,6 +30,12 @@ const BookCard: React.FC<BookCardProps> = ({ book, onAddToCart, onViewDetails, o
 
                 {/* Status Badges */}
                 <div className="absolute top-3 left-3 sm:top-6 sm:left-6 flex flex-col gap-1.5 sm:gap-2">
+                    {book.category && book.category !== 'livro' && (
+                        <div className="px-3 py-1.5 bg-brand-primary/90 text-white text-[7px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg flex items-center gap-2">
+                            <Sparkles className="w-3 h-3" />
+                            {book.category}
+                        </div>
+                    )}
                     {book.isBestseller && (
                         <div className="px-4 py-2 bg-brand-primary text-white text-[8px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg flex items-center gap-2">
                             <Star className="w-3 h-3 fill-current" />
@@ -77,7 +83,9 @@ const BookCard: React.FC<BookCardProps> = ({ book, onAddToCart, onViewDetails, o
                             {book.title}
                         </h3>
                         <p className="text-sm text-gray-400 font-bold uppercase tracking-widest truncate">
-                            {book.author}
+                            {book.authors && book.authors.length > 0
+                                ? book.authors.map(a => a.name).join(', ')
+                                : book.author}
                         </p>
                     </div>
                     <div className="text-right">
