@@ -184,39 +184,64 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
             {/* Mobile Menu Drawer */}
             <AnimatePresence>
                 {isMenuOpen && (
-                    <m.div
-                        initial={{ x: '100%', opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        exit={{ x: '100%', opacity: 0 }}
-                        transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                        className="fixed inset-0 z-[60] bg-white flex flex-col p-[clamp(1.5rem,6vw,4rem)] md:hidden shadow-2xl"
-                    >
-                        <div className="flex justify-between items-center mb-12">
-                            <span className="font-serif font-black text-2xl text-brand-dark">MENU</span>
-                            <button onClick={() => setIsMenuOpen(false)} className="p-2 bg-gray-50 rounded-full" aria-label="Fechar menu">
-                                <X className="w-6 h-6 text-brand-dark" />
-                            </button>
-                        </div>
-                        <div className="flex flex-col gap-4 sm:gap-6 mt-8">
-                            {navLinks.map((link, i) => (
-                                <m.div
-                                    key={link.path}
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: i * 0.05 }}
-                                >
-                                    <Link
-                                        to={link.path}
-                                        onClick={() => setIsMenuOpen(false)}
-                                        className="text-[clamp(1.5rem,7vw,2.8rem)] font-black text-brand-dark text-left uppercase tracking-tight leading-none py-3 border-b border-gray-50 flex items-center justify-between group hover:text-brand-primary transition-all duration-300"
-                                    >
-                                        {link.name}
-                                        <ArrowRight className="w-6 h-6 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-brand-primary" />
-                                    </Link>
-                                </m.div>
-                            ))}
-                        </div>
-                    </m.div>
+                    <>
+                        {/* Backdrop */}
+                        <m.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setIsMenuOpen(false)}
+                            className="fixed inset-0 z-[59] bg-black/40 backdrop-blur-sm md:hidden"
+                        />
+                        {/* Drawer */}
+                        <m.div
+                            initial={{ x: '100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: '100%' }}
+                            transition={{ type: "spring", damping: 28, stiffness: 220 }}
+                            className="fixed top-0 right-0 bottom-0 z-[60] w-72 bg-brand-dark text-white flex flex-col md:hidden shadow-2xl"
+                        >
+                            {/* Header */}
+                            <div className="flex justify-between items-center px-6 py-5 border-b border-white/10">
+                                <div className="flex items-center gap-2">
+                                    <img src={logo} alt="Editora Graça" className="h-6 w-auto brightness-0 invert opacity-70" />
+                                    <span className="font-serif font-black text-sm uppercase tracking-widest text-white/70">Editora <span className="text-brand-primary">Graça</span></span>
+                                </div>
+                                <button onClick={() => setIsMenuOpen(false)} className="p-2 rounded-xl hover:bg-white/10 transition-colors" aria-label="Fechar menu">
+                                    <X className="w-5 h-5 text-white/60" />
+                                </button>
+                            </div>
+
+                            {/* Nav Links */}
+                            <nav className="flex-1 overflow-y-auto py-4 px-3">
+                                {navLinks.map((link, i) => {
+                                    const isActive = (link.path === '/' && location.pathname === '/') || (link.path !== '/' && location.pathname.startsWith(link.path));
+                                    return (
+                                        <m.div
+                                            key={link.path}
+                                            initial={{ opacity: 0, x: 16 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: i * 0.04 }}
+                                        >
+                                            <Link
+                                                to={link.path}
+                                                onClick={() => setIsMenuOpen(false)}
+                                                className={`flex items-center justify-between gap-3 px-4 py-3.5 rounded-xl text-sm font-bold uppercase tracking-widest transition-all duration-200 group ${isActive ? 'bg-brand-primary/15 text-brand-primary' : 'text-white/60 hover:bg-white/5 hover:text-white'}`}
+                                            >
+                                                {link.name}
+                                                <ChevronRight className={`w-4 h-4 transition-transform ${isActive ? 'text-brand-primary' : 'text-white/20 group-hover:text-white/50 group-hover:translate-x-0.5'}`} />
+                                            </Link>
+                                        </m.div>
+                                    );
+                                })}
+                            </nav>
+
+                            {/* Footer */}
+                            <div className="px-6 py-5 border-t border-white/10">
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-white/20 text-center">© {new Date().getFullYear()} Editora Graça</p>
+                            </div>
+                        </m.div>
+                    </>
                 )}
             </AnimatePresence>
 
