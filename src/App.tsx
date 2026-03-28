@@ -73,9 +73,16 @@ const ProtectedRoute = ({ children, allowedRoles }: { children: React.ReactNode,
 };
 
 const AppContent: React.FC = () => {
-    const [books, setBooks] = useState<Book[]>([]);
-    const [siteContent, setSiteContent] = useState<Record<string, any>>({});
-    const [dataLoading, setDataLoading] = useState(true);
+    // Initialize from cache if possible for instant render
+    const [books, setBooks] = useState<Book[]>(() => {
+        const saved = localStorage.getItem('eg_cache_books');
+        return saved ? JSON.parse(saved).data : [];
+    });
+    const [siteContent, setSiteContent] = useState<Record<string, any>>(() => {
+        const saved = localStorage.getItem('eg_cache_site_content_all');
+        return saved ? JSON.parse(saved).data : {};
+    });
+    const [dataLoading, setDataLoading] = useState(!books.length); // Only show loader if no cache
     const [cart, setCart] = useState<any[]>(() => {
         const saved = localStorage.getItem('cart');
         return saved ? JSON.parse(saved) : [];
@@ -94,11 +101,12 @@ const AppContent: React.FC = () => {
         localStorage.setItem('cart', JSON.stringify(cart));
     }, [cart]);
 
-    // Fetch Data
+    // Fetch Data with stale-while-revalidate logic
     useEffect(() => {
         const loadData = async () => {
-            setDataLoading(true);
             try {
+                // If we have cache, we already started rendering. 
+                // We fetch in background to update.
                 const [fetchedBooks, fetchedContent] = await Promise.all([
                     getBooksMinimal(),
                     getSiteContent()
@@ -106,7 +114,7 @@ const AppContent: React.FC = () => {
                 setBooks(fetchedBooks);
                 setSiteContent(fetchedContent);
             } catch (error) {
-                console.error("Failed to fetch initial data:", error);
+                console.error("Failed to fetch/refresh data:", error);
             } finally {
                 setDataLoading(false);
             }

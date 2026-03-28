@@ -642,19 +642,28 @@ let lastBlogFetch = 0;
 
 export const getBlogPosts = async (forceRefresh = false): Promise<BlogPost[]> => {
     const now = Date.now();
+    // 1. Memory cache
     if (!forceRefresh && blogPostsCache && (now - lastBlogFetch < CACHE_DURATION)) {
         return blogPostsCache;
+    }
+    // 2. localStorage cache
+    if (!forceRefresh) {
+        const cached = getLocal('blog_posts');
+        if (cached && Array.isArray(cached)) {
+            blogPostsCache = cached;
+            lastBlogFetch = now;
+            setTimeout(() => getBlogPosts(true), 0);
+            return cached;
+        }
     }
 
     try {
         const q = query(collection(db, COLLECTIONS.BLOG), orderBy('date', 'desc'));
         const snapshot = await getDocs(q);
-
         const posts = snapshot.docs.map(doc => parseFirestoreDoc(doc.data(), doc.id));
-
         blogPostsCache = posts;
         lastBlogFetch = now;
-
+        setLocal('blog_posts', posts);
         return posts;
     } catch (error) {
         console.error('Erro ao buscar posts:', error);
@@ -778,14 +787,26 @@ export const addBlogPostComment = async (comment: { postId: string; userId: stri
 
 // ==================== TEAM ====================
 
-export const getTeamMembers = async (): Promise<TeamMember[]> => {
+export const getTeamMembers = async (forceRefresh = false): Promise<TeamMember[]> => {
+    // 1. localStorage cache (long-lived — team members change rarely)
+    if (!forceRefresh) {
+        const cached = getLocal('team_members');
+        if (cached && Array.isArray(cached)) {
+            // Silently refresh in background
+            setTimeout(() => getTeamMembers(true), 0);
+            return cached;
+        }
+    }
+
     try {
         const q = query(collection(db, COLLECTIONS.TEAM), orderBy('displayOrder', 'asc'));
         const snapshot = await getDocs(q);
-        return snapshot.docs.map(doc => parseFirestoreDoc(doc.data(), doc.id));
+        const members = snapshot.docs.map(doc => parseFirestoreDoc(doc.data(), doc.id));
+        setLocal('team_members', members);
+        return members;
     } catch (error) {
         console.error('Erro ao buscar equipe:', error);
-        return [];
+        return getLocal('team_members') || [];
     }
 };
 
@@ -966,10 +987,21 @@ let siteContentCache: Map<string, Record<string, any>> = new Map();
 
 export const getSiteContent = async (section?: string) => {
     const cacheKey = section || 'all';
+    // 1. Memory cache
     const cached = siteContentCache.get(cacheKey);
+    if (cached) return cached;
 
-    if (cached) {
-        return cached;
+    // 2. localStorage cache
+    const localKey = `site_content_${cacheKey}`;
+    const localCached = getLocal(localKey);
+    if (localCached) {
+        siteContentCache.set(cacheKey, localCached);
+        // Refresh in background
+        setTimeout(async () => {
+            siteContentCache.delete(cacheKey);
+            await getSiteContent(section);
+        }, 0);
+        return localCached;
     }
 
     try {
@@ -985,11 +1017,11 @@ export const getSiteContent = async (section?: string) => {
 
         snapshot.docs.forEach(doc => {
             const data = doc.data();
-            // Use composite key to avoid clashes between sections
             contentMap[`${data.section}.${data.key}`] = data.content;
         });
 
         siteContentCache.set(cacheKey, contentMap);
+        setLocal(localKey, contentMap);
         return contentMap;
     } catch (error) {
         console.error('Error fetching site content:', error);
