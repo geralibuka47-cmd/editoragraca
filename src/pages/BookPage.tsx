@@ -19,6 +19,7 @@ import {
 import { useToast } from '../components/Toast';
 import SEO from '../components/SEO';
 import CountdownTimer from '../components/CountdownTimer';
+import AdUnit from '../components/AdUnit';
 
 interface BookPageProps {
     user?: UserType | null;
@@ -299,6 +300,11 @@ const BookPage: React.FC<BookPageProps> = ({ user, cart, onAddToCart }) => {
                                 >
                                     <Share2 className="w-5 h-5" />
                                 </button>
+                            </div>
+
+                            {/* AdSense Book Detail Mid */}
+                            <div className="pt-12">
+                                <AdUnit slot="SLOT_BOOK_DETAIL" format="auto" className="max-w-2xl" />
                             </div>
 
                             {/* Trust badges */}

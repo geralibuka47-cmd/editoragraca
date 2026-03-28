@@ -12,6 +12,7 @@ import { ServiceCardSkeleton } from '../components/Skeleton';
 import BudgetGenerator from '../components/BudgetGenerator';
 import { PageHero } from '../components/PageHero';
 import SEO from '../components/SEO';
+import AdUnit from '../components/AdUnit';
 
 interface AtelierPageProps {
     siteContent?: Record<string, any>;
@@ -236,6 +237,13 @@ const AtelierPage: React.FC<AtelierPageProps> = ({ siteContent = {} }) => {
                     </div>
                 </div>
             </section>
+
+            {/* AdSense Service Page Mid */}
+            <div className="bg-white py-12 border-y border-gray-50">
+                <div className="container mx-auto px-6 md:px-12">
+                    <AdUnit slot="SLOT_ATELIER_MID" format="horizontal" />
+                </div>
+            </div>
 
             {/* Methodology: The Graça Way */}
             <section className="py-32 bg-brand-dark text-white overflow-hidden relative">

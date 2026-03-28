@@ -197,9 +197,16 @@ const JournalPage: React.FC<JournalPageProps> = ({ user }) => {
                         <div className="max-w-3xl mx-auto">
                             <div className="space-y-10">
                                 {selectedPost.content.split('\n').filter(p => p.trim()).map((para, i) => (
-                                    <p key={i} className="text-lg md:text-2xl text-gray-700 leading-relaxed font-serif first-letter:text-5xl first-letter:font-black first-letter:mr-3 first-letter:float-left first-letter:text-brand-primary">
-                                        {para}
-                                    </p>
+                                    <React.Fragment key={i}>
+                                        <p className="text-lg md:text-2xl text-gray-700 leading-relaxed font-serif first-letter:text-5xl first-letter:font-black first-letter:mr-3 first-letter:float-left first-letter:text-brand-primary">
+                                            {para}
+                                        </p>
+                                        {i === 1 && (
+                                            <div className="py-12 border-y border-gray-50 my-12">
+                                                <AdUnit slot="SLOT_BLOG_MID" format="auto" showLabel={true} />
+                                            </div>
+                                        )}
+                                    </React.Fragment>
                                 ))}
                             </div>
 

@@ -12,6 +12,7 @@ import { PageHero } from '../components/PageHero';
 import { OptimizedImage } from '../components/OptimizedImage';
 import SEO from '../components/SEO';
 import { isReleased } from '../services/dataService';
+import AdUnit from '../components/AdUnit';
 
 interface LibraryPageProps {
     books: Book[];
@@ -149,6 +150,11 @@ const LibraryPage: React.FC<LibraryPageProps> = ({
                 decorativeText="CATÁLOGO"
                 titleClassName="text-4xl sm:text-5xl md:text-7xl lg:text-[10rem] font-black uppercase leading-[0.8] tracking-tighter mb-4"
             />
+
+            {/* AdSense Library Top */}
+            <div className="container mx-auto px-4 sm:px-6 md:px-12 py-8">
+                <AdUnit slot="SLOT_LIBRARY_TOP" format="horizontal" />
+            </div>
 
             {/* Sidebar & Grid Layout */}
             <div className="container mx-auto px-4 sm:px-6 md:px-12 py-12 md:py-20">

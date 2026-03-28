@@ -237,6 +237,11 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
                 </div>
             </section>
 
+            {/* AdSense Top Banner */}
+            <div className="container mx-auto px-4 sm:px-6 md:px-12">
+                <AdUnit slot="SLOT_TOP_HERO" format="horizontal" className="mb-8" />
+            </div>
+
             {/* LEITURA DO MÊS - Editorial Style */}
             {readingOfMonth && (
                 <section className="py-16 sm:py-24 md:py-32 bg-white relative overflow-hidden">
