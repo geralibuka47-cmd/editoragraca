@@ -220,6 +220,7 @@ const AppContent: React.FC = () => {
                         } />
                         <Route path="/livro/:id" element={
                             <BookPage
+                                user={user}
                                 cart={cart}
                                 onAddToCart={(b) => handleAction('ADD_TO_CART', b)}
                             />
