@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Calendar, ArrowRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, ArrowRight, Sparkles } from 'lucide-react';
 import { Book, TeamMember } from '../types';
 import { OptimizedImage } from './OptimizedImage';
 import { Link } from 'react-router-dom';
@@ -21,7 +21,8 @@ const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({ books, authors }) =
         const authorGroups = new Map<string, Book[]>();
 
         futureBooks.forEach(book => {
-            const key = book.authorId || normalizeString(book.author);
+            // Stronger normalization for grouping: remove dots and all spaces
+            const key = book.authorId || normalizeString(book.author).replace(/[.\s]/g, '');
             if (!authorGroups.has(key)) {
                 authorGroups.set(key, []);
             }
@@ -33,7 +34,7 @@ const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({ books, authors }) =
 
             const teamAuthor = authors.find(a =>
                 (a.id && a.id.trim() === firstBook.authorId?.trim()) ||
-                (normalizeString(a.name) === normalizeString(firstBook.author))
+                (normalizeString(a.name).replace(/[.\s]/g, '') === normalizeString(firstBook.author).replace(/[.\s]/g, ''))
             );
 
             const authorName = firstBook.author || teamAuthor?.name || 'Autor';
@@ -42,7 +43,7 @@ const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({ books, authors }) =
             return {
                 author: {
                     name: authorName,
-                    role: firstBook.authorRole || teamAuthor?.role || 'Autor de Referência',
+                    role: firstBook.authorRole || teamAuthor?.role || 'Autor da Obra',
                     imageUrl: authorImg
                 },
                 books: groupBooks.sort((a, b) => new Date(a.launchDate!).getTime() - new Date(b.launchDate!).getTime())
@@ -58,91 +59,129 @@ const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({ books, authors }) =
     const prevSlide = () => setCurrentIndex((prev) => (prev - 1 + groups.length) % groups.length);
 
     return (
-        <section className="section-fluid bg-brand-dark text-white overflow-hidden relative">
-            {/* Background Decorative Element */}
-            <div className="absolute top-0 right-0 w-[50vw] h-[50vw] bg-brand-primary/5 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2" />
+        <section className="section-fluid bg-[#0A0A0B] text-white overflow-hidden relative py-24 sm:py-32">
+            {/* Ambient Background Glow */}
+            <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+                <div className="absolute top-0 right-0 w-[60vw] h-[60vw] bg-brand-primary/10 blur-[150px] rounded-full -translate-y-1/2 translate-x-1/2 animate-pulse" />
+                <div className="absolute bottom-0 left-0 w-[40vw] h-[40vw] bg-brand-primary/5 blur-[120px] rounded-full translate-y-1/2 -translate-x-1/2" />
+            </div>
 
             <div className="container relative z-10">
-                <div className="flex flex-col md:flex-row items-end justify-between mb-16 gap-8">
+                <div className="flex flex-col md:flex-row items-end justify-between mb-20 gap-8">
                     <div className="space-y-4">
-                        <span className="text-brand-primary font-black text-xs uppercase tracking-[0.4em] flex items-center gap-3">
-                            <Calendar className="w-4 h-4" />
-                            Em Antevisão
-                        </span>
-                        <h2 className="text-white uppercase tracking-tighter leading-[0.85]">
-                            Futuros <br /><span className="text-brand-primary italic font-serif lowercase font-normal">Lançamentos</span>
+                        <motion.span
+                            initial={{ opacity: 0, letterSpacing: '0.1em' }}
+                            whileInView={{ opacity: 1, letterSpacing: '0.4em' }}
+                            className="text-brand-primary font-black text-[10px] sm:text-xs uppercase flex items-center gap-3"
+                        >
+                            <Sparkles className="w-4 h-4" />
+                            Exclusividade & Futuro
+                        </motion.span>
+                        <h2 className="text-white uppercase tracking-tighter leading-[0.8] text-5xl sm:text-7xl md:text-8xl font-black">
+                            Novos <br /><span className="text-brand-primary italic font-serif lowercase font-normal">Capítulos</span>
                         </h2>
                     </div>
 
-                    <div className="flex gap-4">
-                        <button onClick={prevSlide} className="w-14 h-14 rounded-full border border-white/10 flex items-center justify-center hover:bg-brand-primary hover:border-brand-primary transition-all group">
-                            <ChevronLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
-                        </button>
-                        <button onClick={nextSlide} className="w-14 h-14 rounded-full border border-white/10 flex items-center justify-center hover:bg-brand-primary hover:border-brand-primary transition-all group">
-                            <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-                        </button>
+                    <div className="flex items-center gap-6">
+                        {/* Slide Indicator */}
+                        <div className="hidden sm:flex items-center gap-2 mr-4">
+                            {groups.map((_, idx) => (
+                                <div
+                                    key={idx}
+                                    className={`h-1 rounded-full transition-all duration-500 ${idx === currentIndex ? 'w-8 bg-brand-primary' : 'w-2 bg-white/10'}`}
+                                />
+                            ))}
+                        </div>
+                        <div className="flex gap-3">
+                            <button onClick={prevSlide} className="w-14 h-14 rounded-2xl border border-white/10 flex items-center justify-center hover:bg-brand-primary hover:border-brand-primary transition-all group backdrop-blur-md">
+                                <ChevronLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
+                            </button>
+                            <button onClick={nextSlide} className="w-14 h-14 rounded-2xl border border-white/10 flex items-center justify-center hover:bg-brand-primary hover:border-brand-primary transition-all group backdrop-blur-md">
+                                <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={currentIndex}
-                        initial={{ opacity: 0, x: 50 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -50 }}
-                        transition={{ duration: 0.6, ease: "circOut" }}
-                        className="grid lg:grid-cols-12 gap-12 items-center"
+                        initial={{ opacity: 0, y: 40 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -40 }}
+                        transition={{ duration: 0.8, ease: "circOut" }}
+                        className="grid lg:grid-cols-12 gap-16 lg:gap-24 items-start"
                     >
-                        {/* Compact Author Info Column */}
-                        <div className="lg:col-span-3 flex flex-col items-center lg:items-start text-center lg:text-left space-y-6">
-                            <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-[2.5rem] overflow-hidden border-2 border-brand-primary/20 p-1 bg-brand-dark/50">
-                                <div className="w-full h-full rounded-[2.2rem] overflow-hidden">
-                                    <OptimizedImage
-                                        src={currentGroup.author.imageUrl}
-                                        alt={currentGroup.author.name}
-                                        className="w-full h-full object-cover"
-                                        aspectRatio="square"
-                                    />
+                        {/* Author Profile - sticky on large screens */}
+                        <div className="lg:col-span-3 lg:sticky lg:top-32 space-y-10">
+                            <div className="relative group mx-auto lg:mx-0 w-fit">
+                                <div className="absolute -inset-4 bg-brand-primary/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+                                <div className="relative w-40 h-40 sm:w-48 sm:h-48 rounded-[3rem] overflow-hidden border-2 border-white/5 p-1 bg-white/5 backdrop-blur-xl">
+                                    <div className="w-full h-full rounded-[2.8rem] overflow-hidden shadow-inner">
+                                        <OptimizedImage
+                                            src={currentGroup.author.imageUrl}
+                                            alt={currentGroup.author.name}
+                                            className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-110"
+                                            aspectRatio="square"
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                            <div className="space-y-2">
-                                <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight leading-tight">{currentGroup.author.name}</h3>
-                                <span className="inline-block px-3 py-1 bg-brand-primary/10 text-brand-primary rounded-lg text-[10px] font-black uppercase tracking-widest border border-brand-primary/20">
-                                    {currentGroup.author.role}
-                                </span>
+
+                            <div className="space-y-3 text-center lg:text-left">
+                                <h3 className="text-3xl sm:text-4xl font-black uppercase tracking-tight leading-none text-white">{currentGroup.author.name}</h3>
+                                <div className="flex flex-col gap-2">
+                                    <span className="inline-block w-fit mx-auto lg:mx-0 px-4 py-1.5 bg-brand-primary/10 text-brand-primary rounded-full text-[10px] font-black uppercase tracking-widest border border-brand-primary/20">
+                                        {currentGroup.author.role}
+                                    </span>
+                                    <p className="text-[10px] text-white/30 font-black uppercase tracking-[0.3em] mt-2">Próximos Lançamentos</p>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Expanded Books Grid Column */}
+                        {/* High-End Books Grid */}
                         <div className="lg:col-span-9">
-                            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
+                            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8 sm:gap-12">
                                 {currentGroup.books.slice(0, 8).map((book, idx) => (
                                     <motion.div
                                         key={book.id}
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: 0.2 + (idx * 0.1) }}
+                                        initial={{ opacity: 0, scale: 0.9, y: 30 }}
+                                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                                        transition={{ delay: idx * 0.12, duration: 0.8, ease: "easeOut" }}
                                         className="group"
                                     >
-                                        <Link to={`/livro/${book.id}`} className="block space-y-4">
-                                            <div className="aspect-[2/3] rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 group-hover:scale-[1.05] group-hover:-translate-y-2 border border-white/5 relative">
+                                        <Link to={`/livro/${book.id}`} className="block relative">
+                                            {/* Glow effect on hover */}
+                                            <div className="absolute -inset-4 bg-brand-primary/5 blur-2xl rounded-[3rem] opacity-0 group-hover:opacity-100 transition-all duration-700" />
+
+                                            <div className="relative aspect-[2/3] rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden shadow-[0_30px_60px_-12px_rgba(0,0,0,0.5)] border border-white/5 transition-all duration-700 group-hover:-translate-y-4 group-hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.6)] group-hover:border-brand-primary/20">
                                                 <OptimizedImage
                                                     src={book.coverUrl}
                                                     alt={book.title}
-                                                    className="w-full h-full object-cover"
+                                                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                                                     aspectRatio="book"
                                                     width={400}
                                                 />
-                                                <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/90 to-transparent">
-                                                    <p className="text-[10px] font-black text-brand-primary uppercase tracking-[0.2em] mb-1">
-                                                        {new Date(book.launchDate!).toLocaleDateString('pt-PT', { day: '2-digit', month: 'short' })}
-                                                    </p>
-                                                    <h4 className="font-black text-xs sm:text-sm uppercase tracking-tight text-white line-clamp-2 leading-tight">{book.title}</h4>
+                                                {/* Sophisticated Overlay */}
+                                                <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/95 via-black/40 to-transparent">
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <div className="h-[1px] w-4 bg-brand-primary"></div>
+                                                        <p className="text-[10px] font-black text-brand-primary uppercase tracking-[0.2em]">
+                                                            {new Date(book.launchDate!).toLocaleDateString('pt-PT', { month: 'long', year: 'numeric' })}
+                                                        </p>
+                                                    </div>
+                                                    <h4 className="font-black text-sm sm:text-base uppercase tracking-tight text-white line-clamp-2 leading-tight group-hover:text-brand-primary transition-colors">
+                                                        {book.title}
+                                                    </h4>
                                                 </div>
                                             </div>
-                                            <div className="flex items-center gap-2 text-brand-primary/60 group-hover:text-brand-primary transition-colors">
-                                                <span className="text-[9px] font-black uppercase tracking-widest">Ver Detalhes</span>
-                                                <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+
+                                            <div className="mt-6 flex items-center justify-between px-2">
+                                                <div className="flex items-center gap-2 text-white/40 group-hover:text-brand-primary transition-colors">
+                                                    <span className="text-[10px] font-black uppercase tracking-[0.15em]">Em Produção</span>
+                                                    <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                                                </div>
+                                                <Calendar className="w-4 h-4 text-white/10 group-hover:text-brand-primary/30 transition-colors" />
                                             </div>
                                         </Link>
                                     </motion.div>
