@@ -1,7 +1,7 @@
 import React from 'react';
 import logo from '../assets/imagens/logo.png';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { ShoppingBag, Search, User, LogOut, Menu, X, Bell, Loader2, ShoppingCart, ChevronRight, ArrowRight } from 'lucide-react';
+import { ShoppingBag, Search, User, LogOut, Menu, X, Bell, Loader2, ShoppingCart, ChevronRight, ArrowRight, Heart } from 'lucide-react';
 import { Input } from './ui/Input';
 import { motion as m, AnimatePresence } from 'framer-motion';
 import { User as UserType, Notification } from '../types';
@@ -157,6 +157,16 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, cartCount, use
                             <User className="w-5 h-5" />
                         </button>
                     )}
+
+                    <button
+                        onClick={() => {
+                            onNavigate('/perfil?tab=wishlist');
+                        }}
+                        className="relative p-2 text-brand-dark/80 hover:text-brand-primary transition-colors rounded-full hover:bg-gray-50"
+                        aria-label="Lista de Desejos"
+                    >
+                        <Heart className="w-5 h-5" />
+                    </button>
 
                     <button
                         onClick={() => onNavigate('/carrinho')}
