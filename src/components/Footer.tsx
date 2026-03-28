@@ -1,86 +1,82 @@
 import React from 'react';
 import logo from '../assets/imagens/logo.png';
-import { Facebook, Instagram, Twitter, Linkedin, ArrowRight } from 'lucide-react';
+import { Facebook, Instagram, Linkedin, Home, BookOpen, Info, Briefcase, Mail, User, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface FooterProps {
     content?: Record<string, any>;
 }
 
+const NAV_ICONS = [
+    { Icon: Home, label: 'Início', to: '/' },
+    { Icon: BookOpen, label: 'Catálogo', to: '/livros' },
+    { Icon: Info, label: 'Sobre', to: '/sobre' },
+    { Icon: Briefcase, label: 'Serviços', to: '/servicos' },
+    { Icon: Mail, label: 'Contacto', to: '/contacto' },
+    { Icon: User, label: 'Conta', to: '/login' },
+    { Icon: ShoppingBag, label: 'Carrinho', to: '/carrinho' },
+];
+
 const Footer: React.FC<FooterProps> = ({ content = {} }) => {
-    const general = content['general.config'] || {};
     const social = content['social.links'] || {};
-    const footerDesc = content['footer.description'] || 'EDITORA GRAÇA (SU), LDA | NIF 5002078139';
+    const year = new Date().getFullYear();
 
     return (
-        <footer className="bg-brand-dark text-white pt-12 sm:pt-16 md:pt-24 pb-8 sm:pb-12 border-t border-white/5 font-sans safe-area-bottom">
-            <div className="container">
+        <footer className="bg-brand-dark text-white border-t border-white/5 font-sans safe-area-bottom">
+            <div className="container mx-auto px-4 sm:px-6 md:px-12 py-8 sm:py-10">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
 
-                <div className="grid lg:grid-cols-12 gap-12 mb-20">
-                    {/* Brand Column */}
-                    <div className="lg:col-span-4 space-y-8">
-                        <div className="flex items-center gap-3">
-                            <img src={logo} alt="Editora Graça" className="h-10 w-auto brightness-0 invert" />
-                            <span className="font-serif font-black text-2xl tracking-tight uppercase">EDITORA <span className="text-brand-primary">GRAÇA</span></span>
-                        </div>
-                        <p className="text-gray-400 leading-relaxed max-w-sm font-medium">
-                            {footerDesc}<br />
-                            {general.address || 'Malanje, Angola'}
-                        </p>
-                        <div className="flex gap-4">
+                    {/* Logo */}
+                    <Link to="/" className="flex items-center gap-3 shrink-0">
+                        <img src={logo} alt="Editora Graça" className="h-8 w-auto brightness-0 invert opacity-80 hover:opacity-100 transition-opacity" />
+                        <span className="font-serif font-black text-lg tracking-tight uppercase hidden sm:inline">
+                            Editora <span className="text-brand-primary">Graça</span>
+                        </span>
+                    </Link>
+
+                    {/* Icon Navigation */}
+                    <nav className="flex items-center gap-1 sm:gap-2" aria-label="Navegação principal">
+                        {NAV_ICONS.map(({ Icon, label, to }) => (
+                            <Link
+                                key={to}
+                                to={to}
+                                title={label}
+                                aria-label={label}
+                                className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 hover:text-white hover:bg-white/5 transition-all group relative"
+                            >
+                                <Icon className="w-4 h-4" />
+                                {/* Tooltip */}
+                                <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-white/10 backdrop-blur-md text-white text-[10px] font-bold rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                    {label}
+                                </span>
+                            </Link>
+                        ))}
+                    </nav>
+
+                    {/* Social + Copyright */}
+                    <div className="flex flex-col sm:flex-row items-center gap-4">
+                        {/* Social icons */}
+                        <div className="flex items-center gap-2">
                             {social.instagram && (
-                                <a href={social.instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-primary transition-colors">
-                                    <Instagram className="w-4 h-4" />
+                                <a href={social.instagram} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-primary transition-colors" aria-label="Instagram">
+                                    <Instagram className="w-3.5 h-3.5" />
                                 </a>
                             )}
                             {social.facebook && (
-                                <a href={social.facebook} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-primary transition-colors">
-                                    <Facebook className="w-4 h-4" />
+                                <a href={social.facebook} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-primary transition-colors" aria-label="Facebook">
+                                    <Facebook className="w-3.5 h-3.5" />
                                 </a>
                             )}
                             {social.linkedin && (
-                                <a href={social.linkedin} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-primary transition-colors">
-                                    <Linkedin className="w-4 h-4" />
+                                <a href={social.linkedin} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-primary transition-colors" aria-label="LinkedIn">
+                                    <Linkedin className="w-3.5 h-3.5" />
                                 </a>
                             )}
                         </div>
-                    </div>
 
-                    {/* Links Grid */}
-                    <div className="lg:col-span-8 grid-universal">
-                        {[
-                            { title: "Empresa", links: [{ l: "Sobre Nós", p: "/sobre" }, { l: "Portefólio", p: "/projetos" }, { l: "Carreiras", p: "#" }, { l: "Imprensa", p: "#" }, { l: "Contactos", p: "/contacto" }] },
-                            { title: "Catálogo", links: [{ l: "Lançamentos", p: "/livros" }, { l: "Mais Vendidos", p: "/livros" }, { l: "E-books", p: "/livros?tipo=digital" }, { l: "Autores", p: "/sobre" }] },
-                            { title: "Suporte", links: [{ l: "A Minha Conta", p: "/login" }, { l: "Envios", p: "#" }, { l: "Devoluções", p: "#" }, { l: "FAQ", p: "#" }] },
-                            { title: "Legal", links: [{ l: "Privacidade", p: "#" }, { l: "Termos", p: "#" }, { l: "Cookies", p: "#" }, { l: "Licenças", p: "#" }] }
-                        ].map((col, idx) => (
-                            <div key={idx}>
-                                <h4 className="font-black text-white uppercase tracking-widest text-sm mb-6">{col.title}</h4>
-                                <ul className="space-y-4">
-                                    {col.links.map(link => (
-                                        <li key={link.l}>
-                                            <Link to={link.p} className="text-gray-400 hover:text-white transition-colors text-sm font-medium flex items-center gap-2 group">
-                                                <span className="w-0 overflow-hidden group-hover:w-3 transition-all duration-300 opacity-0 group-hover:opacity-100 text-brand-primary">
-                                                    <ArrowRight className="w-3 h-3" />
-                                                </span>
-                                                {link.l}
-                                            </Link>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Bottom Bar */}
-                <div className="pt-6 sm:pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-500 text-center md:text-left">
-                    <p>&copy; {new Date().getFullYear()} Editora Graça. Todos os direitos reservados.</p>
-                    <div className="flex items-center gap-2">
-                        <span>desenvolvida por</span>
-                        <a href="https://ibuka47.com" target="_blank" rel="noopener noreferrer" className="font-bold text-brand-primary hover:text-white transition-colors">
-                            ibuka47
-                        </a>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-600">
+                            © {year} Editora Graça · <a href="https://ibuka47.com" target="_blank" rel="noopener noreferrer" className="text-brand-primary hover:text-white transition-colors">ibuka47</a>
+                        </p>
                     </div>
                 </div>
             </div>
