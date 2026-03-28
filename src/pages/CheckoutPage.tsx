@@ -10,6 +10,7 @@ import { Select } from '../components/ui/Select';
 import { Button } from '../components/ui/Button';
 import { motion as m, AnimatePresence } from 'framer-motion';
 import SEO from '../components/SEO';
+import { useAuth } from '../contexts/AuthContext';
 
 // Validation Schema
 const checkoutSchema = z.object({
@@ -30,6 +31,7 @@ interface CheckoutPageProps {
 
 const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onRemoveItem }) => {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [step, setStep] = useState<'cart' | 'details' | 'success'>('cart');
     const stepperWidth = step === 'cart' ? 'w-0' : step === 'details' ? 'w-1/2' : 'w-full';
     const step1Style = step === 'cart' ? 'bg-brand-primary text-white scale-110 shadow-lg' : 'bg-brand-primary text-white';
@@ -67,14 +69,17 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, onUpdateQuantity, onR
             const { createOrder } = await import('../services/dataService');
 
             const result = await createOrder({
+                customerId: user?.id,
                 customerName: data.name.trim(),
                 customerEmail: (data.email || '').trim(),
                 items: cart.map(item => ({
                     bookId: item.id,
                     title: item.title,
+                    author: item.author,
+                    authorId: item.authorId,
+                    coverUrl: item.coverUrl,
                     quantity: item.quantity,
-                    price: Number(item.price) || 0,
-                    authorId: item.authorId
+                    price: Number(item.price) || 0
                 })),
                 total: total,
                 status: 'Pendente',

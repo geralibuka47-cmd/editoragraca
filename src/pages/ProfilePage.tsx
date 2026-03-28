@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Book } from '../types';
-import { BookOpen, Heart, User as UserIcon, LogOut, Settings, Download, ShoppingCart, TrendingUp, Eye, BarChart3, Star, Zap, DollarSign } from 'lucide-react';
+import { BookOpen, Heart, User as UserIcon, LogOut, Settings, Download, ShoppingCart, TrendingUp, Eye, BarChart3, Star, Zap, DollarSign, Package, Check, X as CloseIcon, Clock } from 'lucide-react';
 import { motion as m, AnimatePresence } from 'framer-motion';
 import { OptimizedImage } from '../components/OptimizedImage';
 import { useToast } from '../components/Toast';
@@ -37,8 +37,10 @@ const ProfilePage: React.FC = () => {
     const [purchasedBooks, setPurchasedBooks] = useState<Book[]>([]);
     const [authorBooks, setAuthorBooks] = useState<Book[]>([]);
     const [authorStats, setAuthorStats] = useState<any>(null);
+    const [authorOrders, setAuthorOrders] = useState<any[]>([]);
     const [isLoadingLibrary, setIsLoadingLibrary] = useState(false);
     const [isLoadingAuthor, setIsLoadingAuthor] = useState(false);
+    const [isLoadingOrders, setIsLoadingOrders] = useState(false);
     const [wishlist, setWishlist] = useState<Book[]>(() => {
         const saved = localStorage.getItem('wishlist');
         return saved ? JSON.parse(saved) : [];
@@ -72,7 +74,11 @@ const ProfilePage: React.FC = () => {
     useEffect(() => {
         const fetchAuthorData = async () => {
             if (!user || user.role !== 'autor') return;
-            if (activeTab === 'author_dashboard' || activeTab === 'author_books') {
+
+            const isDashOrBooks = activeTab === 'author_dashboard' || activeTab === 'author_books';
+            const isOrders = activeTab === 'author_orders';
+
+            if (isDashOrBooks) {
                 setIsLoadingAuthor(true);
                 try {
                     const { getAuthorStats, getBooksMinimal } = await import('../services/dataService');
@@ -95,9 +101,43 @@ const ProfilePage: React.FC = () => {
                     setIsLoadingAuthor(false);
                 }
             }
+
+            if (isOrders) {
+                setIsLoadingOrders(true);
+                try {
+                    const { getAllOrders } = await import('../services/dataService');
+                    const allOrders = await getAllOrders();
+
+                    // Filter orders that have items from this author
+                    const filtered = allOrders.filter(order =>
+                        order.items?.some((item: any) =>
+                            item.authorId === user.id ||
+                            (item.author && item.author.toLowerCase() === user.name.toLowerCase())
+                        )
+                    );
+                    setAuthorOrders(filtered);
+                } catch (error) {
+                    console.error('Error fetching author orders:', error);
+                } finally {
+                    setIsLoadingOrders(false);
+                }
+            }
         };
         fetchAuthorData();
     }, [user, activeTab]);
+
+    const handleUpdateStatus = async (orderId: string, newStatus: string) => {
+        try {
+            const { updateOrderStatus } = await import('../services/dataService');
+            await updateOrderStatus(orderId, newStatus as any);
+            showToast(`Encomenda ${newStatus.toLowerCase()} com sucesso!`, 'success');
+
+            // Refresh orders
+            setAuthorOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+        } catch (error) {
+            showToast('Erro ao atualizar estado da encomenda.', 'error');
+        }
+    };
 
     // Update wishlist from local storage when tab changes (simple sync)
     useEffect(() => {
@@ -183,8 +223,9 @@ const ProfilePage: React.FC = () => {
                     <div role="tablist" className="bg-white p-1.5 rounded-xl shadow-sm border border-gray-100 flex gap-2 overflow-x-auto max-w-full no-scrollbar">
                         {[
                             ...(user.role === 'autor' ? [
-                                { id: 'author_dashboard', label: 'Painel Autor', icon: BarChart3 },
+                                { id: 'author_dashboard', label: 'Dashboard', icon: BarChart3 },
                                 { id: 'author_books', label: 'Minhas Obras', icon: BookOpen },
+                                { id: 'author_orders', label: 'Meus Pedidos', icon: Package },
                             ] : []),
                             { id: 'library', label: 'Minha Biblioteca', icon: Download },
                             { id: 'wishlist', label: 'Lista de Desejos', icon: Heart },
@@ -319,6 +360,94 @@ const ProfilePage: React.FC = () => {
                                         >
                                             Saiba Como Publicar
                                         </button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {activeTab === 'author_orders' && (
+                            <div className="space-y-6">
+                                {isLoadingOrders ? (
+                                    <div className="space-y-4">
+                                        {[1, 2].map(i => (
+                                            <div key={i} className="bg-white h-32 rounded-2xl animate-pulse border border-gray-100" />
+                                        ))}
+                                    </div>
+                                ) : authorOrders.length > 0 ? (
+                                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                                        <div className="overflow-x-auto">
+                                            <table className="w-full text-left">
+                                                <thead className="bg-gray-50 border-b border-gray-100">
+                                                    <tr>
+                                                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Pedido</th>
+                                                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Cliente</th>
+                                                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Obras</th>
+                                                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Estado</th>
+                                                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">Ações</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-gray-50">
+                                                    {authorOrders.map(order => (
+                                                        <tr key={order.id} className="hover:bg-gray-50/50 transition-colors">
+                                                            <td className="px-6 py-4">
+                                                                <span className="font-black text-brand-dark block">{order.orderNumber}</span>
+                                                                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{new Date(order.createdAt).toLocaleDateString()}</span>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <span className="font-bold text-gray-900 block">{order.customerName}</span>
+                                                                <span className="text-xs text-gray-500">{order.customerEmail}</span>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <div className="flex -space-x-2">
+                                                                    {order.items.filter((i: any) => i.authorId === user.id || i.author?.toLowerCase() === user.name.toLowerCase()).map((item: any, idx: number) => (
+                                                                        <div key={idx} className="w-8 h-12 rounded bg-gray-100 border-2 border-white overflow-hidden shadow-sm" title={item.title}>
+                                                                            <img src={item.coverUrl} alt="" className="w-full h-full object-cover" />
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <span className={`px-2 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${order.status === 'Validado' ? 'bg-emerald-50 text-emerald-600' :
+                                                                    order.status === 'Cancelado' ? 'bg-red-50 text-red-600' :
+                                                                        'bg-amber-50 text-amber-600'
+                                                                    }`}>
+                                                                    {order.status}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-6 py-4 text-right">
+                                                                {order.status === 'Pendente' && (
+                                                                    <div className="flex justify-end gap-2">
+                                                                        <button
+                                                                            onClick={() => handleUpdateStatus(order.id, 'Validado')}
+                                                                            className="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
+                                                                            title="Aprovar Venda"
+                                                                        >
+                                                                            <Check className="w-4 h-4" />
+                                                                        </button>
+                                                                        <button
+                                                                            onClick={() => handleUpdateStatus(order.id, 'Cancelado')}
+                                                                            className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-sm"
+                                                                            title="Rejeitar/Cancelar"
+                                                                        >
+                                                                            <CloseIcon className="w-4 h-4" />
+                                                                        </button>
+                                                                    </div>
+                                                                )}
+                                                                {order.status !== 'Pendente' && (
+                                                                    <span className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">Concluído</span>
+                                                                )}
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-200">
+                                        <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                                        <h3 className="text-xl font-bold text-gray-900 mb-2">Sem pedidos de compra</h3>
+                                        <p className="text-gray-500 mb-6">Ainda não recebeu pedidos para as suas obras. Continue a divulgar o seu trabalho!</p>
                                     </div>
                                 )}
                             </div>

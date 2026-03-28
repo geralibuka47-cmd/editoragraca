@@ -124,7 +124,7 @@ export interface Order {
   customerName: string;
   customerEmail: string;
   customerId?: string;
-  items: { bookId: string; title: string; quantity: number; price: number; authorId?: string }[];
+  items: { bookId: string; title: string; author?: string; authorId?: string; quantity: number; price: number; coverUrl?: string }[];
   total: number;
   status: 'Pendente' | 'Validado' | 'Cancelado';
   date: string;
