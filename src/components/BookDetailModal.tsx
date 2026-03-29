@@ -99,6 +99,33 @@ const BookDetailModal: React.FC<BookDetailModalProps & { user?: UserType | null;
             setIsSubmittingReview(false);
         }
     };
+    const handleDownload = async () => {
+        if (!book.digitalFileUrl) return;
+
+        try {
+            // Try to fetch as blob to force download
+            const response = await fetch(book.digitalFileUrl);
+            if (!response.ok) throw new Error('Falha ao descarregar');
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+
+            // Extract extension or default to .pdf
+            const extension = book.digitalFileUrl.split('?')[0].split('.').pop() || 'pdf';
+            a.download = `${book.title}.${extension}`;
+
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        } catch (error) {
+            console.error('Download error:', error);
+            // Fallback: open in new tab
+            window.open(book.digitalFileUrl, '_blank');
+        }
+    };
 
     if (!isOpen || !book) return null;
 
@@ -254,14 +281,13 @@ const BookDetailModal: React.FC<BookDetailModalProps & { user?: UserType | null;
                                     {/* Download Button for Digital Books */}
                                     {book.format === 'digital' && book.digitalFileUrl && (
                                         <div className="space-y-3">
-                                            <a
-                                                href={book.digitalFileUrl}
-                                                download
+                                            <button
+                                                onClick={handleDownload}
                                                 className={`w-full btn-premium py-4 md:py-5 justify-center text-base md:text-lg rounded-xl md:rounded-2xl shadow-xl ${book.price === 0 ? 'shadow-green-500/30 !bg-green-600 hover:!bg-green-700' : 'shadow-blue-500/30 !bg-blue-600 hover:!bg-blue-700'} ${!hasDownloadAccess && book.price > 0 ? 'hidden' : 'flex'}`}
                                             >
                                                 <Download className="w-5 h-5 md:w-6 md:h-6" />
                                                 {book.price === 0 ? 'Download Gratuito' : 'Fazer Download'}
-                                            </a>
+                                            </button>
 
                                             {(!hasDownloadAccess || book.price === 0) && (
                                                 <button

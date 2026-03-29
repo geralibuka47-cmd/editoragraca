@@ -149,12 +149,33 @@ const ProfilePage: React.FC = () => {
         }
     }, [activeTab]);
 
-    const handleDownload = (book: Book) => {
+    const handleDownload = async (book: Book) => {
         if (!book.digitalFileUrl) {
             showToast('Ficheiro digital não disponível.', 'error');
             return;
         }
-        window.open(book.digitalFileUrl, '_blank');
+
+        try {
+            showToast('A preparar download...', 'info');
+            const response = await fetch(book.digitalFileUrl);
+            if (!response.ok) throw new Error('Download failed');
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const extension = book.digitalFileUrl.split('?')[0].split('.').pop() || 'pdf';
+            a.download = `${book.title}.${extension}`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            showToast('Download concluído!', 'success');
+        } catch (error) {
+            console.error('Download error:', error);
+            window.open(book.digitalFileUrl, '_blank');
+            showToast('O ficheiro abrirá no navegador.', 'info');
+        }
     };
 
     const handleLogout = async () => {

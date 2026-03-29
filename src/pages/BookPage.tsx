@@ -108,6 +108,41 @@ const BookPage: React.FC<BookPageProps> = ({ user, cart, onAddToCart }) => {
         showToast(newVal ? 'Adicionado aos favoritos ❤️' : 'Removido dos favoritos', 'success');
     };
 
+    const handleDownload = async () => {
+        if (!book || !book.digitalFileUrl) return;
+
+        try {
+            showToast('A preparar download...', 'info');
+
+            // Try to fetch as blob to force download
+            const response = await fetch(book.digitalFileUrl);
+            if (!response.ok) throw new Error('Falha ao descarregar');
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+
+            // Extract extension or default to .pdf
+            const extension = book.digitalFileUrl.split('?')[0].split('.').pop() || 'pdf';
+            a.download = `${book.title}.${extension}`;
+
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+            incrementBookDownload(book.id);
+            showToast('Download iniciado!', 'success');
+        } catch (error) {
+            console.error('Download error:', error);
+            // Fallback: open in new tab if CORS fails
+            window.open(book.digitalFileUrl, '_blank');
+            incrementBookDownload(book.id);
+            showToast('O ficheiro abrirá no navegador.', 'info');
+        }
+    };
+
     // ─── Loading ─────────────────────────────────────────────
     if (loading) {
         return (
@@ -318,14 +353,12 @@ const BookPage: React.FC<BookPageProps> = ({ user, cart, onAddToCart }) => {
                             {/* CTAs */}
                             <div className="flex flex-wrap gap-4 items-center">
                                 {book.format === 'digital' && book.digitalFileUrl && hasAccess ? (
-                                    <a
-                                        href={book.digitalFileUrl}
-                                        download
-                                        onClick={() => incrementBookDownload(book.id)}
+                                    <button
+                                        onClick={handleDownload}
                                         className="flex items-center gap-3 px-10 py-5 bg-brand-primary text-white font-black uppercase tracking-widest text-sm rounded-2xl hover:bg-white hover:text-brand-dark transition-all shadow-2xl"
                                     >
                                         <Download className="w-5 h-5" /> Baixar Obra
-                                    </a>
+                                    </button>
                                 ) : (
                                     <button
                                         onClick={() => { onAddToCart(book); showToast(`"${book.title}" adicionado!`, 'success'); }}
