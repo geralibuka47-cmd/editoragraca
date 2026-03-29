@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight, Calendar, ArrowRight, Sparkles } from 'lucid
 import { Book, TeamMember } from '../types';
 import { OptimizedImage } from './OptimizedImage';
 import { Link } from 'react-router-dom';
-import { normalizeString, isReleased } from '../services/dataService';
+import { normalizeString, isReleased, generateBookSlug } from '../services/dataService';
 
 interface UpcomingReleasesProps {
     books: Book[];
@@ -152,7 +152,7 @@ const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({ books, authors }) =
                                         transition={{ delay: idx * 0.12, duration: 0.8, ease: "easeOut" }}
                                         className="group"
                                     >
-                                        <Link to={`/livro/${book.id}`} className="block relative">
+                                        <Link to={`/livro/${(book as any).slug || generateBookSlug(book.title, book.launchDate)}`} className="block relative">
                                             {/* Glow effect on hover */}
                                             <div className="absolute -inset-4 bg-brand-primary/5 blur-2xl rounded-[3rem] opacity-0 group-hover:opacity-100 transition-all duration-700" />
 

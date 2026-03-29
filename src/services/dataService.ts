@@ -276,22 +276,42 @@ export const getBookById = async (id: string): Promise<Book | null> => {
 };
 
 export const getBookBySlug = async (slug: string): Promise<Book | null> => {
-    try {
-        // First try to find in cache/local
-        const allBooks = await getBooks();
-        const cachedBook = allBooks.find(b => (b as any).slug === slug);
-        if (cachedBook) return cachedBook;
+    if (!slug) return null;
 
-        // Otherwise query Firestore
+    try {
+        // 1. Try finding by ID directly (fastest, supports old links)
+        if (slug.length >= 20) { // Typical Firestore ID length
+            const byId = await getBookById(slug);
+            if (byId) return byId;
+        }
+
+        // 2. Try finding by stored slug field in Firestore
         const q = query(collection(db, COLLECTIONS.BOOKS), where('slug', '==', slug), limit(1));
         const snapshot = await getDocs(q);
-
         if (!snapshot.empty) {
             return parseFirestoreDoc(snapshot.docs[0].data(), snapshot.docs[0].id) as Book;
         }
-        return null;
+
+        // 3. Fallback: Search in local cache first
+        let allBooks = await getBooks();
+        let fallback = allBooks.find(b =>
+            (b as any).slug === slug ||
+            generateBookSlug(b.title, b.launchDate) === slug ||
+            b.id === slug
+        );
+        if (fallback) return fallback;
+
+        // 4. Last resort: Full refresh and deep search
+        allBooks = await getBooks(true);
+        fallback = allBooks.find(b =>
+            (b as any).slug === slug ||
+            generateBookSlug(b.title, b.launchDate) === slug ||
+            b.id === slug
+        );
+
+        return fallback || null;
     } catch (error) {
-        console.error('Erro ao buscar livro por slug:', error);
+        console.error('Erro ultra-robusto ao buscar livro:', error);
         return null;
     }
 };
@@ -959,10 +979,49 @@ export const getBookReviews = async (bookId: string) => {
 
 export const addBookReview = async (review: { bookId: string; userId: string; userName: string; rating: number; comment: string }) => {
     try {
-        await addDoc(collection(db, COLLECTIONS.REVIEWS), {
-            ...review,
-            date: Timestamp.now()
+        await runTransaction(db, async (transaction) => {
+            // 1. Add the review document
+            const reviewRef = doc(collection(db, COLLECTIONS.REVIEWS));
+            transaction.set(reviewRef, {
+                ...review,
+                date: Timestamp.now()
+            });
+
+            // 2. Update book stats
+            const bookRef = doc(db, COLLECTIONS.BOOKS, review.bookId);
+            const bookDoc = await transaction.get(bookRef);
+
+            if (bookDoc.exists()) {
+                const bookData = bookDoc.data() as Book;
+                const currentStats = bookData.stats || {
+                    averageRating: 5,
+                    totalReviews: 0,
+                    views: 0,
+                    downloads: 0,
+                    copiesSold: 0
+                };
+
+                // For legacy compatibility, handle various field naming schemes
+                const oldCount = currentStats.totalReviews || (currentStats as any).reviewsCount || 0;
+                const oldAvg = currentStats.averageRating || (currentStats as any).rating || 5;
+
+                const newCount = oldCount + 1;
+                const newAvg = ((oldAvg * oldCount) + review.rating) / newCount;
+
+                transaction.update(bookRef, {
+                    'stats.averageRating': Number(newAvg.toFixed(1)),
+                    'stats.totalReviews': newCount,
+                    // Maintain legacy fields if they are queried elsewhere
+                    'stats.rating': Number(newAvg.toFixed(1)),
+                    'stats.reviewsCount': newCount,
+                    updatedAt: Timestamp.now()
+                });
+            }
         });
+
+        // Invalidate cache
+        booksCache = null;
+        lastBooksFetch = 0;
     } catch (error) {
         console.error('Error adding review:', error);
         throw error;

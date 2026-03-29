@@ -7,6 +7,7 @@ import { motion as m, AnimatePresence } from 'framer-motion';
 import { OptimizedImage } from '../components/OptimizedImage';
 import { useToast } from '../components/Toast';
 import SEO from '../components/SEO';
+import { generateBookSlug } from '../services/dataService';
 
 const ProfilePage: React.FC = () => {
     const { user, loading } = useAuth();
@@ -546,7 +547,8 @@ const ProfilePage: React.FC = () => {
                                                     <p className="text-sm text-gray-500 mb-3">{book.author}</p>
                                                     <button
                                                         onClick={() => {
-                                                            navigate(`/livro/${book.id}`);
+                                                            const slug = (book as any).slug || generateBookSlug(book.title, book.launchDate);
+                                                            navigate(`/livro/${slug}`);
                                                         }}
                                                         aria-label={`Comprar ${book.title}`}
                                                         className="w-full py-2 bg-brand-primary/10 text-brand-primary font-bold rounded-lg hover:bg-brand-primary hover:text-white transition-colors flex items-center justify-center gap-2"

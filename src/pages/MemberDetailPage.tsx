@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { m, useScroll, useTransform, Variants } from 'framer-motion';
 import { ArrowLeft, Mail, Linkedin, Twitter, Sparkles, MapPin, Award, BookOpen, Quote, Loader2 } from 'lucide-react';
-import { getTeamMemberById, getBooksMinimal, isReleased } from '../services/dataService';
+import { getTeamMemberById, getBooksMinimal, isReleased, generateBookSlug } from '../services/dataService';
 import SEO from '../components/SEO';
 import { OptimizedImage } from '../components/OptimizedImage';
 import { Book } from '../types';
@@ -298,7 +298,10 @@ const MemberDetailPage: React.FC = () => {
                                 >
                                     <BookCard
                                         book={book}
-                                        onViewDetails={(b) => navigate(`/livro/${b.id}`)}
+                                        onViewDetails={(b) => {
+                                            const slug = (b as any).slug || generateBookSlug(b.title, b.launchDate);
+                                            navigate(`/livro/${slug}`);
+                                        }}
                                         onAddToCart={() => { }} // Could be improved if needed
                                         onToggleWishlist={() => { }}
                                     />
