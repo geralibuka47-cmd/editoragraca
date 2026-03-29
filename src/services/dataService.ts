@@ -89,6 +89,10 @@ export const isReleased = (launchDate: any, now?: number): boolean => {
     return d.getTime() <= referenceTime; // Strictly <= now, per user requirement
 };
 
+export const isMobileDevice = (): boolean => {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+};
+
 // Helper: Parse Firestore document to frontend format
 const parseFirestoreDoc = (docData: any, id: string): any => {
     if (!docData) return null;

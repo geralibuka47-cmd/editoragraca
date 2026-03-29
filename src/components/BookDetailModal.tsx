@@ -9,7 +9,8 @@ import {
     incrementBookView,
     checkIsFavorite,
     toggleFavorite,
-    checkDownloadAccess
+    checkDownloadAccess,
+    isMobileDevice
 } from '../services/dataService';
 import { fetchBookByISBN, GoogleBookVolumeInfo } from '../services/googleBooksService';
 
@@ -101,6 +102,11 @@ const BookDetailModal: React.FC<BookDetailModalProps & { user?: UserType | null;
     };
     const handleDownload = async () => {
         if (!book.digitalFileUrl) return;
+
+        if (isMobileDevice()) {
+            window.open(book.digitalFileUrl, '_blank');
+            return;
+        }
 
         try {
             // Try to fetch as blob to force download

@@ -15,7 +15,8 @@ import {
     checkIsFavorite,
     toggleFavorite,
     checkDownloadAccess,
-    isReleased
+    isReleased,
+    isMobileDevice
 } from '../services/dataService';
 import { useToast } from '../components/Toast';
 import SEO from '../components/SEO';
@@ -111,10 +112,18 @@ const BookPage: React.FC<BookPageProps> = ({ user, cart, onAddToCart }) => {
     const handleDownload = async () => {
         if (!book || !book.digitalFileUrl) return;
 
+        // On mobile, direct window.open is more compatible (especially older iOS)
+        if (isMobileDevice()) {
+            window.open(book.digitalFileUrl, '_blank');
+            incrementBookDownload(book.id);
+            showToast('O ficheiro abrirá no navegador.', 'info');
+            return;
+        }
+
         try {
             showToast('A preparar download...', 'info');
 
-            // Try to fetch as blob to force download
+            // Try to fetch as blob to force download (Desktop only)
             const response = await fetch(book.digitalFileUrl);
             if (!response.ok) throw new Error('Falha ao descarregar');
 
@@ -123,7 +132,6 @@ const BookPage: React.FC<BookPageProps> = ({ user, cart, onAddToCart }) => {
             const a = document.createElement('a');
             a.href = url;
 
-            // Extract extension or default to .pdf
             const extension = book.digitalFileUrl.split('?')[0].split('.').pop() || 'pdf';
             a.download = `${book.title}.${extension}`;
 
@@ -136,7 +144,6 @@ const BookPage: React.FC<BookPageProps> = ({ user, cart, onAddToCart }) => {
             showToast('Download iniciado!', 'success');
         } catch (error) {
             console.error('Download error:', error);
-            // Fallback: open in new tab if CORS fails
             window.open(book.digitalFileUrl, '_blank');
             incrementBookDownload(book.id);
             showToast('O ficheiro abrirá no navegador.', 'info');

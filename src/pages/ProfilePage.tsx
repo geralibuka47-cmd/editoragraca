@@ -7,7 +7,7 @@ import { motion as m, AnimatePresence } from 'framer-motion';
 import { OptimizedImage } from '../components/OptimizedImage';
 import { useToast } from '../components/Toast';
 import SEO from '../components/SEO';
-import { generateBookSlug } from '../services/dataService';
+import { generateBookSlug, isMobileDevice } from '../services/dataService';
 
 const ProfilePage: React.FC = () => {
     const { user, loading } = useAuth();
@@ -152,6 +152,12 @@ const ProfilePage: React.FC = () => {
     const handleDownload = async (book: Book) => {
         if (!book.digitalFileUrl) {
             showToast('Ficheiro digital não disponível.', 'error');
+            return;
+        }
+
+        if (isMobileDevice()) {
+            window.open(book.digitalFileUrl, '_blank');
+            showToast('O ficheiro abrirá no navegador.', 'info');
             return;
         }
 
