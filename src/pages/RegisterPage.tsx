@@ -147,7 +147,7 @@ const RegisterPage: React.FC = () => {
     );
 
     return (
-        <div className="min-h-screen bg-[#0fb48b] flex items-center justify-center p-6 selection:bg-[#0fb48b] selection:text-white font-sans">
+        <div className="min-h-screen bg-[#B78628] flex items-center justify-center p-6 selection:bg-[#B78628] selection:text-white font-sans">
             <SEO title="Criar Conta" description="Junte-se à família Editora Graça." />
 
             <div id="recaptcha-container" />
@@ -155,13 +155,13 @@ const RegisterPage: React.FC = () => {
             <m.div
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="w-full max-w-[500px] bg-[#2d333b] rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] p-10 relative overflow-visible"
+                className="w-full max-w-[500px] bg-[#0F172A] rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-10 relative overflow-visible border border-white/5"
             >
                 {/* ── Avatar Circle ────────────────────────────────────── */}
-                <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-24 bg-[#3e444d] rounded-full flex items-center justify-center shadow-lg border-4 border-[#2d333b]">
+                <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-24 bg-[#1E293B] rounded-full flex items-center justify-center shadow-lg border-4 border-[#0F172A]">
                     <div className="relative">
                         <User className="w-12 h-12 text-gray-400" />
-                        <div className="absolute bottom-0 right-0 w-6 h-6 bg-[#0fb48b] rounded-full border-2 border-[#2d333b] flex items-center justify-center">
+                        <div className="absolute bottom-0 right-0 w-6 h-6 bg-[#B78628] rounded-full border-2 border-[#0F172A] flex items-center justify-center">
                             <span className="text-[10px] text-white font-bold">+</span>
                         </div>
                     </div>
@@ -173,13 +173,13 @@ const RegisterPage: React.FC = () => {
                         to="/login"
                         className="relative pb-2 font-black text-lg uppercase tracking-widest text-gray-500 hover:text-gray-400 transition-all font-sans"
                     >
-                        Login
+                        Entrar
                     </Link>
                     <button
                         className="relative pb-2 font-black text-lg uppercase tracking-widest text-white transition-all"
                     >
-                        Sign Up
-                        <m.div layoutId="tab-underline" className="absolute bottom-0 left-0 w-full h-1 bg-white rounded-full" />
+                        Criar Conta
+                        <m.div layoutId="tab-underline" className="absolute bottom-0 left-0 w-full h-1 bg-[#B78628] rounded-full" />
                     </button>
                 </div>
 
@@ -197,7 +197,7 @@ const RegisterPage: React.FC = () => {
                                     </div>
                                     <p className="text-green-400 font-black text-lg uppercase tracking-tighter">Conta Criada!</p>
                                     <p className="text-green-500/70 text-xs font-medium">{emailSuccess}</p>
-                                    <Button onClick={() => navigate('/login')} className="w-full bg-[#0fb48b] text-white py-4 rounded-xl font-black text-xs uppercase tracking-widest">Ir para Login</Button>
+                                    <Button onClick={() => navigate('/login')} className="w-full bg-[#B78628] text-white py-4 rounded-xl font-black text-xs uppercase tracking-widest">Ir para Login</Button>
                                 </m.div>
                             ) : (
                                 <form onSubmit={handleEmail(onEmailSubmit)} className="space-y-6">
@@ -212,8 +212,8 @@ const RegisterPage: React.FC = () => {
                                                 type="button"
                                                 onClick={() => setEmailValue('role', r.id)}
                                                 className={`py-4 rounded-2xl flex items-center justify-center gap-2 transition-all font-black text-[10px] uppercase tracking-widest border-2 ${emailRole === r.id
-                                                    ? 'bg-[#0fb48b] border-[#0fb48b] text-white shadow-lg'
-                                                    : 'bg-[#3e444d] border-transparent text-gray-500 hover:text-gray-400'
+                                                    ? 'bg-[#B78628] border-[#B78628] text-white shadow-lg'
+                                                    : 'bg-[#1E293B] border-transparent text-gray-500 hover:text-gray-400'
                                                     }`}
                                             >
                                                 <r.icon className="w-4 h-4" />
@@ -226,7 +226,7 @@ const RegisterPage: React.FC = () => {
                                         <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 ml-1">Nome Completo</label>
                                         <div className="relative">
                                             <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-500"><User className="w-5 h-5" /></div>
-                                            <input {...regEmail('name')} placeholder="Seu nome" className="w-full bg-[#3e444d] border-none rounded-2xl py-4 pl-14 pr-6 text-white text-sm font-bold placeholder:text-gray-600 focus:ring-2 focus:ring-[#0fb48b] transition-all outline-none" />
+                                            <input {...regEmail('name')} placeholder="Seu nome" className="w-full bg-[#1E293B] border-none rounded-2xl py-4 pl-14 pr-6 text-white text-sm font-bold placeholder:text-gray-600 focus:ring-2 focus:ring-[#B78628] transition-all outline-none" />
                                         </div>
                                         {emailErrors.name && <p className="text-[10px] text-red-500 font-bold ml-1">{emailErrors.name.message}</p>}
                                     </div>
@@ -235,24 +235,24 @@ const RegisterPage: React.FC = () => {
                                         <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 ml-1">Email</label>
                                         <div className="relative">
                                             <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-500"><Mail className="w-5 h-5" /></div>
-                                            <input {...regEmail('email')} type="email" placeholder="seu@email.com" className="w-full bg-[#3e444d] border-none rounded-2xl py-4 pl-14 pr-6 text-white text-sm font-bold placeholder:text-gray-600 focus:ring-2 focus:ring-[#0fb48b] transition-all outline-none" />
+                                            <input {...regEmail('email')} type="email" placeholder="seu@email.com" className="w-full bg-[#1E293B] border-none rounded-2xl py-4 pl-14 pr-6 text-white text-sm font-bold placeholder:text-gray-600 focus:ring-2 focus:ring-[#B78628] transition-all outline-none" />
                                         </div>
                                         {emailErrors.email && <p className="text-[10px] text-red-500 font-bold ml-1">{emailErrors.email.message}</p>}
                                     </div>
 
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 ml-1">Password</label>
+                                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 ml-1">Palavra-passe</label>
                                         <div className="relative">
                                             <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-500"><Lock className="w-5 h-5" /></div>
-                                            <input {...regEmail('password')} type="password" placeholder="••••••••" className="w-full bg-[#3e444d] border-none rounded-2xl py-4 pl-14 pr-6 text-white text-sm font-bold placeholder:text-gray-600 focus:ring-2 focus:ring-[#0fb48b] transition-all outline-none" />
+                                            <input {...regEmail('password')} type="password" placeholder="••••••••" className="w-full bg-[#1E293B] border-none rounded-2xl py-4 pl-14 pr-6 text-white text-sm font-bold placeholder:text-gray-600 focus:ring-2 focus:ring-[#B78628] transition-all outline-none" />
                                         </div>
                                         {emailErrors.password && <p className="text-[10px] text-red-500 font-bold ml-1">{emailErrors.password.message}</p>}
                                     </div>
 
                                     {emailError && <p className="text-[10px] font-bold text-red-500 text-center">⚠️ {emailError}</p>}
 
-                                    <Button type="submit" isLoading={emailLoading} className="w-full py-5 rounded-2xl bg-[#0fb48b] hover:bg-[#0da07a] text-white text-sm font-black uppercase tracking-[0.3em] shadow-lg shadow-[#0fb48b]/20 transition-all active:scale-[0.98]">
-                                        Create Account
+                                    <Button type="submit" isLoading={emailLoading} className="w-full py-5 rounded-2xl bg-[#B78628] hover:bg-[#A37824] text-white text-sm font-black uppercase tracking-[0.3em] shadow-lg shadow-[#B78628]/20 transition-all active:scale-[0.98]">
+                                        Confirmar Registo
                                     </Button>
                                 </form>
                             )}
@@ -269,7 +269,7 @@ const RegisterPage: React.FC = () => {
                                                 { id: 'leitor' as const, icon: BookOpen, label: 'Leitor' },
                                                 { id: 'autor' as const, icon: Sparkles, label: 'Autor' }
                                             ].map(r => (
-                                                <button key={r.id} type="button" onClick={() => setPhoneValue('role', r.id)} className={`py-4 rounded-2xl flex items-center justify-center gap-2 transition-all font-black text-[10px] uppercase tracking-widest border-2 ${phoneRole === r.id ? 'bg-[#0fb48b] border-[#0fb48b] text-white shadow-lg' : 'bg-[#3e444d] border-transparent text-gray-500'}`}>
+                                                <button key={r.id} type="button" onClick={() => setPhoneValue('role', r.id)} className={`py-4 rounded-2xl flex items-center justify-center gap-2 transition-all font-black text-[10px] uppercase tracking-widest border-2 ${phoneRole === r.id ? 'bg-[#B78628] border-[#B78628] text-white shadow-lg' : 'bg-[#1E293B] border-transparent text-gray-500'}`}>
                                                     <r.icon className="w-4 h-4" /> {r.label}
                                                 </button>
                                             ))}
@@ -278,18 +278,18 @@ const RegisterPage: React.FC = () => {
                                             <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 ml-1">Nome Completo</label>
                                             <div className="relative">
                                                 <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-500"><User className="w-5 h-5" /></div>
-                                                <input {...regPhone('name')} placeholder="Seu nome" className="w-full bg-[#3e444d] border-none rounded-2xl py-4 pl-14 pr-6 text-white text-sm font-bold placeholder:text-gray-600 focus:ring-2 focus:ring-[#0fb48b] outline-none" />
+                                                <input {...regPhone('name')} placeholder="Seu nome" className="w-full bg-[#1E293B] border-none rounded-2xl py-4 pl-14 pr-6 text-white text-sm font-bold placeholder:text-gray-600 focus:ring-2 focus:ring-[#B78628] outline-none" />
                                             </div>
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 ml-1">Número de Telemóvel</label>
                                             <div className="flex gap-3">
-                                                <div className="flex items-center gap-2 px-4 py-4 bg-[#3e444d] rounded-2xl text-xs font-black text-white shrink-0">🇦🇴 +244</div>
-                                                <input {...regPhone('phone')} type="tel" placeholder="912 345 678" className="flex-1 px-5 py-4 bg-[#3e444d] border-none rounded-2xl text-sm font-bold text-white outline-none focus:ring-2 focus:ring-[#0fb48b]" />
+                                                <div className="flex items-center gap-2 px-4 py-4 bg-[#1E293B] rounded-2xl text-xs font-black text-white shrink-0">🇦🇴 +244</div>
+                                                <input {...regPhone('phone')} type="tel" placeholder="912 345 678" className="flex-1 px-5 py-4 bg-[#1E293B] border-none rounded-2xl text-sm font-bold text-white outline-none focus:ring-2 focus:ring-[#B78628]" />
                                             </div>
                                         </div>
                                         {phoneError && <p className="text-[10px] font-bold text-red-500 text-center">⚠️ {phoneError}</p>}
-                                        <Button type="submit" isLoading={phoneLoading} className="w-full py-5 rounded-2xl bg-[#0fb48b] hover:bg-[#0da07a] text-white text-sm font-black uppercase tracking-[0.3em] shadow-lg shadow-[#0fb48b]/20">Enviar SMS</Button>
+                                        <Button type="submit" isLoading={phoneLoading} className="w-full py-5 rounded-2xl bg-[#B78628] hover:bg-[#A37824] text-white text-sm font-black uppercase tracking-[0.3em] shadow-lg shadow-[#B78628]/20">Enviar SMS</Button>
                                     </m.form>
                                 )}
                                 {phoneStep === 2 && (
@@ -298,8 +298,8 @@ const RegisterPage: React.FC = () => {
                                             <p className="text-[10px] font-black text-white uppercase tracking-widest">Código Enviado!</p>
                                             <p className="text-[10px] text-gray-500 font-medium">+244 {pendingPhoneData?.phone}</p>
                                         </div>
-                                        <input type="number" value={otp} onChange={e => setOtp(e.target.value)} placeholder="000000" className="w-full bg-[#3e444d] border-none rounded-2xl py-6 text-3xl font-black text-white text-center tracking-[0.5em] outline-none focus:ring-2 focus:ring-[#0fb48b]" />
-                                        <Button type="button" onClick={onOTPConfirm} isLoading={phoneLoading} disabled={otp.length < 6} className="w-full py-5 rounded-2xl bg-[#0fb48b] hover:bg-[#0da07a] text-white text-sm font-black uppercase tracking-[0.3em]">Confirmar e Entrar</Button>
+                                        <input type="number" value={otp} onChange={e => setOtp(e.target.value)} placeholder="000000" className="w-full bg-[#1E293B] border-none rounded-2xl py-6 text-3xl font-black text-white text-center tracking-[0.5em] outline-none focus:ring-2 focus:ring-[#B78628]" />
+                                        <Button type="button" onClick={onOTPConfirm} isLoading={phoneLoading} disabled={otp.length < 6} className="w-full py-5 rounded-2xl bg-[#B78628] hover:bg-[#A37824] text-white text-sm font-black uppercase tracking-[0.3em]">Confirmar e Entrar</Button>
                                     </m.div>
                                 )}
                             </AnimatePresence>
@@ -312,7 +312,7 @@ const RegisterPage: React.FC = () => {
                     <button
                         type="button"
                         onClick={() => setMethod(method === 'email' ? 'phone' : 'email')}
-                        className="text-[10px] font-black uppercase tracking-[0.2em] text-[#0fb48b] hover:text-white transition-colors"
+                        className="text-[10px] font-black uppercase tracking-[0.2em] text-[#B78628] hover:text-white transition-colors"
                     >
                         {method === 'email' ? 'Registar via Telemóvel' : 'Registar via Email'}
                     </button>
@@ -323,8 +323,8 @@ const RegisterPage: React.FC = () => {
             </m.div>
 
             {/* Float Back Link */}
-            <Link to="/" className="fixed bottom-8 px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-full font-black text-[10px] uppercase tracking-widest backdrop-blur-md transition-all">
-                Retornar à Loja
+            <Link to="/" className="fixed bottom-8 px-6 py-3 bg-[#0F172A]/80 hover:bg-[#0F172A] text-white rounded-full font-black text-[10px] uppercase tracking-widest backdrop-blur-md transition-all border border-white/10 shadow-xl">
+                Voltar ao Início
             </Link>
         </div>
     );

@@ -165,8 +165,9 @@ const AppContent: React.FC = () => {
         }
     };
 
+    const isAuthRoute = location.pathname === '/login' || location.pathname === '/registo';
     const isDashboardRoute = location.pathname.startsWith('/admin') || location.pathname.startsWith('/perfil');
-    const showShell = !isDashboardRoute;
+    const showShell = !isDashboardRoute && !isAuthRoute;
     const topOffset = showShell && announcementVisible ? ANNOUNCEMENT_HEIGHT : 0;
 
     return (
