@@ -233,7 +233,7 @@ const AdminBooks: React.FC = () => {
                             className="fixed inset-x-4 top-4 bottom-4 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-4xl bg-white rounded-[2.5rem] shadow-2xl z-[101] overflow-hidden flex flex-col"
                         >
                             {/* Modal Header with Progress */}
-                            <div className="p-8 border-b border-gray-50 shrink-0">
+                            <div className="p-6 md:p-8 border-b border-gray-50 shrink-0">
                                 <div className="flex items-center justify-between mb-6">
                                     <h3 className="text-2xl font-black text-brand-dark uppercase tracking-tighter">
                                         {editingBook ? 'Editar Obra' : 'Nova Obra'}
@@ -268,7 +268,7 @@ const AdminBooks: React.FC = () => {
                                 </div>
                             </div>
 
-                            <form onSubmit={handleSave} className="flex-1 overflow-y-auto p-8">
+                            <form onSubmit={handleSave} className="flex-1 overflow-y-auto p-6 md:p-8">
                                 <AnimatePresence mode="wait">
                                     {currentStep === 1 && (
                                         <motion.div
@@ -278,7 +278,7 @@ const AdminBooks: React.FC = () => {
                                             exit={{ opacity: 0, x: -20 }}
                                             className="space-y-8"
                                         >
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                                                 <div className="space-y-6">
                                                     <div className="space-y-2">
                                                         <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Título</label>
@@ -419,18 +419,18 @@ const AdminBooks: React.FC = () => {
                                             exit={{ opacity: 0, x: -20 }}
                                             className="space-y-8"
                                         >
-                                            <div className="flex items-center justify-between p-2 bg-gray-50 rounded-[2rem]">
+                                            <div className="flex flex-col sm:flex-row items-center justify-between p-2 bg-gray-50 rounded-[1.5rem] sm:rounded-[2.5rem] gap-2">
                                                 <button
                                                     type="button"
                                                     onClick={() => setIsNewAuthor(false)}
-                                                    className={`flex-1 py-4 rounded-[1.8rem] text-[10px] font-black uppercase tracking-widest transition-all ${!isNewAuthor ? 'bg-white shadow-xl text-brand-dark' : 'text-gray-400 hover:text-gray-600'}`}
+                                                    className={`w-full sm:flex-1 py-3 sm:py-4 rounded-[1.2rem] sm:rounded-[1.8rem] text-[10px] font-black uppercase tracking-widest transition-all ${!isNewAuthor ? 'bg-white shadow-xl text-brand-dark' : 'text-gray-400 hover:text-gray-600'}`}
                                                 >
                                                     Selecionar Existente
                                                 </button>
                                                 <button
                                                     type="button"
                                                     onClick={() => setIsNewAuthor(true)}
-                                                    className={`flex-1 py-4 rounded-[1.8rem] text-[10px] font-black uppercase tracking-widest transition-all ${isNewAuthor ? 'bg-white shadow-xl text-brand-dark' : 'text-gray-400 hover:text-gray-600'}`}
+                                                    className={`w-full sm:flex-1 py-3 sm:py-4 rounded-[1.2rem] sm:rounded-[1.8rem] text-[10px] font-black uppercase tracking-widest transition-all ${isNewAuthor ? 'bg-white shadow-xl text-brand-dark' : 'text-gray-400 hover:text-gray-600'}`}
                                                 >
                                                     Registrar Novo
                                                 </button>
@@ -506,7 +506,7 @@ const AdminBooks: React.FC = () => {
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
                                                     <div className="space-y-6">
                                                         <div className="space-y-2">
                                                             <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-4">Nome do Autor</label>
@@ -769,11 +769,11 @@ const AdminBooks: React.FC = () => {
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
-                                <div className="p-8 border-t border-gray-50 bg-gray-50/30 flex items-center justify-between shrink-0">
+                                <div className="p-6 md:p-8 border-t border-gray-50 bg-gray-50/30 flex items-center justify-between shrink-0">
                                     <button
                                         type="button"
                                         onClick={currentStep === 1 ? () => setIsModalOpen(false) : handleBack}
-                                        className="px-8 py-4 bg-white text-gray-400 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:text-brand-dark transition-all border border-gray-100"
+                                        className="px-6 md:px-8 py-3 md:py-4 bg-white text-gray-400 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:text-brand-dark transition-all border border-gray-100"
                                     >
                                         {currentStep === 1 ? 'Cancelar' : 'Anterior'}
                                     </button>
@@ -782,7 +782,7 @@ const AdminBooks: React.FC = () => {
                                         {currentStep < 4 ? (
                                             <button
                                                 type="submit"
-                                                className="px-10 py-4 bg-brand-dark text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-primary transition-all shadow-xl shadow-brand-dark/10"
+                                                className="px-6 md:px-10 py-3 md:py-4 bg-brand-dark text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-primary transition-all shadow-xl shadow-brand-dark/10"
                                             >
                                                 Próximo Passo
                                             </button>
@@ -790,7 +790,7 @@ const AdminBooks: React.FC = () => {
                                             <button
                                                 type="submit"
                                                 disabled={isSaving}
-                                                className="px-10 py-4 bg-brand-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-dark transition-all shadow-xl shadow-brand-primary/20 flex items-center gap-3 disabled:opacity-50"
+                                                className="px-6 md:px-10 py-3 md:py-4 bg-brand-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-dark transition-all shadow-xl shadow-brand-primary/20 flex items-center gap-3 disabled:opacity-50"
                                             >
                                                 {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
                                                 {editingBook ? 'Guardar Alterações' : 'Publicar Obra'}

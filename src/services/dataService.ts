@@ -120,6 +120,8 @@ const parseFirestoreDoc = (docData: any, id: string): any => {
         parsed.stats.views = parsed.stats.views || 0;
         parsed.stats.downloads = parsed.stats.downloads || 0;
         parsed.stats.copiesSold = parsed.stats.copiesSold || 0;
+        parsed.stats.rating = parsed.stats.rating || 5;
+        parsed.stats.reviewsCount = parsed.stats.reviewsCount || 0;
     }
 
     return parsed;
@@ -268,9 +270,39 @@ export const getBookById = async (id: string): Promise<Book | null> => {
         }
         return null;
     } catch (error) {
-        console.error('Erro ao buscar livro:', error);
+        console.error('Erro ao buscar livro por ID:', error);
         return null;
     }
+};
+
+export const getBookBySlug = async (slug: string): Promise<Book | null> => {
+    try {
+        // First try to find in cache/local
+        const allBooks = await getBooks();
+        const cachedBook = allBooks.find(b => (b as any).slug === slug);
+        if (cachedBook) return cachedBook;
+
+        // Otherwise query Firestore
+        const q = query(collection(db, COLLECTIONS.BOOKS), where('slug', '==', slug), limit(1));
+        const snapshot = await getDocs(q);
+
+        if (!snapshot.empty) {
+            return parseFirestoreDoc(snapshot.docs[0].data(), snapshot.docs[0].id) as Book;
+        }
+        return null;
+    } catch (error) {
+        console.error('Erro ao buscar livro por slug:', error);
+        return null;
+    }
+};
+
+export const generateBookSlug = (title: string, launchDate?: string): string => {
+    const normalizedTitle = normalizeString(title).replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    if (!launchDate) return normalizedTitle;
+
+    const date = parseToDate(launchDate);
+    const dateStr = date ? `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}` : '00-00-0000';
+    return `${normalizedTitle}-${dateStr}`;
 };
 
 export const saveBook = async (book: Book, newAuthor?: Partial<User>) => {
@@ -296,6 +328,9 @@ export const saveBook = async (book: Book, newAuthor?: Partial<User>) => {
         if (!book.category) {
             book.category = 'livro';
         }
+
+        // Generate and store slug
+        (book as any).slug = generateBookSlug(book.title, book.launchDate);
 
         const bookData = prepareForFirestore(book);
         const { id, ...payload } = bookData;
@@ -1276,12 +1311,32 @@ export const getBookStats = async (bookId: string) => {
 
 export const incrementBookView = async (bookId: string) => {
     try {
+        // Track in separate collection for privacy/history
         await addDoc(collection(db, COLLECTIONS.BOOK_VIEWS), {
             bookId,
             viewedAt: Timestamp.now()
         });
+
+        // Also increment counter in the book document for performance
+        const bookRef = doc(db, COLLECTIONS.BOOKS, bookId);
+        await updateDoc(bookRef, {
+            'stats.views': increment(1)
+        });
     } catch (error) {
         // Fail silently
+    }
+};
+
+export const incrementBookDownload = async (bookId: string) => {
+    try {
+        // Track in separate collection if we want to add a COLLECTIONS.BOOK_DOWNLOADS later
+        // For now, increment the counter directly in the book document
+        const bookRef = doc(db, COLLECTIONS.BOOKS, bookId);
+        await updateDoc(bookRef, {
+            'stats.downloads': increment(1)
+        });
+    } catch (error) {
+        console.error('Error incrementing download:', error);
     }
 };
 

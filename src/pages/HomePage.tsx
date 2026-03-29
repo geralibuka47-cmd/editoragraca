@@ -596,7 +596,7 @@ const HomePage: React.FC<HomePageProps> = ({ books, loading, siteContent = {}, o
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 <div className="w-2 h-2 bg-white rounded-full"></div>
-                                                <span>4.9 Avaliação Média</span>
+                                                <span>{mostDownloaded.stats?.averageRating || '—'} Avaliação Média</span>
                                             </div>
                                         </div>
                                     </div>

@@ -8,6 +8,7 @@ import { Book } from './types';
 import {
     getBooksMinimal,
     getSiteContent,
+    generateBookSlug,
 } from './services/dataService';
 import { logout as authLogout } from './services/authService';
 import { Loader2 } from 'lucide-react';
@@ -21,6 +22,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 // Lazy loading pages
 const LoginPage = React.lazy(() => import('./pages/LoginPage'));
 const RegisterPage = React.lazy(() => import('./pages/RegisterPage'));
+const ForgotPasswordPage = React.lazy(() => import('./pages/ForgotPasswordPage'));
 const LibraryPage = React.lazy(() => import('./pages/LibraryPage'));
 const HomePage = React.lazy(() => import('./pages/HomePage'));
 const HeritagePage = React.lazy(() => import('./pages/HeritagePage'));
@@ -143,7 +145,8 @@ const AppContent: React.FC = () => {
 
     const handleAction = (type: string, payload?: any) => {
         if (type === 'VIEW_BOOK') {
-            navigate(`/livro/${payload.id}`);
+            const slug = (payload as any).slug || generateBookSlug(payload.title, payload.launchDate);
+            navigate(`/livro/${slug}`);
         } else if (type === 'ADD_TO_CART') {
             handleAddToCart(payload);
         } else if (type === 'NAVIGATE') {
@@ -165,7 +168,9 @@ const AppContent: React.FC = () => {
         }
     };
 
-    const isAuthRoute = location.pathname === '/login' || location.pathname === '/registo';
+    const isAuthRoute = location.pathname === '/login' ||
+        location.pathname === '/registo' ||
+        location.pathname === '/recuperar-senha';
     const isDashboardRoute = location.pathname.startsWith('/admin') || location.pathname.startsWith('/perfil');
     const showShell = !isDashboardRoute && !isAuthRoute;
     const topOffset = showShell && announcementVisible ? ANNOUNCEMENT_HEIGHT : 0;
@@ -227,7 +232,7 @@ const AppContent: React.FC = () => {
                                 onToggleWishlist={(b) => { }}
                             />
                         } />
-                        <Route path="/livro/:id" element={
+                        <Route path="/livro/:slug" element={
                             <BookPage
                                 user={user}
                                 cart={cart}
@@ -242,6 +247,7 @@ const AppContent: React.FC = () => {
                         <Route path="/equipa/:id" element={<MemberDetailPage />} />
                         <Route path="/login" element={<LoginPage />} />
                         <Route path="/registo" element={<RegisterPage />} />
+                        <Route path="/recuperar-senha" element={<ForgotPasswordPage />} />
 
                         <Route path="/carrinho" element={
                             <CheckoutPage

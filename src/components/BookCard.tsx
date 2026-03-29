@@ -105,6 +105,18 @@ const BookCard: React.FC<BookCardProps> = ({ book, onAddToCart, onViewDetails, o
                     <span className="px-4 py-1.5 bg-gray-50 text-gray-500 text-[9px] font-bold uppercase tracking-widest rounded-lg border border-gray-100">
                         {book.genre}
                     </span>
+                    {book.stats && (
+                        <div className="flex items-center gap-3 ml-auto text-gray-400">
+                            <div className="flex items-center gap-1">
+                                <Eye className="w-3 h-3" />
+                                <span className="text-[10px] font-bold">{book.stats.views || 0}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                                <span className="text-[10px] font-bold">{book.stats.averageRating || 5}</span>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

@@ -7,10 +7,11 @@ import {
 } from 'lucide-react';
 import { Book, User as UserType } from '../types';
 import {
-    getBookById,
+    getBookBySlug,
     getBookReviews,
     getBookStats,
     incrementBookView,
+    incrementBookDownload,
     checkIsFavorite,
     toggleFavorite,
     checkDownloadAccess,
@@ -28,21 +29,21 @@ interface BookPageProps {
 }
 
 const BookPage: React.FC<BookPageProps> = ({ user, cart, onAddToCart }) => {
-    const { id } = useParams<{ id: string }>();
+    const { slug } = useParams<{ slug: string }>();
     const navigate = useNavigate();
     const { showToast } = useToast();
 
     const [book, setBook] = useState<Book | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [stats, setStats] = useState({ views: 0, rating: 0, sales: 0, reviewsCount: 0 });
+    const [stats, setStats] = useState({ views: 0, rating: 0, sales: 0, reviewsCount: 0, downloads: 0 });
     const [reviews, setReviews] = useState<any[]>([]);
     const [isFavorite, setIsFavorite] = useState(false);
     const [hasAccess, setHasAccess] = useState(false);
     const [activeTab, setActiveTab] = useState<'sinopse' | 'ficha' | 'avaliacoes'>('sinopse');
 
     useEffect(() => {
-        if (!id) { navigate('/livros'); return; }
+        if (!slug) { navigate('/livros'); return; }
 
         let cancelled = false;
         setLoading(true);
@@ -50,7 +51,7 @@ const BookPage: React.FC<BookPageProps> = ({ user, cart, onAddToCart }) => {
 
         const load = async () => {
             try {
-                const fetchedBook = await getBookById(id);
+                const fetchedBook = await getBookBySlug(slug);
                 if (cancelled) return;
                 if (!fetchedBook) {
                     setError('Livro não encontrado.');
@@ -58,25 +59,35 @@ const BookPage: React.FC<BookPageProps> = ({ user, cart, onAddToCart }) => {
                     return;
                 }
                 setBook(fetchedBook);
+                const bookId = fetchedBook.id;
 
                 // Load secondary data without blocking
                 const promises: Promise<any>[] = [
-                    getBookStats(id).catch(() => ({ views: 0, rating: 0, sales: 0, reviewsCount: 0 })),
-                    getBookReviews(id).catch(() => []),
-                    user ? checkIsFavorite(id, user.id).catch(() => false) : Promise.resolve(false),
-                    checkDownloadAccess(id, user?.id, fetchedBook.price || 0).catch(() => false),
+                    getBookStats(bookId).catch(() => ({ views: 0, rating: 0, sales: 0, reviewsCount: 0, downloads: 0 })),
+                    getBookReviews(bookId).catch(() => []),
+                    user ? checkIsFavorite(bookId, user.id).catch(() => false) : Promise.resolve(false),
+                    checkDownloadAccess(bookId, user?.id, fetchedBook.price || 0).catch(() => false),
                 ];
 
                 const [bookStats, bookReviews, favStatus, downloadAccess] = await Promise.all(promises);
                 if (cancelled) return;
 
-                setStats(bookStats);
+                // Merge stats from book object (which has the incremented counters)
+                const mergedStats = {
+                    ...bookStats,
+                    views: Math.max(bookStats.views, fetchedBook.stats?.views || 0),
+                    downloads: Math.max(bookStats.downloads || 0, fetchedBook.stats?.downloads || 0),
+                    rating: bookStats.rating || fetchedBook.stats?.averageRating || 5,
+                    reviewsCount: bookStats.reviewsCount || fetchedBook.stats?.totalReviews || 0
+                };
+
+                setStats(mergedStats);
                 setReviews(bookReviews);
                 setIsFavorite(favStatus);
                 setHasAccess(downloadAccess);
 
                 // Track view silently
-                incrementBookView(id).catch(() => { });
+                incrementBookView(bookId).catch(() => { });
             } catch (err) {
                 console.error('BookPage load error:', err);
                 if (!cancelled) setError('Erro ao carregar livro. Tente novamente.');
@@ -87,7 +98,7 @@ const BookPage: React.FC<BookPageProps> = ({ user, cart, onAddToCart }) => {
 
         load();
         return () => { cancelled = true; };
-    }, [id, user, navigate]);
+    }, [slug, user, navigate]);
 
     const handleToggleFavorite = async () => {
         if (!user) { showToast('Inicie sessão para guardar favoritos.', 'info'); return; }
@@ -288,14 +299,19 @@ const BookPage: React.FC<BookPageProps> = ({ user, cart, onAddToCart }) => {
                                     {book.price > 0 && <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">AOA</p>}
                                 </div>
                                 <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl border border-white/10">
-                                    <Eye className="w-4 h-4 text-gray-500" />
+                                    <Eye className="w-4 h-4 text-gray-400" />
                                     <span className="text-sm font-black">{stats.views}</span>
-                                    <span className="text-[10px] text-gray-500 uppercase tracking-widest">vistas</span>
+                                    <span className="text-[10px] text-gray-400 uppercase tracking-widest">vistas</span>
+                                </div>
+                                <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl border border-white/10">
+                                    <Download className="w-4 h-4 text-gray-400" />
+                                    <span className="text-sm font-black">{stats.downloads || 0}</span>
+                                    <span className="text-[10px] text-gray-400 uppercase tracking-widest">baixados</span>
                                 </div>
                                 <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl border border-white/10">
                                     <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                                     <span className="text-sm font-black">{stats.rating || '—'}</span>
-                                    <span className="text-[10px] text-gray-500 uppercase tracking-widest">avaliação</span>
+                                    <span className="text-[10px] text-gray-400 uppercase tracking-widest">avaliação</span>
                                 </div>
                             </div>
 
@@ -305,6 +321,7 @@ const BookPage: React.FC<BookPageProps> = ({ user, cart, onAddToCart }) => {
                                     <a
                                         href={book.digitalFileUrl}
                                         download
+                                        onClick={() => incrementBookDownload(book.id)}
                                         className="flex items-center gap-3 px-10 py-5 bg-brand-primary text-white font-black uppercase tracking-widest text-sm rounded-2xl hover:bg-white hover:text-brand-dark transition-all shadow-2xl"
                                     >
                                         <Download className="w-5 h-5" /> Baixar Obra

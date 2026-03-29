@@ -164,8 +164,8 @@ const BudgetGenerator: React.FC = () => {
     };
 
     return (
-        <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100 max-w-4xl mx-auto">
-            <div className="bg-brand-dark p-8 md:p-10 text-white flex justify-between items-center relative overflow-hidden">
+        <div className="bg-white rounded-[2rem] md:rounded-3xl shadow-xl overflow-hidden border border-gray-100 max-w-4xl mx-auto">
+            <div className="bg-brand-dark p-6 md:p-10 text-white flex justify-between items-center relative overflow-hidden">
                 <div className="relative z-10">
                     <h3 className="text-2xl md:text-3xl font-black uppercase tracking-tight mb-2">Simulador de Investimento</h3>
                     <p className="text-gray-400 font-medium text-sm">Obtenha uma previsão instantânea para a sua obra.</p>
@@ -174,7 +174,7 @@ const BudgetGenerator: React.FC = () => {
                 <Calculator className="w-12 h-12 text-brand-primary relative z-10" />
             </div>
 
-            <div className="p-8 md:p-12">
+            <div className="p-6 md:p-12">
                 {/* Steps Indicator */}
                 <div className="flex items-center justify-between mb-12 relative px-4">
                     <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-100 -z-0 -translate-y-1/2 rounded-full"></div>
@@ -292,8 +292,8 @@ const BudgetGenerator: React.FC = () => {
                                                 { id: 'marketing', title: 'Post Publicitário', price: '+ 5.000 Kz' }
                                             ].map((extra) => (
                                                 <label key={extra.id} className={`flex items-center gap-4 p-6 rounded-2xl border-2 cursor-pointer transition-all ${field.value.includes(extra.id) ? 'border-brand-primary bg-brand-primary/5' : 'border-gray-100 hover:bg-gray-50'}`}>
-                                                    <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center ${field.value.includes(extra.id) ? 'bg-brand-primary border-brand-primary text-white' : 'border-gray-300'}`}>
-                                                        {field.value.includes(extra.id) && <Check className="w-4 h-4" />}
+                                                    <div className={`w-5 h-5 md:w-6 md:h-6 rounded-md border-2 flex items-center justify-center shrink-0 ${field.value.includes(extra.id) ? 'bg-brand-primary border-brand-primary text-white' : 'border-gray-300'}`}>
+                                                        {field.value.includes(extra.id) && <Check className="w-3 h-3 md:w-4 md:h-4" />}
                                                     </div>
                                                     <input
                                                         type="checkbox"
@@ -328,7 +328,7 @@ const BudgetGenerator: React.FC = () => {
                             >
                                 <div className="bg-gradient-to-br from-brand-dark to-gray-900 rounded-3xl p-8 text-white text-center">
                                     <p className="text-gray-400 font-bold uppercase tracking-widest text-xs mb-4">Investimento Estimado</p>
-                                    <div className="text-4xl md:text-5xl font-black text-brand-primary mb-2">
+                                    <div className="text-3xl md:text-5xl font-black text-brand-primary mb-2">
                                         {estimatedPrice ? `${formatCurrency(estimatedPrice.min)} - ${formatCurrency(estimatedPrice.max)}` : 'Calculando...'}
                                     </div>
                                     <p className="text-xs text-gray-500 mt-4">*Valores indicativos. Sujeito a análise detalhada do original.</p>
