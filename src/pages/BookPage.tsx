@@ -52,48 +52,60 @@ const BookPage: React.FC<BookPageProps> = ({ user, cart, onAddToCart }) => {
 
         const load = async () => {
             try {
+                // 1. Fetch main book data first
                 const fetchedBook = await getBookBySlug(slug);
                 if (cancelled) return;
+
                 if (!fetchedBook) {
                     setError('Livro não encontrado.');
                     navigate('/livros');
                     return;
                 }
+
                 setBook(fetchedBook);
                 const bookId = fetchedBook.id;
 
-                // Load secondary data without blocking
-                const promises: Promise<any>[] = [
-                    getBookStats(bookId).catch(() => ({ views: 0, rating: 0, sales: 0, reviewsCount: 0, downloads: 0 })),
-                    getBookReviews(bookId).catch(() => []),
-                    user ? checkIsFavorite(bookId, user.id).catch(() => false) : Promise.resolve(false),
-                    checkDownloadAccess(bookId, user?.id, fetchedBook.price || 0).catch(() => false),
-                ];
+                // 2. Set loading to false as soon as we have the book
+                setLoading(false);
 
-                const [bookStats, bookReviews, favStatus, downloadAccess] = await Promise.all(promises);
-                if (cancelled) return;
+                // 3. Load secondary data in background without blocking the UI
+                const loadSecondaryData = async () => {
+                    try {
+                        const promises: Promise<any>[] = [
+                            getBookStats(bookId).catch(() => ({ views: 0, rating: 0, sales: 0, reviewsCount: 0, downloads: 0 })),
+                            getBookReviews(bookId).catch(() => []),
+                            user ? checkIsFavorite(bookId, user.id).catch(() => false) : Promise.resolve(false),
+                            checkDownloadAccess(bookId, user?.id, fetchedBook.price || 0).catch(() => false),
+                        ];
 
-                // Merge stats from book object (which has the incremented counters)
-                const mergedStats = {
-                    ...bookStats,
-                    views: Math.max(bookStats.views, fetchedBook.stats?.views || 0),
-                    downloads: Math.max(bookStats.downloads || 0, fetchedBook.stats?.downloads || 0),
-                    rating: bookStats.rating || fetchedBook.stats?.averageRating || 5,
-                    reviewsCount: bookStats.reviewsCount || fetchedBook.stats?.totalReviews || 0
+                        const [bookStats, bookReviews, favStatus, downloadAccess] = await Promise.all(promises);
+                        if (cancelled) return;
+
+                        const mergedStats = {
+                            ...bookStats,
+                            views: Math.max(bookStats.views, fetchedBook.stats?.views || 0),
+                            downloads: Math.max(bookStats.downloads || 0, fetchedBook.stats?.downloads || 0),
+                            rating: bookStats.rating || fetchedBook.stats?.averageRating || 5,
+                            reviewsCount: bookStats.reviewsCount || fetchedBook.stats?.totalReviews || 0
+                        };
+
+                        setStats(mergedStats);
+                        setReviews(bookReviews);
+                        setIsFavorite(favStatus);
+                        setHasAccess(downloadAccess);
+                        incrementBookView(bookId).catch(() => { });
+                    } catch (e) {
+                        console.error('Error loading secondary book data:', e);
+                    }
                 };
 
-                setStats(mergedStats);
-                setReviews(bookReviews);
-                setIsFavorite(favStatus);
-                setHasAccess(downloadAccess);
-
-                // Track view silently
-                incrementBookView(bookId).catch(() => { });
+                loadSecondaryData();
             } catch (err) {
                 console.error('BookPage load error:', err);
-                if (!cancelled) setError('Erro ao carregar livro. Tente novamente.');
-            } finally {
-                if (!cancelled) setLoading(false);
+                if (!cancelled) {
+                    setError('Erro ao carregar livro. Tente novamente.');
+                    setLoading(false);
+                }
             }
         };
 
@@ -112,9 +124,16 @@ const BookPage: React.FC<BookPageProps> = ({ user, cart, onAddToCart }) => {
     const handleDownload = async () => {
         if (!book || !book.digitalFileUrl) return;
 
-        // On mobile, direct window.open is more compatible (especially older iOS)
+        // On mobile, use a temporary anchor tag which is often more reliable than window.open
         if (isMobileDevice()) {
-            window.open(book.digitalFileUrl, '_blank');
+            const link = document.createElement('a');
+            link.href = book.digitalFileUrl;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
             incrementBookDownload(book.id);
             showToast('O ficheiro abrirá no navegador.', 'info');
             return;

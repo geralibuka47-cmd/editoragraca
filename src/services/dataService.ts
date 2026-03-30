@@ -239,9 +239,16 @@ export const getBooks = async (forceRefresh = false, limitCount?: number): Promi
         if (limitCount) {
             q = query(q, limit(limitCount));
         }
-        const snapshot = await getDocs(q);
 
-        const books = snapshot.docs.map(doc =>
+        // Add a 10s timeout to avoid hanging if Firebase is slow/blocked
+        const fetchPromise = getDocs(q);
+        const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Firestore Fetch Timeout')), 10000)
+        );
+
+        const snapshot = await Promise.race([fetchPromise, timeoutPromise]) as any;
+
+        const books = snapshot.docs.map((doc: any) =>
             parseFirestoreDoc(doc.data(), doc.id)
         ) as Book[];
 

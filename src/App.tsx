@@ -77,17 +77,34 @@ const ProtectedRoute = ({ children, allowedRoles }: { children: React.ReactNode,
 const AppContent: React.FC = () => {
     // Initialize from cache if possible for instant render
     const [books, setBooks] = useState<Book[]>(() => {
-        const saved = localStorage.getItem('eg_cache_books');
-        return saved ? JSON.parse(saved).data : [];
+        try {
+            const saved = localStorage.getItem('eg_cache_books');
+            return saved ? JSON.parse(saved).data || [] : [];
+        } catch (e) {
+            console.error('Error parsing books cache:', e);
+            return [];
+        }
     });
+
     const [siteContent, setSiteContent] = useState<Record<string, any>>(() => {
-        const saved = localStorage.getItem('eg_cache_site_content_all');
-        return saved ? JSON.parse(saved).data : {};
+        try {
+            const saved = localStorage.getItem('eg_cache_site_content_all');
+            return saved ? JSON.parse(saved).data || {} : {};
+        } catch (e) {
+            console.error('Error parsing site content cache:', e);
+            return {};
+        }
     });
-    const [dataLoading, setDataLoading] = useState(!books.length); // Only show loader if no cache
+
+    const [dataLoading, setDataLoading] = useState(!(books?.length > 0)); // Only show loader if no cache
+
     const [cart, setCart] = useState<any[]>(() => {
-        const saved = localStorage.getItem('cart');
-        return saved ? JSON.parse(saved) : [];
+        try {
+            const saved = localStorage.getItem('cart');
+            return saved ? JSON.parse(saved) : [];
+        } catch (e) {
+            return [];
+        }
     });
     const [announcementVisible, setAnnouncementVisible] = useState(false);
     const { showToast } = useToast();
