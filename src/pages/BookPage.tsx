@@ -23,6 +23,14 @@ import SEO from '../components/SEO';
 import CountdownTimer from '../components/CountdownTimer';
 import AdUnit from '../components/AdUnit';
 
+// Helper: race a promise against a timeout, resolving with fallback if slow
+function withTimeout<T>(promise: Promise<T>, fallback: T, ms = 8000): Promise<T> {
+    return Promise.race([
+        promise,
+        new Promise<T>((resolve) => setTimeout(() => resolve(fallback), ms))
+    ]);
+}
+
 interface BookPageProps {
     user?: UserType | null;
     cart: any[];
@@ -42,6 +50,15 @@ const BookPage: React.FC<BookPageProps> = ({ user, cart, onAddToCart }) => {
     const [isFavorite, setIsFavorite] = useState(false);
     const [hasAccess, setHasAccess] = useState(false);
     const [activeTab, setActiveTab] = useState<'sinopse' | 'ficha' | 'avaliacoes'>('sinopse');
+
+    // Safe back navigation: never goes blank when user came from an external link
+    const goBack = () => {
+        if (window.history.length > 1) {
+            navigate(-1);
+        } else {
+            navigate('/livros');
+        }
+    };
 
     useEffect(() => {
         if (!slug) { navigate('/livros'); return; }
@@ -68,17 +85,18 @@ const BookPage: React.FC<BookPageProps> = ({ user, cart, onAddToCart }) => {
                 // 2. Set loading to false as soon as we have the book
                 setLoading(false);
 
-                // 3. Load secondary data in background without blocking the UI
+                // 3. Load secondary data in background — 8s timeout to avoid infinite wait on mobile
                 const loadSecondaryData = async () => {
                     try {
-                        const promises: Promise<any>[] = [
-                            getBookStats(bookId).catch(() => ({ views: 0, rating: 0, sales: 0, reviewsCount: 0, downloads: 0 })),
-                            getBookReviews(bookId).catch(() => []),
-                            user ? checkIsFavorite(bookId, user.id).catch(() => false) : Promise.resolve(false),
-                            checkDownloadAccess(bookId, user?.id, fetchedBook.price || 0).catch(() => false),
-                        ];
+                        const FALLBACK_STATS = { views: 0, rating: 0, sales: 0, reviewsCount: 0, downloads: 0 };
 
-                        const [bookStats, bookReviews, favStatus, downloadAccess] = await Promise.all(promises);
+                        const [bookStats, bookReviews, favStatus, downloadAccess] = await Promise.all([
+                            withTimeout(getBookStats(bookId).catch(() => FALLBACK_STATS), FALLBACK_STATS),
+                            withTimeout(getBookReviews(bookId).catch(() => []), []),
+                            withTimeout(user ? checkIsFavorite(bookId, user.id).catch(() => false) : Promise.resolve(false), false),
+                            withTimeout(checkDownloadAccess(bookId, user?.id, fetchedBook.price || 0).catch(() => false), false),
+                        ]);
+
                         if (cancelled) return;
 
                         const mergedStats = {
@@ -205,7 +223,7 @@ const BookPage: React.FC<BookPageProps> = ({ user, cart, onAddToCart }) => {
 
                 {/* Back */}
                 <div className="container pt-8 pb-0 px-4 sm:px-6 md:px-12">
-                    <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-white/40 hover:text-brand-primary transition-colors text-xs font-bold uppercase tracking-widest group">
+                    <button onClick={goBack} className="flex items-center gap-2 text-white/40 hover:text-brand-primary transition-colors text-xs font-bold uppercase tracking-widest group">
                         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                         Voltar
                     </button>
@@ -284,7 +302,7 @@ const BookPage: React.FC<BookPageProps> = ({ user, cart, onAddToCart }) => {
                 </div>
                 <div className="container mx-auto px-4 sm:px-6 md:px-12 relative z-10">
                     {/* Back */}
-                    <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-white/40 hover:text-brand-primary transition-colors text-xs font-bold uppercase tracking-widest mb-12 group">
+                    <button onClick={goBack} className="flex items-center gap-2 text-white/40 hover:text-brand-primary transition-colors text-xs font-bold uppercase tracking-widest mb-12 group">
                         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                         Voltar
                     </button>

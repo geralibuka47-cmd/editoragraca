@@ -224,84 +224,86 @@ const AppContent: React.FC = () => {
                 style={showShell ? { paddingTop: `calc(${topOffset}px + clamp(64px, 6vw, 96px))` } : {}}
                 tabIndex={-1}
             >
-                <React.Suspense fallback={
-                    <div className="h-screen flex items-center justify-center">
-                        <Loader2 className="w-8 h-8 text-brand-primary animate-spin" />
-                    </div>
-                }>
-                    <Routes>
-                        <Route path="/" element={
-                            <HomePage
-                                books={books}
-                                loading={dataLoading}
-                                onViewDetails={(b) => handleAction('VIEW_BOOK', b)}
-                                onAddToCart={(b) => handleAction('ADD_TO_CART', b)}
-                                onToggleWishlist={(b) => { }}
-                                onNavigate={(v) => handleAction('NAVIGATE', v)}
-                            />
-                        } />
-                        <Route path="/livros" element={
-                            <LibraryPage
-                                books={books}
-                                loading={dataLoading}
-                                onViewDetails={(b) => handleAction('VIEW_BOOK', b)}
-                                onAddToCart={(b) => handleAction('ADD_TO_CART', b)}
-                                onToggleWishlist={(b) => { }}
-                            />
-                        } />
-                        <Route path="/livro/:slug" element={
-                            <BookPage
-                                user={user}
-                                cart={cart}
-                                onAddToCart={(b) => handleAction('ADD_TO_CART', b)}
-                            />
-                        } />
-                        <Route path="/sobre" element={<HeritagePage siteContent={siteContent} />} />
-                        <Route path="/contacto" element={<ConciergePage siteContent={siteContent} />} />
-                        <Route path="/projetos" element={<ExhibitionPage siteContent={siteContent} />} />
-                        <Route path="/servicos" element={<AtelierPage siteContent={siteContent} />} />
-                        <Route path="/blog" element={<JournalPage user={user} />} />
-                        <Route path="/equipa/:id" element={<MemberDetailPage />} />
-                        <Route path="/login" element={<LoginPage />} />
-                        <Route path="/registo" element={<RegisterPage />} />
-                        <Route path="/recuperar-senha" element={<ForgotPasswordPage />} />
+                <ErrorBoundary>
+                    <React.Suspense fallback={
+                        <div className="h-screen flex items-center justify-center">
+                            <Loader2 className="w-8 h-8 text-brand-primary animate-spin" />
+                        </div>
+                    }>
+                        <Routes>
+                            <Route path="/" element={
+                                <HomePage
+                                    books={books}
+                                    loading={dataLoading}
+                                    onViewDetails={(b) => handleAction('VIEW_BOOK', b)}
+                                    onAddToCart={(b) => handleAction('ADD_TO_CART', b)}
+                                    onToggleWishlist={(b) => { }}
+                                    onNavigate={(v) => handleAction('NAVIGATE', v)}
+                                />
+                            } />
+                            <Route path="/livros" element={
+                                <LibraryPage
+                                    books={books}
+                                    loading={dataLoading}
+                                    onViewDetails={(b) => handleAction('VIEW_BOOK', b)}
+                                    onAddToCart={(b) => handleAction('ADD_TO_CART', b)}
+                                    onToggleWishlist={(b) => { }}
+                                />
+                            } />
+                            <Route path="/livro/:slug" element={
+                                <BookPage
+                                    user={user}
+                                    cart={cart}
+                                    onAddToCart={(b) => handleAction('ADD_TO_CART', b)}
+                                />
+                            } />
+                            <Route path="/sobre" element={<HeritagePage siteContent={siteContent} />} />
+                            <Route path="/contacto" element={<ConciergePage siteContent={siteContent} />} />
+                            <Route path="/projetos" element={<ExhibitionPage siteContent={siteContent} />} />
+                            <Route path="/servicos" element={<AtelierPage siteContent={siteContent} />} />
+                            <Route path="/blog" element={<JournalPage user={user} />} />
+                            <Route path="/equipa/:id" element={<MemberDetailPage />} />
+                            <Route path="/login" element={<LoginPage />} />
+                            <Route path="/registo" element={<RegisterPage />} />
+                            <Route path="/recuperar-senha" element={<ForgotPasswordPage />} />
 
-                        <Route path="/carrinho" element={
-                            <CheckoutPage
-                                cart={cart}
-                                onUpdateQuantity={handleUpdateQuantity}
-                                onRemoveItem={(id) => handleUpdateQuantity(id, 0)}
-                            />
-                        } />
+                            <Route path="/carrinho" element={
+                                <CheckoutPage
+                                    cart={cart}
+                                    onUpdateQuantity={handleUpdateQuantity}
+                                    onRemoveItem={(id) => handleUpdateQuantity(id, 0)}
+                                />
+                            } />
 
-                        {/* Protected Routes */}
-                        <Route path="/perfil" element={
-                            <ProtectedRoute allowedRoles={['leitor', 'autor', 'adm']}>
-                                <ProfilePage />
-                            </ProtectedRoute>
-                        } />
+                            {/* Protected Routes */}
+                            <Route path="/perfil" element={
+                                <ProtectedRoute allowedRoles={['leitor', 'autor', 'adm']}>
+                                    <ProfilePage />
+                                </ProtectedRoute>
+                            } />
 
-                        <Route path="/admin/*" element={
-                            <ProtectedRoute allowedRoles={['adm']}>
-                                <AdminLayout>
-                                    <Routes>
-                                        <Route path="/" element={<AdminOverview />} />
-                                        <Route path="livros" element={<AdminBooksPage />} />
-                                        <Route path="utilizadores" element={<AdminUsersPage />} />
-                                        <Route path="encomendas" element={<AdminOrdersPage />} />
-                                        <Route path="manuscritos" element={<AdminManuscriptsPage />} />
-                                        <Route path="blog" element={<AdminBlogPage />} />
-                                        <Route path="equipa" element={<AdminTeamPage />} />
-                                        <Route path="settings" element={<AdminSettingsPage />} />
-                                        {/* Future admin pages will be added here */}
-                                    </Routes>
-                                </AdminLayout>
-                            </ProtectedRoute>
-                        } />
+                            <Route path="/admin/*" element={
+                                <ProtectedRoute allowedRoles={['adm']}>
+                                    <AdminLayout>
+                                        <Routes>
+                                            <Route path="/" element={<AdminOverview />} />
+                                            <Route path="livros" element={<AdminBooksPage />} />
+                                            <Route path="utilizadores" element={<AdminUsersPage />} />
+                                            <Route path="encomendas" element={<AdminOrdersPage />} />
+                                            <Route path="manuscritos" element={<AdminManuscriptsPage />} />
+                                            <Route path="blog" element={<AdminBlogPage />} />
+                                            <Route path="equipa" element={<AdminTeamPage />} />
+                                            <Route path="settings" element={<AdminSettingsPage />} />
+                                            {/* Future admin pages will be added here */}
+                                        </Routes>
+                                    </AdminLayout>
+                                </ProtectedRoute>
+                            } />
 
-                        <Route path="*" element={<Navigate to="/" replace />} />
-                    </Routes>
-                </React.Suspense>
+                            <Route path="*" element={<Navigate to="/" replace />} />
+                        </Routes>
+                    </React.Suspense>
+                </ErrorBoundary>
             </main>
 
             {showShell && <Footer content={siteContent} />}

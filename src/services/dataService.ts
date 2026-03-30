@@ -267,8 +267,8 @@ export const getBooks = async (forceRefresh = false, limitCount?: number): Promi
 };
 
 export const getBooksMinimal = async (forceRefresh = false): Promise<Book[]> => {
-    // Fetch a moderate subset initially to ensure stats and future releases are included
-    return getBooks(forceRefresh, 40);
+    // Fetch up to 100 books to ensure full catalog is available (homepage, library, etc.)
+    return getBooks(forceRefresh, 100);
 };
 
 export const getBookById = async (id: string): Promise<Book | null> => {
