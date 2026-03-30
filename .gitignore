@@ -3,35 +3,26 @@ logs
 *.log
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# Node / Vite
+node_modules/
+dist/
+dist-ssr/
+.vite/
+.vercel
+package-lock.json
+
+# Environment
 .env
 .env.*
 !.env.example
-
-# Editor directories and files
-.vscode/*
-!.vscode/settings.json
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# Vercel
-.vercel
-
-# Firebase Admin SDK credentials (NEVER commit this!)
 serviceAccountKey.json
 
-# Supabase export data
-supabase-export/
+# OS
+.DS_Store
+Thumbs.db
+
+# Project Specific
+antigo/node_modules/
+antigo/dist/
+antigo/.vite/
