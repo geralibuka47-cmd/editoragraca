@@ -1,0 +1,153 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // ==================== FUNÇÕES AUXILIARES ====================
+    
+    // Verifica se o utilizador está autenticado
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Verifica se é o próprio utilizador
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    // Verifica se é administrador
+    function isAdmin() {
+      return isAuthenticated() && 
+             firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'adm';
+    }
+    
+    // Verifica se é autor
+    function isAuthor() {
+      return isAuthenticated() && 
+             firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'autor';
+    }
+    
+    // Verifica tamanho do ficheiro (máximo 10MB para imagens, 50MB para PDFs)
+    function isValidSize(maxSizeMB) {
+      return request.resource.size < maxSizeMB * 1024 * 1024;
+    }
+    
+    // Verifica tipo de ficheiro - imagens
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+    
+    // Verifica tipo de ficheiro - PDF
+    function isPDF() {
+      return request.resource.contentType == 'application/pdf';
+    }
+    
+    // ==================== BOOK COVERS ====================
+    
+    // Capas de livros (públicas para leitura, apenas admin/autor para escrita)
+    match /book-covers/{fileName} {
+      // Qualquer um pode ler capas de livros
+      allow read: if true;
+      
+      // Apenas admin e autores podem fazer upload de capas
+      // Limite: 5MB, apenas imagens
+      allow create, update: if (isAdmin() || isAuthor()) && 
+                               isImage() && 
+                               isValidSize(5);
+      
+      // Apenas admin pode eliminar
+      allow delete: if isAdmin();
+    }
+    
+    // ==================== PROFILE PICTURES ====================
+    
+    // Fotos de perfil (públicas para leitura)
+    match /profile-pictures/{fileName} {
+      // Qualquer um pode ler fotos de perfil
+      allow read: if true;
+      
+      // Utilizador autenticado pode fazer upload da sua foto
+      // Limite: 2MB, apenas imagens
+      allow create, update: if isAuthenticated() && 
+                               isImage() && 
+                               isValidSize(2);
+      
+      // Utilizador pode eliminar sua própria foto, admin pode eliminar qualquer
+      allow delete: if isAuthenticated() || isAdmin();
+    }
+    
+    // ==================== MANUSCRIPTS ====================
+    
+    // Manuscritos submetidos (privados)
+    match /manuscripts/{fileName} {
+      // Apenas admin pode ler todos os manuscritos
+      allow read: if isAdmin();
+      
+      // Utilizador autenticado pode fazer upload de manuscrito
+      // Limite: 50MB, PDF ou DOCX
+      allow create: if isAuthenticated() && 
+                       (isPDF() || request.resource.contentType.matches('application/.*word.*')) &&
+                       isValidSize(50);
+      
+      // Apenas admin pode atualizar
+      allow update: if isAdmin();
+      
+      // Apenas admin pode eliminar
+      allow delete: if isAdmin();
+    }
+    
+    // ==================== PAYMENT PROOFS ====================
+    
+    // Comprovativos de pagamento (muito privados)
+    match /payment-proofs/{fileName} {
+      // Apenas admin pode ler comprovativos
+      allow read: if isAdmin();
+      
+      // Utilizador autenticado pode enviar comprovativo
+      // Limite: 5MB, imagens ou PDF
+      allow create: if isAuthenticated() && 
+                       (isImage() || isPDF()) &&
+                       isValidSize(5);
+      
+      // Apenas admin pode atualizar
+      allow update: if isAdmin();
+      
+      // Apenas admin pode eliminar
+      allow delete: if isAdmin();
+    }
+    
+    // ==================== BLOG IMAGES ====================
+    
+    // Imagens do blog (públicas)
+    match /blog-images/{fileName} {
+      // Qualquer um pode ler imagens do blog
+      allow read: if true;
+      
+      // Apenas admin pode fazer upload
+      // Limite: 5MB, apenas imagens
+      allow create, update: if isAdmin() && 
+                               isImage() && 
+                               isValidSize(5);
+      
+      // Apenas admin pode eliminar
+      allow delete: if isAdmin();
+    }
+    
+    // ==================== EDITORA-PUBLIC (Bucket Geral) ====================
+    
+    // Ficheiros públicos gerais
+    match /editora-public/{allPaths=**} {
+      // Leitura pública
+      allow read: if true;
+      
+      // Apenas admin pode modificar
+      allow write: if isAdmin();
+    }
+    
+    // ==================== FALLBACK - Negar tudo que não foi explicitamente permitido ====================
+    
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
