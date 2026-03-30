@@ -1,68 +1,50 @@
     </main>
 
-    <footer class="bg-brand-dark text-white section-fluid mt-auto">
-        <div class="container grid-universal">
-            <!-- About -->
-            <div class="flex flex-col gap-6">
-                <div class="flex items-center gap-3">
-                    <img src="/public/img/logo.png" alt="Logo" class="h-10 w-auto brightness-0 invert opacity-80">
-                    <div class="flex flex-col leading-[0.85]">
-                        <span class="font-serif font-black text-[12px] uppercase tracking-tight text-white/60">Editora</span>
-                        <span class="font-serif font-black text-brand-primary text-xl uppercase tracking-tighter">Graça</span>
+    <footer class="bg-brand-dark text-white border-t border-white/5 font-sans safe-area-bottom">
+        <div class="container mx-auto px-4 sm:px-6 md:px-12 py-8 sm:py-10">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
+
+                <!-- Logo -->
+                <a href="/" class="flex items-center gap-3 shrink-0 no-underline">
+                    <img src="/public/img/logo.png" alt="Editora Graça" class="h-8 w-auto brightness-0 invert opacity-80 hover:opacity-100 transition-opacity">
+                    <span class="font-serif font-black text-lg tracking-tight uppercase hidden sm:inline text-white">
+                        Editora <span class="text-brand-primary">Graça</span>
+                    </span>
+                </a>
+
+                <!-- Icon Navigation -->
+                <nav class="flex items-center gap-1 sm:gap-2" aria-label="Navegação principal">
+                    <a href="/" title="Início" class="w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 hover:text-white hover:bg-white/5 transition-all group relative">
+                        <i data-lucide="home" class="w-4 h-4"></i>
+                    </a>
+                    <a href="/livros" title="Catálogo" class="w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 hover:text-white hover:bg-white/5 transition-all group relative">
+                        <i data-lucide="book-open" class="w-4 h-4"></i>
+                    </a>
+                    <a href="/sobre" title="Sobre" class="w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 hover:text-white hover:bg-white/5 transition-all group relative">
+                        <i data-lucide="info" class="w-4 h-4"></i>
+                    </a>
+                    <a href="/servicos" title="Serviços" class="w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 hover:text-white hover:bg-white/5 transition-all group relative">
+                        <i data-lucide="briefcase" class="w-4 h-4"></i>
+                    </a>
+                    <a href="/contacto" title="Contacto" class="w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 hover:text-white hover:bg-white/5 transition-all group relative">
+                        <i data-lucide="mail" class="w-4 h-4"></i>
+                    </a>
+                </nav>
+
+                <!-- Social + Copyright -->
+                <div class="flex flex-col sm:flex-row items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <a href="https://instagram.com/editoragraca" target="_blank" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-primary transition-colors" aria-label="Instagram">
+                            <i data-lucide="instagram" class="w-3.5 h-3.5"></i>
+                        </a>
+                        <a href="https://facebook.com/editoragraca" target="_blank" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-primary transition-colors" aria-label="Facebook">
+                            <i data-lucide="facebook" class="w-3.5 h-3.5"></i>
+                        </a>
                     </div>
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-0">
+                        © <?php echo date("Y"); ?> Editora Graça · <a href="https://ibuka47.com" target="_blank" class="text-brand-primary hover:text-white no-underline transition-colors">ibuka47</a>
+                    </p>
                 </div>
-                <p class="text-sm text-white/60 max-w-xs">
-                    Fundada em 2020 em Malanje, a Editora Graça é uma casa editorial angolana focada na excelência literária e na promoção de autores lusófonos.
-                </p>
-                <!-- Social -->
-                <div class="flex gap-4">
-                    <a href="https://facebook.com/editoragraca" class="p-2 bg-white/5 hover:bg-brand-primary rounded-xl transition-all" aria-label="Facebook">
-                        <i data-lucide="facebook" class="w-5 h-5"></i>
-                    </a>
-                    <a href="https://instagram.com/editoragraca" class="p-2 bg-white/5 hover:bg-brand-primary rounded-xl transition-all" aria-label="Instagram">
-                        <i data-lucide="instagram" class="w-5 h-5"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Links -->
-            <div class="grid grid-cols-2 gap-8 lg:col-span-2">
-                <div class="flex flex-col gap-6">
-                    <h4 class="font-black uppercase tracking-widest text-xs text-brand-primary">Explorar</h4>
-                    <nav class="flex flex-col gap-3">
-                        <a href="/livros" class="text-sm text-white/50 hover:text-white transition-colors">Catálogo</a>
-                        <a href="/blog" class="text-sm text-white/50 hover:text-white transition-colors">Blog</a>
-                        <a href="/servicos" class="text-sm text-white/50 hover:text-white transition-colors">Serviços</a>
-                        <a href="/projetos" class="text-sm text-white/50 hover:text-white transition-colors">Portefólio</a>
-                    </nav>
-                </div>
-                <div class="flex flex-col gap-6">
-                    <h4 class="font-black uppercase tracking-widest text-xs text-brand-primary">Institucional</h4>
-                    <nav class="flex flex-col gap-3">
-                        <a href="/sobre" class="text-sm text-white/50 hover:text-white transition-colors">Sobre Nós</a>
-                        <a href="/contacto" class="text-sm text-white/50 hover:text-white transition-colors">Contactos</a>
-                        <a href="/termos" class="text-sm text-white/50 hover:text-white transition-colors">Termos e Condições</a>
-                    </nav>
-                </div>
-            </div>
-
-            <!-- Newsletter Placeholder -->
-            <div class="flex flex-col gap-6">
-                <h4 class="font-black uppercase tracking-widest text-xs text-brand-primary">Newsletter</h4>
-                <p class="text-xs text-white/40">Inscreva-se para receber novidades sobre lançamentos e eventos literários.</p>
-                <form class="flex gap-2">
-                    <input type="email" placeholder="Seu email" class="input-premium bg-white/5 border-white/10 text-white placeholder:text-white/20 px-4 py-2 text-sm rounded-lg flex-1">
-                    <button class="btn-premium px-4 py-2" style="font-size: 10px;">OK</button>
-                </form>
-            </div>
-        </div>
-
-        <div class="container border-t border-white/5 mt-20 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p class="text-[10px] font-bold uppercase tracking-widest text-white/20">
-                &copy; <?php echo date("Y"); ?> Editora Graça. Todos os direitos reservados.
-            </p>
-            <div class="flex gap-6">
-                <span class="text-[10px] font-bold uppercase tracking-widest text-white/20">Feito em Angola</span>
             </div>
         </div>
     </footer>

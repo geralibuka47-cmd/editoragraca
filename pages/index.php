@@ -20,8 +20,8 @@ require_once __DIR__ . '/../templates/header.php';
                 </div>
 
                 <h1 class="uppercase leading-[0.9] tracking-tighter text-brand-dark">
-                    Onde a Arte <br>
-                    <span class="text-brand-primary italic font-serif lowercase font-normal">Encontra o Legado</span>
+                    <span id="hero-title-line1">Onde a Arte</span> <br>
+                    <span id="hero-title-line2" class="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-amber-600">Encontra o Legado</span>
                 </h1>
                 <p class="text-gray-500 font-medium max-w-lg leading-relaxed text-sm sm:text-base md:text-lg">
                     Curadoria de excelência para leitores que exigem o extraordinário. Conheça as vozes que moldam o futuro da cultura.
@@ -125,47 +125,67 @@ require_once __DIR__ . '/../templates/header.php';
         </div>
     </section>
 
-    <!-- 5. EXPERIÊNCIA PHILOS -->
-    <section class="py-24 md:py-32 bg-brand-dark relative overflow-hidden px-4 sm:px-6 md:px-12">
-        <div class="container mx-auto grid lg:grid-cols-2 gap-16 items-center relative z-10">
-            <div class="space-y-12">
-                <div class="space-y-6">
-                    <span class="text-brand-primary font-black text-[10px] uppercase tracking-[0.4em]">Experiência</span>
-                    <h2 class="text-5xl sm:text-7xl font-black text-white uppercase tracking-tighter leading-none">
-                        Mais que uma <br>Editora, um <br><span class="text-brand-primary italic font-serif lowercase font-normal">Movimento.</span>
-                    </h2>
+    <!-- 5. MAIS VISTOS -->
+    <section id="most-viewed-section" class="py-12 sm:py-16 md:py-24 bg-white px-4 sm:px-6 md:px-12 hidden">
+        <div class="container mx-auto">
+            <div class="flex flex-col sm:flex-row justify-between sm:items-end gap-4 mb-8 sm:mb-16">
+                <div>
+                    <span class="text-brand-primary font-bold uppercase tracking-widest text-[10px] sm:text-xs">Tendências do Acervo</span>
+                    <h2 class="text-2xl sm:text-4xl md:text-5xl font-black text-brand-dark mt-2 uppercase tracking-tight">Obras Mais Vistas</h2>
                 </div>
-                <div class="grid gap-6">
-                    <div class="flex items-center gap-4 group">
-                        <div class="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-brand-primary group-hover:bg-brand-primary group-hover:text-white transition-all">
-                            <i data-lucide="check" class="w-6 h-6"></i>
-                        </div>
-                        <p class="text-xl font-bold text-white/90">Acabamentos de luxo em cada edição.</p>
-                    </div>
-                    <div class="flex items-center gap-4 group">
-                        <div class="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-brand-primary group-hover:bg-brand-primary group-hover:text-white transition-all">
-                            <i data-lucide="check" class="w-6 h-6"></i>
-                        </div>
-                        <p class="text-xl font-bold text-white/90">Curadoria de autores angolanos.</p>
-                    </div>
-                    <div class="flex items-center gap-4 group">
-                        <div class="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-brand-primary group-hover:bg-brand-primary group-hover:text-white transition-all">
-                            <i data-lucide="check" class="w-6 h-6"></i>
-                        </div>
-                        <p class="text-xl font-bold text-white/90">Eventos exclusivos para membros.</p>
-                    </div>
+                <div class="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-500 rounded-full text-[10px] font-black uppercase tracking-widest">
+                    <i data-lucide="eye" class="w-3 h-3"></i>
+                    <span>Curiosidade em Alta</span>
                 </div>
             </div>
-            <div class="grid sm:grid-cols-2 gap-6">
-                <div class="p-10 bg-white/5 rounded-[3rem] border border-white/10 space-y-6 hover:bg-white/10 transition-all">
-                    <i data-lucide="star" class="w-10 h-10 text-brand-primary"></i>
-                    <h4 class="text-2xl font-black text-white uppercase">Premium</h4>
-                    <p class="text-gray-400 leading-relaxed font-medium">Qualidade inegociável em cada página impressa.</p>
+            <div id="most-viewed-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-12">
+                <!-- Hydrated via JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. EXPERIÊNCIA PHILOS (Legacy Refactor) -->
+    <section class="py-16 sm:py-24 md:py-32 bg-brand-dark text-white px-4 sm:px-6 md:px-12 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-full h-full opacity-10 pointer-events-none">
+            <div class="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-brand-primary blur-[120px] rounded-full"></div>
+        </div>
+
+        <!-- MAIS BAIXADO CONTENT HERE (Injected via JS) -->
+        <div id="most-downloaded-container" class="container mx-auto mb-16 sm:mb-24 md:mb-32 relative z-10 px-4 sm:px-0">
+            <!-- Dynamically Injected -->
+        </div>
+
+        <div class="container grid lg:grid-cols-2 gap-12 sm:gap-20 items-center relative z-10">
+            <div>
+                <span class="text-brand-primary font-bold uppercase tracking-widest text-xs sm:text-sm">Experiência</span>
+                <h2 class="mt-4 mb-6 sm:mb-8 leading-tight uppercase text-white font-black text-4xl sm:text-6xl tracking-tighter">
+                    Mais que uma editora, <br>um movimento.
+                </h2>
+                <ul class="space-y-4 sm:space-y-6">
+                    <li class="flex items-center gap-4 text-base sm:text-xl font-medium text-gray-300">
+                        <i data-lucide="check-circle" class="w-6 h-6 text-brand-primary shrink-0"></i>
+                        Acabamentos de luxo em cada edição.
+                    </li>
+                    <li class="flex items-center gap-4 text-base sm:text-xl font-medium text-gray-300">
+                        <i data-lucide="check-circle" class="w-6 h-6 text-brand-primary shrink-0"></i>
+                        Curadoria internacional de autores.
+                    </li>
+                    <li class="flex items-center gap-4 text-base sm:text-xl font-medium text-gray-300">
+                        <i data-lucide="check-circle" class="w-6 h-6 text-brand-primary shrink-0"></i>
+                        Eventos exclusivos para membros.
+                    </li>
+                </ul>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div class="bg-white/5 p-6 sm:p-8 rounded-2xl sm:rounded-3xl backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-colors">
+                    <i data-lucide="star" class="w-8 h-8 sm:w-10 sm:h-10 text-brand-primary mb-4 sm:mb-6"></i>
+                    <h4 class="text-xl sm:text-2xl font-black mb-2 text-white">Premium</h4>
+                    <p class="text-xs sm:text-sm text-gray-400">Qualidade inegociável em cada página impressa.</p>
                 </div>
-                <div class="p-10 bg-white/5 rounded-[3rem] border border-white/10 space-y-6 hover:bg-white/10 transition-all mt-12">
-                    <i data-lucide="clock" class="w-10 h-10 text-brand-primary"></i>
-                    <h4 class="text-2xl font-black text-white uppercase">Eterno</h4>
-                    <p class="text-gray-400 leading-relaxed font-medium">Obras feitas para durar gerações.</p>
+                <div class="bg-white/5 p-6 sm:p-8 rounded-2xl sm:rounded-3xl backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-colors sm:translate-y-8 lg:translate-y-12">
+                    <i data-lucide="clock" class="w-8 h-8 sm:w-10 sm:h-10 text-brand-primary mb-4 sm:mb-6"></i>
+                    <h4 class="text-xl sm:text-2xl font-black mb-2 text-white">Eterno</h4>
+                    <p class="text-xs sm:text-sm text-gray-400">Obras feitas para durar gerações.</p>
                 </div>
             </div>
         </div>

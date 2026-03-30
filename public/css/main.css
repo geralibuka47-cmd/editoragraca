@@ -10,10 +10,11 @@
     --font-body: "Open Sans", sans-serif;
     --font-sans: "Roboto", sans-serif;
 
-    /* Tailwind-like spacing/radius if needed */
+    /* Tailwind-like spacing/radius */
     --radius-lg: 0.5rem;
     --radius-xl: 1rem;
     --radius-2xl: 2rem;
+    --radius-3xl: 3rem;
 }
 
 /* Base Styles */
@@ -182,8 +183,15 @@ a:focus-visible,
 }
 
 @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: .5; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .5;
+    }
 }
 
 @keyframes fadeIn {
@@ -191,6 +199,7 @@ a:focus-visible,
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -233,6 +242,7 @@ a:focus-visible,
     .safe-area-bottom {
         padding-bottom: env(safe-area-inset-bottom);
     }
+
     .safe-area-top {
         padding-top: env(safe-area-inset-top);
     }

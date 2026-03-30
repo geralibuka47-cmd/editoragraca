@@ -94,6 +94,10 @@
                     <i data-lucide="user" class="w-5 h-5"></i>
                 </a>
 
+                <a href="/perfil?tab=wishlist" class="relative p-2 text-brand-dark/80 hover:text-brand-primary transition-colors rounded-full hover:bg-gray-50" aria-label="Lista de Desejos">
+                    <i data-lucide="heart" class="w-5 h-5"></i>
+                </a>
+
                 <a href="/carrinho" class="relative p-2 text-brand-dark/80 hover:text-brand-primary transition-colors rounded-full hover:bg-gray-50" aria-label="Carrinho">
                     <i data-lucide="shopping-bag" class="w-5 h-5"></i>
                     <span id="cart-count" class="absolute top-1 right-1 w-4 h-4 bg-brand-primary text-white text-[9px] font-black flex items-center justify-center rounded-full hidden">0</span>
