@@ -43,7 +43,7 @@
 
 
     <!-- Firebase SDK (Global) -->
-    <script type="module" src="/public/js/firebase.js"></script>
+    <script type="module" src="/public/js/firebase-config.js"></script>
 </head>
 
 <body>

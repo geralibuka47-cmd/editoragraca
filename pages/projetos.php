@@ -55,88 +55,12 @@ require_once __DIR__ . '/../templates/header.php';
 
             <!-- ACADEMIA GRACA -->
             <div id="tab-content-academia" class="tab-content block animate-fade-in">
-                <div class="grid lg:grid-cols-2 gap-16 md:gap-24 items-center">
-                    <div class="space-y-12">
-                        <div class="space-y-4">
-                            <span class="text-brand-primary font-black text-xs uppercase tracking-[0.5em]">Cultivando o intelecto e a escrita</span>
-                            <h2 class="text-4xl sm:text-6xl md:text-8xl font-black text-brand-dark uppercase tracking-tighter leading-tight">
-                                Academia <br><span class="text-brand-primary italic font-serif lowercase font-normal">Intelectual</span>
-                            </h2>
-                        </div>
-                        <p class="text-lg sm:text-2xl text-gray-500 font-medium leading-relaxed max-w-xl">
-                            A Academia Graça é um projeto educacional e formativo da Editora Graça, criado para orientar escritores de tenra idade e contribuir para a formação intelectual de jovens estudantes.
-                        </p>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div class="p-8 bg-gray-50 rounded-[2rem] border border-gray-100 space-y-4">
-                                <i data-lucide="users" class="w-8 h-8 text-brand-primary"></i>
-                                <div>
-                                    <p class="text-2xl font-black text-brand-dark">5 Ativos</p>
-                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Estudantes</p>
-                                </div>
-                            </div>
-                            <div class="p-8 bg-gray-50 rounded-[2rem] border border-gray-100 space-y-4">
-                                <i data-lucide="target" class="w-8 h-8 text-brand-primary"></i>
-                                <div>
-                                    <p class="text-2xl font-black text-brand-dark">Integral</p>
-                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Foco</p>
-                                </div>
-                            </div>
-                            <div class="p-8 bg-gray-50 rounded-[2rem] border border-gray-100 space-y-4">
-                                <i data-lucide="radio" class="w-8 h-8 text-brand-primary"></i>
-                                <div>
-                                    <p class="text-2xl font-black text-brand-dark">Pedagógico</p>
-                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="relative">
-                        <div class="aspect-[4/5] bg-gray-100 rounded-[3rem] sm:rounded-[4rem] overflow-hidden relative shadow-2xl transition-transform hover:rotate-1 duration-1000">
-                            <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&q=80"
-                                alt="Academia Graça"
-                                class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-gradient-to-t from-brand-dark/80 via-transparent to-transparent"></div>
-                            <div class="absolute bottom-8 sm:bottom-12 left-8 sm:left-12 right-8 sm:right-12 p-8 sm:p-10 bg-white/10 backdrop-blur-xl rounded-[2rem] border border-white/20 text-white">
-                                <p class="text-xs sm:text-sm font-medium leading-relaxed italic">
-                                    "Onde a curiosidade infantil se torna rigor intelectual angolano."
-                                </p>
-                            </div>
-                        </div>
-                        <div class="absolute -top-12 -right-12 w-40 h-40 sm:w-48 sm:h-48 bg-brand-primary p-8 rounded-full flex flex-col items-center justify-center text-white shadow-2xl animate-pulse text-center">
-                            <span class="text-3xl sm:text-4xl font-black">100%</span>
-                            <span class="text-[7px] sm:text-[8px] font-black uppercase tracking-widest">Aproveitamento</span>
-                        </div>
-                    </div>
-                </div>
+                <!-- Dynamically Hydrated -->
             </div>
 
             <!-- FUNDACAO GRACA -->
             <div id="tab-content-fundacao" class="tab-content hidden animate-fade-in">
-                <div class="max-w-4xl mx-auto py-20 sm:py-40 space-y-12 sm:space-y-16 text-center">
-                    <div class="w-24 h-24 sm:w-32 sm:h-32 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto shadow-2xl">
-                        <i data-lucide="heart" class="w-12 h-12 sm:w-16 sm:h-16 fill-current"></i>
-                    </div>
-                    <div class="space-y-6">
-                        <h2 class="text-4xl sm:text-7xl md:text-9xl font-black text-brand-dark tracking-tighter uppercase leading-none">
-                            Fundação <br><span class="text-red-500 italic font-serif lowercase font-normal">Graça</span>
-                        </h2>
-                        <p class="text-xl sm:text-2xl text-gray-400 font-medium max-w-2xl mx-auto leading-relaxed">
-                            O nosso braço de responsabilidade social focado na erradicação do analfabetismo literário e apoio a talentos periféricos africanos.
-                        </p>
-                    </div>
-                    <div class="grid md:grid-cols-2 gap-6 sm:gap-8 max-w-2xl mx-auto">
-                        <div class="p-8 sm:p-10 bg-gray-50 rounded-[2.5rem] border border-gray-100 text-left space-y-4">
-                            <i data-lucide="globe" class="w-5 h-5 text-brand-primary"></i>
-                            <h4 class="font-black text-sm uppercase tracking-widest text-brand-dark">Impacto Rural</h4>
-                            <p class="text-xs text-gray-500 leading-relaxed">Expansão literária para além das capitais provinciais angolanas.</p>
-                        </div>
-                        <div class="p-8 sm:p-10 bg-gray-50 rounded-[2.5rem] border border-gray-100 text-left space-y-4">
-                            <i data-lucide="layers" class="w-5 h-5 text-brand-primary"></i>
-                            <h4 class="font-black text-sm uppercase tracking-widest text-brand-dark">Acervo Digital</h4>
-                            <p class="text-xs text-gray-500 leading-relaxed">Digitalização de obras raras para preservação do património.</p>
-                        </div>
-                    </div>
-                </div>
+                <!-- Dynamically Hydrated -->
             </div>
 
             <!-- GRACA PLAY -->

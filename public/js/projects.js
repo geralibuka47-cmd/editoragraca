@@ -1,6 +1,7 @@
 /**
  * Editora Graça — Projects & Initiatives Logic (100% Dynamic)
  */
+import { db } from './firebase-config.js';
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
 let DEFAULT_RSS_URL = 'https://anchor.fm/s/10838fbcc/podcast/rss';
@@ -8,7 +9,6 @@ window.podcastsLoaded = false;
 
 async function getRssUrl() {
     try {
-        const db = window.db;
         const configRef = doc(db, "site_content", "config");
         const snap = await getDoc(configRef);
         if (snap.exists()) {

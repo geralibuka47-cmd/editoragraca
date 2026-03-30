@@ -3,6 +3,7 @@
  */
 import { getBooks, getUpcomingBooks, getAuthors } from './books.js';
 import { renderBookCard, renderAuthorCard, reinitIcons } from './utils.js';
+import { db } from './firebase-config.js';
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -156,7 +157,6 @@ async function loadSuccessAuthors() {
 
 async function loadInstitutionalContent() {
     try {
-        const db = window.db;
         const configRef = doc(db, "site_content", "config");
         const snap = await getDoc(configRef);
 

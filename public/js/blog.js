@@ -1,6 +1,4 @@
-/**
- * Editora Graça — Blog Controller (Vanila JS)
- */
+import { db } from './firebase-config.js';
 import {
     collection,
     query,
@@ -36,7 +34,6 @@ document.addEventListener('DOMContentLoaded', async () => {
  */
 async function renderPostList(container) {
     try {
-        const db = window.db;
         const postsRef = collection(db, "blog");
         const q = query(postsRef, orderBy("date", "desc"));
         const snapshot = await getDocs(q);
@@ -158,7 +155,6 @@ function setupNewsletter(container) {
  */
 async function renderSinglePost(slug, container) {
     try {
-        const db = window.db;
         const postsRef = collection(db, "blog");
         const q = query(postsRef, where("slug", "==", slug), limit(1));
         let snapshot = await getDocs(q);
@@ -248,7 +244,6 @@ async function renderSinglePost(slug, container) {
 
 async function loadRelatedPosts(currentId) {
     try {
-        const db = window.db;
         const q = query(collection(db, "blog"), limit(3));
         const snapshot = await getDocs(q);
         const posts = snapshot.docs

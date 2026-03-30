@@ -1,6 +1,4 @@
-/**
- * Editora Graça — Books Service (Vanila JS)
- */
+import { db } from './firebase-config.js';
 import {
     collection,
     query,
@@ -21,7 +19,6 @@ import {
  */
 export async function getBooks(filters = {}) {
     try {
-        const db = window.db;
         if (!db) throw new Error("Firebase DB not initialized.");
 
         const booksRef = collection(db, "books");
@@ -56,7 +53,6 @@ export async function getBooks(filters = {}) {
  */
 export async function getUpcomingBooks() {
     try {
-        const db = window.db;
         const booksRef = collection(db, "books");
         const snapshot = await getDocs(query(booksRef, orderBy("launchDate", "asc")));
         const now = Date.now();
@@ -75,7 +71,6 @@ export async function getUpcomingBooks() {
  */
 export async function getBookBySlug(slug) {
     try {
-        const db = window.db;
         const booksRef = collection(db, "books");
         const q = query(booksRef, where("slug", "==", slug), limit(1));
         const snapshot = await getDocs(q);
@@ -99,7 +94,6 @@ export async function getBookBySlug(slug) {
  */
 export async function getAuthors() {
     try {
-        const db = window.db;
         const q = query(collection(db, "users"), where('role', '==', 'autor'));
         const snapshot = await getDocs(q);
         return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -114,7 +108,6 @@ export async function getAuthors() {
  */
 async function registerAuthor(author) {
     try {
-        const db = window.db;
         const authorData = {
             ...author,
             role: 'autor',
@@ -134,7 +127,6 @@ async function registerAuthor(author) {
  */
 export async function saveBook(book, newAuthor = null) {
     try {
-        const db = window.db;
         let authorId = book.authorId;
 
         // 1. Handle new author registration
@@ -189,7 +181,6 @@ export async function saveBook(book, newAuthor = null) {
  */
 export async function deleteBook(id) {
     try {
-        const db = window.db;
         await deleteDoc(doc(db, "books", id));
     } catch (error) {
         console.error("Error deleting book:", error);

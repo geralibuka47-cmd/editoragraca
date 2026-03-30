@@ -18,7 +18,7 @@ require_once __DIR__ . '/../templates/header.php';
                     <span class="text-brand-primary italic font-serif font-normal lowercase">Nós</span>
                 </h1>
                 <p id="about-intro-text" class="text-xl md:text-2xl text-gray-500 font-medium max-w-2xl leading-relaxed animate-fade-in" style="animation-delay: 0.1s">
-                    Não somos apenas uma editora; somos os arquitetos de um novo renascimento intelectual angolano, onde a estética e o rigor convergem.
+                    <!-- Hydrated via JS -->
                 </p>
             </div>
         </div>
@@ -35,15 +35,15 @@ require_once __DIR__ . '/../templates/header.php';
                         Curadoria de <br><span class="text-brand-primary italic font-serif lowercase font-normal">Obra-Prima</span>
                     </h2>
                     <p id="about-essence-text" class="text-lg sm:text-2xl text-gray-500 font-medium leading-relaxed">
-                        Nascida da interseção entre o design editorial de elite e a paixão pelas letras angolanas, a Editora Graça surgiu para preencher um vazio: a necessidade de livros que fossem objetos de arte e veículos de pensamento crítico.
+                        <!-- Hydrated via JS -->
                     </p>
                     <div class="flex gap-8 sm:gap-12 pt-4">
                         <div class="space-y-2">
-                            <p id="about-stats-books" class="text-4xl font-black text-brand-dark">26+</p>
-                            <p class="text-[10px] uppercase font-bold text-gray-400 tracking-widest">Obras Imortalizadas</p>
+                            <p id="about-stats-books" class="text-4xl font-black text-brand-dark">--</p>
+                            <p class="text-[10px] uppercase font-bold text-gray-400 tracking-widest">Obras Publicadas</p>
                         </div>
                         <div class="space-y-2">
-                            <p id="about-stats-talent" class="text-4xl font-black text-brand-dark">100%</p>
+                            <p id="about-stats-talent" class="text-4xl font-black text-brand-dark">--</p>
                             <p class="text-[10px] uppercase font-bold text-gray-400 tracking-widest">Talento Lusófono</p>
                         </div>
                     </div>
@@ -72,21 +72,7 @@ require_once __DIR__ . '/../templates/header.php';
             </div>
 
             <div id="about-values-grid" class="grid md:grid-cols-3 gap-8 sm:gap-12">
-                <div class="p-10 sm:p-12 bg-white/5 rounded-[3rem] sm:rounded-[4rem] border border-white/10 hover:bg-brand-primary/10 transition-all group">
-                    <i data-lucide="palette" class="w-10 h-10 sm:w-12 sm:h-12 text-brand-primary mb-8 sm:mb-10 group-hover:scale-110 transition-transform"></i>
-                    <h3 class="text-2xl sm:text-3xl font-black uppercase tracking-tight mb-4">Estética Radical</h3>
-                    <p class="text-gray-400 font-medium leading-relaxed">Acreditamos que a beleza é a porta de entrada para a sabedoria intelectual.</p>
-                </div>
-                <div class="p-10 sm:p-12 bg-white/5 rounded-[3rem] sm:rounded-[4rem] border border-white/10 hover:bg-brand-primary/10 transition-all group">
-                    <i data-lucide="shield" class="w-10 h-10 sm:w-12 sm:h-12 text-brand-primary mb-8 sm:mb-10 group-hover:scale-110 transition-transform"></i>
-                    <h3 class="text-2xl sm:text-3xl font-black uppercase tracking-tight mb-4">Rigor Editorial</h3>
-                    <p class="text-gray-400 font-medium leading-relaxed">Cada vírgula é auditada para garantir o padrão internacional de excelência.</p>
-                </div>
-                <div class="p-10 sm:p-12 bg-white/5 rounded-[3rem] sm:rounded-[4rem] border border-white/10 hover:bg-brand-primary/10 transition-all group">
-                    <i data-lucide="zap" class="w-10 h-10 sm:w-12 sm:h-12 text-brand-primary mb-8 sm:mb-10 group-hover:scale-110 transition-transform"></i>
-                    <h3 class="text-2xl sm:text-3xl font-black uppercase tracking-tight mb-4">Vanguarda Digital</h3>
-                    <p class="text-gray-400 font-medium leading-relaxed">Exploramos novas fronteiras de leitura num mundo em constante mutação.</p>
-                </div>
+                <!-- Hydrated via JS -->
             </div>
         </div>
     </section>
@@ -103,40 +89,7 @@ require_once __DIR__ . '/../templates/header.php';
                 </div>
 
                 <div id="about-timeline-container" class="space-y-16 sm:space-y-24 relative pb-10">
-                    <div class="absolute left-6 sm:left-10 md:left-1/2 top-0 bottom-0 w-px bg-gray-100"></div>
-
-                    <!-- Year 2026 -->
-                    <div class="relative flex flex-col md:flex-row gap-8 sm:gap-12 items-start md:items-center">
-                        <div class="flex-1 md:text-right pl-16 md:pl-0">
-                            <p class="text-5xl sm:text-7xl font-black text-gray-100 italic font-serif leading-none">2026</p>
-                            <h4 class="text-xl sm:text-2xl font-black text-brand-dark uppercase tracking-tight mt-2 mb-4">O Futuro Global</h4>
-                            <p class="text-gray-500 font-medium leading-relaxed max-w-sm ml-auto mr-auto md:mr-0">Reestruturação premium e expansão para o mercado global sem perder as raízes angolanas.</p>
-                        </div>
-                        <div class="absolute left-4 sm:left-[34px] md:static w-4 h-4 sm:w-6 sm:h-6 bg-brand-dark border-4 border-brand-primary rounded-full z-10 shadow-xl"></div>
-                        <div class="flex-1 hidden md:block"></div>
-                    </div>
-
-                    <!-- Year 2023 -->
-                    <div class="relative flex flex-col md:flex-row-reverse gap-8 sm:gap-12 items-start md:items-center">
-                        <div class="flex-1 md:text-left pl-16 md:pl-0">
-                            <p class="text-5xl sm:text-7xl font-black text-gray-100 italic font-serif leading-none">2023</p>
-                            <h4 class="text-xl sm:text-2xl font-black text-brand-dark uppercase tracking-tight mt-2 mb-4">Consolidação</h4>
-                            <p class="text-gray-500 font-medium leading-relaxed max-w-sm mr-auto ml-auto md:ml-0">Marca de 26+ obras publicadas e 18 províncias angolanas alcançadas.</p>
-                        </div>
-                        <div class="absolute left-4 sm:left-[34px] md:static w-4 h-4 sm:w-6 sm:h-6 bg-brand-dark border-4 border-brand-primary rounded-full z-10 shadow-xl"></div>
-                        <div class="flex-1 hidden md:block"></div>
-                    </div>
-
-                    <!-- Year 2020 -->
-                    <div class="relative flex flex-col md:flex-row gap-8 sm:gap-12 items-start md:items-center">
-                        <div class="flex-1 md:text-right pl-16 md:pl-0">
-                            <p class="text-5xl sm:text-7xl font-black text-gray-100 italic font-serif leading-none">2020</p>
-                            <h4 class="text-xl sm:text-2xl font-black text-brand-dark uppercase tracking-tight mt-2 mb-4">A Génese</h4>
-                            <p class="text-gray-500 font-medium leading-relaxed max-w-sm ml-auto mr-auto md:mr-0">Fundação por Nilton Graça, unindo design de luxo e literatura angolana.</p>
-                        </div>
-                        <div class="absolute left-4 sm:left-[34px] md:static w-4 h-4 sm:w-6 sm:h-6 bg-brand-dark border-4 border-brand-primary rounded-full z-10 shadow-xl"></div>
-                        <div class="flex-1 hidden md:block"></div>
-                    </div>
+                    <!-- Hydrated via JS -->
                 </div>
             </div>
         </div>
@@ -146,30 +99,7 @@ require_once __DIR__ . '/../templates/header.php';
     <section class="py-24 sm:py-32 bg-gray-50 relative px-4 sm:px-6 md:px-12">
         <div class="container mx-auto">
             <div id="about-founder-container" class="bg-white rounded-[3rem] sm:rounded-[5rem] p-10 sm:p-20 md:p-32 shadow-2xl overflow-hidden relative border border-gray-100">
-                <div class="absolute top-0 right-0 w-64 h-64 sm:w-96 sm:h-96 bg-brand-primary/5 blur-[100px] rounded-full translate-x-1/2 -translate-y-1/2"></div>
-
-                <div class="grid lg:grid-cols-2 gap-12 sm:gap-24 items-center">
-                    <div class="order-2 lg:order-1 space-y-8 sm:space-y-12">
-                        <div class="space-y-4">
-                            <span class="text-brand-primary font-black text-[10px] sm:text-xs uppercase tracking-[0.5em]">O Visionário</span>
-                            <h2 class="text-4xl sm:text-7xl md:text-8xl font-black text-brand-dark uppercase tracking-tighter leading-none">
-                                Nilton <br>Graça
-                            </h2>
-                        </div>
-                        <p class="text-xl sm:text-2xl font-serif italic text-gray-500 leading-relaxed">
-                            "A literatura angolana é um gigante adormecido. A minha missão é acordá-lo com a dignidade e a estética que o nosso povo merece."
-                        </p>
-                        <div class="space-y-2">
-                            <p class="text-brand-dark font-black uppercase text-[10px] sm:text-xs tracking-widest">Fundador & Diretor Criativo</p>
-                            <div class="w-16 sm:w-20 h-1 bg-brand-primary"></div>
-                        </div>
-                    </div>
-                    <div class="order-1 lg:order-2">
-                        <div class="aspect-[4/5] bg-gray-100 rounded-[3rem] sm:rounded-[4rem] overflow-hidden grayscale hover:grayscale-0 transition-all duration-700 shadow-xl max-w-sm mx-auto">
-                            <img src="/public/img/niltongraca.png" alt="Nilton Graça" class="w-full h-full object-cover">
-                        </div>
-                    </div>
-                </div>
+                <!-- Hydrated via JS -->
             </div>
         </div>
     </section>

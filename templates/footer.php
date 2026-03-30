@@ -152,9 +152,13 @@
             doc,
             getDoc
         } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+        import {
+            db
+        } from '/public/js/firebase-config.js';
+
         document.addEventListener('DOMContentLoaded', async () => {
             try {
-                const configRef = doc(window.db, "site_content", "config");
+                const configRef = doc(db, "site_content", "config");
                 const snap = await getDoc(configRef);
                 if (snap.exists()) {
                     const data = snap.data();

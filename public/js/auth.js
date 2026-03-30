@@ -1,6 +1,7 @@
 /**
  * Editora Graça — Authentication Service (Vanila JS)
  */
+import { auth, db } from './firebase-config.js';
 import {
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
@@ -17,7 +18,6 @@ import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.1/f
  */
 export async function login(email, password) {
     try {
-        const auth = window.auth;
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         return userCredential.user;
     } catch (error) {
@@ -31,9 +31,6 @@ export async function login(email, password) {
  */
 export async function register(email, password, name) {
     try {
-        const auth = window.auth;
-        const db = window.db;
-
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
@@ -57,7 +54,7 @@ export async function register(email, password, name) {
  */
 export async function logout() {
     try {
-        await signOut(window.auth);
+        await signOut(auth);
         window.location.href = '/';
     } catch (error) {
         console.error("Logout error:", error);
@@ -69,7 +66,6 @@ export async function logout() {
  */
 export async function forgotPassword(email) {
     try {
-        const auth = window.auth;
         await sendPasswordResetEmail(auth, email);
         return { success: true };
     } catch (error) {
@@ -82,9 +78,8 @@ export async function forgotPassword(email) {
  * Subscribe to auth changes
  */
 export function onAuth(callback) {
-    return onAuthStateChanged(window.auth, async (firebaseUser) => {
+    return onAuthStateChanged(auth, async (firebaseUser) => {
         if (firebaseUser) {
-            const db = window.db;
             const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
             const userData = userDoc.exists() ? userDoc.data() : {};
             callback({ id: firebaseUser.uid, ...firebaseUser, ...userData });

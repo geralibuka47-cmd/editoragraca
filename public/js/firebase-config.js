@@ -18,15 +18,17 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const storage = getStorage(app);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
 
-// Also expose to window for mixed-environment scripts
+// Expose to window FOR ALL SCRIPTS (Safe-check)
 window.firebaseApp = app;
 window.auth = auth;
 window.db = db;
 window.storage = storage;
 
-console.log("Firebase initialized successfully (esm).");
+console.log("Firebase initialized & exposed (esm).");
+
+export { app, auth, db, storage };
 export default app;

@@ -2,7 +2,7 @@
  * Editora Graça — Budget Simulator Logic (Vanila JS)
  */
 import { db } from './firebase-config.js';
-import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { collection, addDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
 class BudgetSimulator {
     constructor() {

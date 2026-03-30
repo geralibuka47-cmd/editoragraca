@@ -1,6 +1,7 @@
 /**
  * Editora Graça — Admin Settings Controller (Vanila JS)
  */
+import { db } from './firebase-config.js';
 import {
     doc,
     setDoc,
@@ -27,7 +28,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadSettings() {
     try {
-        const db = window.db;
         const configRef = doc(db, "site_content", "config");
         const snap = await getDoc(configRef);
 
@@ -165,7 +165,6 @@ async function setupSaveAction() {
         reinitIcons(btn);
 
         try {
-            const db = window.db;
             await setDoc(doc(db, "site_content", "config"), currentSettings);
             alert("Configurações guardadas com sucesso!");
         } catch (e) {

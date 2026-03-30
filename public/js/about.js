@@ -1,6 +1,7 @@
 /**
  * Editora Graça — About Page Logic
  */
+import { db } from './firebase-config.js';
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { reinitIcons } from './utils.js';
 
@@ -10,7 +11,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadAboutContent() {
     try {
-        const db = window.db;
         const aboutRef = doc(db, "site_content", "about");
         const snap = await getDoc(aboutRef);
 
