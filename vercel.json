@@ -1,0 +1,91 @@
+{
+    "functions": {
+        "api/*.php": {
+            "runtime": "vercel-php@0.7.2"
+        },
+        "pages/**/*.php": {
+            "runtime": "vercel-php@0.7.2"
+        },
+        "index.php": {
+            "runtime": "vercel-php@0.7.2"
+        }
+    },
+    "routes": [
+        {
+            "src": "/public/(.*)",
+            "dest": "/public/$1"
+        },
+        {
+            "src": "/admin/(.*)",
+            "dest": "/pages/admin/$1.php"
+        },
+        {
+            "src": "/admin",
+            "dest": "/pages/admin/index.php"
+        },
+        {
+            "src": "/livro/(.*)",
+            "dest": "/pages/livro.php?slug=$1"
+        },
+        {
+            "src": "/",
+            "dest": "/pages/index.php"
+        },
+        {
+            "src": "/livros",
+            "dest": "/pages/livros.php"
+        },
+        {
+            "src": "/blog",
+            "dest": "/pages/blog.php"
+        },
+        {
+            "src": "/servicos",
+            "dest": "/pages/servicos.php"
+        },
+        {
+            "src": "/projetos",
+            "dest": "/pages/projetos.php"
+        },
+        {
+            "src": "/sobre",
+            "dest": "/pages/sobre.php"
+        },
+        {
+            "src": "/contacto",
+            "dest": "/pages/contacto.php"
+        },
+        {
+            "src": "/login",
+            "dest": "/pages/login.php"
+        },
+        {
+            "src": "/registo",
+            "dest": "/pages/registo.php"
+        },
+        {
+            "src": "/perfil",
+            "dest": "/pages/perfil.php"
+        },
+        {
+            "src": "/carrinho",
+            "dest": "/pages/carrinho.php"
+        },
+        {
+            "src": "/recuperar-senha",
+            "dest": "/pages/recuperar-senha.php"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/pages/$1.php"
+        },
+        {
+            "handle": "filesystem"
+        },
+        {
+            "src": "/(.*)",
+            "status": 404,
+            "dest": "/pages/404.php"
+        }
+    ]
+}
