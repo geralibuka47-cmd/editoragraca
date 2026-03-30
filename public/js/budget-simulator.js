@@ -25,10 +25,31 @@ class BudgetSimulator {
         this.init();
     }
 
-    init() {
+    async init() {
+        await this.loadRates();
         this.cacheElements();
         this.bindEvents();
         this.updateUI();
+    }
+
+    async loadRates() {
+        try {
+            const configRef = doc(db, "site_content", "config");
+            const snap = await getDoc(configRef);
+            if (snap.exists()) {
+                const data = snap.data();
+                this.rates = data.pricing || {
+                    pageLow: 250,
+                    pageHigh: 200,
+                    baseCover: 10000,
+                    isbn: 6000,
+                    deposito: 6000
+                };
+            }
+        } catch (e) {
+            console.error("Error loading rates:", e);
+            this.rates = { pageLow: 250, pageHigh: 200, baseCover: 10000, isbn: 6000, deposito: 6000 };
+        }
     }
 
     cacheElements() {
@@ -77,11 +98,8 @@ class BudgetSimulator {
         let min = 0;
         let max = 0;
 
-        const PRICE_PER_PAGE_LOW = 250;
-        const PRICE_PER_PAGE_HIGH = 200;
-
         const pages = this.formData.pages || (this.formData.wordCount ? Math.ceil(this.formData.wordCount / 250) : 0);
-        const rate = pages > 250 ? PRICE_PER_PAGE_HIGH : PRICE_PER_PAGE_LOW;
+        const rate = pages > 250 ? this.rates.pageHigh : this.rates.pageLow;
 
         if (this.formData.serviceType === 'revisao' || this.formData.serviceType === 'diagramacao') {
             const base = pages * rate;
@@ -89,15 +107,15 @@ class BudgetSimulator {
             max += base * 1.1;
         } else if (this.formData.serviceType === 'completo') {
             const editorial = (pages * rate) * 2;
-            const fixed = 10000 + 6000 + 6000; // Capa + ISBN + Depósito
+            const fixed = this.rates.baseCover + this.rates.isbn + this.rates.deposito;
             min += editorial + fixed;
             max += (editorial + fixed) * 1.15;
         }
 
         // Extras
-        if (this.formData.extras.includes('capa')) { min += 10000; max += 15000; }
-        if (this.formData.extras.includes('isbn')) { min += 6000; max += 6000; }
-        if (this.formData.extras.includes('deposito')) { min += 6000; max += 6000; }
+        if (this.formData.extras.includes('capa')) { min += this.rates.baseCover; max += this.rates.baseCover * 1.5; }
+        if (this.formData.extras.includes('isbn')) { min += this.rates.isbn; max += this.rates.isbn; }
+        if (this.formData.extras.includes('deposito')) { min += this.rates.deposito; max += this.rates.deposito; }
 
         this.prices = { min, max };
         this.updatePriceDisplay();

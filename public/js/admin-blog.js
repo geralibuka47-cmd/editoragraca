@@ -1,172 +1,110 @@
-import { onAuth } from './auth.js';
+/**
+ * Editora Graça — Admin: Blog Controller
+ */
 import { db } from './firebase-config.js';
-import {
-    collection,
-    getDocs,
-    addDoc,
-    updateDoc,
-    deleteDoc,
-    doc,
-    query,
-    orderBy
-} from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { collection, query, getDocs, orderBy, addDoc, deleteDoc, doc, Timestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
 let allPosts = [];
 
-onAuth((user) => {
-    if (!user || user.role !== 'adm') {
-        window.location.href = '/login';
-        return;
-    }
-    loadPosts();
+document.addEventListener('DOMContentLoaded', async () => {
+    loadBlogPosts();
+
+    const form = document.getElementById('blog-form');
+    form?.addEventListener('submit', handleBlogSubmit);
 });
 
-async function loadPosts() {
-    const loader = document.getElementById('admin-blog-loading');
-    const grid = document.getElementById('admin-blog-grid');
-    const emptyState = document.getElementById('blog-empty-state');
-
+async function loadBlogPosts() {
+    const list = document.getElementById('blog-list');
     try {
-        const q = query(collection(db, "blog"), orderBy("date", "desc"));
+        const q = query(collection(db, 'blog'), orderBy('createdAt', 'desc'));
         const snapshot = await getDocs(q);
         allPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-        renderPosts(allPosts);
-        loader.classList.add('hidden');
-
-        if (allPosts.length === 0) {
-            emptyState.classList.remove('hidden');
-            grid.classList.add('hidden');
-        } else {
-            emptyState.classList.add('hidden');
-            grid.classList.remove('hidden');
-        }
+        renderPosts();
     } catch (error) {
-        console.error("Error loading posts:", error);
+        console.error("Error loading blog posts:", error);
+        if (list) list.innerHTML = '<p class="text-xs text-red-500 font-bold uppercase tracking-widest text-center py-20 col-span-full">Erro ao carregar dados.</p>';
     }
 }
 
-function renderPosts(posts) {
-    const grid = document.getElementById('admin-blog-grid');
-    grid.innerHTML = '';
+function renderPosts() {
+    const list = document.getElementById('blog-list');
+    if (!list) return;
 
-    posts.forEach(post => {
-        const card = document.createElement('div');
-        card.className = "group bg-white rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-500 overflow-hidden flex flex-col";
-        card.innerHTML = `
-            <div class="h-48 bg-gray-100 relative overflow-hidden shrink-0">
-                <img src="${post.imageUrl}" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
-                <div class="absolute top-4 left-4">
-                    <div class="px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-[8px] font-black uppercase tracking-widest text-brand-dark shadow-sm">
-                        ${new Date(post.date).toLocaleDateString()}
+    if (allPosts.length === 0) {
+        list.innerHTML = '<div class="col-span-full py-20 text-center"><p class="text-gray-400 font-bold uppercase tracking-widest text-xs">Nenhum artigo publicado</p></div>';
+        return;
+    }
+
+    list.innerHTML = '';
+    allPosts.forEach((post, i) => {
+        const date = post.createdAt ? new Date(post.createdAt.seconds * 1000).toLocaleDateString() : 'N/A';
+        const html = `
+            <div class="group bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700 animate-fade-in" style="animation-delay: ${i * 0.1}s">
+                <div class="aspect-video relative overflow-hidden">
+                    <img src="${post.imageUrl}" alt="${post.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    <div class="absolute inset-0 bg-gradient-to-t from-brand-dark/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+                         <button onclick="deletePost('${post.id}')" class="p-4 bg-red-500 text-white rounded-2xl hover:bg-brand-dark transition-all shadow-xl">
+                            <i data-lucide="trash-2" class="w-5 h-5"></i>
+                        </button>
                     </div>
                 </div>
-            </div>
-            <div class="p-8 flex-1 flex flex-col">
-                <h3 class="text-xl font-black text-brand-dark mb-4 group-hover:text-brand-primary transition-colors line-clamp-2">${post.title}</h3>
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
-                        <i data-lucide="user" class="w-4 h-4"></i>
+                <div class="p-8 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-black uppercase tracking-widest text-brand-primary">Geral</span>
+                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">${date}</span>
                     </div>
-                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">${post.author}</span>
-                </div>
-                <div class="mt-auto pt-6 border-t border-gray-50 flex items-center justify-end gap-2">
-                    <button class="edit-btn p-3 bg-gray-50 hover:bg-brand-dark hover:text-white rounded-xl transition-all" data-id="${post.id}">
-                        <i data-lucide="edit-2" class="w-4 h-4"></i>
-                    </button>
-                    <button class="delete-btn p-3 bg-gray-50 hover:bg-red-500 hover:text-white rounded-xl transition-all text-red-500" data-id="${post.id}">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                    </button>
+                    <h3 class="text-xl font-black text-brand-dark uppercase tracking-tight group-hover:text-brand-primary transition-colors line-clamp-1">${post.title}</h3>
+                    <p class="text-xs text-gray-500 line-clamp-2 italic">${post.content?.replace(/<[^>]*>?/gm, '')}</p>
                 </div>
             </div>
         `;
-
-        card.querySelector('.edit-btn').addEventListener('click', () => openModal(post));
-        card.querySelector('.delete-btn').addEventListener('click', () => deletePost(post.id, post.title));
-
-        grid.appendChild(card);
+        list.insertAdjacentHTML('beforeend', html);
     });
 
     if (window.lucide) window.lucide.createIcons();
 }
 
-// Modal Logic
-const modal = document.getElementById('post-modal');
-const form = document.getElementById('post-form');
+window.openBlogModal = () => {
+    document.getElementById('blog-modal').classList.remove('hidden');
+    document.getElementById('modal-title').textContent = 'Novo Artigo';
+    document.getElementById('blog-form').reset();
+    document.getElementById('blog-id').value = '';
+};
 
-document.getElementById('add-post-btn').addEventListener('click', () => openModal());
-document.getElementById('close-modal').addEventListener('click', closeModal);
-document.getElementById('cancel-post').addEventListener('click', closeModal);
+window.closeBlogModal = () => {
+    document.getElementById('blog-modal').classList.add('hidden');
+};
 
-function openModal(post = null) {
-    const title = document.getElementById('modal-title');
-    const saveBtn = document.getElementById('save-post-btn');
-
-    if (post) {
-        title.textContent = "EDITAR ARTIGO";
-        saveBtn.textContent = "GUARDAR ALTERAÇÕES";
-        document.getElementById('post-id').value = post.id;
-        document.getElementById('post-title').value = post.title;
-        document.getElementById('post-author').value = post.author;
-        document.getElementById('post-image').value = post.imageUrl;
-        document.getElementById('post-content').value = post.content;
-    } else {
-        title.textContent = "NOVO ARTIGO";
-        saveBtn.textContent = "PUBLICAR ARTIGO";
-        form.reset();
-        document.getElementById('post-id').value = '';
-    }
-
-    modal.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeModal() {
-    modal.classList.add('hidden');
-    document.body.style.overflow = 'auto';
-}
-
-form.addEventListener('submit', async (e) => {
+async function handleBlogSubmit(e) {
     e.preventDefault();
-    const id = document.getElementById('post-id').value;
-    const data = {
-        title: document.getElementById('post-title').value,
-        author: document.getElementById('post-author').value,
-        imageUrl: document.getElementById('post-image').value,
-        content: document.getElementById('post-content').value,
-        date: id ? allPosts.find(p => p.id === id).date : new Date().toISOString()
-    };
+    const title = document.getElementById('blog-title').value;
+    const imageUrl = document.getElementById('blog-image').value;
+    const content = document.getElementById('blog-content').value;
 
     try {
-        if (id) {
-            await updateDoc(doc(db, "blog", id), data);
-        } else {
-            await addDoc(collection(db, "blog"), data);
-        }
-        closeModal();
-        loadPosts();
+        await addDoc(collection(db, 'blog'), {
+            title,
+            imageUrl,
+            content,
+            author: "Administrador",
+            createdAt: Timestamp.now()
+        });
+        alert("Artigo publicado com sucesso!");
+        closeBlogModal();
+        loadBlogPosts();
     } catch (error) {
         console.error("Error saving post:", error);
-    }
-});
-
-async function deletePost(id, title) {
-    if (confirm(`Eliminar o artigo "${title}"?`)) {
-        try {
-            await deleteDoc(doc(db, "blog", id));
-            loadPosts();
-        } catch (error) {
-            console.error("Error deleting post:", error);
-        }
+        alert("Erro ao publicar artigo.");
     }
 }
 
-// Search
-document.getElementById('blog-search').addEventListener('input', (e) => {
-    const term = e.target.value.toLowerCase();
-    const filtered = allPosts.filter(p =>
-        p.title.toLowerCase().includes(term) ||
-        p.author.toLowerCase().includes(term)
-    );
-    renderPosts(filtered);
-});
+window.deletePost = async (id) => {
+    if (!confirm("Tem a certeza que deseja eliminar este artigo permanentemente?")) return;
+    try {
+        await deleteDoc(doc(db, 'blog', id));
+        loadBlogPosts();
+    } catch (error) {
+        console.error("Error deleting post:", error);
+        alert("Erro ao eliminar o artigo.");
+    }
+}

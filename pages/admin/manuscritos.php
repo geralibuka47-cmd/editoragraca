@@ -1,48 +1,55 @@
 <?php
+
+/**
+ * Editora Graça — Admin: Manuscritos (100% Parity)
+ */
 $pageTitle = "Gestão de Manuscritos";
-require_once __DIR__ . '/../../templates/header.php';
+require_once __DIR__ . '/../../templates/admin-header.php';
 ?>
 
-<div class="min-h-screen bg-gray-50 pb-20">
-    <div class="container mx-auto px-6 pt-32">
-        <?php require_once __DIR__ . '/../../templates/admin-header.php'; ?>
-
-        <!-- Filters & Search -->
-        <div class="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm mb-8 flex flex-col md:flex-row gap-4 items-center">
-            <div class="relative flex-1 w-full">
-                <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
-                <input type="text" id="manuscript-search" placeholder="Pesquisar por título ou autor..." class="w-full pl-12 pr-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all">
-            </div>
-            <select id="status-filter" class="w-full md:w-auto px-6 py-4 bg-gray-50 border-none rounded-2xl text-xs font-black uppercase tracking-widest outline-none cursor-pointer hover:bg-gray-100 transition-colors">
-                <option value="all">Todos os Estados</option>
-                <option value="pending">⏳ Pendente</option>
-                <option value="review">🔍 Em Análise</option>
-                <option value="approved">✅ Aprovado</option>
-                <option value="rejected">❌ Rejeitado</option>
-            </select>
+<div class="space-y-8 animate-fade-in">
+    <!-- Page Header -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+            <span class="text-brand-primary font-bold uppercase tracking-[0.4em] text-[10px]">Novos Talentos</span>
+            <h2 class="text-4xl sm:text-5xl font-black text-brand-dark uppercase tracking-tighter leading-none mt-2">
+                Manuscritos
+            </h2>
         </div>
+    </div>
 
-        <!-- Loading State -->
-        <div id="admin-manuscripts-loading" class="py-20 flex flex-col items-center gap-4">
-            <div class="w-10 h-10 border-4 border-brand-primary border-t-transparent rounded-full animate-spin"></div>
-            <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">A carregar submissões...</span>
+    <!-- Filters & Search -->
+    <div class="flex flex-col md:flex-row gap-4 items-center bg-white p-4 rounded-3xl border border-gray-100 shadow-sm">
+        <div class="relative flex-1 w-full text-brand-dark">
+            <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+            <input
+                type="text"
+                id="manuscript-search"
+                placeholder="Pesquisar por título ou autor..."
+                class="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-brand-primary/20 transition-all outline-none">
         </div>
+        <select
+            id="manuscript-filter"
+            class="w-full md:w-auto px-4 py-3 bg-gray-50 border-none rounded-2xl text-xs font-bold uppercase tracking-widest outline-none cursor-pointer hover:bg-gray-100 transition-colors text-brand-dark">
+            <option value="all">Todos os Estados</option>
+            <option value="pending">⏳ Pendentes</option>
+            <option value="review">🔍 Em Análise</option>
+            <option value="approved">✅ Aprovados</option>
+            <option value="rejected">❌ Rejeitados</option>
+            <option value="published">📚 Publicados</option>
+        </select>
+    </div>
 
-        <!-- Manuscripts Grid -->
-        <div id="admin-manuscripts-grid" class="grid grid-cols-1 gap-6 hidden">
-            <!-- Manuscripts will be injected here -->
-        </div>
-
-        <!-- Empty State -->
-        <div id="manuscript-empty-state" class="hidden py-32 text-center space-y-6">
-            <div class="w-20 h-20 bg-gray-100 rounded-3xl flex items-center justify-center mx-auto text-gray-300">
-                <i data-lucide="file-text" class="w-10 h-10"></i>
-            </div>
-            <p class="text-gray-400 font-bold uppercase tracking-widest text-xs">Nenhum manuscrito encontrado.</p>
+    <!-- Manuscripts List -->
+    <div id="manuscripts-list" class="grid grid-cols-1 gap-6">
+        <div class="h-64 flex flex-col items-center justify-center gap-4 text-gray-400">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
+            <span class="text-xs font-bold uppercase tracking-widest">A carregar manuscritos...</span>
         </div>
     </div>
 </div>
 
+<!-- Scripts -->
 <script type="module" src="/public/js/admin-manuscripts.js"></script>
 
-<?php require_once __DIR__ . '/../../templates/footer.php'; ?>
+<?php include __DIR__ . '/../../templates/footer.php'; ?>

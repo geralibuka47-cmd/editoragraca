@@ -133,7 +133,7 @@
     </script>
 
     <!-- WhatsApp Bubble -->
-    <a href="https://wa.me/244973038386" target="_blank" class="fixed bottom-8 right-8 z-[100] group" aria-label="Fale connosco no WhatsApp">
+    <a id="whatsapp-bubble" href="https://wa.me/244973038386" target="_blank" class="fixed bottom-8 right-8 z-[100] group" aria-label="Fale connosco no WhatsApp">
         <div class="relative">
             <div class="absolute inset-0 bg-emerald-500 blur-2xl opacity-20 scale-150 animate-pulse"></div>
             <div class="w-16 h-16 bg-emerald-500 text-white rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-all duration-500 relative z-10">
@@ -145,6 +145,46 @@
             </div>
         </div>
     </a>
+
+    <!-- Footer Dynamic Sync -->
+    <script type="module">
+        import {
+            doc,
+            getDoc
+        } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const configRef = doc(window.db, "site_content", "config");
+                const snap = await getDoc(configRef);
+                if (snap.exists()) {
+                    const data = snap.data();
+
+                    // WhatsApp
+                    if (data.contact?.whatsapp) {
+                        const wa = document.getElementById('whatsapp-bubble');
+                        if (wa) wa.href = `https://wa.me/${data.contact.whatsapp.replace(/\D/g, '')}`;
+                    }
+
+                    // Socials
+                    if (data.socials) {
+                        const fb = document.querySelector('a[href*="facebook.com"]');
+                        if (fb && data.socials.facebook) fb.href = data.socials.facebook;
+
+                        const ig = document.querySelector('a[href*="instagram.com"]');
+                        if (ig && data.socials.instagram) ig.href = data.socials.instagram;
+                    }
+
+                    // Footer Description
+                    if (data.institutional?.footerAbout) {
+                        const desc = document.querySelector('footer p.text-sm');
+                        if (desc) desc.textContent = data.institutional.footerAbout;
+                    }
+                }
+            } catch (e) {
+                console.warn("Footer sync failed:", e);
+            }
+        });
+    </script>
 
     </body>
 
