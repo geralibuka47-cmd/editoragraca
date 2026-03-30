@@ -5,7 +5,13 @@
  */
 $pageTitle = "Início";
 
-// Mock data (Fase 1 - Until Firebase JS is initialized)
+// Mock data based on React 'Pasta Antiga'
+$stats = [
+    'booksCount' => 40,
+    'authorsCount' => 12,
+    'readersCount' => 500
+];
+
 $books = [
     [
         'id' => '1',
@@ -14,11 +20,11 @@ $books = [
         'author' => 'José Eduardo Agualusa',
         'price' => 4500,
         'genre' => 'Ficção Literária',
-        'coverUrl' => 'https://picsum.photos/seed/agualusa/300/450',
+        'coverUrl' => 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=450',
         'isBestseller' => true,
         'isNew' => true,
         'description' => 'Uma sátira brilhante sobre a construção da memória e identidade na Angola pós-guerra.',
-        'stats' => ['averageRating' => '4.9']
+        'stats' => ['averageRating' => '4.9', 'downloads' => 120]
     ],
     [
         'id' => '2',
@@ -27,10 +33,10 @@ $books = [
         'author' => 'Mia Couto',
         'price' => 5200,
         'genre' => 'Ficção Literária',
-        'coverUrl' => 'https://picsum.photos/seed/miacouto/300/450',
+        'coverUrl' => 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&q=80&w=450',
         'isBestseller' => true,
         'description' => 'Um clássico moderno que entrelaça a dura realidade da guerra com o realismo mágico.',
-        'stats' => ['averageRating' => '5.0']
+        'stats' => ['averageRating' => '5.0', 'downloads' => 85]
     ],
     [
         'id' => '3',
@@ -39,21 +45,10 @@ $books = [
         'author' => 'Pepetela',
         'price' => 3800,
         'genre' => 'História e Biografia',
-        'coverUrl' => 'https://picsum.photos/seed/pepetela/300/450',
+        'coverUrl' => 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=450',
         'isNew' => true,
         'description' => 'Uma reflexão profunda sobre os sonhos e desilusões da geração que lutou pela independência.',
-        'stats' => ['averageRating' => '4.8']
-    ],
-    [
-        'id' => '4',
-        'slug' => 'bom-dia-camaradas',
-        'title' => 'Bom Dia Camaradas',
-        'author' => 'Ondjaki',
-        'price' => 3200,
-        'genre' => 'Ficção Literária',
-        'coverUrl' => 'https://picsum.photos/seed/ondjaki/300/450',
-        'description' => 'A vida em Luanda vista através dos olhos de uma criança, com humor e ternura.',
-        'stats' => ['averageRating' => '4.7']
+        'stats' => ['averageRating' => '4.8', 'downloads' => 60]
     ]
 ];
 
@@ -63,7 +58,7 @@ require_once __DIR__ . '/../templates/header.php';
 ?>
 
 <!-- Hero Section -->
-<section class="min-h-[80vh] section-fluid flex items-center relative overflow-hidden">
+<section class="min-h-screen section-fluid flex items-center relative overflow-hidden bg-white">
     <div class="absolute top-0 right-0 w-1/2 h-full bg-gray-50 skew-x-12 translate-x-1/3 -z-10 hidden lg:block"></div>
 
     <div class="container mx-auto grid lg:grid-cols-2 gap-10 sm:gap-16 items-center w-full">
@@ -73,20 +68,22 @@ require_once __DIR__ . '/../templates/header.php';
                 <span>🎉 Lançamento Oficial — Já Online</span>
             </div>
 
-            <h1 class="uppercase leading-[0.9] tracking-tighter">
+            <h1 class="uppercase leading-[0.9] tracking-tighter text-brand-dark">
                 Onde a Arte <br>
-                <span class="text-gradient-gold">Encontra o Legado</span>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-amber-600">
+                    Encontra o Legado
+                </span>
             </h1>
 
             <p class="text-gray-500 font-medium max-w-lg leading-relaxed">
-                Curadoria de excelência para leitores que exigem o extraordinário. Conheça as vozes que moldam o futuro da literatura angolana.
+                Curadoria de excelência para leitores que exigem o extraordinário. Conheça as vozes que moldam o futuro da cultura.
             </p>
 
             <div class="flex flex-col sm:flex-row gap-4 pt-4">
-                <a href="/livros" class="btn-premium px-10 py-5 bg-brand-dark shadow-xl shadow-brand-dark/20 flex items-center justify-center gap-3 group">
+                <a href="/livros" class="px-10 py-5 bg-brand-dark text-white font-bold uppercase tracking-widest rounded-xl hover:bg-brand-primary transition-all shadow-xl shadow-brand-dark/20 flex items-center justify-center gap-3 group">
                     Explorar Acervo <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
                 </a>
-                <a href="/sobre" class="btn-premium px-10 py-5 bg-white border border-gray-200 text-brand-dark shadow-none hover:bg-gray-50">
+                <a href="/sobre" class="px-10 py-5 bg-white border border-gray-200 text-brand-dark font-bold uppercase tracking-widest rounded-xl hover:bg-gray-50 transition-all text-center">
                     A Nossa Essência
                 </a>
             </div>
@@ -94,15 +91,16 @@ require_once __DIR__ . '/../templates/header.php';
             <!-- Stats -->
             <div class="flex flex-wrap items-center gap-6 sm:gap-12 pt-8 sm:pt-12 border-t border-gray-100">
                 <div>
-                    <p class="text-3xl sm:text-4xl font-black text-brand-dark">40+</p>
+                    <p class="text-3xl sm:text-4xl font-black text-brand-dark"><?php echo $stats['booksCount']; ?>+</p>
                     <p class="text-[10px] sm:text-xs uppercase tracking-widest text-gray-400 font-bold mt-1">Obras Publicadas</p>
                 </div>
                 <div>
-                    <p class="text-3xl sm:text-4xl font-black text-brand-dark">500+</p>
+                    <p class="text-3xl sm:text-4xl font-black text-brand-dark"><?php echo $stats['readersCount']; ?>+</p>
                     <p class="text-[10px] sm:text-xs uppercase tracking-widest text-gray-400 font-bold mt-1">Leitores</p>
                 </div>
             </div>
         </div>
+
 
         <!-- Hero Image -->
         <div class="relative hidden lg:block animate-fade-in" style="animation-delay: 0.2s;">
